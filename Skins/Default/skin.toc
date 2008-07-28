@@ -1,0 +1,12 @@
+## Interface: 20300
+## Title: WIM Classic Skin
+## Notes: WIM Skin
+## Author: Pazza (Bronzebeard)
+## eMail: johnlangone@gmail.com
+## X-Email: johnlangone@gmail.com
+## X-Website: http://www.wimaddon.com/
+## X-Category: MYADDONS_CATEGORY_CHAT
+## Dependencies: WIM
+
+skin.xml
+skin.lua
