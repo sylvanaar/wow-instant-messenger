@@ -57,17 +57,38 @@ local WindowSoupBowl = {
     }
 }
 
+-- the following table defines a list of actions to be taken when
+-- script handlers are fired for different type windows.
+-- use WIM:RegisterWidgetTrigger(WindowType, ScriptEvent, function());
+local Widget_Triggers = {};
+
+
 local RegisteredWidgets = {}; -- a list of registered widgets added to windows from modules.
 WIM.windows.widgets = RegisteredWidgets;
 
 -- Sample Widget with triggers
 RegisteredWidgets["Test"] = {
 	create = function() DEFAULT_CHAT_FRAME:AddMessage("HELLO WORLD!"); return 1; end,
-	onShow = function() DEFAULT_CHAT_FRAME:AddMessage("Window Shown"); end,
-	onHide = function() DEFAULT_CHAT_FRAME:AddMessage("Window Hidden"); end,
+	onWinShow = function() DEFAULT_CHAT_FRAME:AddMessage("Window Shown"); end,
+	onWinHide = function() DEFAULT_CHAT_FRAME:AddMessage("Window Hidden"); end,
 	defaults = function() DEFAULT_CHAT_FRAME:AddMessage("Defaults Loaded"); end,
 	props = function() DEFAULT_CHAT_FRAME:AddMessage("Properties set"); end,
 };
+
+
+
+local function executeHandlers(WidgetName, wType, HandlerName, ...)
+	local tbl, fun;
+	if(Widget_Triggers[WidgetName] and Widget_Triggers[WidgetName][HandlerName] and Widget_Triggers[WidgetName][HandlerName][wType]) then
+		tbl = Widget_Triggers[WidgetName][HandlerName][wType];
+	end
+	if(type(tbl) == "table") then
+		for i=1,table.getn(tbl) do
+			fun = tbl[i];
+			fun(...);
+		end
+	end
+end
 
 --Returns object, SoupBowl_windows_index or nil if window can not be found.
 local function getWindowBy(userName)
@@ -185,19 +206,6 @@ local function MessageWindow_Frame_OnUpdate()
     --      WIM_Tabs.x = this:GetLeft();
     --      WIM_Tabs.y = this:GetTop();
     --end
-end
-
-local function MessageWindow_ExitButton_OnEnter()
-    if(WIM.db.showToolTips == true) then
-	GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
-	GameTooltip:SetText(WIM_LOCALIZED_TOOLTIP_SHIFT_CLICK_TO_CLOSE);
-    end
-    MessageWindow_FadeControler_OnEnter();
-end
-
-local function MessageWindow_ExitButton_OnLeave()
-    GameTooltip:Hide();
-    MessageWindow_FadeControler_OnLeave();
 end
 
 local function MessageWindow_ExitButton_OnClick()
@@ -378,6 +386,16 @@ local function MessageWindow_MsgBox_OnUpdate()
     end
 end
 
+local function loadHandlers(obj)
+	local widgets = obj.widgets;
+	for widget, tbl in pairs(Widget_Triggers) do
+		for handler,_ in pairs(tbl) do
+			if(not widgets[widget]:GetScript(handler)) then
+				widgets[widget]:SetScript(handler, function(...) executeHandlers(widget, obj.type, handler, ...); end)
+			end
+		end
+	end
+end
 
 local function loadRegisteredWidgets(obj)
 	local widgets = obj.widgets;
@@ -445,9 +463,7 @@ local function instantiateWindow(obj)
     -- create core window objects
     widgets.close = CreateFrame("Button", fName.."ExitButton", obj);
     widgets.close:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-    widgets.close:SetScript("OnEnter", MessageWindow_ExitButton_OnEnter);
-    widgets.close:SetScript("OnLeave", MessageWindow_ExitButton_OnLeave);
-    widgets.close:SetScript("OnClick", MessageWindow_ExitButton_OnClick);
+    --widgets.close:SetScript("OnClick", function(...) executeHandlers("close", obj.type, "OnClick", ...); end);
 
     --buttons.history = CreateFrame("Button", fName.."HistoryButton", obj);
     --history:RegisterForClicks("LeftButtonUp", "RightButtonUp");
@@ -518,9 +534,37 @@ local function instantiateWindow(obj)
     widgets.msg_box:SetScript("OnUpdate", MessageWindow_MsgBox_OnUpdate);
     widgets.msg_box:SetScript("OnMouseUp", MessageWindow_MsgBox_OnMouseUp);
     
+    --Addmessage functions
+    obj.AddMessage = function(self, ...)
+	obj.widgets.chat_display:AddMessage(...);
+    end
+    
+    obj.AddUserMessage = function(self, user, msg, ...)
+	local str = user.." - "..msg;
+	obj:AddMessage(str, ...);
+    end
+
+    -- PopUp rules
+    obj.Pop = function(self, forceResult) -- true to force show, false it ignore rules and force quiet.
+	-- pass isNew to pop ruleset.
+	if(forceResult ~= nil) then
+		-- go by forceResult and ignore rules
+		if(forceResult == true) then
+			obj:Show();
+		end
+	else
+		-- execute pop rules.
+		obj:Show(); -- exists for testing.
+	end
+	
+	-- at this state the message is no longer classified as a new window, reset flag.
+	obj.isNew = false;
+    end
+    
     
     -- load Registered Widgets
     loadRegisteredWidgets(obj);
+    loadHandlers(obj);
     
     --local shortcuts = CreateFrame("Frame", fName.."ShortcutFrame", obj);
     --shortcuts:SetToplevel(true);
@@ -539,6 +583,8 @@ local function loadWindowDefaults(obj)
     obj.theLevel = "";
     obj.theRace = "";
     obj.theClass = "";
+    
+    obj.isNew = true;
     
     --obj.icon.track = false;
 
@@ -572,6 +618,7 @@ local function loadWindowDefaults(obj)
     
     -- load Registered Widgets (if not created already) & set defaults
     loadRegisteredWidgets(obj);
+    loadHandlers(obj);
     
     WIM:ApplySkinToWindow(obj);
 end
@@ -664,6 +711,22 @@ end
 
 
 
+function WIM:RegisterWidgetTrigger(WidgetName, wType, HandlerName, Function)
+	-- config table to handle widget
+	if(not Widget_Triggers[WidgetName]) then
+		Widget_Triggers[WidgetName] = {}
+	end
+	--config widget table to handle hander
+	if(not Widget_Triggers[WidgetName][HandlerName]) then
+		Widget_Triggers[WidgetName][HandlerName] = {
+			whisper = {},
+			chat = {},
+			w2w = {}
+		};
+	end
+	--register to table
+	table.insert(Widget_Triggers[WidgetName][HandlerName][wType], Function);
+end
 
 function WIM:GetWindowSoupBowl()
     return WindowSoupBowl;
@@ -684,3 +747,27 @@ end
 function WIM:DestroyWindow(playerNameOrObject)
 	destroyWindow(playerNameOrObject);
 end
+
+
+
+
+----------------------------------
+-- Set default widget triggers	--
+----------------------------------
+
+WIM:RegisterWidgetTrigger("close", "whisper", "OnEnter", function()
+		if(WIM.db.showToolTips == true) then
+			GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
+			GameTooltip:SetText(WIM_LOCALIZED_TOOLTIP_SHIFT_CLICK_TO_CLOSE);
+		end
+		MessageWindow_FadeControler_OnEnter();
+	end);
+
+WIM:RegisterWidgetTrigger("close", "whisper", "OnLeave", function()
+		GameTooltip:Hide();
+		MessageWindow_FadeControler_OnLeave();
+	end);
+
+
+
+

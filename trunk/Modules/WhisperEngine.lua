@@ -43,17 +43,40 @@ function WhisperEngine:OnDisableWIM()
 
 end
 
+local function getWhisperWindowByUser(user)
+    user = WIM:FormatUserName(user);
+    if(not user or user == "") then
+        -- if invalid user, then return nil;
+        return nil;
+    end
+    local obj = Windows[user];
+    if(obj and obj.type == "whisper") then
+        -- if the whisper window exists, return the object
+        return obj;
+    else
+        -- otherwise, create a new one.
+        Windows[user] = WIM:CreateWhisperWindow(user);
+        return Windows[user];
+    end
+end
+
 
 --------------------------------------
 --          Event Handlers          --
 --------------------------------------
 
 function WhisperEngine:CHAT_MSG_WHISPER()
-    WhisperEngine:dPrint(arg1);
+    local color = WIM.db.displayColors.wispIn; -- color contains .r, .g & .b
+    local win = getWhisperWindowByUser(arg2);
+    win:AddUserMessage(arg2, arg1, color.r, color.g, color.b);
+    win:Pop();
 end
 
 function WhisperEngine:CHAT_MSG_WHISPER_INFORM()
-
+    local color = WIM.db.displayColors.wispOut; -- color contains .r, .g & .b
+    local win = getWhisperWindowByUser(arg2);
+    win:AddUserMessage(UnitName("player"), arg1, color.r, color.g, color.b);
+    win:Pop();
 end
 
 
