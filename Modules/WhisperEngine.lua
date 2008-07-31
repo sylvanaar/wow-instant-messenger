@@ -22,7 +22,19 @@ WhisperEngine.db_defaults.whispers = {
         raid = {},
         other = {}
     },
+    playSound = true,
 }
+
+WhisperEngine.db_defaults.displayColors.wispIn = {
+	r=0.5607843137254902, 
+	g=0.03137254901960784, 
+	b=0.7607843137254902
+    }
+WhisperEngine.db_defaults.displayColors.wispOut = {
+        r=1, 
+	g=0.07843137254901961, 
+	b=0.9882352941176471
+    }
 
 -- register events needed for Whisper handling. (Note WIM handles these events for modules declared within.)
 WhisperEngine:RegisterEvent("CHAT_MSG_WHISPER");
@@ -84,6 +96,9 @@ function WhisperEngine:CHAT_MSG_WHISPER()
     local win = getWhisperWindowByUser(arg2);
     win:AddUserMessage(arg2, arg1, color.r, color.g, color.b);
     win:Pop();
+    if(WIM.db.whispers.playSound) then
+        PlaySoundFile("Interface\\AddOns\\"..WIM.addonTocName.."\\Sounds\\wisp.wav");
+    end
 end
 
 function WhisperEngine:CHAT_MSG_WHISPER_INFORM()

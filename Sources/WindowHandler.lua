@@ -2,16 +2,6 @@ local WIM = WIM;
 
 -- load message window related default settings.
 WIM.db_defaults.displayColors = {
-		wispIn = {
-				r=0.5607843137254902, 
-				g=0.03137254901960784, 
-				b=0.7607843137254902
-			},
-		wispOut = {
-				r=1, 
-				g=0.07843137254901961, 
-				b=0.9882352941176471
-			},
 		sysMsg = {
 				r=1, 
 				g=0.6627450980392157, 
@@ -75,13 +65,17 @@ local RegisteredWidgets = {}; -- a list of registered widgets added to windows f
 WIM.windows.widgets = RegisteredWidgets;
 
 -- Sample Widget with triggers
---[[RegisteredWidgets["Test"] = {
-	create = function() DEFAULT_CHAT_FRAME:AddMessage("HELLO WORLD!"); return CreateFrame("Frame"); end,
-	onWinShow = function() DEFAULT_CHAT_FRAME:AddMessage("Window Shown"); end,
-	onWinHide = function() DEFAULT_CHAT_FRAME:AddMessage("Window Hidden"); end,
-	defaults = function() DEFAULT_CHAT_FRAME:AddMessage("Defaults Loaded"); end,
-	props = function() DEFAULT_CHAT_FRAME:AddMessage("Properties set"); end,
-};]]
+RegisteredWidgets["Test"] = function(parentWindow)
+	DEFAULT_CHAT_FRAME:AddMessage("Test Widget created!");
+	local t = CreateFrame("Frame");
+	t.SetDefaults = function()
+			DEFAULT_CHAT_FRAME:AddMessage("Test Widget defaults set!");
+		end
+	t.UpdateProps = function()
+			DEFAULT_CHAT_FRAME:AddMessage("Test Widget props updated!");
+		end
+	return t;
+end
 
 
 
@@ -162,11 +156,16 @@ local function MessageWindow_Frame_OnShow()
         WIM.windows[user].newMSG = false;
         WIM.windows[user].is_visible = true;
         if(WIM.db.autoFocus == true) then
-    	getglobal(this:GetName().."MsgBox"):SetFocus();
+		getglobal(this:GetName().."MsgBox"):SetFocus();
         end
         --WIM_WindowOnShow(this);
-        this.QueuedToHide = false;
         updateScrollBars(this);
+	local widgetName, widgetObj;
+	for widgetName, widgetObj in pairs(obj.widgets) do
+		if(type(widgetObj.OnWindowShow) == "function") then
+			widgetObj:OnWindowShow();
+		end
+	end
     end
 end
 
@@ -180,9 +179,15 @@ local function MessageWindow_Frame_OnHide()
             WIM.windows[user].is_visible = false;
         end
         if ( this.isMoving ) then
-    	this:StopMovingOrSizing();
-    	this.isMoving = false;
+		this:StopMovingOrSizing();
+		this.isMoving = false;
         end
+	local widgetName, widgetObj;
+	for widgetName, widgetObj in pairs(obj.widgets) do
+		if(type(widgetObj.OnWindowHide) == "function") then
+			widgetObj:OnWindowHide();
+		end
+	end
     end
 end
 
@@ -303,15 +308,19 @@ end
 
 local function loadRegisteredWidgets(obj)
 	local widgets = obj.widgets;
-	for widget, data in pairs(RegisteredWidgets) do
+	for widget, createFun in pairs(RegisteredWidgets) do
 		if(widgets[widget] == nil) then
-			if(type(data.create) == "function") then
-				widgets[widget]  = data.create();
+			if(type(createFun) == "function") then
+				widgets[widget]  = createFun(obj);
 				WIM:dPrint("Widget '"..widget.."' added to '"..obj:GetName().."'");
-				data.defaults(widgets[widget], obj); -- load defaults for this widget
+				if(type(widgets[widget].SetDefaults) == "function") then
+					widgets[widget]:SetDefaults(); -- load defaults for this widget
+				end
 			end
 		else
-			data.defaults(widgets[widget], obj); -- load defaults for this widget
+			if(type(widgets[widget].SetDefaults) == "function") then
+				widgets[widget]:SetDefaults(); -- load defaults for this widget
+			end
 		end
 		--widgets[widget].parentWindow = obj;
 		if(type(widgets[widget]) == "table") then
@@ -451,6 +460,10 @@ local function instantiateWindow(obj)
 	icon:SetTexCoord(coord[1], coord[2], coord[3], coord[4], coord[5], coord[6], coord[7], coord[8]);
     end
     
+    obj.UpdateCharDetails = function(self)
+	obj.widgets.char_info:SetText(WIM:GetSelectedSkin().message_window.strings.char_info.format(obj.guild, obj.level, obj.race, obj.class));
+    end
+    
     obj.WhoCallback = function(result)
 	if( result.Online and result.Name == obj.theUser) then
 		obj.class = result.Class;
@@ -459,6 +472,7 @@ local function instantiateWindow(obj)
 		obj.guild = result.Guild;
 		obj.location = result.Zone;
 		obj:UpdateIcon();
+		obj:UpdateCharDetails();
 	end
     end
     
@@ -495,6 +509,30 @@ local function instantiateWindow(obj)
 	obj.isNew = false;
     end
     
+    obj.UpdateProps = function(self)
+	obj:SetScale(WIM.db.windowSize);
+	obj.widgets.Backdrop:SetAlpha(WIM.db.windowAlpha);
+	local Path,_,Flags = obj.widgets.chat_display:GetFont();
+	obj.widgets.chat_display:SetFont(Path,WIM.db.fontSize+2,Flags);
+	obj.widgets.chat_display:SetAlpha(1);
+	obj.widgets.msg_box:SetAlpha(1);
+	obj.widgets.msg_box:SetAltArrowKeyMode(WIM.db.ignoreArrowKeys);
+	
+	obj.widgets.from:SetAlpha(1);
+	obj.widgets.char_info:SetAlpha(1);
+	obj.widgets.close:SetAlpha(WIM.db.windowAlpha);
+	obj.widgets.scroll_up:SetAlpha(WIM.db.windowAlpha);
+	obj.widgets.scroll_down:SetAlpha(WIM.db.windowAlpha);
+	
+	-- process registered widgets
+	local widgetName, widgetObj;
+	for widgetName, widgetObj in pairs(obj.widgets) do
+		if(type(widgetObj.UpdateProps) == "function") then
+			widgetObj:UpdateProps();
+		end
+	end
+    end
+    
     -- load Registered Widgets
     loadRegisteredWidgets(obj);
     loadHandlers(obj);
@@ -510,39 +548,47 @@ end
 
 -- load object into it's default state.
 local function loadWindowDefaults(obj)
-    obj:Hide();
+	obj:Hide();
 
-    obj.guild = "";
-    obj.level = "";
-    obj.race = "";
-    obj.class = "blank";
-    obj.location = "";
-    obj:UpdateIcon();
+	obj.guild = "";
+	obj.level = "";
+	obj.race = "";
+	obj.class = "blank";
+	obj.location = "";
+	obj:UpdateIcon();
     
-    obj.isNew = true;
+	obj.isNew = true;
 
-    obj:SetScale(1);
-    obj:SetAlpha(1);
+	obj:SetScale(1);
+	obj:SetAlpha(1);
     
-    obj.widgets.Backdrop:SetAlpha(1);
+	obj.widgets.Backdrop:SetAlpha(1);
     
-    obj.widgets.from:SetText(obj.theUser);
+	obj.widgets.from:SetText(obj.theUser);
     
-    obj.widgets.char_info:SetText("");
+	obj.widgets.char_info:SetText("");
     
-    obj.widgets.msg_box.setText = 0;
-    obj.widgets.msg_box:SetText("");
+	obj.widgets.msg_box.setText = 0;
+	obj.widgets.msg_box:SetText("");
     
-    obj.widgets.chat_display:Clear();
-    obj.widgets.chat_display:AddMessage("  ");
-    obj.widgets.chat_display:AddMessage("  ");
-    updateScrollBars(obj);
+	obj.widgets.chat_display:Clear();
+	obj.widgets.chat_display:AddMessage("  ");
+	obj.widgets.chat_display:AddMessage("  ");
+	updateScrollBars(obj);
     
-    -- load Registered Widgets (if not created already) & set defaults
-    loadRegisteredWidgets(obj);
-    loadHandlers(obj);
+	-- load Registered Widgets (if not created already) & set defaults
+	loadRegisteredWidgets(obj);
+	loadHandlers(obj);
     
-    WIM:ApplySkinToWindow(obj);
+	WIM:ApplySkinToWindow(obj);
+	-- process registered widgets
+	local widgetName, widgetObj;
+	for widgetName, widgetObj in pairs(obj.widgets) do
+		if(type(widgetObj.SetDefaults) == "function") then
+			widgetObj:SetDefaults();
+		end
+	end
+	obj:UpdateProps();
 end
 
 --Create (recycle if available) message window. Returns object.
@@ -686,7 +732,13 @@ function WIM:DestroyWindow(playerNameOrObject)
 	destroyWindow(playerNameOrObject);
 end
 
-
+function WIM:RegisterWidget(widgetName, createFunction, moduleName)
+	-- moduleName is optional if not being called from a module.
+	RegisteredWidgets[widgetName] = createFunction;
+	if(moduleName) then
+		WIM.modules[widgetName].hasWidget = true;
+	end
+end
 
 
 ----------------------------------

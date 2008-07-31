@@ -1,4 +1,9 @@
-WIM = {}; -- WIM's core object.
+WIM = { -- WIM's core object.
+    addonTocName = "WIM_Rewrite",
+    version = "3.0.0",
+    revision = "",
+    beta = true
+}; 
 local WIM = WIM;
 
 WIM.debug = true; -- turn debugging on and off.
@@ -13,6 +18,7 @@ WIM.libs = {}; -- table of loaded library references.
 WIM.db_defaults = {
     enabled = true,
     showToolTips = true,
+    modules = {},
 }
 
 -- WIM.env is an evironmental reference for the current instance of WIM.
@@ -143,11 +149,13 @@ function WIM:CreateModule(moduleName)
                 libs = WIM.libs,
             },
             db = WIM.db,
-            db_defaults = WIM.db_defaults;
+            db_defaults = WIM.db_defaults,
             RegisterEvent = function(self, event) RegisterEvent(event); end,
             Enable = function() WIM:EnableModule(moduleName, true) end,
             Disable = function() WIM:EnableModule(moduleName, false) end,
             dPrint = function(self, t) WIM:dPrint(t); end,
+            hasWidget = false,
+            RegisterWidget = function(widgetName, createFunction) WIM:RegisterWidget(widgetName, createFunction, moduleName); end
         }
         return WIM.modules[moduleName];
     else
@@ -162,14 +170,22 @@ function WIM:EnableModule(moduleName, enabled)
             WIM:dPrint("Module '"..moduleName.."' can not be disabled!");
             return;
         end
-        module.enabled = enabled;
-        if(type(module.OnEnableDisable) == "function") then
-            module:OnEnableDisable(enabled);
-        end
         if(enabled) then
+            module.enabled = enabled;
+            if(type(module.OnEnableDisable) == "function") then
+                module:OnEnableDisable(enabled);
+            end
             WIM:dPrint("Module '"..moduleName.."' Enabled");
         else
-            WIM:dPrint("Module '"..moduleName.."' Disabled");
+            if(module.hasWidget) then
+                WIM:dPrint("Module '"..moduleName.."' will be disabled after restart.");
+            else
+                module.enabled = enabled;
+                if(type(module.OnEnableDisable) == "function") then
+                    module:OnEnableDisable(enabled);
+                end
+                WIM:dPrint("Module '"..moduleName.."' Disabled");
+            end
         end
     end
 end
