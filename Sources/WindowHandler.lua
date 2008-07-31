@@ -32,7 +32,6 @@ WIM.db_defaults.fontSize = 12;
 WIM.db_defaults.windowSize = 1;
 WIM.db_defaults.windowAlpha = .8;
 WIM.db_defaults.windowOnTop = true;
-WIM.db_defaults.windowFade = false;
 WIM.db_defaults.keepFocus = true;
 WIM.db_defaults.keepFocusRested = true;
 WIM.db_defaults.autoFocus = false;
@@ -48,6 +47,8 @@ WIM.db_defaults.winCascade = {
 		enabled = true,
 		direction = "downright"
 	};
+WIM.db_defaults.winFade = true;
+
 
 local WindowSoupBowl = {
     windowToken = 0,
@@ -56,6 +57,13 @@ local WindowSoupBowl = {
     windows = {
     }
 }
+
+local FadeProps = {
+	min = .5,
+	max = 1,
+	interval = .25,
+	delay = 1
+};
 
 -- the following table defines a list of actions to be taken when
 -- script handlers are fired for different type windows.
@@ -67,13 +75,13 @@ local RegisteredWidgets = {}; -- a list of registered widgets added to windows f
 WIM.windows.widgets = RegisteredWidgets;
 
 -- Sample Widget with triggers
-RegisteredWidgets["Test"] = {
-	create = function() DEFAULT_CHAT_FRAME:AddMessage("HELLO WORLD!"); return 1; end,
+--[[RegisteredWidgets["Test"] = {
+	create = function() DEFAULT_CHAT_FRAME:AddMessage("HELLO WORLD!"); return CreateFrame("Frame"); end,
 	onWinShow = function() DEFAULT_CHAT_FRAME:AddMessage("Window Shown"); end,
 	onWinHide = function() DEFAULT_CHAT_FRAME:AddMessage("Window Hidden"); end,
 	defaults = function() DEFAULT_CHAT_FRAME:AddMessage("Defaults Loaded"); end,
 	props = function() DEFAULT_CHAT_FRAME:AddMessage("Properties set"); end,
-};
+};]]
 
 
 
@@ -104,7 +112,9 @@ end
 
 -- climb up inherritance tree and find parent window recursively.
 local function getParentMessageWindow(obj)
-    if(obj.isParent) then
+    if(not obj) then
+	return nil;
+    elseif(obj.isParent) then
         return obj;
     elseif(obj:GetName() == "UIParent") then
         return nil;
@@ -146,31 +156,6 @@ local function MessageWindow_MovementControler_OnDragStop()
     end
 end
 
-local function MessageWindow_FadeControler_OnEnter()
-    local window = getParentMessageWindow(this);
-    if(window) then
-        if(WIM.db.windowFade) then
-            -- WIM_FadeIn(window.theUser);
-        end
-        window.isMouseOver = true;
-        window.QueuedToHide = false;
-    end
-end
-
-local function MessageWindow_FadeControler_OnLeave()
-    local window = getParentMessageWindow(this);
-    if(window) then
-        if(WIM.db.windowFade) then
-            if(getglobal(window:GetName().."MsgBox") ~= WIM_EditBoxInFocus) then
-                -- WIM_FadeOut(window.theUser);
-            else
-                window.QueuedToHide = true;
-            end
-        end
-        window.isMouseOver = false;
-    end
-end
-
 local function MessageWindow_Frame_OnShow()
     local user = this.theUser;
     if(user ~= nil and WIM.windows[user]) then
@@ -202,162 +187,76 @@ local function MessageWindow_Frame_OnHide()
 end
 
 local function MessageWindow_Frame_OnUpdate()
-    --if(WIM_Tabs.enabled == true) then
-    --      WIM_Tabs.x = this:GetLeft();
-    --      WIM_Tabs.y = this:GetTop();
-    --end
-end
-
-local function MessageWindow_ExitButton_OnClick()
-    if(IsShiftKeyDown()) then
-	--WIM_CloseConvo(this:GetParent().theUser);
-	-- do some check if tabs are loaded and show next available.
-    else
-        this:GetParent():Hide();
-    end
-end
-
-local function MessageWindow_ScrollUp_OnClick()
-	local obj = this:GetParent();
-	if( IsControlKeyDown() ) then
-		obj.widgets.chat_display:ScrollToTop();
-	else
-		if( IsShiftKeyDown() ) then
-		    obj.widgets.chat_display:PageUp();
-		else
-		    obj.widgets.chat_display:ScrollUp();
+	-- fading segment
+	if(WIM.db.winFade) then
+		this.fadeElapsed = (this.fadeElapsed or 0) + arg1;
+		while(this.fadeElapsed > .1) do
+			local window = GetMouseFocus();
+			if(window) then
+				if((window == this or window.parentWindow == this  or this.isOnHyperLink or
+						(WIM.EditBoxInFocus and WIM.EditBoxInFocus.parentWindow == this)) and
+						(not this.fadedIn or this.delayFade)) then
+					this.fadedIn = true;
+					this.delayFade = false;
+					this.delayFadeElapsed = 0;
+					UIFrameFadeIn(this, FadeProps.interval, this:GetAlpha(), FadeProps.max);
+				elseif(window ~= this and window.parentWindow ~= this and not this.isOnHyperLink and
+						(not WIM.EditBoxInFocus or WIM.EditBoxInFocus.parentWindow ~= this) and this.fadedIn) then
+					if(this.delayFade) then
+						this.delayFadeElapsed = (this.delayFadeElapsed or 0) + arg1;
+						while(this.delayFadeElapsed > FadeProps.delay) do
+							this.delayFade = false;
+							this.delayFadeElapsed = 0;
+						end
+					else
+						this.fadedIn = false;
+						this.delayFadeElapsed = 0;
+						UIFrameFadeOut(this, FadeProps.interval, this:GetAlpha(), FadeProps.min);
+					end
+				end
+			end
+			this.fadeElapsed = 0;
 		end
 	end
-	updateScrollBars(obj);
 end
 
-local function MessageWindow_ScrollDown_OnClick()
-	local obj = this:GetParent();
-	if( IsControlKeyDown() ) then
-		obj.widgets.chat_display:ScrollToBottom();
+local function setWindowAsFadedIn(obj)
+	if(WIM.db.winFade) then
+		obj.delayFadeElapsed = 0;
+		obj.delayFade = true;
+		obj.fadedIn = true;
+		UIFrameFadeIn(obj, FadeProps.interval, obj:GetAlpha(), FadeProps.max)
 	else
-		if( IsShiftKeyDown() ) then
-		    obj.widgets.chat_display:PageDown();
-		else
-		    obj.widgets.chat_display:ScrollDown();
-		end
+		obj:SetAlpha(FadeProps.max);
 	end
-	updateScrollBars(obj);
 end
 
-local function MessageWindow_ScrollingMessageFrame_OnMouseWheel()
-    if(arg1 > 0) then
-	if( IsControlKeyDown() ) then
-	    this:ScrollToTop();
-	else
-	    if( IsShiftKeyDown() ) then
-		this:PageUp();
-	    else
-		this:ScrollUp();
-	    end
-	end
-    else
-	if( IsControlKeyDown() ) then
-	    this:ScrollToBottom();
-	else
-	    if( IsShiftKeyDown() ) then
-                this:PageDown();
-	    else
-		this:ScrollDown();
-	    end
-	end
-    end
-    updateScrollBars(getParentMessageWindow(this));
-end
 
-local function MessageWindow_ScrollingMessageFrame_OnMouseDown()
-    this:GetParent().prevLeft = this:GetParent():GetLeft();
-    this:GetParent().prevTop = this:GetParent():GetTop();
-end
 
-local function MessageWindow_ScrollingMessageFrame_OnMouseUp()
-    if(this:GetParent().prevLeft == this:GetParent():GetLeft() and this:GetParent().prevTop == this:GetParent():GetTop()) then
-	--[ Frame was clicked not dragged
-	if(WIM_EditBoxInFocus == nil) then
-	    getglobal(this:GetParent():GetName().."MsgBox"):SetFocus();
-	else
-	    if(WIM_EditBoxInFocus:GetName() == this:GetParent():GetName().."MsgBox") then
-		getglobal(this:GetParent():GetName().."MsgBox"):Hide();
-		getglobal(this:GetParent():GetName().."MsgBox"):Show();
-	    else
-		getglobal(this:GetParent():GetName().."MsgBox"):SetFocus();
-	    end
-	end
-    end
-end
+--local function MessageWindow_MsgBox_OnMouseUp()
+--    CloseDropDownMenus();
+--    if(arg1 == "RightButton") then
+--        WIM_MSGBOX_MENU_CUR_USER = this:GetParent().theUser;
+--        UIDropDownMenu_Initialize(WIM_MsgBoxMenu, WIM_MsgBoxMenu_Initialize, "MENU");
+--        ToggleDropDownMenu(1, nil, WIM_MsgBoxMenu, this, 0, 0);
+--    end
+--end
 
-local function MessageWindow_MsgBox_OnMouseUp()
-    CloseDropDownMenus();
-    if(arg1 == "RightButton") then
-        WIM_MSGBOX_MENU_CUR_USER = this:GetParent().theUser;
-        UIDropDownMenu_Initialize(WIM_MsgBoxMenu, WIM_MsgBoxMenu_Initialize, "MENU");
-        ToggleDropDownMenu(1, nil, WIM_MsgBoxMenu, this, 0, 0);
-    end
-end
 
-local function MessageWindow_MsgBox_OnEnterPressed()
-    local _, tParent = this:GetParent();
-						
-    if(this:GetText() == "") then
-	if(WIM.db.windowFade and this:GetParent().QueuedToHide) then
-            --WIM_FadeOut(this:GetParent().theUser);
-        end
-        this:Hide();
-        this:Show();
-        return;
-    else
-        if(WIM.db.windowFade) then
-            --WIM_FadeOutDelayed(this:GetParent().theUser);
-        end
-    end
-						
-    if(strsub(this:GetText(), 1, 1) == "/") then
-        WIM_EditBoxInFocus = nil;
-        ChatFrameEditBox:SetText(this:GetText());
-        ChatEdit_SendText(ChatFrameEditBox, 1);
-        WIM_EditBoxInFocus = this;
-    else
-        SendChatMessage(this:GetText(), "WHISPER", nil, WIM_ParseNameTag(this:GetParent().theUser));
-        this:AddHistoryLine(this:GetText());
-    end
-    this:SetText("");
-    if(not WIM.db.keepFocus) then
-        this:Hide();
-        this:Show();
-    elseif(not IsResting() and WIM.db.keepFocusRested) then
-        this:Hide();
-        this:Show();
-    end
-end
+--local function MessageWindow_MsgBox_OnTabPressed()
+--    --cycle through windows
+--    if(WIM_Tabs.enabled == true) then
+--        if(IsShiftKeyDown()) then
+--            WIM_TabStep(-1);
+--        else
+--            WIM_TabStep(1);
+--        end
+--    else
+--        WIM_ToggleWindow_Toggle();
+--    end
+--end
 
-local function MessageWindow_MsgBox_OnEscapePressed()
-    this:SetText("");
-    this:Hide();
-    this:Show();
-    if(WIM.db.windowFade) then
-        --WIM_FadeOut(this:GetParent().theUser);
-    end
-end
-
-local function MessageWindow_MsgBox_OnTabPressed()
-    --cycle through windows
-    if(WIM_Tabs.enabled == true) then
-        if(IsShiftKeyDown()) then
-            WIM_TabStep(-1);
-        else
-            WIM_TabStep(1);
-        end
-    else
-        WIM_ToggleWindow_Toggle();
-    end
-end
-
-local function MessageWindow_MsgBox_OnTextChanged()
+--local function MessageWindow_MsgBox_OnTextChanged()
     --[[if(WIM_W2W[this:GetParent().theUser]) then
 	if(not this.w2w_typing) then 
 	    this.w2w_typing = 0;
@@ -377,14 +276,7 @@ local function MessageWindow_MsgBox_OnTextChanged()
 	end
     end]]
     --WIM_EditBox_OnChanged();
-end
-
-local function MessageWindow_MsgBox_OnUpdate()
-    if(this.setText == 1) then
-	this.setText = 0;
-	this:SetText("");
-    end
-end
+--end
 
 local function loadHandlers(obj)
 	local widgets = obj.widgets;
@@ -394,6 +286,18 @@ local function loadHandlers(obj)
 				widgets[widget]:SetScript(handler, function(...) executeHandlers(widget, obj.type, handler, ...); end)
 			end
 		end
+	end
+end
+
+
+local function setAllChildrenParentWindow(parent, child)
+	local i;
+	if(child ~= parent) then
+		child.parentWindow = parent;
+	end
+	local children = {child:GetChildren()};
+	for i=1,table.getn(children) do
+		setAllChildrenParentWindow(parent, children[i]);
 	end
 end
 
@@ -409,9 +313,22 @@ local function loadRegisteredWidgets(obj)
 		else
 			data.defaults(widgets[widget], obj); -- load defaults for this widget
 		end
+		--widgets[widget].parentWindow = obj;
+		if(type(widgets[widget]) == "table") then
+			widgets[widget].parentWindow = obj;
+		end
 	end
+	setAllChildrenParentWindow(obj, obj)
 end
 
+local function updateActiveObjects()
+	for i=1, table.getn(WindowSoupBowl.windows) do
+		if(WindowSoupBowl.windows[i].inUse) then
+			loadRegisteredWidgets(WindowSoupBowl.windows[i].obj);
+			loadHandlers(WindowSoupBowl.windows[i].obj);
+		end
+	end
+end
 
 -- create all of MessageWindow's object children
 local function instantiateWindow(obj)
@@ -428,8 +345,6 @@ local function instantiateWindow(obj)
     obj:RegisterForDrag("LeftButton");
     obj:SetScript("OnDragStart", function() MessageWindow_MovementControler_OnDragStart(); end);
     obj:SetScript("OnDragStop", function() MessageWindow_MovementControler_OnDragStop(); end);
-    obj:SetScript("OnEnter", MessageWindow_FadeControler_OnEnter);
-    obj:SetScript("OnLeave", MessageWindow_FadeControler_OnLeave);
     obj:SetScript("OnShow", MessageWindow_Frame_OnShow);
     obj:SetScript("OnHide", MessageWindow_Frame_OnHide);
     obj:SetScript("OnUpdate", MessageWindow_Frame_OnUpdate);
@@ -463,7 +378,6 @@ local function instantiateWindow(obj)
     -- create core window objects
     widgets.close = CreateFrame("Button", fName.."ExitButton", obj);
     widgets.close:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-    --widgets.close:SetScript("OnClick", function(...) executeHandlers("close", obj.type, "OnClick", ...); end);
 
     --buttons.history = CreateFrame("Button", fName.."HistoryButton", obj);
     --history:RegisterForClicks("LeftButtonUp", "RightButtonUp");
@@ -487,15 +401,9 @@ local function instantiateWindow(obj)
     
     widgets.scroll_up = CreateFrame("Button", fName.."ScrollUp", obj);
     widgets.scroll_up:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-    widgets.scroll_up:SetScript("OnEnter", MessageWindow_FadeControler_OnEnter);
-    widgets.scroll_up:SetScript("OnLeave", MessageWindow_FadeControler_OnLeave);
-    widgets.scroll_up:SetScript("OnClick", MessageWindow_ScrollUp_OnClick);
     
     widgets.scroll_down = CreateFrame("Button", fName.."ScrollDown", obj);
     widgets.scroll_down:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-    widgets.scroll_down:SetScript("OnEnter", MessageWindow_FadeControler_OnEnter);
-    widgets.scroll_down:SetScript("OnLeave", MessageWindow_FadeControler_OnLeave);
-    widgets.scroll_down:SetScript("OnClick", MessageWindow_ScrollDown_OnClick);
     
     widgets.chat_display = CreateFrame("ScrollingMessageFrame", fName.."ScrollingMessageFrame", obj);
     widgets.chat_display:RegisterForDrag("LeftButton");
@@ -504,15 +412,8 @@ local function instantiateWindow(obj)
     widgets.chat_display:SetMovable(true);
     widgets.chat_display:SetScript("OnDragStart", function() MessageWindow_MovementControler_OnDragStart(); end);
     widgets.chat_display:SetScript("OnDragStop", function() MessageWindow_MovementControler_OnDragStop(); end);
-    widgets.chat_display:SetScript("OnMouseWheel", MessageWindow_ScrollingMessageFrame_OnMouseWheel);
     widgets.chat_display:SetScript("OnHyperlinkClick", function() ChatFrame_OnHyperlinkShow(arg1, arg2, arg3); end);
     widgets.chat_display:SetScript("OnMessageScrollChanged", function() updateScrollBars(this:GetParent()); end);
-    widgets.chat_display:SetScript("OnMouseDown", MessageWindow_ScrollingMessageFrame_OnMouseDown);
-    widgets.chat_display:SetScript("OnMouseUp", MessageWindow_ScrollingMessageFrame_OnMouseUp);
-    widgets.chat_display:SetScript("OnEnter", MessageWindow_FadeControler_OnEnter);
-    widgets.chat_display:SetScript("OnLeave", MessageWindow_FadeControler_OnLeave);
-    widgets.chat_display:SetScript("OnHyperlinkEnter", MessageWindow_Hyperlink_OnEnter);
-    widgets.chat_display:SetScript("OnHyperlinkLeave", MessageWindow_Hyperlink_OnLeave);
     widgets.chat_display:SetJustifyH("LEFT");
     widgets.chat_display:EnableMouse(true);
     widgets.chat_display:EnableMouseWheel(1);
@@ -523,16 +424,6 @@ local function instantiateWindow(obj)
     widgets.msg_box:SetMaxLetters(255);
     widgets.msg_box:SetAltArrowKeyMode(true);
     widgets.msg_box:EnableMouse(true);
-    widgets.msg_box:SetScript("OnEnterPressed", MessageWindow_MsgBox_OnEnterPressed);
-    widgets.msg_box:SetScript("OnEscapePressed", MessageWindow_MsgBox_OnEscapePressed);
-    widgets.msg_box:SetScript("OnTabPressed", MessageWindow_MsgBox_OnTabPressed);
-    widgets.msg_box:SetScript("OnEditFocusGained", function() WIM_EditBoxInFocus = this; end);
-    widgets.msg_box:SetScript("OnEditFocusLost", function() WIM_EditBoxInFocus = nil; end);
-    widgets.msg_box:SetScript("OnEnter", MessageWindow_FadeControler_OnEnter);
-    widgets.msg_box:SetScript("OnLeave", MessageWindow_FadeControler_OnLeave);
-    widgets.msg_box:SetScript("OnTextChanged", MessageWindow_MsgBox_OnTextChanged);
-    widgets.msg_box:SetScript("OnUpdate", MessageWindow_MsgBox_OnUpdate);
-    widgets.msg_box:SetScript("OnMouseUp", MessageWindow_MsgBox_OnMouseUp);
     
     --Addmessage functions
     obj.AddMessage = function(self, ...)
@@ -543,24 +434,66 @@ local function instantiateWindow(obj)
 	local str = user.." - "..msg;
 	obj:AddMessage(str, ...);
     end
-
+    
+    obj.UpdateIcon = function(self)
+	local icon = obj.widgets.class_icon;
+	local classTag = obj.class;
+	if(obj.class == "") then
+		classTag = "blank"
+	else
+		if(WIM.constants.classes[obj.class]) then
+			classTag = string.lower(WIM.constants.classes[obj.class].tag);
+		else
+			classTag = "blank";
+		end
+	end
+	local coord = WIM:GetSelectedSkin().message_window.class_icon[classTag];
+	icon:SetTexCoord(coord[1], coord[2], coord[3], coord[4], coord[5], coord[6], coord[7], coord[8]);
+    end
+    
+    obj.WhoCallback = function(result)
+	if( result.Online and result.Name == obj.theUser) then
+		obj.class = result.Class;
+		obj.level = result.Level;
+		obj.race = result.Race;
+		obj.guild = result.Guild;
+		obj.location = result.Zone;
+		obj:UpdateIcon();
+	end
+    end
+    
+    obj.SendWho = function(self)
+	local whoLib = WIM.libs.WhoLib;
+	whoLib:UserInfo(obj.theUser, 
+		{
+			queue = whoLib.WHOLIB_QUEUE_QUIET, 
+			timeout = 0,
+			flags = whoLib.WHOLIB_FLAG_ALLWAYS_CALLBACK,
+			callback = obj.WhoCallback
+		});
+    end
+    
     -- PopUp rules
     obj.Pop = function(self, forceResult) -- true to force show, false it ignore rules and force quiet.
 	-- pass isNew to pop ruleset.
+	if(obj.isNew) then
+		obj:SendWho();
+	end
 	if(forceResult ~= nil) then
 		-- go by forceResult and ignore rules
 		if(forceResult == true) then
+			setWindowAsFadedIn(obj);
 			obj:Show();
 		end
 	else
 		-- execute pop rules.
+		setWindowAsFadedIn(obj);
 		obj:Show(); -- exists for testing.
 	end
 	
 	-- at this state the message is no longer classified as a new window, reset flag.
 	obj.isNew = false;
     end
-    
     
     -- load Registered Widgets
     loadRegisteredWidgets(obj);
@@ -579,34 +512,23 @@ end
 local function loadWindowDefaults(obj)
     obj:Hide();
 
-    obj.theGuild = "";
-    obj.theLevel = "";
-    obj.theRace = "";
-    obj.theClass = "";
+    obj.guild = "";
+    obj.level = "";
+    obj.race = "";
+    obj.class = "blank";
+    obj.location = "";
+    obj:UpdateIcon();
     
     obj.isNew = true;
-    
-    --obj.icon.track = false;
 
     obj:SetScale(1);
     obj:SetAlpha(1);
     
     obj.widgets.Backdrop:SetAlpha(1);
     
-    obj.widgets.class_icon.class = "blank";
-    
     obj.widgets.from:SetText(obj.theUser);
     
     obj.widgets.char_info:SetText("");
-    
-    --local history = getglobal(fName.."HistoryButton");
-    --history:Hide();
-    
-    --local w2w = getglobal(fName.."W2WButton");
-    --w2w:Hide();
-    
-    --local chatting = getglobal(fName.."IsChattingButton");
-    --chatting:Hide();
     
     obj.widgets.msg_box.setText = 0;
     obj.widgets.msg_box:SetText("");
@@ -653,8 +575,8 @@ local function createWindow(userName, wtype)
         WindowSoupBowl.windows[index].user = userName;
         obj.theUser = userName;
         obj.type = wtype;
-        obj.icon.theUser = userName;
-        loadMessageWindowDefaults(obj); -- clear contents of window and revert back to it's initial state.
+	obj.isGM = WIM:IsGM(userName);
+        loadWindowDefaults(obj); -- clear contents of window and revert back to it's initial state.
         WIM:dPrint("Window recycled '"..obj:GetName().."'");
         return obj;
     else
@@ -673,6 +595,7 @@ local function createWindow(userName, wtype)
         f.theUser = userName;
         f.type = wtype;
         f.isParent = true;
+	f.isGM = WIM:IsGM(userName);
         instantiateWindow(f);
         --f.icon.theUser = userName;
         loadWindowDefaults(f);
@@ -682,12 +605,25 @@ local function createWindow(userName, wtype)
 end
 
 
+--Returns object, SoupBowl_windows_index or nil if window can not be found.
+local function getWindowByName(userName)
+    if(type(userName) ~= "string") then
+        return nil;
+    end
+    for i=1,table.getn(WindowSoupBowl.windows) do
+        if(WindowSoupBowl.windows[i].user == userName) then
+            return WindowSoupBowl.windows[i].obj, i;
+        end
+    end
+end
+
 --Deletes message window and makes it available in the Soup Bowl.
 local function destroyWindow(userNameOrObj)
+    local obj, index;
     if(type(userNameOrObj) == "string") then
-        local obj, index = getWindowByName(userNameOrObj);
+        obj, index = getWindowByName(userNameOrObj);
     else
-        local obj = userNameOrObj;
+	obj, index = getWindowByName(userNameOrObj.theUser);
     end
     
     if(obj) then
@@ -695,14 +631,13 @@ local function destroyWindow(userNameOrObj)
         WindowSoupBowl.windows[index].user = "";
         WindowSoupBowl.available = WindowSoupBowl.available + 1;
         WindowSoupBowl.used = WindowSoupBowl.used - 1;
-        WIM_Astrolabe:RemoveIconFromMinimap(obj.icon);
-        obj.icon:Hide();
-        obj.icon.track = false;
-        obj.theUser = nil;
+        --WIM_Astrolabe:RemoveIconFromMinimap(obj.icon);
+        --obj.icon:Hide();
+        --obj.icon.track = false;
         obj:Show();
-        local chatBox = getglobal(obj:GetName().."ScrollingMessageFrame");
-        chatBox:Clear();
+        obj.widgets.chat_display:Clear();
         obj:Hide();
+	WIM:dPrint("Window '"..obj:GetName().."' destroyed.");
     end
 end
 
@@ -725,7 +660,10 @@ function WIM:RegisterWidgetTrigger(WidgetName, wType, HandlerName, Function)
 		};
 	end
 	--register to table
-	table.insert(Widget_Triggers[WidgetName][HandlerName][wType], Function);
+	for i=1,select("#", string.split(",", wType)) do
+		table.insert(Widget_Triggers[WidgetName][HandlerName][select(i, string.split(",", wType))], Function);
+	end
+	updateActiveObjects();
 end
 
 function WIM:GetWindowSoupBowl()
@@ -755,19 +693,136 @@ end
 -- Set default widget triggers	--
 ----------------------------------
 
-WIM:RegisterWidgetTrigger("close", "whisper", "OnEnter", function()
+WIM:RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnEnter", function()
 		if(WIM.db.showToolTips == true) then
 			GameTooltip:SetOwner(this, "ANCHOR_TOPRIGHT");
 			GameTooltip:SetText(WIM_LOCALIZED_TOOLTIP_SHIFT_CLICK_TO_CLOSE);
 		end
-		MessageWindow_FadeControler_OnEnter();
+	end);
+	
+WIM:RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnLeave", function() GameTooltip:Hide(); end);
+	
+WIM:RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnClick", function()
+		if(IsShiftKeyDown()) then
+			destroyWindow(this:GetParent());
+		else
+			this:GetParent():Hide();
+		end
 	end);
 
-WIM:RegisterWidgetTrigger("close", "whisper", "OnLeave", function()
-		GameTooltip:Hide();
-		MessageWindow_FadeControler_OnLeave();
+WIM:RegisterWidgetTrigger("scroll_up", "whisper,chat,w2w", "OnClick", function()
+		local obj = this:GetParent();
+		if( IsControlKeyDown() ) then
+			obj.widgets.chat_display:ScrollToTop();
+		else
+			if( IsShiftKeyDown() ) then
+			    obj.widgets.chat_display:PageUp();
+			else
+			    obj.widgets.chat_display:ScrollUp();
+			end
+		end
+		updateScrollBars(obj);
 	end);
 
+WIM:RegisterWidgetTrigger("scroll_down", "whisper,chat,w2w", "OnClick", function()
+		local obj = this:GetParent();
+		if( IsControlKeyDown() ) then
+			obj.widgets.chat_display:ScrollToBottom();
+		else
+			if( IsShiftKeyDown() ) then
+			    obj.widgets.chat_display:PageDown();
+			else
+			    obj.widgets.chat_display:ScrollDown();
+			end
+		end
+		updateScrollBars(obj);
+	end);
 
+WIM:RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnMouseWheel", function()
+	    if(arg1 > 0) then
+		if( IsControlKeyDown() ) then
+		    this:ScrollToTop();
+		else
+		    if( IsShiftKeyDown() ) then
+			this:PageUp();
+		    else
+			this:ScrollUp();
+		    end
+		end
+	    else
+		if( IsControlKeyDown() ) then
+		    this:ScrollToBottom();
+		else
+		    if( IsShiftKeyDown() ) then
+	                this:PageDown();
+		    else
+			this:ScrollDown();
+		    end
+		end
+	    end
+	    updateScrollBars(getParentMessageWindow(this));
+	end);
 
+WIM:RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnMouseDown", function()
+	    this:GetParent().prevLeft = this:GetParent():GetLeft();
+	    this:GetParent().prevTop = this:GetParent():GetTop();
+	end);
+
+WIM:RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnMouseUp", function()
+	    if(this:GetParent().prevLeft == this:GetParent():GetLeft() and this:GetParent().prevTop == this:GetParent():GetTop()) then
+		--[ Frame was clicked not dragged
+		local msg_box = this:GetParent().widgets.msg_box;
+		if(WIM.EditBoxInFocus == nil) then
+		    msg_box:SetFocus();
+		else
+		    if(WIM.EditBoxInFocus == msg_box) then
+			msg_box:Hide();
+			msg_box:Show();
+		    else
+			msg_box:SetFocus();
+		    end
+		end
+	    end
+	end);
+	
+WIM:RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkEnter", function()
+			local obj = this.parentWindow;
+			obj.isOnHyperLink = true;
+		end)
+		
+WIM:RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkLeave", function()
+			local obj = this.parentWindow;
+			obj.isOnHyperLink = false;
+		end)
+
+WIM:RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEnterPressed", function()
+		if(strsub(this:GetText(), 1, 1) == "/") then
+			WIM_EditBoxInFocus = nil;
+			ChatFrameEditBox:SetText(this:GetText());
+			ChatEdit_SendText(ChatFrameEditBox, 1);
+			this:SetText("");
+			WIM_EditBoxInFocus = this;
+		else
+			if(this:GetText() == "") then
+				this:Hide();
+				this:Show();
+			end
+		end
+	end);
+	
+WIM:RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEscapePressed", function()
+		this:SetText("");
+		this:Hide();
+		this:Show();
+	end);
+	
+WIM:RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnUpdate", function()
+		if(this.setText == 1) then
+			this.setText = 0;
+			this:SetText("");
+		end
+	end);
+	
+WIM:RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusGained", function() WIM.EditBoxInFocus = this; end);
+WIM:RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusLost", function() WIM.EditBoxInFocus = nil; end);
 

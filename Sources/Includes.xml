@@ -5,6 +5,8 @@
     <Script file="StateHandler.lua"/>
     <Script file="WindowHandler.lua"/>
     <Script file="Skinner.lua"/>
+    <Script file="URL.lua"/>
+    <Script file="Hooks.lua"/>
     <Script file="-Emoticons.lua"/>
 
 </Ui>
