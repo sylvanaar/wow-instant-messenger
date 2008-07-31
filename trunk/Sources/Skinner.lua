@@ -22,33 +22,6 @@ local prematureRegisters = {};
 local WindowSoupBowl = WIM:GetWindowSoupBowl();
 
 
-local function MessageWindow_ArrangeShortcutBar(ParentFrame)
-    local ShortcutCount = WIM:GetShortcutCount();
-    for i=1,ShortcutCount do
-        local shortcut = getglobal(ParentFrame:GetName().."Button"..i);
-        if(i == 1) then
-            shortcut:SetPoint("TOPLEFT", ParentFrame:GetName(), "TOPLEFT", 0, 0);
-        else
-            if(SelectedSkin.message_window.shortcuts.verticle) then
-                if(SelectedSkin.message_window.shortcuts.inverted) then
-                    shortcut:SetPoint("BOTTOMLEFT", ParentFrame:GetName().."Button"..(i-1), "TOPLEFT", 0, 2);
-                else
-                    shortcut:SetPoint("TOPLEFT", ParentFrame:GetName().."Button"..(i-1), "BOTTOMLEFT", 0, -2);
-                end
-            else
-                if(SelectedSkin.message_window.shortcuts.inverted) then
-                    shortcut:SetPoint("TOPRIGHT", ParentFrame:GetName().."Button"..(i-1), "TOPLEFT", -2, 0);
-                else
-                    shortcut:SetPoint("TOPLEFT", ParentFrame:GetName().."Button"..(i-1), "TOPRIGHT", 2, 0);
-                end
-            end
-        end
-        shortcut:SetWidth(SelectedSkin.message_window.shortcuts.button_size);
-        shortcut:SetHeight(SelectedSkin.message_window.shortcuts.button_size);
-    end
-    
-end
-
 -- load selected skin
 function WIM:ApplySkinToWindow(obj)
     local fName = obj:GetName();
@@ -242,16 +215,16 @@ function WIM:ApplySkinToWindow(obj)
     chat_display:ClearAllPoints();
     chat_display:SetPoint("TOPLEFT", fName, "TOPLEFT", SelectedSkin.message_window.chat_display.rect.tl_offset.x, SelectedSkin.message_window.chat_display.rect.tl_offset.y);
     chat_display:SetPoint("BOTTOMRIGHT", fName, "BOTTOMRIGHT", SelectedSkin.message_window.chat_display.rect.br_offset.x, SelectedSkin.message_window.chat_display.rect.br_offset.y);
-    local font, height, flags = getglobal(WIM_Data.skin.font):GetFont();
-    chat_display:SetFont(font, WIM_Data.fontSize+2, WIM_Data.skin.font_outline);
+    local font, height, flags = getglobal(WIM.db.skin.font):GetFont();
+    chat_display:SetFont(font, WIM.db.fontSize+2, WIM.db.skin.font_outline);
 
     --msg_box
     local msg_box = obj.widgets.msg_box;
     msg_box:ClearAllPoints();
     msg_box:SetPoint("TOPLEFT", fName, "BOTTOMLEFT", SelectedSkin.message_window.msg_box.rect.tl_offset.x, SelectedSkin.message_window.msg_box.rect.tl_offset.y);
     msg_box:SetPoint("BOTTOMRIGHT", fName, "BOTTOMRIGHT", SelectedSkin.message_window.msg_box.rect.br_offset.x, SelectedSkin.message_window.msg_box.rect.br_offset.y);
-    local font, height, flags = getglobal(WIM_Data.skin.font):GetFont();
-    msg_box:SetFont(font, SelectedSkin.message_window.msg_box.font_height, WIM_Data.skin.font_outline);
+    local font, height, flags = getglobal(WIM.db.skin.font):GetFont();
+    msg_box:SetFont(font, SelectedSkin.message_window.msg_box.font_height, WIM.db.skin.font_outline);
     msg_box:SetTextColor(SelectedSkin.message_window.msg_box.font_color[1], SelectedSkin.message_window.msg_box.font_color[2], SelectedSkin.message_window.msg_box.font_color[3]);
     
     --shorcuts
@@ -277,6 +250,17 @@ local function deleteStyleFileEntries(theTable)
     end
 end
 
+local function populateFemaleClassInfo(tbl)
+    tbl.message_window.class_icon["druidf"] = tbl.message_window.class_icon["druid"];
+    tbl.message_window.class_icon["hunterf"] = tbl.message_window.class_icon["hunter"];
+    tbl.message_window.class_icon["magef"] = tbl.message_window.class_icon["mage"];
+    tbl.message_window.class_icon["paladinf"] = tbl.message_window.class_icon["paladin"];
+    tbl.message_window.class_icon["priestf"] = tbl.message_window.class_icon["priest"];
+    tbl.message_window.class_icon["roguef"] = tbl.message_window.class_icon["rogue"];
+    tbl.message_window.class_icon["shamanf"] = tbl.message_window.class_icon["shaman"];
+    tbl.message_window.class_icon["warlockf"] = tbl.message_window.class_icon["warlock"];
+    tbl.message_window.class_icon["warriorf"] = tbl.message_window.class_icon["warrior"];
+end
 
 
 
@@ -417,11 +401,15 @@ function WIM:RegisterSkin(skinTable)
         deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_down.PushedTexture);
         deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_down.HighlightTexture);
         deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_down.DisabledTexture);
+        
+        populateFemaleClassInfo(SkinTable[skinTable.title]);
         return;
     end
     
     -- inherrit missing data from default skin.
     WIM.copyTable(SkinTable["WIM Classic"], skinTable);
+        
+    populateFemaleClassInfo(skinTable);    
         
     --check if default style images exist. if not, inherrit from 'WIM Classic'
     if(not skinTable.message_window.file[skinTable.default_style]) then skinTable.message_window.file[skinTable.default_style] = SkinTable["WIM Classic"].message_window.file.default; end
@@ -472,12 +460,14 @@ function WIM:RegisterSkin(skinTable)
         if(not skinTable.message_window.buttons.scroll_down.DisabledTexture[styles[i]]) then skinTable.message_window.buttons.scroll_down.DisabledTexture[styles[i]] = skinTable.message_window.buttons.scroll_down.DisabledTexture[skinTable.default_style]; end
     end
     
+
     
     -- finalize registration
     SkinTable[skinTable.title] = skinTable;
+    populateFemaleClassInfo(SkinTable[skinTable.title]);
     
     -- if this is the selected skin, load it now
-    if(skinTable.title == WIM_Data.skin.selected) then
+    if(skinTable.title == WIM.db.skin.selected) then
         WIM:LoadSkin(WIM.db.skin.selected, WIM.db.skin.style);
     end
 end

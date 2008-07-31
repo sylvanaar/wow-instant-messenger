@@ -4,7 +4,7 @@ local WIM = WIM;
 WIM.debug = true; -- turn debugging on and off.
 WIM.constants = {}; -- constants such as class colors will be stored here. (includes female class names).
 WIM.modules = {}; -- module table. consists of all registerd WIM modules/plugins/skins. (treated the same).
-WIM.windows = {active = {}}; -- table of WIM windows.
+WIM.windows = {active = {whisper = {}, chat = {}, w2w = {}}}; -- table of WIM windows.
 WIM.libs = {}; -- table of loaded library references.
 
 -- default options. live data is found in WIM.db
@@ -57,6 +57,7 @@ local function initialize()
             GuildRoster();
         end
     
+    WIM.libs.WhoLib = AceLibrary and AceLibrary('WhoLib-1.0');
     WIM.libs.Astrolabe = DongleStub("Astrolabe-0.4");
     
     WIM.isInitialized = true;

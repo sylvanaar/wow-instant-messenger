@@ -98,7 +98,8 @@ function WIM:FormatUserName(user)
 	return user;
 end
 
-    
+
+
 --------------------------------------
 --      Debugging Functions         --
 --------------------------------------

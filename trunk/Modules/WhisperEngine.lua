@@ -32,7 +32,7 @@ WhisperEngine:RegisterEvent("CHAT_MSG_DND");
 WhisperEngine:RegisterEvent("CHAT_MSG_SYSTEM");
 --WhisperEngine:RegisterEvent("CHAT_MSG_ADDON");
 
-local Windows = WIM.windows.active;
+local Windows = WIM.windows.active.whisper;
 
 
 function WhisperEngine:OnEnableWIM()
@@ -60,6 +60,20 @@ local function getWhisperWindowByUser(user)
     end
 end
 
+local function windowDestroyed()
+    if(IsShiftKeyDown()) then
+        local user = this:GetParent().theUser;
+        Windows[user] = nil;
+    end
+end
+
+WIM:RegisterWidgetTrigger("close", "whisper", "OnClick", windowDestroyed);
+
+WIM:RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function()
+        local obj = this:GetParent();
+        SendChatMessage(this:GetText(), "WHISPER", nil, obj.theUser);
+        this:SetText("");
+    end);
 
 --------------------------------------
 --          Event Handlers          --
@@ -78,6 +92,39 @@ function WhisperEngine:CHAT_MSG_WHISPER_INFORM()
     win:AddUserMessage(UnitName("player"), arg1, color.r, color.g, color.b);
     win:Pop();
 end
+
+
+
+
+--------------------------------------
+--          Whisper Related Hooks   --
+--------------------------------------
+local function FF_SendMessage()
+	if(WIM.db.enabled) then
+		if(WIM.EditBoxInFocus) then
+			WIM.EditBoxInFocus:SetText("");
+		end
+		local name = GetFriendInfo(FriendsFrame.selectedFriend);
+		local win = getWhisperWindowByUser(name);
+                win:Pop(true); -- force popup
+                win.widgets.msg_box:SetFocus();
+		ChatEdit_OnEscapePressed(ChatFrameEditBox);
+	end
+end
+
+
+--hooksecurefunc("ChatFrame_SendTell", WIM_ChatFrame_SendTell);
+hooksecurefunc("FriendsFrame_SendMessage", FF_SendMessage);
+--hooksecurefunc("ChatEdit_ExtractTellTarget", WIM_ChatEdit_ExtractTellTarget);
+--hooksecurefunc("SendChatMessage", WIM_SendChatMessage);
+--hooksecurefunc("ChatEdit_HandleChatType", WIM_ChatEdit_HandleChatType);
+--Hook ChatFrame_ReplyTell & ChatFrame_ReplyTell2
+--hooksecurefunc("ChatFrame_ReplyTell", WIM_ChatFrame_ReplyTell);
+--hooksecurefunc("ChatFrame_ReplyTell2", WIM_ChatFrame_ReplyTell2);
+
+
+
+
 
 
 -- This is a core module and must always be loaded...

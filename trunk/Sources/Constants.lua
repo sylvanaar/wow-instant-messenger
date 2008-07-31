@@ -1,6 +1,13 @@
 WIM.constants.classes = {};
 local classes = WIM.constants.classes;
 
+local classList = {
+     "WIM_LOCALIZED_DRUID", "WIM_LOCALIZED_HUNTER", "WIM_LOCALIZED_MAGE",
+     "WIM_LOCALIZED_PALADIN", "WIM_LOCALIZED_PRIEST", "WIM_LOCALIZED_ROGUE",
+     "WIM_LOCALIZED_SHAMAN", "WIM_LOCALIZED_WARLOCK", "WIM_LOCALIZED_WARRIOR"
+};
+
+--Male Classes - this doesn't apply to every locale
 classes[WIM_LOCALIZED_DRUID]	= {
                                     color = "ff7d0a",
                                     tag = "DRUID"
@@ -41,14 +48,32 @@ classes[WIM_LOCALIZED_GM]	= {
                                     color = "00c0ff",
                                     tag = "GM"
                                 };
-	
--- accomodate female class names by inherriting data from males.
-classes[WIM_LOCALIZED_DRUID_FEMALE]	= classes[WIM_LOCALIZED_DRUID];
-classes[WIM_LOCALIZED_HUNTER_FEMALE]	= classes[WIM_LOCALIZED_HUNTER];
-classes[WIM_LOCALIZED_MAGE_FEMALE]	= classes[WIM_LOCALIZED_MAGE];
-classes[WIM_LOCALIZED_PALADIN_FEMALE]	= classes[WIM_LOCALIZED_PALADIN];
-classes[WIM_LOCALIZED_PRIEST_FEMALE]	= classes[WIM_LOCALIZED_PRIEST];
-classes[WIM_LOCALIZED_ROGUE_FEMALE]	= classes[WIM_LOCALIZED_ROGUE];
-classes[WIM_LOCALIZED_SHAMAN_FEMALE]	= classes[WIM_LOCALIZED_SHAMAN];
-classes[WIM_LOCALIZED_WARLOCK_FEMALE]	= classes[WIM_LOCALIZED_WARLOCK];
-classes[WIM_LOCALIZED_WARRIOR_FEMALE]	= classes[WIM_LOCALIZED_WARRIOR];
+
+-- propigate female class types and update tags appropriately
+local i;
+for i=1, table.getn(classList) do
+     if(_G[classList[i]] ~= _G[classList[i].."_FEMALE"]) then
+          classes[_G[classList[i].."_FEMALE"]] = {
+               color = classes[_G[classList[i]]].color,
+               tag = classes[_G[classList[i]]].tag.."F"
+          };
+     end
+end
+
+
+classes.GetClassByTag = function(t)
+     for class, tbl in pairs(classes) do
+          if(type(tbl) == "table") then
+               if(tbl.tag == t) then
+                    return class;
+               end
+          end
+     end
+     -- can't find tag, before returning blank, see we're being asked for a female class, then try again.
+     local ft = string.gsub(t, "(F)$", "");
+     if( ft == t) then
+          return ""
+     else
+          return classes.GetClassByTag(ft);
+     end
+end
