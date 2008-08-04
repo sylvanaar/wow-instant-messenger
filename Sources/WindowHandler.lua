@@ -192,6 +192,9 @@ local function MessageWindow_Frame_OnHide()
 end
 
 local function MessageWindow_Frame_OnUpdate()
+	-- window is visible, there aren't any messages waiting...
+	this.msgWaiting = false;
+	
 	-- fading segment
 	if(WIM.db.winFade) then
 		this.fadeElapsed = (this.fadeElapsed or 0) + arg1;
@@ -442,6 +445,7 @@ local function instantiateWindow(obj)
     obj.AddUserMessage = function(self, user, msg, ...)
 	local str = user.." - "..msg;
 	obj:AddMessage(str, ...);
+	obj.msgWaiting = true;
     end
     
     obj.UpdateIcon = function(self)
@@ -488,7 +492,15 @@ local function instantiateWindow(obj)
     end
     
     -- PopUp rules
-    obj.Pop = function(self, forceResult) -- true to force show, false it ignore rules and force quiet.
+    obj.Pop = function(self, msgDirection, forceResult) -- true to force show, false it ignore rules and force quiet.
+	-- account for variable arguments.
+	if(type(msgDirection) ~= "string" and type(msgDirection) == "boolean") then
+		forceResult = msgDirection;
+		msgDirection = "in";
+	elseif(msgDirection == nil) then
+		msgDirection = "in";
+	end
+    
 	-- pass isNew to pop ruleset.
 	if(obj.isNew) then
 		obj:SendWho();
@@ -501,8 +513,16 @@ local function instantiateWindow(obj)
 		end
 	else
 		-- execute pop rules.
-		setWindowAsFadedIn(obj);
-		obj:Show(); -- exists for testing.
+		local rules = WIM.db.whispers.pop_rules[WIM.curState]; -- defaults incase unknown
+		if(obj.type == "whisper") then
+			rules = WIM.db.whispers.pop_rules[WIM.curState];
+		end
+		if((rules.onSend and msgDirection == "out") or
+				(rules.onReceive and msgDirection == "in") or
+				(rules.onNew and obj.isNew and msgDirection == "in")) then 
+			setWindowAsFadedIn(obj);
+			obj:Show(); -- exists for testing.
+		end
 	end
 	
 	-- at this state the message is no longer classified as a new window, reset flag.

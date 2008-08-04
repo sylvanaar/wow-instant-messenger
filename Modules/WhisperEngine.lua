@@ -9,18 +9,50 @@ WhisperEngine = WIM:CreateModule("WhisperEngine");
 WhisperEngine.db_defaults.whispers = {
     pop_rules = {
         --pop-up rule sets based off of your location
-        city = {
+        resting = {
             onSend = true,
             onReceive = true,
             onNew = true,
             supress = true,
         },
-        combat = {},
-        pvp = {},
-        arena = {},
-        party = {},
-        raid = {},
-        other = {}
+        combat = {
+            onSend = false,
+            onReceive = false,
+            onNew = false,
+            supress = false,
+        },
+        pvp = {
+            onSend = true,
+            onReceive = true,
+            onNew = true,
+            supress = true,
+        },
+        arena = {
+            onSend = false,
+            onReceive = false,
+            onNew = false,
+            supress = false,
+        },
+        party = {
+            onSend = true,
+            onReceive = true,
+            onNew = true,
+            supress = true,
+        },
+        raid = {
+            onSend = true,
+            onReceive = true,
+            onNew = true,
+            supress = true,
+        },
+        other = {
+            onSend = true,
+            onReceive = true,
+            onNew = true,
+            supress = true,
+        },
+        alwaysOther = true,
+        intercept = true,
     },
     playSound = true,
 }
@@ -95,7 +127,7 @@ function WhisperEngine:CHAT_MSG_WHISPER()
     local color = WIM.db.displayColors.wispIn; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
     win:AddUserMessage(arg2, arg1, color.r, color.g, color.b);
-    win:Pop();
+    win:Pop("in");
     if(WIM.db.whispers.playSound) then
         PlaySoundFile("Interface\\AddOns\\"..WIM.addonTocName.."\\Sounds\\wisp.wav");
     end
@@ -105,7 +137,7 @@ function WhisperEngine:CHAT_MSG_WHISPER_INFORM()
     local color = WIM.db.displayColors.wispOut; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
     win:AddUserMessage(UnitName("player"), arg1, color.r, color.g, color.b);
-    win:Pop();
+    win:Pop("out");
 end
 
 
@@ -114,28 +146,91 @@ end
 --------------------------------------
 --          Whisper Related Hooks   --
 --------------------------------------
-local function FF_SendMessage()
-	if(WIM.db.enabled) then
-		if(WIM.EditBoxInFocus) then
-			WIM.EditBoxInFocus:SetText("");
-		end
-		local name = GetFriendInfo(FriendsFrame.selectedFriend);
-		local win = getWhisperWindowByUser(name);
+
+local function replyTellTarget(TellNotTold)
+    if(WIM.db.enabled) then
+        if(WIM.db.whispers.pop_rules.intercept and WIM.db.whispers.pop_rules[WIM.curState].onSend) then
+            local lastTell;
+            if(TellNotTold) then
+                lastTell = ChatEdit_GetLastTellTarget();
+            else
+                lastTell = ChatEdit_GetLastToldTarget();
+            end
+            if ( lastTell ~= "" ) then
+                local win = getWhisperWindowByUser(lastTell);
+                win.widgets.msg_box.setText = 1;
                 win:Pop(true); -- force popup
                 win.widgets.msg_box:SetFocus();
 		ChatEdit_OnEscapePressed(ChatFrameEditBox);
+            end
+        end
+    end
+end
+
+local function CF_extractTellTarget(editBox, msg)
+    if(WIM.db.enabled) then
+        -- Grab the first "word" in the string
+        local target = gsub(msg, "(%s*)([^%s]+)(.*)", "%2", 1);
+        if ( (strlen(target) <= 0) or (strsub(target, 1, 1) == "|") ) then
+            return;
+        end
+	
+        if(WIM.db.whispers.pop_rules.intercept and WIM.db.whispers.pop_rules[WIM.curState].onSend) then
+            target = string.gsub(target, "^%l", string.upper)
+	    local win = getWhisperWindowByUser(target);
+            win.widgets.msg_box.setText = 1;
+            win:Pop(true); -- force popup
+            win.widgets.msg_box:SetFocus();
+	    ChatEdit_OnEscapePressed(ChatFrameEditBox);
+        end
+    end
+end
+
+local function CF_sendTell(name) -- needed in order to UnitPopups to work with whispers.
+    if(WIM.db.enabled) then
+	if(WIM.db.whispers.pop_rules.intercept and WIM.db.whispers.pop_rules[WIM.curState].onSend) then
+            -- Remove spaces from the server name for slash command parsing
+            name = gsub(name, " ", "");
+	    local win = getWhisperWindowByUser(name);
+            win.widgets.msg_box.setText = 1;
+            win:Pop(true); -- force popup
+            win.widgets.msg_box:SetFocus();
+	    ChatEdit_OnEscapePressed(ChatFrameEditBox);
+	end
+    end
+end
+
+local function CF_HandleChatType(editBox, msg, command, send)
+	for index, value in pairs(ChatTypeInfo) do
+		local i = 1;
+		local cmdString = getglobal("SLASH_"..index..i);
+		while ( cmdString ) do
+			cmdString = strupper(cmdString);
+			if ( cmdString == command ) then
+				-- index is the entered command
+				if(index == "REPLY") then replyTellTarget(true); end
+				return;
+			end
+			i = i + 1;
+			cmdString = getglobal("SLASH_"..index..i);
+		end
 	end
 end
 
 
---hooksecurefunc("ChatFrame_SendTell", WIM_ChatFrame_SendTell);
-hooksecurefunc("FriendsFrame_SendMessage", FF_SendMessage);
---hooksecurefunc("ChatEdit_ExtractTellTarget", WIM_ChatEdit_ExtractTellTarget);
---hooksecurefunc("SendChatMessage", WIM_SendChatMessage);
---hooksecurefunc("ChatEdit_HandleChatType", WIM_ChatEdit_HandleChatType);
+
+-- the following hook is needed in order to intercept Send Whisper from UnitPopup Menus
+hooksecurefunc("ChatFrame_SendTell", CF_sendTell);
+
+-- the following hook is needed in order to intercept /w, /whisper
+hooksecurefunc("ChatEdit_ExtractTellTarget", CF_extractTellTarget);
+
+-- the following hook is needed in order to intercept /r
+hooksecurefunc("ChatEdit_HandleChatType", CF_HandleChatType);
+
 --Hook ChatFrame_ReplyTell & ChatFrame_ReplyTell2
---hooksecurefunc("ChatFrame_ReplyTell", WIM_ChatFrame_ReplyTell);
---hooksecurefunc("ChatFrame_ReplyTell2", WIM_ChatFrame_ReplyTell2);
+hooksecurefunc("ChatFrame_ReplyTell", function() replyTellTarget(true) end);
+hooksecurefunc("ChatFrame_ReplyTell2", function() replyTellTarget(false) end);
 
 
 
