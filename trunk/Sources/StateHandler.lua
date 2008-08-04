@@ -46,6 +46,15 @@ local function evaluateState()
     else
         WIM.curState = "other";
     end
+    
+    local module = WIM.modules[moduleName];
+    if(module) then
+        module.enabled = enabled;
+        if(type(module.OnStateChange) == "function") then
+            module:OnStateChange(WIM.curState);
+        end
+    end
+    
     WIM:dPrint("Evaluated State: "..WIM.curState);
 end
 
