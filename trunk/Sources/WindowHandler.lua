@@ -703,6 +703,9 @@ local function destroyWindow(userNameOrObj)
         obj:Show();
         obj.widgets.chat_display:Clear();
         obj:Hide();
+	if(obj.tabStrip) then
+		obj.tabStrip:Detach(obj.theUser);
+	end
 	WIM:dPrint("Window '"..obj:GetName().."' destroyed.");
     end
 end

@@ -409,6 +409,9 @@ local WIM_ClassicSkin = {
         }
     },
     tab_strip = {
+        file = {
+            default = ""
+        },
         rect = {
             anchor_points = {
                 self = "BOTTOMLEFT",
@@ -421,7 +424,9 @@ local WIM_ClassicSkin = {
                     right = 15
                 }
             }
-        }
+        },
+        vertical = false,
+        inverted = false,
     },
     emoticons = {
         rect = {
