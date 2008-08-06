@@ -409,8 +409,18 @@ local WIM_ClassicSkin = {
         }
     },
     tab_strip = {
-        file = {
-            default = ""
+        files = {
+            tabs = {
+                normal = {
+                    default = "Interface\AddOns\WIM_Rewrite\Skins\Default\tab_normal"
+                },
+                selected = {
+                    default = "Interface\AddOns\WIM_Rewrite\Skins\Default\tab_selected"
+                },
+                hover = {
+                    default = ""
+                }
+            },
         },
         rect = {
             anchor_points = {
@@ -426,7 +436,6 @@ local WIM_ClassicSkin = {
             }
         },
         vertical = false,
-        inverted = false,
     },
     emoticons = {
         rect = {

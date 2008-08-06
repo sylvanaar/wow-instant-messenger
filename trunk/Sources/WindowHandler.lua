@@ -77,7 +77,115 @@ RegisteredWidgets["Test"] = function(parentWindow)
 	return t;
 end
 
+local windowListByLevel_Recycle = {};
+local function getActiveWindowListByLevel()
+	-- first remove items from previously used list.
+	local i;
+	for i=1,table.getn(windowListByLevel_Recycle) do
+		table.remove(windowListByLevel_Recycle, 1);
+	end
+	-- load all used windows into table
+	for i=1, table.getn(WindowSoupBowl.windows) do
+		if(WindowSoupBowl.windows[i].inUse and WindowSoupBowl.windows[i].obj:IsVisible()) then
+			table.insert(windowListByLevel_Recycle, WindowSoupBowl.windows[i].obj);
+		end
+	end
+	table.sort(windowListByLevel_Recycle, function(a,b)
+		a, b = a:GetFrameLevel(), b:GetFrameLevel();
+		return a>b;
+	end);
+	return windowListByLevel_Recycle;
+end
 
+function getWindowAtCursorPosition(excludeObj)
+	-- can optionaly exclude an object
+	local x,y = GetCursorPosition();
+	local windows = getActiveWindowListByLevel();
+	local i;
+	for i=1,table.getn(windows) do
+		if(excludeObj ~= windows[i]) then
+			local x1, y1 = windows[i]:GetLeft(), windows[i]:GetTop();
+			local x2, y2 = x1 + windows[i]:GetWidth(), y1 - windows[i]:GetHeight();
+			if(x >= x1 and x <= x2 and y <= y1 and y >= y2) then
+				return windows[i];
+			end
+		end
+	end
+	return nil;
+end
+
+-- helperFrame's purpose is to assist with dragging and dropping of Windows into tab strips.
+-- The frame will monitor which window objects are being dragged over and attach itself to them when
+-- it's key trigger is pressed.
+local helperFrame = CreateFrame("Frame", "WIM_WindowHelperFrame", UIParent);
+helperFrame.flash = helperFrame:CreateTexture(helperFrame:GetName().."Flash", "OVERLAY");
+helperFrame.flash:SetPoint("BOTTOMLEFT");
+helperFrame.flash:SetPoint("BOTTOMRIGHT");
+helperFrame.flash:SetHeight(4);
+helperFrame.flash:SetBlendMode("ADD");
+helperFrame.flash:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
+helperFrame:SetFrameStrata("TOOLTIP");
+helperFrame:SetWidth(1);
+helperFrame:SetHeight(1);
+helperFrame.ResetState = function(self)
+        helperFrame:ClearAllPoints();
+	helperFrame:SetParent(UIPanel);
+        helperFrame:SetWidth(1);
+        helperFrame:SetHeight(1);
+        helperFrame:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", 0, 0);
+        helperFrame.attachedTo = nil;
+        helperFrame.isAttached = false;
+    end
+helperFrame:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", 0, 0);
+helperFrame:SetScript("OnUpdate", function()
+                if(IsShiftKeyDown()) then
+			local obj = GetMouseFocus();
+			if(obj and (obj.isWimWindow or obj.parentWindow)) then
+				local win;
+				if(obj.isWimWindow) then
+					win = obj;
+				else
+					win = obj.parentWindow;
+				end
+				local mWin = getWindowAtCursorPosition(win);
+				if(win.isMoving and not this.isAttached) then
+					if(mWin) then
+						-- attach to window
+						local skinTable = WIM:GetSelectedSkin().tab_strip;
+						this.attachedTo = mWin;
+						this:ClearAllPoints();
+						this:SetParent(mWin);
+						this:SetPoint(skinTable.rect.anchor_points.self, mWin, skinTable.rect.anchor_points.relative, skinTable.rect.offsets.margins.left, skinTable.rect.offsets.top);
+						this:SetWidth(win:GetWidth() - skinTable.rect.offsets.margins.left - skinTable.rect.offsets.margins.right);
+						this:SetHeight(this.flash:GetHeight());
+						this.isAttached = true;
+					end
+				elseif(win.isMoving and this.isAttached) then
+					if(mWin ~= this.attachedTo) then
+						this:ResetState();
+					end
+				else
+					if(this.isAttached) then
+						this:ResetState();
+					end
+				end
+			else
+				if(this.isAttached) then
+					this:ResetState();
+				end
+			end
+                else
+                    if(this.isAttached) then
+                        this:ResetState();
+                    end
+                end
+                if(this.isAttached) then
+                    this.flash:Show();
+                else
+                    this.flash:Hide();
+                end
+            end);
+helperFrame:Show();
 
 local function executeHandlers(WidgetName, wType, HandlerName, ...)
 	local tbl, fun;
@@ -201,14 +309,18 @@ local function MessageWindow_Frame_OnUpdate()
 		while(this.fadeElapsed > .1) do
 			local window = GetMouseFocus();
 			if(window) then
-				if((window == this or window.parentWindow == this  or this.isOnHyperLink or
-						(WIM.EditBoxInFocus and WIM.EditBoxInFocus.parentWindow == this)) and
+				if(((window == this or window.parentWindow == this  or this.isOnHyperLink or
+						this == helperFrame.attachedTo or
+						(WIM.EditBoxInFocus and WIM.EditBoxInFocus.parentWindow == this)) or
+						(window.tabStrip and window.tabStrip.selected.obj == this)) and
 						(not this.fadedIn or this.delayFade)) then
 					this.fadedIn = true;
 					this.delayFade = false;
 					this.delayFadeElapsed = 0;
 					UIFrameFadeIn(this, FadeProps.interval, this:GetAlpha(), FadeProps.max);
 				elseif(window ~= this and window.parentWindow ~= this and not this.isOnHyperLink and
+						(not (window.tabStrip and window.tabStrip.selected.obj == this)) and
+						helperFrame.attachedTo ~= this and
 						(not WIM.EditBoxInFocus or WIM.EditBoxInFocus.parentWindow ~= this) and this.fadedIn) then
 					if(this.delayFade) then
 						this.delayFadeElapsed = (this.delayFadeElapsed or 0) + arg1;
@@ -357,9 +469,11 @@ local function instantiateWindow(obj)
     obj:RegisterForDrag("LeftButton");
     obj:SetScript("OnDragStart", function() MessageWindow_MovementControler_OnDragStart(); end);
     obj:SetScript("OnDragStop", function() MessageWindow_MovementControler_OnDragStop(); end);
+    obj:SetScript("OnMouseUp", function() MessageWindow_MovementControler_OnDragStop(); end);
     obj:SetScript("OnShow", MessageWindow_Frame_OnShow);
     obj:SetScript("OnHide", MessageWindow_Frame_OnHide);
     obj:SetScript("OnUpdate", MessageWindow_Frame_OnUpdate);
+    obj.isWimWindow = true;
     
     --obj.icon = createMipmapDodad(fName);
     
@@ -509,7 +623,11 @@ local function instantiateWindow(obj)
 		-- go by forceResult and ignore rules
 		if(forceResult == true) then
 			setWindowAsFadedIn(obj);
-			obj:Show();
+			if(obj.tabStrip) then
+				obj.tabStrip:JumpToTabName(obj.theUser);
+			else
+				obj:Show();
+			end
 		end
 	else
 		-- execute pop rules.
@@ -521,7 +639,11 @@ local function instantiateWindow(obj)
 				(rules.onReceive and msgDirection == "in") or
 				(rules.onNew and obj.isNew and msgDirection == "in")) then 
 			setWindowAsFadedIn(obj);
-			obj:Show(); -- exists for testing.
+			if(obj.tabStrip) then
+				obj.tabStrip:JumpToTabName(obj.theUser);
+			else
+				obj:Show();
+			end
 		end
 	end
 	
