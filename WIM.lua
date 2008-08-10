@@ -38,7 +38,7 @@ local WIM_isBeta = true;
 
 -- create a frame to moderate events and frame updates.
     local workerFrame = CreateFrame("Frame", "WIM_workerFrame");
-    workerFrame:SetScript("OnEvent", function() WIM:EventHandler(event) end);
+    workerFrame:SetScript("OnEvent", function(self, event, ...) WIM:EventHandler(event, ...); end);
     
     -- some events we always want to listen to so data is ready upon WIM being enabled.
     workerFrame:RegisterEvent("VARIABLES_LOADED");
@@ -219,7 +219,7 @@ function WIM:EventHandler(event, ...)
     -- no matter what, we want to see these.
     if(not (event == "CHAT_MSG_WHISPER" and agr6 ~= "GM")) then
         -- first we will filter out
-        if(honorChatFrameEventFilter(event, agr1 or "")) then
+        if(honorChatFrameEventFilter(event, arg1 or "")) then
             -- ChatFrame's event filters said to block this message.
             return;
         end
@@ -228,10 +228,11 @@ function WIM:EventHandler(event, ...)
 
     -- Core WIM Event Handlers.
     WIM:dPrint("Event '"..event.."' received.");
+    WIM:dPrint("Args:"..(arg1 or "")..","..(arg2 or "")..","..(arg3 or "")..","..(arg4 or "")..","..(arg5 or "")..","..(arg6 or "")..","..(arg7 or "")..","..(arg8 or "")..","..(arg9 or "")..","..(arg10 or "")..","..(arg11 or ""));
     local fun = WIM[event];
     if(type(fun) == "function") then
         WIM:dPrint("  +-- WIM:"..event);
-        fun();
+        fun(WIM, ...);
     end
     
     -- Module Event Handlers
@@ -240,7 +241,7 @@ function WIM:EventHandler(event, ...)
         fun = tData[event];
         if(type(fun) == "function" and tData.enabled) then
             WIM:dPrint("  +-- "..module..":"..event);
-            fun(...);
+            fun(WIM.modules[module], ...);
         end
     end
 end
