@@ -316,7 +316,7 @@ local function MessageWindow_Frame_OnHide()
     end
 end
 
-local function MessageWindow_Frame_OnUpdate(elapsed)
+local function MessageWindow_Frame_OnUpdate(event, elapsed)
 	-- window is visible, there aren't any messages waiting...
 	this.msgWaiting = false;
 	
