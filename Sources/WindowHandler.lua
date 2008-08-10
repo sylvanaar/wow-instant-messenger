@@ -133,8 +133,8 @@ helperFrame.ResetState = function(self)
         helperFrame:SetWidth(1);
         helperFrame:SetHeight(1);
         helperFrame:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", 0, 0);
+	helperFrame.isAttached = false;
         helperFrame.attachedTo = nil;
-        helperFrame.isAttached = false;
     end
 helperFrame:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", 0, 0);
 helperFrame:SetScript("OnUpdate", function()
@@ -147,21 +147,22 @@ helperFrame:SetScript("OnUpdate", function()
 				else
 					win = obj.parentWindow;
 				end
+				if(win.isMoving and not (win.tabStrip and win.tabStrip:IsVisible())) then
 				local mWin = getWindowAtCursorPosition(win);
-				if(win.isMoving and not this.isAttached) then
-					if(mWin) then
-						-- attach to window
-						local skinTable = WIM:GetSelectedSkin().tab_strip;
-						this.attachedTo = mWin;
-						this:ClearAllPoints();
-						this:SetParent(mWin);
-						this:SetPoint(skinTable.rect.anchor_points.self, mWin, skinTable.rect.anchor_points.relative, skinTable.rect.offsets.margins.left, skinTable.rect.offsets.top);
-						this:SetWidth(win:GetWidth() - skinTable.rect.offsets.margins.left - skinTable.rect.offsets.margins.right);
-						this:SetHeight(this.flash:GetHeight());
-						this.isAttached = true;
-					end
-				elseif(win.isMoving and this.isAttached) then
-					if(mWin ~= this.attachedTo) then
+					if(not this.isAttached) then
+						if(mWin) then
+							-- attach to window
+							local skinTable = WIM:GetSelectedSkin().tab_strip;
+							this.attachedTo = mWin;
+							mWin.helperFrame = helperFrame;
+							this:ClearAllPoints();
+							this:SetParent(mWin);
+							this:SetPoint(skinTable.rect.anchor_points.self, mWin, skinTable.rect.anchor_points.relative, skinTable.rect.offsets.margins.left, skinTable.rect.offsets.top);
+							this:SetWidth(win:GetWidth() - skinTable.rect.offsets.margins.left - skinTable.rect.offsets.margins.right);
+							this:SetHeight(this.flash:GetHeight());
+							this.isAttached = true;
+						end
+					elseif(this.isAttached and mWin ~= this.attachedTo) then
 						this:ResetState();
 					end
 				else
@@ -218,6 +219,8 @@ local function getParentMessageWindow(obj)
 	return nil;
     elseif(obj.isParent) then
         return obj;
+    elseif(obj.parentWindow) then
+	return obj.parentWindow;
     elseif(obj:GetName() == "UIParent") then
         return nil;
     else
@@ -253,8 +256,22 @@ end
 local function MessageWindow_MovementControler_OnDragStop()
     local window = getParentMessageWindow(this);
     if(window) then
+	local dropTo = helperFrame.attachedTo;
+	helperFrame:ResetState();
         window:StopMovingOrSizing();
         window.isMoving = false;
+	if(dropTo) then
+		if(window.tabStrip) then
+			window.tabStrip:Detach(window.theUser);
+		end
+		if(dropTo.tabStrip) then
+			dropTo.tabStrip:Attach(window.theUser);
+		else
+			local tabStrip = WIM:GetAvailableTabGroup();
+			tabStrip:Attach(dropTo.theUser);
+			tabStrip:Attach(window.theUser);
+		end
+	end
     end
 end
 
@@ -299,13 +316,13 @@ local function MessageWindow_Frame_OnHide()
     end
 end
 
-local function MessageWindow_Frame_OnUpdate()
+local function MessageWindow_Frame_OnUpdate(elapsed)
 	-- window is visible, there aren't any messages waiting...
 	this.msgWaiting = false;
 	
 	-- fading segment
 	if(WIM.db.winFade) then
-		this.fadeElapsed = (this.fadeElapsed or 0) + arg1;
+		this.fadeElapsed = (this.fadeElapsed or 0) + elapsed;
 		while(this.fadeElapsed > .1) do
 			local window = GetMouseFocus();
 			if(window) then
@@ -323,7 +340,7 @@ local function MessageWindow_Frame_OnUpdate()
 						helperFrame.attachedTo ~= this and
 						(not WIM.EditBoxInFocus or WIM.EditBoxInFocus.parentWindow ~= this) and this.fadedIn) then
 					if(this.delayFade) then
-						this.delayFadeElapsed = (this.delayFadeElapsed or 0) + arg1;
+						this.delayFadeElapsed = (this.delayFadeElapsed or 0) + elapsed;
 						while(this.delayFadeElapsed > FadeProps.delay) do
 							this.delayFade = false;
 							this.delayFadeElapsed = 0;
@@ -474,6 +491,7 @@ local function instantiateWindow(obj)
     obj:SetScript("OnHide", MessageWindow_Frame_OnHide);
     obj:SetScript("OnUpdate", MessageWindow_Frame_OnUpdate);
     obj.isWimWindow = true;
+    obj.helperFrame = helperFrame;
     
     --obj.icon = createMipmapDodad(fName);
     
@@ -596,13 +614,17 @@ local function instantiateWindow(obj)
     
     obj.SendWho = function(self)
 	local whoLib = WIM.libs.WhoLib;
-	whoLib:UserInfo(obj.theUser, 
-		{
-			queue = whoLib.WHOLIB_QUEUE_QUIET, 
-			timeout = 0,
-			flags = whoLib.WHOLIB_FLAG_ALLWAYS_CALLBACK,
-			callback = obj.WhoCallback
-		});
+	if(whoLib) then
+		whoLib:UserInfo(obj.theUser, 
+			{
+				queue = whoLib.WHOLIB_QUEUE_QUIET, 
+				timeout = 0,
+				flags = whoLib.WHOLIB_FLAG_ALLWAYS_CALLBACK,
+				callback = obj.WhoCallback
+			});
+	else
+		WIM:dPrint("WhoLib-1.0 not loaded... Skipping who lookup!");
+	end
     end
     
     -- PopUp rules
