@@ -228,7 +228,8 @@ function WIM:EventHandler(event, ...)
 
     -- Core WIM Event Handlers.
     WIM:dPrint("Event '"..event.."' received.");
-    WIM:dPrint("Args:"..(arg1 or "")..","..(arg2 or "")..","..(arg3 or "")..","..(arg4 or "")..","..(arg5 or "")..","..(arg6 or "")..","..(arg7 or "")..","..(arg8 or "")..","..(arg9 or "")..","..(arg10 or "")..","..(arg11 or ""));
+    -- the following line is for debugging only.
+    --WIM:dPrint("Args:"..(arg1 or "")..","..(arg2 or "")..","..(arg3 or "")..","..(arg4 or "")..","..(arg5 or "")..","..(arg6 or "")..","..(arg7 or "")..","..(arg8 or "")..","..(arg9 or "")..","..(arg10 or "")..","..(arg11 or ""));
     local fun = WIM[event];
     if(type(fun) == "function") then
         WIM:dPrint("  +-- WIM:"..event);
