@@ -63,25 +63,25 @@ end
 --      Event Triggers                  --
 ------------------------------------------
 
-function WIM:PLAYER_REGEN_ENABLED()
+function WIM:PLAYER_REGEN_ENABLED(...)
     -- player no longer in combat
     flag_combat = false;
     evaluateState();
 end
 
-function WIM:PLAYER_REGEN_DISABLED()
+function WIM:PLAYER_REGEN_DISABLED(...)
     -- player in combat
     flag_combat = true;
     evaluateState();
 end
 
-function WIM:PLAYER_UPDATE_RESTING()
+function WIM:PLAYER_UPDATE_RESTING(...)
     -- player has either entered or left resting state
     flag_resting = IsResting();
     evaluateState();    
 end
 
-function WIM:PLAYER_ENTERING_WORLD()
+function WIM:PLAYER_ENTERING_WORLD(...)
     -- check if player is in arena, bg, party or raid.
     evaluateState();
 end

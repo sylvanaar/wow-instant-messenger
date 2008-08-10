@@ -213,7 +213,8 @@ end
 
 
 -- This is WIM's core event controler.
-function WIM:EventHandler(event)
+function WIM:EventHandler(event, ...)
+    local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
     -- before we do any filtering, make sure that we are not speaking to a GM.
     -- no matter what, we want to see these.
     if(not (event == "CHAT_MSG_WHISPER" and agr6 ~= "GM")) then
@@ -239,7 +240,7 @@ function WIM:EventHandler(event)
         fun = tData[event];
         if(type(fun) == "function" and tData.enabled) then
             WIM:dPrint("  +-- "..module..":"..event);
-            fun();
+            fun(...);
         end
     end
 end

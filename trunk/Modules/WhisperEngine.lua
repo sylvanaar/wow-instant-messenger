@@ -123,7 +123,8 @@ WIM:RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function()
 --          Event Handlers          --
 --------------------------------------
 
-function WhisperEngine:CHAT_MSG_WHISPER()
+function WhisperEngine:CHAT_MSG_WHISPER(...)
+    local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
     local color = WIM.db.displayColors.wispIn; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
     win:AddUserMessage(arg2, arg1, color.r, color.g, color.b);
@@ -133,7 +134,8 @@ function WhisperEngine:CHAT_MSG_WHISPER()
     end
 end
 
-function WhisperEngine:CHAT_MSG_WHISPER_INFORM()
+function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
+    local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
     local color = WIM.db.displayColors.wispOut; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
     win:AddUserMessage(UnitName("player"), arg1, color.r, color.g, color.b);
