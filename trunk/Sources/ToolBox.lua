@@ -98,7 +98,29 @@ function WIM:FormatUserName(user)
 	return user;
 end
 
+-- a simple function to add an item to a table checking for duplicates.
+-- this is ok, since the table is never too large to slow things down.
+function WIM.addToTableUnique(tbl, item)
+    local i;
+    for i=1,table.getn(tbl) do
+        if(tbl[i] == item) then
+            return;
+        end
+    end
+    table.insert(tbl, item);
+end
 
+-- remove item from table. Return true if removed, false otherwise.
+function WIM.removeFromTable(tbl, item)
+    local i;
+    for i=1,table.getn(tbl) do
+        if(tbl[i] == item) then
+            table.remove(tbl, i);
+            return true;
+        end
+    end
+    return false;
+end
 
 --------------------------------------
 --      Debugging Functions         --
