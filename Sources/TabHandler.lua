@@ -57,7 +57,7 @@ helperFrame:SetScript("OnDragStart", function()
                 end
             end);
 helperFrame:SetScript("OnDragStop", function()
-                local win = this.obj.childObj;
+                local win = this.parentWindow;
                 local x,y = win:GetLeft(), win:GetTop();
                 win:ClearAllPoints();
                 win:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y);
@@ -132,27 +132,11 @@ helperFrame:Show();
 
 -- a simple function to add an item to a table checking for duplicates.
 -- this is ok, since the table is never too large to slow things down.
-local function addToTableUnique(tbl, item)
-    local i;
-    for i=1,table.getn(tbl) do
-        if(tbl[i] == item) then
-            return;
-        end
-    end
-    table.insert(tbl, item);
-end
+local addToTableUnique = WIM.addToTableUnique;
 
 -- remove item from table. Return true if removed, false otherwise.
-local function removeFromTable(tbl, item)
-    local i;
-    for i=1,table.getn(tbl) do
-        if(tbl[i] == item) then
-            table.remove(tbl, i);
-            return true;
-        end
-    end
-    return false;
-end
+local removeFromTable = WIM.removeFromTable;
+
 
 -- get the table index of an item. return's 0 if not found
 local function getIndexFromTable(tbl, item)

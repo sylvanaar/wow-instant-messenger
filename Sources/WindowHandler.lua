@@ -844,12 +844,12 @@ local function destroyWindow(userNameOrObj)
         --WIM_Astrolabe:RemoveIconFromMinimap(obj.icon);
         --obj.icon:Hide();
         --obj.icon.track = false;
-        obj:Show();
-        obj.widgets.chat_display:Clear();
-        obj:Hide();
 	if(obj.tabStrip) then
 		obj.tabStrip:Detach(obj.theUser);
 	end
+        obj:Show();
+        obj.widgets.chat_display:Clear();
+        obj:Hide();
 	WIM:dPrint("Window '"..obj:GetName().."' destroyed.");
     end
 end

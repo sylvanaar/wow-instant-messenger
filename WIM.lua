@@ -32,9 +32,6 @@ WIM.lists = {};
 -- list of all the events registered from attached modules.
 local Events = {};
 
-local WIM_isEnabled = false;
-local WIM_isBeta = true;
-
 
 -- create a frame to moderate events and frame updates.
     local workerFrame = CreateFrame("Frame", "WIM_workerFrame");
@@ -129,7 +126,7 @@ end
 -- unregistered. A disabled module will not receive events.
 local function RegisterEvent(event)
     Events[event] = true;
-    if( WIM_isEnabled ) then
+    if( WIM.db and WIM.db.enabled ) then
         workerFrame:RegisterEvent(event);
     end
 end
@@ -195,26 +192,23 @@ end
 --------------------------------------
 
 local function honorChatFrameEventFilter(event, msg)
-	local chatFilters = ChatFrame_GetMessageEventFilters(event);
-	if chatFilters then 
-		local filter, newmsg = false;
-		for _, filterFunc in next, chatFilters do
-			-- first make sure, we aren't doubling up on events. We don't need WIM to do its own twice.
-			if(filterFunc ~= WIM_ChatFrame_MessageEventFilter_WHISPERS) then
-				filter, newmsg = filterFunc(msg);
-				if filter then 
-					return true; 
-				end 
-			end
-		end 
+    local chatFilters = ChatFrame_GetMessageEventFilters(event);
+    if chatFilters then 
+	local filter, newmsg = false;
+        for _, filterFunc in next, chatFilters do
+            filter, newmsg = filterFunc(msg);
+            if filter then 
+		return true; 
+	    end 
 	end 
-	return false;
+    end 
+    return false;
 end
 
 
 -- This is WIM's core event controler.
 function WIM:EventHandler(event, ...)
-    local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
+    local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
     -- before we do any filtering, make sure that we are not speaking to a GM.
     -- no matter what, we want to see these.
     if(not (event == "CHAT_MSG_WHISPER" and agr6 ~= "GM")) then
