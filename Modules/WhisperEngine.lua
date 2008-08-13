@@ -2,8 +2,10 @@
 -- Author: John Langone (Pazza - Bronzebeard)
 -- Description: This module handles whisper behaviors as well as their respective window actions.
 
+local WIM = WIM;
+
 -- create WIM Module
-WhisperEngine = WIM:CreateModule("WhisperEngine");
+local WhisperEngine = WIM:CreateModule("WhisperEngine");
 
 -- declare default settings for whispers.
 WhisperEngine.db_defaults.whispers = {
