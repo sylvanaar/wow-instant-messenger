@@ -47,10 +47,10 @@ local Events = {};
 -- called when WIM is first loaded into memory but after variables are loaded.
 local function initialize()
     --load cached information from the WIM_Cache saved variable.
-	WIM_Cache[WIM.env.realm] = WIM_Cache[WIM.env.realm] or {};
-        WIM_Cache[WIM.env.realm][WIM.env.character] = WIM_Cache[WIM.env.realm][WIM.env.character] or {};
-	WIM.lists.friends = WIM_Cache[WIM.env.realm][WIM.env.character].friendList;
-	WIM.lists.guild = WIM_Cache[WIM.env.realm][WIM.env.character].guildList;
+	WIM.env.cache[WIM.env.realm] = WIM.env.cache[WIM.env.realm] or {};
+        WIM.env.cache[WIM.env.realm][WIM.env.character] = WIM.env.cache[WIM.env.realm][WIM.env.character] or {};
+	WIM.lists.friends = WIM.env.cache[WIM.env.realm][WIM.env.character].friendList;
+	WIM.lists.guild = WIM.env.cache[WIM.env.realm][WIM.env.character].guildList;
         
         if(type(WIM.lists.friends) ~= "table") then WIM.lists.friends = {}; end
         if(type(WIM.lists.guild) ~= "table") then WIM.lists.guild = {}; end
@@ -66,6 +66,25 @@ local function initialize()
     WIM.isInitialized = true;
     
     WIM:RegisterPrematureSkins();
+    
+    --enableModules
+    local moduleName, tData;
+    for moduleName, tData in pairs(WIM.modules) do
+        WIM.modules[moduleName].db = WIM.db;
+        if(WIM.modules[moduleName].canDisable ~= false) then
+            local modDB = WIM.db.modules[moduleName];
+            if(modDB) then
+                if(modDB.enabled == nil) then
+                    modDB.enabled = WIM.modules[moduleName].enableByDefault;
+                end
+                WIM:EnableModule(moduleName, modDB.enabled);
+            else
+                if(WIM.modules[moduleName].enableByDefault) then
+                    WIM:EnableModule(moduleName, true);
+                end
+            end
+        end
+    end
     
     WIM:dPrint("WIM initialized...");
 end
@@ -132,11 +151,12 @@ local function RegisterEvent(event)
 end
 
 -- create a new WIM module. Will return module object.
-function WIM:CreateModule(moduleName)
+function WIM:CreateModule(moduleName, enableByDefault)
     if(type(moduleName) == "string") then
         WIM.modules[moduleName] = {
             title = moduleName,
             enabled = false,
+            enableByDefault = enableByDefault or false,
             canDisable = true,
             resources = {
                 lists = WIM.lists,
@@ -169,8 +189,10 @@ function WIM:EnableModule(moduleName, enabled)
         end
         if(enabled) then
             module.enabled = enabled;
-            if(type(module.OnEnableDisable) == "function") then
-                module:OnEnableDisable(enabled);
+            if(enabled and type(module.OnEnable) == "function") then
+                module:OnEnable();
+            elseif(not enabled and type(module.OnDisable) == "function") then
+                module:OnDisable();
             end
             WIM:dPrint("Module '"..moduleName.."' Enabled");
         else
@@ -178,11 +200,17 @@ function WIM:EnableModule(moduleName, enabled)
                 WIM:dPrint("Module '"..moduleName.."' will be disabled after restart.");
             else
                 module.enabled = enabled;
-                if(type(module.OnEnableDisable) == "function") then
-                    module:OnEnableDisable(enabled);
+                if(enabled and type(module.OnEnable) == "function") then
+                    module:OnEnable();
+                elseif(not enabled and type(module.OnDisable) == "function") then
+                    module:OnDisable();
                 end
                 WIM:dPrint("Module '"..moduleName.."' Disabled");
             end
+        end
+        if(WIM.db) then
+            WIM.db.modules[moduleName] = WIM.db.modules[moduleName] or {};
+            WIM.db.modules[moduleName].enabled = enabled;
         end
     end
 end
@@ -242,12 +270,15 @@ function WIM:EventHandler(event, ...)
 end
 
 function WIM:VARIABLES_LOADED()
-    WIM.db = WIM3_Data or {};
-    WIM_Cache = WIM_Cache or {};
+    WIM3_Data = WIM3_Data or {};
+    WIM.db = WIM3_Data;
+    WIM3_Cache = WIM3_Cache or {};
+    WIM.env.cache = WIM3_Cache;
     
     -- load some environment data.
     WIM.env.realm = GetCVar("realmName");
     WIM.env.character = UnitName("player");
+    
     
     -- inherrit any new default options which wheren't shown in previous releases.
     WIM.copyTable(WIM.db_defaults, WIM.db);
@@ -258,28 +289,28 @@ function WIM:VARIABLES_LOADED()
 end
 
 function WIM:FRIENDLIST_UPDATE()
-    WIM_Cache[WIM.env.realm][WIM.env.character].friendList = {};
+    WIM.env.cache[WIM.env.realm][WIM.env.character].friendList = {};
 	for i=1, GetNumFriends() do 
 		local name, junk = GetFriendInfo(i);
 		if(name) then
-			WIM_Cache[WIM.env.realm][WIM.env.character].friendList[name] = "1"; --[set place holder for quick lookup
+			WIM.env.cache[WIM.env.realm][WIM.env.character].friendList[name] = "1"; --[set place holder for quick lookup
 		end
 	end
-    WIM.lists.friends = WIM_Cache[WIM.env.realm][WIM.env.character].friendList;
+    WIM.lists.friends = WIM.env.cache[WIM.env.realm][WIM.env.character].friendList;
     WIM:dPrint("Friends list updated...");
 end
 
 function WIM:GUILD_ROSTER_UPDATE()
-	WIM_Cache[WIM.env.realm][WIM.env.character].guildList = {};
+	WIM.env.cache[WIM.env.realm][WIM.env.character].guildList = {};
 	if(IsInGuild()) then
 		for i=1, GetNumGuildMembers(true) do 
 			local name, junk = GetGuildRosterInfo(i);
 			if(name) then
-				WIM_Cache[WIM.env.realm][WIM.env.character].guildList[name] = "1"; --[set place holder for quick lookup
+				WIM.env.cache[WIM.env.realm][WIM.env.character].guildList[name] = "1"; --[set place holder for quick lookup
 			end
 		end
 	end
-	WIM.lists.guild = WIM_Cache[WIM.env.realm][WIM.env.character].guildList;
+	WIM.lists.guild = WIM.env.cache[WIM.env.realm][WIM.env.character].guildList;
         WIM:dPrint("Guild list updated...");
 end
 

@@ -2,5 +2,6 @@
 ..\FrameXML\UI.xsd">
 
     <Script file="WhisperEngine.lua"/>
+    <Script file="MinimapIcon.lua"/>
 
 </Ui>

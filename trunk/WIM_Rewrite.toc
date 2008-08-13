@@ -9,7 +9,7 @@
 ## X-Category: MYADDONS_CATEGORY_CHAT
 ## DefaultState: Enabled
 ## OptionalDeps: Titan, AllInOneInventory, EngInventory, LootLink, FuBar, ItemSync, AdvancedTradeSkillWindow
-## SavedVariables: WIM3_Data, WIM_Alias, WIM_Filters, WIM_History, WIM_Cache, WIM_FuBarDB
+## SavedVariables: WIM3_Data, WIM_Alias, WIM_Filters, WIM_History, WIM3_Cache, WIM_FuBarDB
 ## X-Embeds: PratPlugin-1.0, WhoLib
 
 Localization\Includes.xml
