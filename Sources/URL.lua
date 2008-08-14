@@ -1,4 +1,38 @@
-function WIM:isLinkTypeURL(link)
+local patterns = {
+	-- X@X.Y url (---> email)
+	"^(www%.[%w_-]+%.%S+[^%p%s])",
+	"%s(www%.[%w_-]+%.%S+[^%p%s])",
+	-- XXX.YYY.ZZZ.WWW:VVVV/UUUUU url
+	"^(%d%d?%d?%.%d%d?%d?%.%d%d?%d?%.%d%d?%d?:%d%d?%d?%d?%d?/%S+[^%p%s])",
+	"%s(%d%d?%d?%.%d%d?%d?%.%d%d?%d?%.%d%d?%d?:%d%d?%d?%d?%d?/%S+[^%p%s])",
+	-- XXX.YYY.ZZZ.WWW:VVVV url (IP of ts server for example)
+	"^(%d%d?%d?%.%d%d?%d?%.%d%d?%d?%.%d%d?%d?:%d%d?%d?%d?%d?)", 
+	"%s(%d%d?%d?%.%d%d?%d?%.%d%d?%d?%.%d%d?%d?:%d%d?%d?%d?%d?)", 
+	-- XXX.YYY.ZZZ.WWW/VVVVV url (---> IP)
+	"^(%d%d?%d?%.%d%d?%d?%.%d%d?%d?%.%d%d?%d?/%S+[^%p%s])", 
+	"%s(%d%d?%d?%.%d%d?%d?%.%d%d?%d?%.%d%d?%d?/%S+[^%p%s])", 
+	-- XXX.YYY.ZZZ.WWW url (---> IP)
+	"^(%d%d?%d?%.%d%d?%d?%.%d%d?%d?%.%d%d?%d?)", 
+	"%s(%d%d?%d?%.%d%d?%d?%.%d%d?%d?%.%d%d?%d?)",
+	-- X.Y.Z:WWWW/VVVVV url
+	"^([%w_.-]+[%w_-]%.%a%a+:%d%d?%d?%d?%d?/%S+[^%p%s])", 
+	"%s([%w_.-]+[%w_-]%.%a%a+:%d%d?%d?%d?%d?/%S+[^%p%s])", 
+	-- X.Y.Z:WWWW url  (ts server for example)
+	"^([%w_.-]+[%w_-]%.%a%a+:%d%d?%d?%d?%d?)", 
+	"%s([%w_.-]+[%w_-]%.%a%a+:%d%d?%d?%d?%d?)", 
+	-- X.Y.Z/WWWWW url
+	"^([%w_.-]+[%w_-]%.%a%a+/%S+[^%p%s])", 
+	"%s([%w_.-]+[%w_-]%.%a%a+/%S+[^%p%s])", 
+	-- X.Y.Z url
+	"^([%w_.-]+[%w_-]%.%a%a+)", 
+	"%s([%w_.-]+[%w_-]%.%a%a+)", 
+	-- X://Y url
+	"(%a+://[%d%w_-%.]+[%.%d%w_%-%/%?%%%=%;%:%+%&]*)", 
+};	
+
+
+
+local function isLinkTypeURL(link)
 	if (strsub(link, 1, 7) == "wim_url") then
 		return true;
 	else
@@ -6,7 +40,7 @@ function WIM:isLinkTypeURL(link)
 	end
 end
 
-function WIM:DisplayURL(link)
+local function displayURL(link)
 	local theLink = "";
 	if (string.len(link) > 4) and (string.sub(link,1,8) == "wim_url:") then
 		theLink = string.sub(link,9, string.len(link));
@@ -42,3 +76,15 @@ function WIM:DisplayURL(link)
 	};
 	StaticPopup_Show ("WIM_SHOW_URL", theLink);
 end
+
+
+--Hook SetItemRef
+local SetItemRef_orig = SetItemRef;
+local function setItemRef (link, text, button)
+	if (isLinkTypeURL(link)) then
+		displayURL(link);
+		return;
+	end
+	SetItemRef_orig(link, text, button);
+end
+SetItemRef = setItemRef;
