@@ -100,14 +100,18 @@ end
 
 -- a simple function to add an item to a table checking for duplicates.
 -- this is ok, since the table is never too large to slow things down.
-function WIM.addToTableUnique(tbl, item)
+function WIM.addToTableUnique(tbl, item, prioritize)
     local i;
     for i=1,table.getn(tbl) do
         if(tbl[i] == item) then
             return;
         end
     end
-    table.insert(tbl, item);
+    if(prioritize) then
+        table.insert(tbl, 1, item);
+    else
+        table.insert(tbl, item);
+    end
 end
 
 -- remove item from table. Return true if removed, false otherwise.
