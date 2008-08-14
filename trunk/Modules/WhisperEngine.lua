@@ -137,6 +137,9 @@ local function CHAT_MSG_WHISPER(...)
     if(WIM.db.whispers.playSound) then
         PlaySoundFile("Interface\\AddOns\\"..WIM.addonTocName.."\\Sounds\\wisp.wav");
     end
+    if(WIM.db.whispers.pop_rules[WIM.curState].supress) then
+        ChatEdit_SetLastTellTarget(arg2);
+    end
 end
 
 local function CHAT_MSG_WHISPER_INFORM(...)
@@ -145,6 +148,9 @@ local function CHAT_MSG_WHISPER_INFORM(...)
     local win = getWhisperWindowByUser(arg2);
     win:AddUserMessage(UnitName("player"), arg1, color.r, color.g, color.b);
     win:Pop("out");
+    if(WIM.db.whispers.pop_rules[WIM.curState].supress) then
+        ChatEdit_SetLastToldTarget(arg2);
+    end
 end
 
 local function getNewEventTable(msgID)

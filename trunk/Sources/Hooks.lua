@@ -3,16 +3,7 @@ This file contains hooks which are required by WIM's core.
 Module specific hooks are found within it's own files.
 ]]
 
---Hook SetItemRef
-local SetItemRef_orig = SetItemRef;
-local function setItemRef (link, text, button)
-	if (WIM:isLinkTypeURL(link)) then
-		DisplayURL(link);
-		return;
-	end
-	SetItemRef_orig(link, text, button);
-end
-SetItemRef = setItemRef;
+
 
 
 
