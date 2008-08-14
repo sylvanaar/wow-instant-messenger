@@ -55,10 +55,23 @@ local FadeProps = {
 	delay = 1
 };
 
+local FormattingCalls = {}; -- functions which are passed events to be formatted. Only one may be used at once.
+
+local StringModifiers = {}; -- registered functions which will be used to format the message part of the string.
+
+
 -- the following table defines a list of actions to be taken when
 -- script handlers are fired for different type windows.
 -- use WIM:RegisterWidgetTrigger(WindowType, ScriptEvent, function());
 local Widget_Triggers = {};
+
+local function applyStringModifiers(str)
+	local i;
+	for i=1, table.getn(StringModifiers) do
+		str = StringModifiers[i](str);
+	end
+	return str;
+end
 
 
 local RegisteredWidgets = {}; -- a list of registered widgets added to windows from modules.
@@ -570,8 +583,9 @@ local function instantiateWindow(obj)
     widgets.msg_box:EnableMouse(true);
     
     --Addmessage functions
-    obj.AddMessage = function(self, ...)
-	obj.widgets.chat_display:AddMessage(...);
+    obj.AddMessage = function(self, msg, ...)
+	msg = applyStringModifiers(msg);
+	obj.widgets.chat_display:AddMessage(msg, ...);
     end
     
     obj.AddUserMessage = function(self, user, msg, ...)
@@ -907,6 +921,13 @@ function WIM:RegisterWidget(widgetName, createFunction, moduleName)
 	end
 end
 
+function WIM:RegisterStringModifier(fun, prioritize)
+	WIM.addToTableUnique(StringModifiers, fun, prioritize);
+end
+
+function WIM:UnregisterStringModifier(fun)
+	WIM.removeFromTable(StringModifiers, fun);
+end
 
 ----------------------------------
 -- Set default widget triggers	--

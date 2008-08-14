@@ -1,7 +1,7 @@
 WIM = { -- WIM's core object.
     addonTocName = "WIM_Rewrite",
     version = "3.0.0",
-    revision = "",
+    revision = "$Revision:$",
     beta = true
 }; 
 local WIM = WIM;
@@ -215,6 +215,16 @@ function WIM:EnableModule(moduleName, enabled)
     end
 end
 
+function WIM:CallModuleFunction(funName, ...)
+    -- notify all enabled modules.
+    local module, tData, fun;
+    for module, tData in pairs(WIM.modules) do
+        fun = tData[funName];
+        if(type(fun) == "function" and tData.enabled) then
+            fun(tData, ...);
+        end
+    end
+end
 --------------------------------------
 --          Event Handlers          --
 --------------------------------------

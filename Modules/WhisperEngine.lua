@@ -2,6 +2,16 @@
 -- Author: John Langone (Pazza - Bronzebeard)
 -- Description: This module handles whisper behaviors as well as their respective window actions.
 
+--[[
+    Extends Modules by adding:
+        Module:OnEvent_Whisper(eventItem)
+        Module:OnEvent_WhisperInform(eventItem)
+        Module:PostEvent_Whisper(args[...])
+        Module:PostEvent_WhisperInform(args[...])
+]]
+
+
+
 local WIM = WIM;
 
 -- create WIM Module
@@ -134,12 +144,11 @@ local function CHAT_MSG_WHISPER(...)
     local win = getWhisperWindowByUser(arg2);
     win:AddUserMessage(arg2, arg1, color.r, color.g, color.b);
     win:Pop("in");
-    if(WIM.db.whispers.playSound) then
-        PlaySoundFile("Interface\\AddOns\\"..WIM.addonTocName.."\\Sounds\\wisp.wav");
-    end
+
     if(WIM.db.whispers.pop_rules[WIM.curState].supress) then
         ChatEdit_SetLastTellTarget(arg2);
     end
+    WIM:CallModuleFunction("PostEvent_Whisper", ...);
 end
 
 local function CHAT_MSG_WHISPER_INFORM(...)
@@ -151,6 +160,7 @@ local function CHAT_MSG_WHISPER_INFORM(...)
     if(WIM.db.whispers.pop_rules[WIM.curState].supress) then
         ChatEdit_SetLastToldTarget(arg2);
     end
+    WIM:CallModuleFunction("PostEvent_WhisperInform", ...);
 end
 
 local function getNewEventTable(msgID)
@@ -298,15 +308,11 @@ local function pushEvent(event, ...)
     end
     addToTableUnique(WhisperQueue, eventItem);
     -- notify all modules.
-    local module, tData, fun;
-    for module, tData in pairs(WIM.modules) do
+    if(eventItem.argCount > 0) then
         if(eventItem.event == "CHAT_MSG_WHISPER") then
-            fun = tData["OnEvent_Whisper"];
+            WIM:CallModuleFunction("OnEvent_Whisper", eventItem);
         else
-            fun = tData["OnEvent_WhisperInform"];
-        end
-        if(type(fun) == "function" and tData.enabled and eventItem.argCount > 0) then
-            fun(WIM.modules[module], eventItem);
+            WIM:CallModuleFunction("OnEvent_WhisperInform", eventItem);
         end
     end
     eventItem.flags.passedToModules = true;

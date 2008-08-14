@@ -3,5 +3,7 @@
 
     <Script file="WhisperEngine.lua"/>
     <Script file="MinimapIcon.lua"/>
-
+    <Script file="URLHandler.lua"/>
+    <Script file="Sounds.lua"/>
+    
 </Ui>
