@@ -1,7 +1,6 @@
 WIM = { -- WIM's core object.
     addonTocName = "WIM_Rewrite",
     version = "3.0.0",
-    revision = "$Revision:$",
     beta = true
 }; 
 local WIM = WIM;
