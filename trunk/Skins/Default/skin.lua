@@ -95,95 +95,99 @@ local WIM_ClassicSkin = {
                 texture_coord = {.25, .25, .25, .75, .75, .25, .75, .75}
             }
         },
-        class_icon = {
-            file = {
-                default = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
-                blue = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
-                green = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
-                red = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
-                yellow = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons"
-            },
-            rect = {
-                size = {
-                    x = 64,
-                    y = 64
+        widgets = {
+            class_icon = {
+                file = {
+                    default = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
+                    blue = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
+                    green = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
+                    red = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
+                    yellow = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons"
                 },
-                anchor = "TOPLEFT",
-                offset = {
-                    x = -10,
-                    y = 12
-                }
+                width = 64,
+                height = 64,
+                points = {
+                    {"TOPLEFT", "window", "TOPLEFT", -10, 12}
+                },
+                blank = {.5, .5, .5, .75, .75, .5, .75, .75},
+                druid = {0, 0, 0, .25, .25, 0, .25, .25},
+                hunter = {.25, 0, .25, .25, .5, 0, .5, .25},
+                mage = {.5, 0, .5, .25, .75, 0, .75, .25},
+                paladin = {.75, 0, .75, .25, 1, 0, 1, .25},
+                priest = {0, .25, 0, .5, .25, .25, .25, .5},
+                rogue = {.25, .25, .25, .5, .5, .25, .5, .5},
+                shaman = {.5, .25, .5, .5, .75, .25, .75, .5},
+                warlock = {.75, .25, .75, .5, 1, .25, 1, .5},
+                warrior = {0, .5, 0, .75, .25, .5, .25, .75},
+                gm = {.25, .5, .25, .75, .5, .5, .5, .75}
             },
-            blank = {.5, .5, .5, .75, .75, .5, .75, .75},
-            druid = {0, 0, 0, .25, .25, 0, .25, .25},
-            hunter = {.25, 0, .25, .25, .5, 0, .5, .25},
-            mage = {.5, 0, .5, .25, .75, 0, .75, .25},
-            paladin = {.75, 0, .75, .25, 1, 0, 1, .25},
-            priest = {0, .25, 0, .5, .25, .25, .25, .5},
-            rogue = {.25, .25, .25, .5, .5, .25, .5, .5},
-            shaman = {.5, .25, .5, .5, .75, .25, .75, .5},
-            warlock = {.75, .25, .75, .5, 1, .25, 1, .5},
-            warrior = {0, .5, 0, .75, .25, .5, .25, .75},
-            gm = {.25, .5, .25, .75, .5, .5, .5, .75}
-        },
-        strings = {
             from = {
-                rect = {
-                    anchor = "TOPLEFT",
-                    offset = {
-                        x = 50,
-                        y = -8
-                    }
+                points = {
+                    {"TOPLEFT", "window", "TOPLEFT", 50, -8}
                 },
                 inherits_font = "GameFontNormalLarge"
             },
             char_info = {
                 format = formatDetails,
-                rect = {
-                    anchor = "TOP",
-                    offset = {
-                        x = 0,
-                        y = -30
-                    }
+                points = {
+                    {"TOP", "window", "TOP", 0, -30}
                 },
                 inherits_font = "GameFontNormal",
                 color = {1, 1, 1}
-            }
-        },
-        buttons = {
+            },
             close = {
-                NormalTexture = {
-                    default = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
-                    blue = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
-                    green = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
-                    red = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
-                    yellow = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up"
-                },
-                PushedTexture = {
-                    default = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
-                    blue = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
-                    green = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
-                    red = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
-                    yellow = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down"
-                },
-                HighlightTexture = {
-                    default = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
-                    blue = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
-                    green = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
-                    red = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
-                    yellow = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight"
-                },
-                HighlightAlphaMode = "ADD",
-                rect = {
-                    size = {
-                        x = 32,
-                        y = 32,
+                state_hide = {
+                    NormalTexture = {
+                        default = "Interface\\Minimap\\UI-Minimap-MinimizeButtonDown-Up",
+                        blue = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Up",
+                        green = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Up",
+                        red = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Up",
+                        yellow = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Up"
                     },
-                    anchor = "TOPRIGHT",
-                    offset = {
-                        x = 4,
-                        y = 1
-                    }
+                    PushedTexture = {
+                        default = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Down",
+                        blue = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Down",
+                        green = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Down",
+                        red = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Down",
+                        yellow = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Down"
+                    },
+                    HighlightTexture = {
+                        default = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
+                        blue = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
+                        green = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
+                        red = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
+                        yellow = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight"
+                    },
+                    HighlightAlphaMode = "ADD"
+                },
+                state_close = {
+                    NormalTexture = {
+                        default = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
+                        blue = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
+                        green = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
+                        red = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
+                        yellow = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up"
+                    },
+                    PushedTexture = {
+                        default = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
+                        blue = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
+                        green = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
+                        red = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
+                        yellow = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down"
+                    },
+                    HighlightTexture = {
+                        default = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
+                        blue = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
+                        green = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
+                        red = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
+                        yellow = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight"
+                    },
+                    HighlightAlphaMode = "ADD"
+                },
+                width = 32,
+                height = 32,
+                points = {
+                    {"TOPRIGHT", "window", "TOPRIGHT", 4, 1}
                 }
             },
             history = {
@@ -313,17 +317,11 @@ local WIM_ClassicSkin = {
                     yellow = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Disabled"
                 },
                 HighlightAlphaMode = "ADD",
-                rect = {
-                    size = {
-                        x = 32,
-                        y = 32
-                    },
-                    anchor = "TOPRIGHT",
-                    offset = {
-                        x = -4,
-                        y = -39
-                    }
-                }
+                width = 32,
+                height = 32,
+                points = {
+                    {"TOPRIGHT", "window", "TOPRIGHT", -4, -39}
+                },
             },
             scroll_down = {
                 NormalTexture = {
@@ -355,58 +353,54 @@ local WIM_ClassicSkin = {
                     yellow = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Disabled"
                 },
                 HighlightAlphaMode = "ADD",
+                width = 32,
+                height = 32,
+                points = {
+                    {"BOTTOMRIGHT", "window", "BOTTOMRIGHT", -4, 24}
+                },
+            },
+            chat_display = {
+                points = {
+                    {"TOPLEFT", "window", "TOPLEFT", 24, -46},
+                    {"BOTTOMRIGHT", "window", "BOTTOMRIGHT", -38, 39}
+                },
+            },
+            msg_box = {
+                font_height = 14,
+                font_color = {1,1,1},
+                points = {
+                    {"TOPLEFT", "window", "BOTTOMLEFT", 24, 30},
+                    {"BOTTOMRIGHT", "window", "BOTTOMRIGHT", -10, 4}
+                },
+            },
+            resize = {
+                NormalTexture = {
+                    default = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\resize",
+                    blue = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\resize",
+                    green = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\resize",
+                    red = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\resize",
+                    yellow = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\resize"
+                },
+                width = 25,
+                height = 25,
+                points = {
+                    {"BOTTOMRIGHT", "window", "BOTTOMRIGHT", 5, -5}
+                }
+            },
+            shortcuts = {
+                verticle = true,
+                inverted = false,
+                button_size = 28,
+                buffer = 132,
                 rect = {
-                    size = {
-                        x = 32,
-                        y = 32
-                    },
-                    anchor = "BOTTOMRIGHT",
+                    anchor = "TOPRIGHT",
                     offset = {
-                        x = -4,
-                        y = 24
+                        x = -30,
+                        y = -95
                     }
                 }
             }
         },
-        chat_display = {
-            rect = {
-                tl_offset = {
-                    x = 24,
-                    y = -46
-                },
-                br_offset = {
-                    x = -38,
-                    y = 39
-                }
-            }
-        },
-        msg_box = {
-            font_height = 14,
-            font_color = {1,1,1},
-            rect = {
-                tl_offset = {
-                    x = 22,
-                    y = 35
-                },
-                br_offset = {
-                    x = -10,
-                    y = 0
-                }
-            }
-        },
-        shortcuts = {
-            verticle = true,
-            inverted = false,
-            button_size = 28,
-            buffer = 132,
-            rect = {
-                anchor = "TOPRIGHT",
-                offset = {
-                    x = -30,
-                    y = -95
-                }
-            }
-        }
     },
     tab_strip = {
         files = {
@@ -422,18 +416,11 @@ local WIM_ClassicSkin = {
                 }
             },
         },
-        rect = {
-            anchor_points = {
-                self = "BOTTOMLEFT",
-                relative = "TOPLEFT"
-            },
-            offsets = {
-                top = -4,
-                margins = {
-                    left = 38,
-                    right = 15
-                }
-            }
+
+        height = 32,
+        points = {
+            {"BOTTOMLEFT", "window", "TOPLEFT", 38, -4},
+            {"BOTTOMRIGHT", "window", "TOPRIGHT", -20, -4}
         },
         vertical = false,
     },

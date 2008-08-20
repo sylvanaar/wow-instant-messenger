@@ -204,8 +204,8 @@ local function createTabGroup()
     local tabStrip = CreateFrame("Frame", stripName, UIParent);
     tabStrip:SetFrameStrata("DIALOG");
     tabStrip:SetToplevel(true);
-    tabStrip:SetWidth(384);
-    tabStrip:SetHeight(32);
+    --tabStrip:SetWidth(384);
+    --tabStrip:SetHeight(32);
     
     -- properties, tags, trackers
     tabStrip.attached = {};
@@ -268,10 +268,16 @@ local function createTabGroup()
             return;
         end
     
+        -- relocate tabStrip to window
+        local win = tabStrip.selected.obj;
+        local skinTable = WIM:GetSelectedSkin().tab_strip;
+        tabStrip:SetParent(win);
+        tabStrip.parentWindow = win;
+        WIM:SetWidgetRect(tabStrip, skinTable);
+    
         -- re-order tabs & sizing
-        local skinTable = WIM:GetSelectedSkin();
         local curSize;
-        if(skinTable.tab_strip.vertical) then
+        if(skinTable.vertical) then
             curSize = tabStrip:GetHeight();
         else
             curSize = tabStrip:GetWidth();
@@ -329,25 +335,23 @@ local function createTabGroup()
             tabStrip.selected.name = winName;
             tabStrip.selected.obj = win;
             tabStrip:UpdateTabs();
+            tabStrip.parentWindow = win;
         end
     end
     
     tabStrip.JumpToTabName = function(self, winName)
-        local skinTable = WIM:GetSelectedSkin().tab_strip;
         local oldWin = tabStrip.selected.obj;
         
         tabStrip:SetSelectedName(winName);
         local win = tabStrip.selected.obj;
         if(oldWin and oldWin ~= win) then
+            win:SetWidth(oldWin:GetWidth());
+            win:SetHeight(oldWin:GetHeight());
             win:ClearAllPoints();
             win:SetPoint("TOPLEFT", "UIParent", "BOTTOMLEFT", oldWin:GetLeft(), oldWin:GetTop());
             win:SetAlpha(oldWin:GetAlpha());
         end
         win:Show();
-        tabStrip:ClearAllPoints();
-        tabStrip:SetParent(win);
-	tabStrip:SetPoint(skinTable.rect.anchor_points.self, win, skinTable.rect.anchor_points.relative, skinTable.rect.offsets.margins.left, skinTable.rect.offsets.top);
-	tabStrip:SetWidth(win:GetWidth() - skinTable.rect.offsets.margins.left - skinTable.rect.offsets.margins.right);
         tabStrip:UpdateTabs();
         local i;
         for i=1,table.getn(tabStrip.attached) do
