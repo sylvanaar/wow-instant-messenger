@@ -41,7 +41,7 @@ local Events = {};
     workerFrame:RegisterEvent("ADDON_LOADED");
     workerFrame:RegisterEvent("GUILD_ROSTER_UPDATE");
     workerFrame:RegisterEvent("FRIENDLIST_UPDATE");
-    
+
 
 -- called when WIM is first loaded into memory but after variables are loaded.
 local function initialize()

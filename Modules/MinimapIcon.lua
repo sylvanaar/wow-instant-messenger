@@ -6,15 +6,6 @@ MinimapIcon.db_defaults.minimap = {
 };
 
 
-local colors = {
-    {1, 1, 1, 1, 1, 1}, -- white
-    {0, 0, 0, 0, 0, 0}, -- black
-    {99/255, 98/255, 15/255, 243/255, 241/255, 108/255}, -- yellow
-    {144/255, 19/255, 19/255, 243/255, 108/255, 108/255}, -- red
-    {0/255, 60/255, 159/255, 91/255, 131/255, 201/255}, -- blue
-    {15/255, 99/255, 15/255, 120/255, 243/255, 107/255}, -- green
-}
-
 local Notifications = {};	-- list of current notifications
 local NotificationIndex = 1;	-- index for update messages
 local Notification_Bowl = {};
@@ -81,33 +72,14 @@ end
 -- linear and as such, can now be given any color and
 -- have the same gradient effect applied.
 
-
--- return the smaller of two values
-local function fmin(a,b)
-    if(a<b) then
-        return a;
-    else
-        return b;
-    end
-end
-
-local function fmax(a,b)
-    if(a>b) then
-        return a;
-    else
-        return b;
-    end
-end
-
-
 local function RGBHextoHSVPerc(rgbStr)
     local R, G, B = string.sub(rgbStr, 1, 2), string.sub(rgbStr, 3, 4), string.sub(rgbStr, 5, 6);
     R, G, B = tonumber(R, 16)/255, tonumber(G, 16)/255, tonumber(B, 16)/255;
     local i, x, v, f;
-    x = fmin(R, G);
-    x = fmin(x, B);
-    v = fmax(R, G);
-    v = fmax(v, B);
+    x = math.min(R, G);
+    x = math.min(x, B);
+    v = math.max(R, G);
+    v = math.max(v, B);
     if(v == x) then
         return nil, 0, v;
     else
@@ -181,10 +153,10 @@ local function getGradientFromColor(...)
         h, s, v = RGBHextoHSVPerc(string.format ("%.2x%.2x%.2x",select(1, ...), select(2, ...), select(3, ...)));
     end
 
-    s1 = fmin(1, s+.29/2);
-    v1 = fmax(0, v-.57/2);
-    s2 = fmax(0, s-.29/2);
-    v2 = fmin(1, s+.57/2);
+    s1 = math.min(1, s+.29/2);
+    v1 = math.max(0, v-.57/2);
+    s2 = math.max(0, s-.29/2);
+    v2 = math.min(1, s+.57/2);
     
     local r1, g1, b1 = HSVPerctoRGBPerc(h, s1, v1);
     local r2, g2, b2 = HSVPerctoRGBPerc(h, s2, v2);
@@ -212,8 +184,8 @@ local function createMinimapIcon()
 	overlay:SetPoint('TOPLEFT');
 
 	local bg = self:CreateTexture(nil, 'BACKGROUND');
-	bg:SetWidth(20); bg:SetHeight(19);
-	bg:SetTexture(1,1,1);
+	bg:SetWidth(20); bg:SetHeight(20);
+	bg:SetTexture('Interface\\CharacterFrame\\TempPortraitAlphaMask');
 	bg:SetPoint("TOPLEFT", 6, -6)
 	self.backGround = bg;
 
@@ -232,7 +204,7 @@ local function createMinimapIcon()
 
 	local flash = CreateFrame("Frame", "WIM3MinimapButtonFlash", self);
 	flash:SetFrameStrata('MEDIUM');
-	--flash:SetParent(self);
+	flash:SetParent(self);
 	flash:SetAllPoints(self);
 	flash:Show();
 	flash.texture = flash:CreateTexture(nil, "BORDER");

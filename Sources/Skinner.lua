@@ -21,6 +21,24 @@ local prematureRegisters = {};
 
 local WindowSoupBowl = WIM:GetWindowSoupBowl();
 
+local function setPointsToObj(obj, pointsTable)
+    obj:ClearAllPoints();
+    local i;
+    for i=1, table.getn(pointsTable) do
+        local point, relativeTo, relativePoint, offx, offy = unpack(pointsTable[i]);
+        -- first we need to convert the string representation of objects into actual objects.
+        if(relativeTo and type(relativeTo) == "string") then
+            if(string.lower(relativeTo) == "window") then
+                relativeTo = obj.parentWindow;
+            else
+                relativeTo = obj.parentWindow.widgets[curPoint[2]];
+            end
+            relativeTo = relativeTo or UIPanel;
+        end
+        -- set the actual points
+        obj:SetPoint(point, relativeTo, relativePoint, offx, offy);
+    end
+end
 
 -- load selected skin
 function WIM:ApplySkinToWindow(obj)
@@ -31,13 +49,8 @@ function WIM:ApplySkinToWindow(obj)
         WIM.db.skin.font = SkinTable["WIM Classic"].default_font;
     end
     
-    local isSmartStyle = false;
-    local prevStyle = SelectedStyle;
-    if(type(SelectedSkin.smart_style) == "function" and SelectedStyle == "#SMART#") then
-        isSmartStyle = true;
-        local smartStyleFunction = SelectedSkin.smart_style;
-        SelectedStyle = smartStyleFunction(obj.theUser, obj.theGuild, obj.theLevel, obj.theRace, obj.theClass);
-    end
+    local SelectedSkin = WIM:GetSelectedSkin();
+    local SelectedStyle = WIM:GetSelectedStyle(obj);
     
     --set backdrop edges and background textures.
     local tl = obj.widgets.Backdrop.tl;
@@ -128,36 +141,36 @@ function WIM:ApplySkinToWindow(obj)
     
     --set class icon
     local class_icon = obj.widgets.class_icon;
-    class_icon:SetTexture(SelectedSkin.message_window.class_icon.file[SelectedStyle]);
-    class_icon:ClearAllPoints();
-    class_icon:SetPoint(SelectedSkin.message_window.class_icon.rect.anchor, fName.."Backdrop", SelectedSkin.message_window.class_icon.rect.anchor, SelectedSkin.message_window.class_icon.rect.offset.x, SelectedSkin.message_window.class_icon.rect.offset.y);
-    class_icon:SetWidth(SelectedSkin.message_window.class_icon.rect.size.x);
-    class_icon:SetHeight(SelectedSkin.message_window.class_icon.rect.size.y);
+    WIM:ApplySkinToWidget(class_icon);
+    class_icon:SetTexture(SelectedSkin.message_window.widgets.class_icon.file[SelectedStyle]);
     --WIM_UpdateMessageWindowClassIcon(obj);
     
     --set from font
     local from = obj.widgets.from;
-    from:ClearAllPoints();
-    from:SetPoint(SelectedSkin.message_window.strings.from.rect.anchor, fName.."Backdrop", SelectedSkin.message_window.strings.from.rect.anchor, SelectedSkin.message_window.strings.from.rect.offset.x, SelectedSkin.message_window.strings.from.rect.offset.y);
-    from:SetFontObject(getglobal(SelectedSkin.message_window.strings.from.inherits_font));
+    WIM:ApplySkinToWidget(from);
+    from:SetFontObject(getglobal(SelectedSkin.message_window.widgets.from.inherits_font));
+    
     
     --set character details font
     local char_info = obj.widgets.char_info;
-    char_info:ClearAllPoints();
-    char_info:SetPoint(SelectedSkin.message_window.strings.char_info.rect.anchor, fName.."Backdrop", SelectedSkin.message_window.strings.char_info.rect.anchor, SelectedSkin.message_window.strings.char_info.rect.offset.x, SelectedSkin.message_window.strings.char_info.rect.offset.y);
-    char_info:SetFontObject(getglobal(SelectedSkin.message_window.strings.char_info.inherits_font));
-    char_info:SetTextColor(SelectedSkin.message_window.strings.char_info.color[1], SelectedSkin.message_window.strings.char_info.color[2], SelectedSkin.message_window.strings.char_info.color[3]);
+    WIM:ApplySkinToWidget(char_info);
+    char_info:SetFontObject(getglobal(SelectedSkin.message_window.widgets.char_info.inherits_font));
+    char_info:SetTextColor(SelectedSkin.message_window.widgets.char_info.color[1], SelectedSkin.message_window.widgets.char_info.color[2], SelectedSkin.message_window.widgets.char_info.color[3]);
     --WIM_MessageWindow_RefreshCharacterDetails(obj);
 
     --close button
     local close = obj.widgets.close;
-    close:ClearAllPoints();
-    close:SetPoint(SelectedSkin.message_window.buttons.close.rect.anchor, fName, SelectedSkin.message_window.buttons.close.rect.anchor, SelectedSkin.message_window.buttons.close.rect.offset.x, SelectedSkin.message_window.buttons.close.rect.offset.y);
-    close:SetWidth(SelectedSkin.message_window.buttons.close.rect.size.x);
-    close:SetHeight(SelectedSkin.message_window.buttons.close.rect.size.y);
-    close:SetNormalTexture(SelectedSkin.message_window.buttons.close.NormalTexture[SelectedStyle]);
-    close:SetPushedTexture(SelectedSkin.message_window.buttons.close.PushedTexture[SelectedStyle]);
-    close:SetHighlightTexture(SelectedSkin.message_window.buttons.close.HighlightTexture[SelectedStyle], SelectedSkin.message_window.buttons.close.HighlightAlphaMode);
+    WIM:ApplySkinToWidget(close);
+    -- close button is a special case... so do the following extra work.
+    if(close.curTextureIndex == 1) then
+        close:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_hide.NormalTexture[SelectedStyle]);
+        close:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_hide.PushedTexture[SelectedStyle]);
+        close:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_hide.HighlightTexture[SelectedStyle], SelectedSkin.message_window.widgets.close.state_hide.HighlightAlphaMode);
+    else
+        close:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_close.NormalTexture[SelectedStyle]);
+        close:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_close.PushedTexture[SelectedStyle]);
+        close:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_close.HighlightTexture[SelectedStyle], SelectedSkin.message_window.widgets.close.state_close.HighlightAlphaMode);
+    end
     
     --history button
     --local history = getglobal(fName.."HistoryButton");
@@ -190,42 +203,24 @@ function WIM:ApplySkinToWindow(obj)
     
     --scroll_up button
     local scroll_up = obj.widgets.scroll_up;
-    scroll_up:ClearAllPoints();
-    scroll_up:SetPoint(SelectedSkin.message_window.buttons.scroll_up.rect.anchor, fName, SelectedSkin.message_window.buttons.scroll_up.rect.anchor, SelectedSkin.message_window.buttons.scroll_up.rect.offset.x, SelectedSkin.message_window.buttons.scroll_up.rect.offset.y);
-    scroll_up:SetWidth(SelectedSkin.message_window.buttons.scroll_up.rect.size.x);
-    scroll_up:SetHeight(SelectedSkin.message_window.buttons.scroll_up.rect.size.y);
-    scroll_up:SetNormalTexture(SelectedSkin.message_window.buttons.scroll_up.NormalTexture[SelectedStyle]);
-    scroll_up:SetPushedTexture(SelectedSkin.message_window.buttons.scroll_up.PushedTexture[SelectedStyle]);
-    scroll_up:SetDisabledTexture(SelectedSkin.message_window.buttons.scroll_up.DisabledTexture[SelectedStyle]);
-    scroll_up:SetHighlightTexture(SelectedSkin.message_window.buttons.scroll_up.HighlightTexture[SelectedStyle], SelectedSkin.message_window.buttons.scroll_up.HighlightAlphaMode);
+    WIM:ApplySkinToWidget(scroll_up);
     
     --scroll_down button
     local scroll_down = obj.widgets.scroll_down;
-    scroll_down:ClearAllPoints();
-    scroll_down:SetPoint(SelectedSkin.message_window.buttons.scroll_down.rect.anchor, fName, SelectedSkin.message_window.buttons.scroll_down.rect.anchor, SelectedSkin.message_window.buttons.scroll_down.rect.offset.x, SelectedSkin.message_window.buttons.scroll_down.rect.offset.y);
-    scroll_down:SetWidth(SelectedSkin.message_window.buttons.scroll_down.rect.size.x);
-    scroll_down:SetHeight(SelectedSkin.message_window.buttons.scroll_down.rect.size.y);
-    scroll_down:SetNormalTexture(SelectedSkin.message_window.buttons.scroll_down.NormalTexture[SelectedStyle]);
-    scroll_down:SetPushedTexture(SelectedSkin.message_window.buttons.scroll_down.PushedTexture[SelectedStyle]);
-    scroll_down:SetDisabledTexture(SelectedSkin.message_window.buttons.scroll_down.DisabledTexture[SelectedStyle]);
-    scroll_down:SetHighlightTexture(SelectedSkin.message_window.buttons.scroll_down.HighlightTexture[SelectedStyle],  SelectedSkin.message_window.buttons.scroll_down.HighlightAlphaMode);
+    WIM:ApplySkinToWidget(scroll_down);
     
     --chat display
     local chat_display = obj.widgets.chat_display;
-    chat_display:ClearAllPoints();
-    chat_display:SetPoint("TOPLEFT", fName, "TOPLEFT", SelectedSkin.message_window.chat_display.rect.tl_offset.x, SelectedSkin.message_window.chat_display.rect.tl_offset.y);
-    chat_display:SetPoint("BOTTOMRIGHT", fName, "BOTTOMRIGHT", SelectedSkin.message_window.chat_display.rect.br_offset.x, SelectedSkin.message_window.chat_display.rect.br_offset.y);
+    WIM:ApplySkinToWidget(chat_display);
     local font, height, flags = getglobal(WIM.db.skin.font):GetFont();
     chat_display:SetFont(font, WIM.db.fontSize+2, WIM.db.skin.font_outline);
 
     --msg_box
     local msg_box = obj.widgets.msg_box;
-    msg_box:ClearAllPoints();
-    msg_box:SetPoint("TOPLEFT", fName, "BOTTOMLEFT", SelectedSkin.message_window.msg_box.rect.tl_offset.x, SelectedSkin.message_window.msg_box.rect.tl_offset.y);
-    msg_box:SetPoint("BOTTOMRIGHT", fName, "BOTTOMRIGHT", SelectedSkin.message_window.msg_box.rect.br_offset.x, SelectedSkin.message_window.msg_box.rect.br_offset.y);
+    WIM:ApplySkinToWidget(msg_box);
     local font, height, flags = getglobal(WIM.db.skin.font):GetFont();
-    msg_box:SetFont(font, SelectedSkin.message_window.msg_box.font_height, WIM.db.skin.font_outline);
-    msg_box:SetTextColor(SelectedSkin.message_window.msg_box.font_color[1], SelectedSkin.message_window.msg_box.font_color[2], SelectedSkin.message_window.msg_box.font_color[3]);
+    msg_box:SetFont(font, SelectedSkin.message_window.widgets.msg_box.font_height, WIM.db.skin.font_outline);
+    msg_box:SetTextColor(SelectedSkin.message_window.widgets.msg_box.font_color[1], SelectedSkin.message_window.widgets.msg_box.font_color[2], SelectedSkin.message_window.widgets.msg_box.font_color[3]);
     
     --shorcuts
     --local shortcuts = getglobal(fName.."ShortcutFrame");
@@ -237,9 +232,6 @@ function WIM:ApplySkinToWindow(obj)
     
     --WIM_SetWindowProps(obj);
     
-    if(isSmartStyle) then
-        SelectedStyle = prevStyle;
-    end
 end
 
 local function deleteStyleFileEntries(theTable)
@@ -251,15 +243,15 @@ local function deleteStyleFileEntries(theTable)
 end
 
 local function populateFemaleClassInfo(tbl)
-    tbl.message_window.class_icon["druidf"] = tbl.message_window.class_icon["druid"];
-    tbl.message_window.class_icon["hunterf"] = tbl.message_window.class_icon["hunter"];
-    tbl.message_window.class_icon["magef"] = tbl.message_window.class_icon["mage"];
-    tbl.message_window.class_icon["paladinf"] = tbl.message_window.class_icon["paladin"];
-    tbl.message_window.class_icon["priestf"] = tbl.message_window.class_icon["priest"];
-    tbl.message_window.class_icon["roguef"] = tbl.message_window.class_icon["rogue"];
-    tbl.message_window.class_icon["shamanf"] = tbl.message_window.class_icon["shaman"];
-    tbl.message_window.class_icon["warlockf"] = tbl.message_window.class_icon["warlock"];
-    tbl.message_window.class_icon["warriorf"] = tbl.message_window.class_icon["warrior"];
+    tbl.message_window.widgets.class_icon["druidf"] = tbl.message_window.widgets.class_icon["druid"];
+    tbl.message_window.widgets.class_icon["hunterf"] = tbl.message_window.widgets.class_icon["hunter"];
+    tbl.message_window.widgets.class_icon["magef"] = tbl.message_window.widgets.class_icon["mage"];
+    tbl.message_window.widgets.class_icon["paladinf"] = tbl.message_window.widgets.class_icon["paladin"];
+    tbl.message_window.widgets.class_icon["priestf"] = tbl.message_window.widgets.class_icon["priest"];
+    tbl.message_window.widgets.class_icon["roguef"] = tbl.message_window.widgets.class_icon["rogue"];
+    tbl.message_window.widgets.class_icon["shamanf"] = tbl.message_window.widgets.class_icon["shaman"];
+    tbl.message_window.widgets.class_icon["warlockf"] = tbl.message_window.widgets.class_icon["warlock"];
+    tbl.message_window.widgets.class_icon["warriorf"] = tbl.message_window.widgets.class_icon["warrior"];
 end
 
 
@@ -271,10 +263,16 @@ function WIM:RegisterPrematureSkins()
 end
 
 function WIM:GetSelectedSkin()
-    return SelectedSkin;
+    return SelectedSkin or SkinTable["WIM Classic"];
 end
 
-function WIM:GetSelectedStyle()
+function WIM:GetSelectedStyle(obj)
+    local SelectedSkin = WIM:GetSelectedSkin();
+    local SelectedStyle = SelectedStyle;
+    if(type(SelectedSkin.smart_style) == "function" and SelectedStyle == "#SMART#") then
+        local smartStyleFunction = SelectedSkin.smart_style;
+        SelectedStyle = smartStyleFunction(obj.theUser, obj.theGuild, obj.theLevel, obj.theRace, obj.theClass);
+    end
     return SelectedStyle;
 end
 
@@ -377,7 +375,7 @@ function WIM:RegisterSkin(skinTable)
         if(skinTable.title == WIM.db.skin.selected) then
             WIM:LoadSkin(WIM.db.skin.selected, WIM.db.skin.style);
         end
-        -- create skin template from WIM Classic and remove any style references.
+        --[[ create skin template from WIM Classic and remove any style references.
         WIM.copyTable(SkinTable["WIM Classic"], SkinTemplate);
         deleteStyleFileEntries(SkinTemplate.styles);
         deleteStyleFileEntries(SkinTemplate.message_window.file);
@@ -400,7 +398,7 @@ function WIM:RegisterSkin(skinTable)
         deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_down.NormalTexture);
         deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_down.PushedTexture);
         deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_down.HighlightTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_down.DisabledTexture);
+        deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_down.DisabledTexture);]]
         
         populateFemaleClassInfo(SkinTable[skinTable.title]);
         return;
@@ -480,4 +478,43 @@ function WIM:GetFontKeyByName(fontName)
 	end
 	return nil;
 end
+
+
+
+function WIM:SetWidgetRect(obj, widgetSkinTable)
+    if(type(widgetSkinTable) == "table") then
+        if(type(widgetSkinTable.width) == "number") then
+            obj:SetWidth(widgetSkinTable.width);
+        end
+        if(type(widgetSkinTable.height) == "number") then
+            obj:SetHeight(widgetSkinTable.height);
+        end
+        if(widgetSkinTable.points) then
+            setPointsToObj(obj, widgetSkinTable.points);
+        end
+    end
+end
+
+function WIM:ApplySkinToWidget(obj)
+    if(obj.GetObjectType) then
+        local widgetSkin = WIM:GetSelectedSkin().message_window.widgets[obj.widgetName] or obj.defaultSkin;
+        local SelectedStyle = WIM:GetSelectedStyle();
+        local oType = obj:GetObjectType();
+        WIM:SetWidgetRect(obj, widgetSkin);
+        if(oType == "Button" or oType == "CheckButton") then
+            if(widgetSkin.NormalTexture) then obj:SetNormalTexture(widgetSkin.NormalTexture[SelectedStyle]); end
+            if(widgetSkin.PushedTexture) then obj:SetPushedTexture(widgetSkin.PushedTexture[SelectedStyle]); end
+            if(widgetSkin.DisabledTexture) then obj:SetDisabledTexture(widgetSkin.DisabledTexture[SelectedStyle]); end
+            if(widgetSkin.HighlightTexture) then obj:SetHighlightTexture(widgetSkin.HighlightTexture[SelectedStyle], widgetSkin.HighlightAlphaMode); end
+        elseif(oType == "FontString") then
+        
+        else
+            
+        end
+    else
+        WIM:dPrint("Invalid widget trying to be skinned.");
+    end
+end
+
+
 

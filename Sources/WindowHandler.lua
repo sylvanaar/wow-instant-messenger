@@ -40,6 +40,7 @@ WIM.db_defaults.winCascade = {
 WIM.db_defaults.winFade = true;
 
 
+
 local WindowSoupBowl = {
     windowToken = 0,
     available = 0,
@@ -56,7 +57,16 @@ local FadeProps = {
 };
 
 local FormattingCalls = {}; -- functions which are passed events to be formatted. Only one may be used at once.
-
+--insert default - always need a fallback.
+table.insert(FormattingCalls, 1, {
+	name = "Default",
+	fun = function(user, message)
+		return "[|Hplayer:"..user.."|h"..user.."|h]: "..message;
+	end
+});
+	
+	
+	
 local StringModifiers = {}; -- registered functions which will be used to format the message part of the string.
 
 
@@ -64,6 +74,22 @@ local StringModifiers = {}; -- registered functions which will be used to format
 -- script handlers are fired for different type windows.
 -- use WIM:RegisterWidgetTrigger(WindowType, ScriptEvent, function());
 local Widget_Triggers = {};
+
+local function getFormatByName(format)
+	local i;
+	for i=1, table.getn(FormattingCalls) do
+		if(FormattingCalls[i].name == format) then
+			return FormattingCalls[i].fun;
+		end
+	end
+	return FormattingCalls[1].fun;
+end
+
+local function applyMessageFormatting(user, message)
+	local fun = getFormatByName(WIM.db.selectedFormat);
+	return fun(user, message);
+end
+
 
 local function applyStringModifiers(str)
 	local i;
@@ -127,6 +153,54 @@ function getWindowAtCursorPosition(excludeObj)
 	return nil;
 end
 
+-- window resizing helper
+local resizeFrame = CreateFrame("Button", "WIM_WindowResizeFrame", UIParent);
+resizeFrame:Hide();
+resizeFrame.widgetName = "resize";
+resizeFrame.Attach = function(self, win)
+		if(win.widgets.close ~= GetMouseFocus() and not WIM.EditBoxInFocus) then
+			self:SetParent(win);
+			self.parentWindow = win;
+			WIM:ApplySkinToWidget(self);
+			self:Show();
+			resizeFrame:SetFrameLevel(999);
+		else
+			resizeFrame:Hide();
+		end
+	end
+resizeFrame.Reset = function(self)
+		self:SetParent(UIParent);
+		self:ClearAllPoints();
+		self:SetPoint("TOPLEFT");
+		self:Hide();
+	end
+resizeFrame:SetScript("OnMouseDown", function()
+		this.isSizing = true;
+		this.parentWindow:SetResizable(true);
+		this.parentWindow:StartSizing("BOTTOMRIGHT");
+	end);
+resizeFrame:SetScript("OnMouseUp", function()
+		this.isSizing = false;
+		this.parentWindow:StopMovingOrSizing();
+		local tabStrip = this.parentWindow.tabStrip;
+		if(tabStrip) then
+			WIM:dPrint("Size sent to tab strip.");
+		end
+	end);
+resizeFrame:SetScript("OnUpdate", function()
+		if(this.isSizing and this.parentWindow and this.parentWindow.tabStrip) then
+			local curSize = this.parentWindow:GetWidth()..this.parentWindow:GetHeight();
+			if(this.prevSize ~= curSize) then
+				this.parentWindow.tabStrip:UpdateTabs();
+				this.prevSize = curSize;
+			end
+		end
+		if(this.parentWindow.isMoving) then
+			this:Reset();
+		end
+	end)
+
+
 -- helperFrame's purpose is to assist with dragging and dropping of Windows into tab strips.
 -- The frame will monitor which window objects are being dragged over and attach itself to them when
 -- it's key trigger is pressed.
@@ -160,18 +234,18 @@ helperFrame:SetScript("OnUpdate", function()
 				else
 					win = obj.parentWindow;
 				end
+				resizeFrame:Attach(win);
 				if(win.isMoving and not (win.tabStrip and win.tabStrip:IsVisible())) then
 				local mWin = getWindowAtCursorPosition(win);
 					if(not this.isAttached) then
 						if(mWin) then
 							-- attach to window
 							local skinTable = WIM:GetSelectedSkin().tab_strip;
+							this.parentWindow = mWin;
 							this.attachedTo = mWin;
 							mWin.helperFrame = helperFrame;
-							this:ClearAllPoints();
 							this:SetParent(mWin);
-							this:SetPoint(skinTable.rect.anchor_points.self, mWin, skinTable.rect.anchor_points.relative, skinTable.rect.offsets.margins.left, skinTable.rect.offsets.top);
-							this:SetWidth(win:GetWidth() - skinTable.rect.offsets.margins.left - skinTable.rect.offsets.margins.right);
+							WIM:SetWidgetRect(this, skinTable);
 							this:SetHeight(this.flash:GetHeight());
 							this.isAttached = true;
 						end
@@ -184,11 +258,13 @@ helperFrame:SetScript("OnUpdate", function()
 					end
 				end
 			else
+				resizeFrame:Reset();
 				if(this.isAttached) then
 					this:ResetState();
 				end
 			end
                 else
+		    resizeFrame:Reset();
                     if(this.isAttached) then
                         this:ResetState();
                     end
@@ -457,6 +533,7 @@ local function loadRegisteredWidgets(obj)
 		if(widgets[widget] == nil) then
 			if(type(createFun) == "function") then
 				widgets[widget]  = createFun(obj);
+				widgets[widget].widgetName = widget;
 				WIM:dPrint("Widget '"..widget.."' added to '"..obj:GetName().."'");
 				if(type(widgets[widget].SetDefaults) == "function") then
 					widgets[widget]:SetDefaults(); -- load defaults for this widget
@@ -520,6 +597,8 @@ local function instantiateWindow(obj)
     widgets.Backdrop:SetToplevel(false);
     widgets.Backdrop:SetAllPoints(obj);
     widgets.class_icon = widgets.Backdrop:CreateTexture(fName.."BackdropClassIcon", "BACKGROUND");
+    widgets.class_icon.widgetName = "class_icon";
+    widgets.class_icon.parentWindow = obj;
     widgets.Backdrop.tl = widgets.Backdrop:CreateTexture(fName.."Backdrop_TL", "BORDER");
     widgets.Backdrop.tr = widgets.Backdrop:CreateTexture(fName.."Backdrop_TR", "BORDER");
     widgets.Backdrop.bl = widgets.Backdrop:CreateTexture(fName.."Backdrop_BL", "BORDER");
@@ -530,11 +609,16 @@ local function instantiateWindow(obj)
     widgets.Backdrop.r  = widgets.Backdrop:CreateTexture(fName.."Backdrop_R" , "BORDER");
     widgets.Backdrop.bg = widgets.Backdrop:CreateTexture(fName.."Backdrop_BG", "BORDER");
     widgets.from = widgets.Backdrop:CreateFontString(fName.."BackdropFrom", "OVERLAY", "GameFontNormalLarge");
+    widgets.from.widgetName = "from";
     widgets.char_info = widgets.Backdrop:CreateFontString(fName.."BackdropCharacterDetails", "OVERLAY", "GameFontNormal");
+    widgets.char_info.widgetName = "char_info";
     
     -- create core window objects
     widgets.close = CreateFrame("Button", fName.."ExitButton", obj);
     widgets.close:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+    widgets.close.curTextureIndex = 1;
+    widgets.close.parentWindow = obj;
+    widgets.close.widgetName = "close";
 
     --buttons.history = CreateFrame("Button", fName.."HistoryButton", obj);
     --history:RegisterForClicks("LeftButtonUp", "RightButtonUp");
@@ -558,9 +642,11 @@ local function instantiateWindow(obj)
     
     widgets.scroll_up = CreateFrame("Button", fName.."ScrollUp", obj);
     widgets.scroll_up:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+    widgets.scroll_up.widgetName = "scroll_up";
     
     widgets.scroll_down = CreateFrame("Button", fName.."ScrollDown", obj);
     widgets.scroll_down:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+    widgets.scroll_down.widgetName = "scroll_down";
     
     widgets.chat_display = CreateFrame("ScrollingMessageFrame", fName.."ScrollingMessageFrame", obj);
     widgets.chat_display:RegisterForDrag("LeftButton");
@@ -574,6 +660,7 @@ local function instantiateWindow(obj)
     widgets.chat_display:SetJustifyH("LEFT");
     widgets.chat_display:EnableMouse(true);
     widgets.chat_display:EnableMouseWheel(1);
+    widgets.chat_display.widgetName = "chat_display";
     
     widgets.msg_box = CreateFrame("EditBox", fName.."MsgBox", obj);
     widgets.msg_box:SetAutoFocus(false);
@@ -581,6 +668,7 @@ local function instantiateWindow(obj)
     widgets.msg_box:SetMaxLetters(255);
     widgets.msg_box:SetAltArrowKeyMode(true);
     widgets.msg_box:EnableMouse(true);
+    widgets.msg_box.widgetName = "msg_box";
     
     --Addmessage functions
     obj.AddMessage = function(self, msg, ...)
@@ -589,7 +677,7 @@ local function instantiateWindow(obj)
     end
     
     obj.AddUserMessage = function(self, user, msg, ...)
-	local str = user.." - "..msg;
+	local str = applyMessageFormatting(user, msg);
 	obj:AddMessage(str, ...);
 	obj.msgWaiting = true;
     end
@@ -606,12 +694,12 @@ local function instantiateWindow(obj)
 			classTag = "blank";
 		end
 	end
-	local coord = WIM:GetSelectedSkin().message_window.class_icon[classTag];
+	local coord = WIM:GetSelectedSkin().message_window.widgets.class_icon[classTag];
 	icon:SetTexCoord(coord[1], coord[2], coord[3], coord[4], coord[5], coord[6], coord[7], coord[8]);
     end
     
     obj.UpdateCharDetails = function(self)
-	obj.widgets.char_info:SetText(WIM:GetSelectedSkin().message_window.strings.char_info.format(obj.guild, obj.level, obj.race, obj.class));
+	obj.widgets.char_info:SetText(WIM:GetSelectedSkin().message_window.widgets.char_info.format(obj.guild, obj.level, obj.race, obj.class));
     end
     
     obj.WhoCallback = function(result)
@@ -711,6 +799,12 @@ local function instantiateWindow(obj)
 	end
     end
     
+    --enforce that all core widgets have parentWindow set.
+	local w;
+	for _, w in pairs(obj.widgets) do
+		w.parentWindow = obj;
+	end
+    
     -- load Registered Widgets
     loadRegisteredWidgets(obj);
     loadHandlers(obj);
@@ -758,7 +852,6 @@ local function loadWindowDefaults(obj)
 	loadRegisteredWidgets(obj);
 	loadHandlers(obj);
     
-	WIM:ApplySkinToWindow(obj);
 	-- process registered widgets
 	local widgetName, widgetObj;
 	for widgetName, widgetObj in pairs(obj.widgets) do
@@ -766,6 +859,7 @@ local function loadWindowDefaults(obj)
 			widgetObj:SetDefaults();
 		end
 	end
+	WIM:ApplySkinToWindow(obj);
 	obj:UpdateProps();
 end
 
@@ -929,6 +1023,14 @@ function WIM:UnregisterStringModifier(fun)
 	WIM.removeFromTable(StringModifiers, fun);
 end
 
+function WIM:RegisterUserMessageFormatting(name, fun)
+	table.insert(FormattingCalls, {
+		name = name,
+		fun = fun
+	});
+end
+
+
 ----------------------------------
 -- Set default widget triggers	--
 ----------------------------------
@@ -947,6 +1049,33 @@ WIM:RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnClick", function()
 			destroyWindow(this:GetParent());
 		else
 			this:GetParent():Hide();
+		end
+	end);
+	
+WIM:RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnUpdate", function()
+		if(GetMouseFocus() == this) then
+			if(IsShiftKeyDown() and this.curTextureIndex == 1) then
+				local SelectedSkin = WIM:GetSelectedSkin();
+				local SelectedStyle = WIM:GetSelectedStyle(this.parentWindow);
+				this:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_close.NormalTexture[SelectedStyle]);
+				this:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_close.PushedTexture[SelectedStyle]);
+				this:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_close.HighlightTexture[SelectedStyle], SelectedSkin.message_window.widgets.close.state_close.HighlightAlphaMode);
+				this.curTextureIndex = 2;
+			elseif(not IsShiftKeyDown() and this.curTextureIndex == 2) then
+				local SelectedSkin = WIM:GetSelectedSkin();
+				local SelectedStyle = WIM:GetSelectedStyle(this.parentWindow);
+				this:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_hide.NormalTexture[SelectedStyle]);
+				this:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_hide.PushedTexture[SelectedStyle]);
+				this:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_hide.HighlightTexture[SelectedStyle], SelectedSkin.message_window.widgets.close.state_hide.HighlightAlphaMode);
+				this.curTextureIndex = 1;
+			end
+		elseif(this.curTextureIndex == 2) then
+			local SelectedSkin = WIM:GetSelectedSkin();
+			local SelectedStyle = WIM:GetSelectedStyle(this.parentWindow);
+			this:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_hide.NormalTexture[SelectedStyle]);
+			this:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_hide.PushedTexture[SelectedStyle]);
+			this:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_hide.HighlightTexture[SelectedStyle], SelectedSkin.message_window.widgets.close.state_hide.HighlightAlphaMode);
+			this.curTextureIndex = 1;
 		end
 	end);
 

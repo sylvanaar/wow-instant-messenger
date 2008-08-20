@@ -78,6 +78,9 @@ local WIM = WIM;
     
 WIM.copyTable = copyTable;
 
+
+
+
 function WIM:FormatUserName(user)
 	if(user ~= nil) then
 		if(WIM:IsGM(user)) then
