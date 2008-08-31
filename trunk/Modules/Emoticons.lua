@@ -78,7 +78,7 @@ local function filterEmoticons(theMsg)
     for emote,_ in pairs(emoteTable.definitions) do
         img = getEmoteFilePath(emote);
         if(img and img ~= "") then
-            theMsg = string.gsub(theMsg, convertEmoteToPattern(emote), "|T"..img..":"..emoteTable.rect.width..":"..emoteTable.rect.height..":"..emoteTable.rect.xoffset..":"..emoteTable.rect.yoffset.."|t");
+            theMsg = string.gsub(theMsg, convertEmoteToPattern(emote), "|T"..img..":"..emoteTable.width..":"..emoteTable.height..":"..emoteTable.offset[1]..":"..emoteTable.offset[2].."|t");
         end
     end
         

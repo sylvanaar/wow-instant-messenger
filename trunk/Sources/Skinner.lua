@@ -55,86 +55,59 @@ function WIM:ApplySkinToWindow(obj)
     --set backdrop edges and background textures.
     local tl = obj.widgets.Backdrop.tl;
     tl:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
-    tl:SetTexCoord(SelectedSkin.message_window.rect.top_left.texture_coord[1], SelectedSkin.message_window.rect.top_left.texture_coord[2],
-                    SelectedSkin.message_window.rect.top_left.texture_coord[3], SelectedSkin.message_window.rect.top_left.texture_coord[4],
-                    SelectedSkin.message_window.rect.top_left.texture_coord[5], SelectedSkin.message_window.rect.top_left.texture_coord[6],
-                    SelectedSkin.message_window.rect.top_left.texture_coord[7], SelectedSkin.message_window.rect.top_left.texture_coord[8]);
+    tl:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.top_left.texture_coord));
     tl:ClearAllPoints();
-    tl:SetPoint("TOPLEFT", fName.."Backdrop", "TOPLEFT", SelectedSkin.message_window.rect.top_left.offset.x, SelectedSkin.message_window.rect.top_left.offset.y);
-    tl:SetWidth(SelectedSkin.message_window.rect.top_left.size.x);
-    tl:SetHeight(SelectedSkin.message_window.rect.top_left.size.y);
+    tl:SetPoint("TOPLEFT", fName.."Backdrop", "TOPLEFT", unpack(SelectedSkin.message_window.backdrop.top_left.offset));
+    tl:SetWidth(SelectedSkin.message_window.backdrop.top_left.width);
+    tl:SetHeight(SelectedSkin.message_window.backdrop.top_left.height);
     local tr = obj.widgets.Backdrop.tr;
     tr:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
-    tr:SetTexCoord(SelectedSkin.message_window.rect.top_right.texture_coord[1], SelectedSkin.message_window.rect.top_right.texture_coord[2],
-                    SelectedSkin.message_window.rect.top_right.texture_coord[3], SelectedSkin.message_window.rect.top_right.texture_coord[4],
-                    SelectedSkin.message_window.rect.top_right.texture_coord[5], SelectedSkin.message_window.rect.top_right.texture_coord[6],
-                    SelectedSkin.message_window.rect.top_right.texture_coord[7], SelectedSkin.message_window.rect.top_right.texture_coord[8]);
+    tr:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.top_right.texture_coord));
     tr:ClearAllPoints();
-    tr:SetPoint("TOPRIGHT", fName.."Backdrop", "TOPRIGHT", SelectedSkin.message_window.rect.top_right.offset.x, SelectedSkin.message_window.rect.top_right.offset.y);
-    tr:SetWidth(SelectedSkin.message_window.rect.top_right.size.x);
-    tr:SetHeight(SelectedSkin.message_window.rect.top_right.size.y);
+    tr:SetPoint("TOPRIGHT", fName.."Backdrop", "TOPRIGHT", unpack(SelectedSkin.message_window.backdrop.top_right.offset));
+    tr:SetWidth(SelectedSkin.message_window.backdrop.top_right.width);
+    tr:SetHeight(SelectedSkin.message_window.backdrop.top_right.height);
     local bl = obj.widgets.Backdrop.bl;
     bl:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
-    bl:SetTexCoord(SelectedSkin.message_window.rect.bottom_left.texture_coord[1], SelectedSkin.message_window.rect.bottom_left.texture_coord[2],
-                    SelectedSkin.message_window.rect.bottom_left.texture_coord[3], SelectedSkin.message_window.rect.bottom_left.texture_coord[4],
-                    SelectedSkin.message_window.rect.bottom_left.texture_coord[5], SelectedSkin.message_window.rect.bottom_left.texture_coord[6],
-                    SelectedSkin.message_window.rect.bottom_left.texture_coord[7], SelectedSkin.message_window.rect.bottom_left.texture_coord[8]);
+    bl:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.bottom_left.texture_coord));
     bl:ClearAllPoints();
-    bl:SetPoint("BOTTOMLEFT", fName.."Backdrop", "BOTTOMLEFT", SelectedSkin.message_window.rect.bottom_left.offset.x, SelectedSkin.message_window.rect.bottom_left.offset.y);
-    bl:SetWidth(SelectedSkin.message_window.rect.bottom_left.size.x);
-    bl:SetHeight(SelectedSkin.message_window.rect.bottom_left.size.y);
+    bl:SetPoint("BOTTOMLEFT", fName.."Backdrop", "BOTTOMLEFT", unpack(SelectedSkin.message_window.backdrop.bottom_left.offset));
+    bl:SetWidth(SelectedSkin.message_window.backdrop.bottom_left.width);
+    bl:SetHeight(SelectedSkin.message_window.backdrop.bottom_left.height);
     local br = obj.widgets.Backdrop.br;
     br:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
-    br:SetTexCoord(SelectedSkin.message_window.rect.bottom_right.texture_coord[1], SelectedSkin.message_window.rect.bottom_right.texture_coord[2],
-                    SelectedSkin.message_window.rect.bottom_right.texture_coord[3], SelectedSkin.message_window.rect.bottom_right.texture_coord[4],
-                    SelectedSkin.message_window.rect.bottom_right.texture_coord[5], SelectedSkin.message_window.rect.bottom_right.texture_coord[6],
-                    SelectedSkin.message_window.rect.bottom_right.texture_coord[7], SelectedSkin.message_window.rect.bottom_right.texture_coord[8]);
+    br:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.bottom_right.texture_coord));
     br:ClearAllPoints();
-    br:SetPoint("BOTTOMRIGHT", fName.."Backdrop", "BOTTOMRIGHT", SelectedSkin.message_window.rect.bottom_right.offset.x, SelectedSkin.message_window.rect.bottom_right.offset.y);
-    br:SetWidth(SelectedSkin.message_window.rect.bottom_right.size.x);
-    br:SetHeight(SelectedSkin.message_window.rect.bottom_right.size.y);
+    br:SetPoint("BOTTOMRIGHT", fName.."Backdrop", "BOTTOMRIGHT", unpack(SelectedSkin.message_window.backdrop.bottom_right.offset));
+    br:SetWidth(SelectedSkin.message_window.backdrop.bottom_right.width);
+    br:SetHeight(SelectedSkin.message_window.backdrop.bottom_right.height);
     local t = obj.widgets.Backdrop.t;
-    t:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
-    t:SetTexCoord(SelectedSkin.message_window.rect.top.texture_coord[1], SelectedSkin.message_window.rect.top.texture_coord[2],
-                    SelectedSkin.message_window.rect.top.texture_coord[3], SelectedSkin.message_window.rect.top.texture_coord[4],
-                    SelectedSkin.message_window.rect.top.texture_coord[5], SelectedSkin.message_window.rect.top.texture_coord[6],
-                    SelectedSkin.message_window.rect.top.texture_coord[7], SelectedSkin.message_window.rect.top.texture_coord[8]);
+    t:SetTexture(SelectedSkin.message_window.file[SelectedStyle], SelectedSkin.message_window.backdrop.top.tile or nil);
+    t:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.top.texture_coord));
     t:ClearAllPoints();
     t:SetPoint("TOPLEFT", fName.."Backdrop_TL", "TOPRIGHT", 0, 0);
     t:SetPoint("BOTTOMRIGHT", fName.."Backdrop_TR", "BOTTOMLEFT", 0, 0);
     local b = obj.widgets.Backdrop.b;
-    b:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
-    b:SetTexCoord(SelectedSkin.message_window.rect.bottom.texture_coord[1], SelectedSkin.message_window.rect.bottom.texture_coord[2],
-                    SelectedSkin.message_window.rect.bottom.texture_coord[3], SelectedSkin.message_window.rect.bottom.texture_coord[4],
-                    SelectedSkin.message_window.rect.bottom.texture_coord[5], SelectedSkin.message_window.rect.bottom.texture_coord[6],
-                    SelectedSkin.message_window.rect.bottom.texture_coord[7], SelectedSkin.message_window.rect.bottom.texture_coord[8]);
+    b:SetTexture(SelectedSkin.message_window.file[SelectedStyle], SelectedSkin.message_window.backdrop.bottom.tile or nil);
+    b:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.bottom.texture_coord));
     b:ClearAllPoints();
     b:SetPoint("TOPLEFT", fName.."Backdrop_BL", "TOPRIGHT", 0, 0);
     b:SetPoint("BOTTOMRIGHT", fName.."Backdrop_BR", "BOTTOMLEFT", 0, 0);
     local l = obj.widgets.Backdrop.l;
-    l:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
-    l:SetTexCoord(SelectedSkin.message_window.rect.left.texture_coord[1], SelectedSkin.message_window.rect.left.texture_coord[2],
-                    SelectedSkin.message_window.rect.left.texture_coord[3], SelectedSkin.message_window.rect.left.texture_coord[4],
-                    SelectedSkin.message_window.rect.left.texture_coord[5], SelectedSkin.message_window.rect.left.texture_coord[6],
-                    SelectedSkin.message_window.rect.left.texture_coord[7], SelectedSkin.message_window.rect.left.texture_coord[8]);
+    l:SetTexture(SelectedSkin.message_window.file[SelectedStyle], SelectedSkin.message_window.backdrop.left.tile or nil);
+    l:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.left.texture_coord));
     l:ClearAllPoints();
     l:SetPoint("TOPLEFT", fName.."Backdrop_TL", "BOTTOMLEFT", 0, 0);
     l:SetPoint("BOTTOMRIGHT", fName.."Backdrop_BL", "TOPRIGHT", 0, 0);
     local r = obj.widgets.Backdrop.r;
-    r:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
-    r:SetTexCoord(SelectedSkin.message_window.rect.right.texture_coord[1], SelectedSkin.message_window.rect.right.texture_coord[2],
-                    SelectedSkin.message_window.rect.right.texture_coord[3], SelectedSkin.message_window.rect.right.texture_coord[4],
-                    SelectedSkin.message_window.rect.right.texture_coord[5], SelectedSkin.message_window.rect.right.texture_coord[6],
-                    SelectedSkin.message_window.rect.right.texture_coord[7], SelectedSkin.message_window.rect.right.texture_coord[8]);
+    r:SetTexture(SelectedSkin.message_window.file[SelectedStyle], SelectedSkin.message_window.backdrop.right.tile or nil);
+    r:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.right.texture_coord));
     r:ClearAllPoints();
     r:SetPoint("TOPLEFT", fName.."Backdrop_TR", "BOTTOMLEFT", 0, 0);
     r:SetPoint("BOTTOMRIGHT", fName.."Backdrop_BR", "TOPRIGHT", 0, 0);
     local bg = obj.widgets.Backdrop.bg;
-    bg:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
-    bg:SetTexCoord(SelectedSkin.message_window.rect.background.texture_coord[1], SelectedSkin.message_window.rect.background.texture_coord[2],
-                    SelectedSkin.message_window.rect.background.texture_coord[3], SelectedSkin.message_window.rect.background.texture_coord[4],
-                    SelectedSkin.message_window.rect.background.texture_coord[5], SelectedSkin.message_window.rect.background.texture_coord[6],
-                    SelectedSkin.message_window.rect.background.texture_coord[7], SelectedSkin.message_window.rect.background.texture_coord[8]);
+    bg:SetTexture(SelectedSkin.message_window.file[SelectedStyle], SelectedSkin.message_window.backdrop.background.tile or nil);
+    bg:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.background.texture_coord));
     bg:ClearAllPoints();
     bg:SetPoint("TOPLEFT", fName.."Backdrop_TL", "BOTTOMRIGHT", 0, 0);
     bg:SetPoint("BOTTOMRIGHT", fName.."Backdrop_BR", "TOPLEFT", 0, 0);

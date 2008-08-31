@@ -195,9 +195,9 @@ local function createMinimapIcon()
 	text:SetText("");
 	self.text = text;
 
-	local ticon = self:CreateTexture(nil, 'BACKGROUND');
+	local ticon = self:CreateTexture(nil, 'BORDER');
 	ticon:SetWidth(20); ticon:SetHeight(20);
-	ticon:SetTexture('Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\minimap');
+	ticon:SetTexture('Interface\\AddOns\\'..WIM.addonTocName..'\\Skins\\Default\\minimap');
 	ticon:SetTexCoord(0.05, 0.95, 0.05, 0.95);
 	ticon:SetPoint("TOPLEFT", 6, -5)
 	self.icon = ticon;

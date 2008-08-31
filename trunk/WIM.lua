@@ -84,6 +84,8 @@ local function initialize()
             end
         end
     end
+    -- notify all modules of current state.
+    WIM:CallModuleFunction("OnStateChange", WIM.curState);
     
     WIM:dPrint("WIM initialized...");
 end
@@ -292,6 +294,9 @@ function WIM:VARIABLES_LOADED()
     -- inherrit any new default options which wheren't shown in previous releases.
     WIM.copyTable(WIM.db_defaults, WIM.db);
     WIM.lists.gm = {};
+    
+    -- load previous state into memory
+    WIM.curState = WIM.db.lastState;
     
     initialize();
     WIM:SetEnabled(WIM.db.enabled);
