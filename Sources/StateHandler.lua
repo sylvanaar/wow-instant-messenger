@@ -8,6 +8,10 @@
 
 local WIM = WIM;
 
+-- we want to know the current state since last login.
+-- this information is loaded when WIM is initialized. Check WIM.lua
+WIM.db_defaults.lastState = "other";
+
 WIM.curState = "other";
 -- available states include: resting, combat, pvp, arena, raid, party, other
 
@@ -46,6 +50,8 @@ local function evaluateState()
     else
         WIM.curState = "other";
     end
+    
+    WIM.lastState = WIM.curState; -- we want to remember our last state.
     
     WIM:CallModuleFunction("OnStateChange", WIM.curState);
     WIM:dPrint("Evaluated State: "..WIM.curState);

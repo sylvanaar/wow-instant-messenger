@@ -34,64 +34,49 @@ local WIM_ClassicSkin = {
             red = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window_red",
             yellow = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window_yellow"
         },
-        rect = {
+        backdrop = {
             top_left = {
-                size = {
-                    x = 64,
-                    y = 64,
-                },
-                offset = {
-                    x = 0,
-                    y = 0
-                },
+                width = 64,
+                height = 64,
+                offset = {0, 0},
                 texture_coord = {0, 0, 0, .25, .25, 0, .25, .25}
             },
             top_right = {
-                size = {
-                    x = 64,
-                    y = 64,
-                },
-                offset = {
-                    x = 0,
-                    y = 0
-                },
+                width = 64,
+                height = 64,
+                offset = {0, 0},
                 texture_coord = {.75, 0, .75, .25, 1, 0, 1, .25}
             },
             bottom_left = {
-                size = {
-                    x = 64,
-                    y = 64,
-                },
-                offset = {
-                    x = 0,
-                    y = 0
-                },
+                width = 64,
+                height = 64,
+                offset = {0, 0},
                 texture_coord = {0, .75, 0, 1, .25, .75, .25, 1}
             },
             bottom_right = {
-                size = {
-                    x = 64,
-                    y = 64,
-                },
-                offset = {
-                    x = 0,
-                    y = 0
-                },
+                width = 64,
+                height = 64,
+                offset = {0, 0},
                 texture_coord = {.75, .75, .75, 1, 1, .75, 1, 1}
             },
             top = {
+                tile = false,
                 texture_coord = {.25, 0, .25, .25, .75, 0, .75, .25}
             },
             bottom = {
+                tile = false,
                 texture_coord = {.25, .75, .25, 1, .75, .75, .75, 1}
             },
             left = {
+                tile = false,
                 texture_coord = {0, .25, 0, .75, .25, .25, .25, .75}
             },
             right = {
+                tile = false,
                 texture_coord = {.75, .25, .75, .75, 1, .25, 1, .75}
             },
             background = {
+                tile = false,
                 texture_coord = {.25, .25, .25, .75, .75, .25, .75, .75}
             }
         },
@@ -425,12 +410,9 @@ local WIM_ClassicSkin = {
         vertical = false,
     },
     emoticons = {
-        rect = {
-            height = 0,
-            width = 0, -- if left at 0, images will size according to font height.
-            xoffset = 0,
-            yoffset = 0
-        },
+        width = 0,
+        height = 0,
+        offset = {0, 0},
         definitions = {
             [":)"] = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\Emoticons\\smile.tga",
             [":-)"] = ":)",

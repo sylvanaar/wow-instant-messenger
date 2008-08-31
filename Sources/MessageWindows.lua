@@ -420,7 +420,7 @@ end
 local function MessageWindow_MsgBox_OnTextChanged()
     if(WIM_W2W[this:GetParent().theUser]) then
 	if(not this.w2w_typing) then 
-	    this.w2w_typing = 0;
+		this.w2w_typing = 0;
 	end
 	if(this:GetText() ~= "") then
 	    if(time() - this.w2w_typing > 2) then

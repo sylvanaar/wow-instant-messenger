@@ -694,8 +694,7 @@ local function instantiateWindow(obj)
 			classTag = "blank";
 		end
 	end
-	local coord = WIM:GetSelectedSkin().message_window.widgets.class_icon[classTag];
-	icon:SetTexCoord(coord[1], coord[2], coord[3], coord[4], coord[5], coord[6], coord[7], coord[8]);
+	icon:SetTexCoord(unpack(WIM:GetSelectedSkin().message_window.widgets.class_icon[classTag]));
     end
     
     obj.UpdateCharDetails = function(self)
