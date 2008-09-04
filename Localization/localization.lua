@@ -7,6 +7,8 @@
 	--  bottom of this file!				    --
 	--------------------------------------------------------------
 	
+        setfenv(1, WIM);
+        
 	-- Global Strings --
                 WIM_LOCALIZED_YES 			        = "Yes";
                 WIM_LOCALIZED_NO 				= "No";

@@ -6,7 +6,7 @@ WIM.db_defaults.urls = {
     color = "FFFFFF";
 };
 
-local Emote = WIM:CreateModule("Emoticons", true);
+local Emote = WIM.CreateModule("Emoticons", true);
 
 -----------------------------------------------------
 --                Emoticon Functions               --
@@ -25,7 +25,7 @@ local function convertEmoteToPattern(theEmote)
 end
 
 local function getEmoteFilePath(theEmote)
-    local emoteTable = WIM:GetSelectedSkin().emoticons;
+    local emoteTable = WIM.GetSelectedSkin().emoticons;
 
     local tmp = emoteTable.definitions[theEmote];
     -- if emote not found or if mal formed/linked emote, prevent infinate loop.
@@ -58,7 +58,7 @@ local function filterEmoticons(theMsg)
 	end
     end
 
-    local SelectedSkin = WIM:GetSelectedSkin();
+    local SelectedSkin = WIM.GetSelectedSkin();
     local emoteTable = SelectedSkin.emoticons;
         
     -- first as to not disrupt any links, lets remove them and put them back later.
@@ -96,23 +96,23 @@ end
 
 
 function Emote:OnEnable()
-    WIM:RegisterStringModifier(filterEmoticons);
+    WIM.RegisterStringModifier(filterEmoticons);
 end
 
 function Emote:OnDisable()
-    WIM:UnregisterStringModifier(filterEmoticons);
+    WIM.UnregisterStringModifier(filterEmoticons);
 end
 
 
 
 
 -- Extended Global
-function WIM:GetEmoteTable()
-    local SelectedSkin = WIM:GetSelectedSkin();
+function WIM.GetEmoteTable()
+    local SelectedSkin = WIM.GetSelectedSkin();
     local list = {};
     local tmp;
     for key,_ in pairs(SelectedSkin.emoticons.definitions) do
-        tmp = WIM:getEmoteFilePath(key);
+        tmp = WIM.getEmoteFilePath(key);
         if(tmp ~= "") then
             if(not list[tmp]) then
                 list[tmp] = {

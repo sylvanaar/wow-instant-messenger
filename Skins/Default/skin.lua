@@ -7,9 +7,6 @@ local function formatDetails(guild, level, race, class)
 end
 
 
-
-
-
 --Default window skin
 local WIM_ClassicSkin = {
     title = "WIM Classic",
@@ -34,6 +31,8 @@ local WIM_ClassicSkin = {
             red = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window_red",
             yellow = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window_yellow"
         },
+        min_width = 256,
+        min_height = 128,
         backdrop = {
             top_left = {
                 width = 64,
@@ -94,6 +93,7 @@ local WIM_ClassicSkin = {
                 points = {
                     {"TOPLEFT", "window", "TOPLEFT", -10, 12}
                 },
+                is_round = true,
                 blank = {.5, .5, .5, .75, .75, .5, .75, .75},
                 druid = {0, 0, 0, .25, .25, 0, .25, .25},
                 hunter = {.25, 0, .25, .25, .5, 0, .5, .25},
@@ -110,15 +110,19 @@ local WIM_ClassicSkin = {
                 points = {
                     {"TOPLEFT", "window", "TOPLEFT", 50, -8}
                 },
-                inherits_font = "GameFontNormalLarge"
+                font = "GameFontNormalLarge",
+                font_color = "ffffff",
+                font_height = 16,
+                font_flags = "",
+                use_class_color = true
             },
             char_info = {
                 format = formatDetails,
                 points = {
                     {"TOP", "window", "TOP", 0, -30}
                 },
-                inherits_font = "GameFontNormal",
-                color = {1, 1, 1}
+                font = "GameFontNormal",
+                font_color = "ffffff"
             },
             close = {
                 state_hide = {
@@ -541,4 +545,4 @@ local WIM_ClassicSkin = {
 --                  Register Skin                       --
 ----------------------------------------------------------
 
-WIM:RegisterSkin(WIM_ClassicSkin);
+WIM.RegisterSkin(WIM_ClassicSkin);

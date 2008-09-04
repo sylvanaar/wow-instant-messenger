@@ -1,7 +1,19 @@
 local WIM = WIM;
-local MinimapIcon = WIM:CreateModule("MinimapIcon", true);
 
-MinimapIcon.db_defaults.minimap = {
+-- imports
+local _G = _G;
+local CreateFrame = CreateFrame;
+local math = math;
+local table = table;
+local pairs = pairs;
+local string = string;
+
+-- set namespace
+setfenv(1, WIM);
+
+local MinimapIcon = CreateModule("MinimapIcon", true);
+
+db_defaults.minimap = {
     position = 200
 };
 
@@ -60,116 +72,12 @@ local function popNote(tag)
     end
 end
 
-
-
-----------------------------------------------
---              Gradient Tools              --
-----------------------------------------------
--- the following bits of code is a result of boredom
--- and determination to get it done. The gradient pattern
--- which I was aiming for could not be manipulated in RGB,
--- however by converting RGB to HSV, the pattern now becomes
--- linear and as such, can now be given any color and
--- have the same gradient effect applied.
-
-local function RGBHextoHSVPerc(rgbStr)
-    local R, G, B = string.sub(rgbStr, 1, 2), string.sub(rgbStr, 3, 4), string.sub(rgbStr, 5, 6);
-    R, G, B = tonumber(R, 16)/255, tonumber(G, 16)/255, tonumber(B, 16)/255;
-    local i, x, v, f;
-    x = math.min(R, G);
-    x = math.min(x, B);
-    v = math.max(R, G);
-    v = math.max(v, B);
-    if(v == x) then
-        return nil, 0, v;
-    else
-        if(R == x) then
-            f = G - B;
-        elseif(G == x) then
-            f = B - R;
-        else
-            f = R - G;
-        end
-        if(R == x) then
-            i = 3;
-        elseif(G == x) then
-            i = 5;
-        else
-            i = 1;
-        end
-        return ((i - f /(v - x))/6), (v - x)/v, v;
-    end
-end
-
-local function HSVPerctoRGBPerc(H, S, V)
-    local m, n, f, i;
-    if(H == nil) then
-        return V, V, V;
-    else
-        H = H * 6;
-        if (H == 0) then
-            H=.01;
-        end
-        i = math.floor(H);
-        f = H - i;
-        if((i % 2) == 0) then
-            f = 1 - f; -- if i is even
-        end
-        m = V * (1 - S);
-        n = V * (1 - S * f);
-        if(i == 6 or i == 0) then
-            return V, n, m;
-        elseif(i == 1) then
-            return n, V, m;
-        elseif(i == 2) then
-            return m, V, n;
-        elseif(i == 3) then
-            return m, n, V;
-        elseif(i == 4) then
-            return n, m, V;
-        elseif(i == 5) then
-            return V, m, n;
-        else
-            return 0, 0, 0;
-        end
-    end
-end
-
--- pass rgb as signle arg hex, or triple arg rgb percent.
--- entering ! before a hex, will return a solid color.
-local function getGradientFromColor(...)
-    local h, s, v, s1, v1, s2, v2;
-    if(select("#", ...) == 0) then
-        return 0, 0, 0, 0, 0, 0;
-    elseif(select("#", ...) == 1) then
-        if(string.sub(select(1, ...),1, 1) == "!") then
-            local rgbStr = string.sub(select(1, ...), 2, 7);
-            local R, G, B = string.sub(rgbStr, 1, 2), string.sub(rgbStr, 3, 4), string.sub(rgbStr, 5, 6);
-            return tonumber(R, 16)/255, tonumber(G, 16)/255, tonumber(B, 16)/255, tonumber(R, 16)/255, tonumber(G, 16)/255, tonumber(B, 16)/255;
-        else
-            h, s, v = RGBHextoHSVPerc(select(1, ...));
-        end
-    else
-        h, s, v = RGBHextoHSVPerc(string.format ("%.2x%.2x%.2x",select(1, ...), select(2, ...), select(3, ...)));
-    end
-
-    s1 = math.min(1, s+.29/2);
-    v1 = math.max(0, v-.57/2);
-    s2 = math.max(0, s-.29/2);
-    v2 = math.min(1, s+.57/2);
-    
-    local r1, g1, b1 = HSVPerctoRGBPerc(h, s1, v1);
-    local r2, g2, b2 = HSVPerctoRGBPerc(h, s2, v2);
-    
-    return r1, g1, b1, r2, g2, b2;
-end
-
 ----------------------------------------------
 --          Minimap Icon Creation           --
 ----------------------------------------------
 
 local function createMinimapIcon()
-    local icon = CreateFrame('Button', 'WIM3MinimapButton', Minimap);
+    local icon = CreateFrame('Button', 'WIM3MinimapButton', _G.Minimap);
     icon.Load = function(self)
         self:SetFrameStrata('MEDIUM');
 	self:SetWidth(31); self:SetHeight(31);
@@ -197,7 +105,7 @@ local function createMinimapIcon()
 
 	local ticon = self:CreateTexture(nil, 'BORDER');
 	ticon:SetWidth(20); ticon:SetHeight(20);
-	ticon:SetTexture('Interface\\AddOns\\'..WIM.addonTocName..'\\Skins\\Default\\minimap');
+	ticon:SetTexture('Interface\\AddOns\\'..addonTocName..'\\Skins\\Default\\minimap');
 	ticon:SetTexCoord(0.05, 0.95, 0.05, 0.95);
 	ticon:SetPoint("TOPLEFT", 6, -5)
 	self.icon = ticon;
@@ -210,8 +118,8 @@ local function createMinimapIcon()
 	flash.texture = flash:CreateTexture(nil, "BORDER");
 	flash.texture:SetTexture('Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight');
 	flash.OnUpdate = function(self, elapsed)
-			    this.timeElapsed = (this.timeElapsed or 0) + elapsed;
-			    while(this.timeElapsed > 1) do
+			    self.timeElapsed = (self.timeElapsed or 0) + elapsed;
+			    while(self.timeElapsed > 1) do
 				local minimap = self:GetParent();
 				if(NotificationIndex > table.getn(Notifications)) then
 				    minimap.icon:Show();
@@ -224,12 +132,12 @@ local function createMinimapIcon()
 				    minimap.text:Show();
 				    minimap.icon:Hide();
 				end
-				this.timeElapsed = 0;
+				self.timeElapsed = 0;
 				NotificationIndex = NotificationIndex + 1
 			    end
 			    if(table.getn(Notifications) == 0) then
 				NotificationIndex = 1;
-				this.timeElapsed = 0;
+				self.timeElapsed = 0;
 				local minimap = self:GetParent();
 				minimap.text:Hide();
 				minimap.icon:Show();
@@ -281,7 +189,7 @@ local function createMinimapIcon()
 	self:LockHighlight();
 	self.icon:SetTexCoord(0, 1, 0, 1);
 	self:SetScript('OnUpdate', self.OnUpdate);
-	GameTooltip:Hide();
+	_G.GameTooltip:Hide();
     end
     icon.OnDragStop = function(self)
         self.dragging = nil;
@@ -290,20 +198,20 @@ local function createMinimapIcon()
 	self:UnlockHighlight();
     end
     icon.OnUpdate = function(self)
-        local mx, my = Minimap:GetCenter();
-	local px, py = GetCursorPosition();
-	local scale = Minimap:GetEffectiveScale();
+        local mx, my = _G.Minimap:GetCenter();
+	local px, py = _G.GetCursorPosition();
+	local scale = _G.Minimap:GetEffectiveScale();
 
 	px, py = px / scale, py / scale;
 
-        WIM.db.minimap.position = math.deg(math.atan2(py - my, px - mx)) % 360;
+        db.minimap.position = math.deg(math.atan2(py - my, px - mx)) % 360;
 	self:UpdatePosition();
     end
     icon.UpdatePosition = function(self)
-        local angle = math.rad(WIM.db.minimap.position or random(0, 360));
+        local angle = math.rad(db.minimap.position or random(0, 360));
 	local cos = math.cos(angle);
 	local sin = math.sin(angle);
-	local minimapShape = GetMinimapShape and GetMinimapShape() or 'ROUND';
+	local minimapShape = _G.GetMinimapShape and _G.GetMinimapShape() or 'ROUND';
 
 	local round = false;
 	if minimapShape == 'ROUND' then
@@ -348,7 +256,7 @@ local function createMinimapIcon()
 	self:SetPoint('CENTER', x, y);
     end
     icon:Load();
-    WIM:dPrint("MinimapIcon Created...");
+    dPrint("MinimapIcon Created...");
     return icon;
 end
 
@@ -371,12 +279,14 @@ function MinimapIcon:OnEnable()
         icon = createMinimapIcon();
         MinimapIcon:OnEnable();
     end
+    WIM.MinimapIcon = icon;
 end
 
 function MinimapIcon:OnDisable()
     if(icon) then
         icon:Hide();
     end
+    WIM.MinimapIcon = nil;
 end
 
 
@@ -386,11 +296,11 @@ end
 --      Global Extensions to WIM    --
 --------------------------------------
 
-function WIM:MinimapPushAlert(tag, color, numText, description)
+function MinimapPushAlert(tag, color, numText, description)
     pushNote(tag, color, numText, description);
 end
 
-function WIM:MinimapPopAlert(tag)
+function MinimapPopAlert(tag)
     popNote(tag);
 end
 

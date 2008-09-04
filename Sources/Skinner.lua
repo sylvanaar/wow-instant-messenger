@@ -1,6 +1,18 @@
 local WIM = WIM;
 
-WIM.db_defaults.skin = {
+-- imports
+local _G = _G;
+local table = table;
+local pairs = pairs;
+local string = string;
+local debugstack = debugstack;
+local type = type;
+local unpack = unpack;
+
+-- set namespace
+setfenv(1, WIM);
+
+db_defaults.skin = {
     selected = "WIM Classic",
     style = "default",
     font = "ChatFontNormal",
@@ -41,16 +53,18 @@ local function setPointsToObj(obj, pointsTable)
 end
 
 -- load selected skin
-function WIM:ApplySkinToWindow(obj)
+function ApplySkinToWindow(obj)
     local fName = obj:GetName();
     
-    if(getglobal(WIM.db.skin.font) == nil) then
+    if(_G[db.skin.font] == nil) then
         DEFAULT_CHAT_FRAME:AddMessage("WIM SKIN ERROR: Selected skin object not found! Loading default font instead.");
-        WIM.db.skin.font = SkinTable["WIM Classic"].default_font;
+        db.skin.font = SkinTable["WIM Classic"].default_font;
     end
     
     local SelectedSkin = WIM:GetSelectedSkin();
     local SelectedStyle = WIM:GetSelectedStyle(obj);
+    
+    obj:SetMinResize(SelectedSkin.message_window.min_width, SelectedSkin.message_window.min_height);
     
     --set backdrop edges and background textures.
     local tl = obj.widgets.Backdrop.tl;
@@ -114,26 +128,21 @@ function WIM:ApplySkinToWindow(obj)
     
     --set class icon
     local class_icon = obj.widgets.class_icon;
-    WIM:ApplySkinToWidget(class_icon);
+    ApplySkinToWidget(class_icon);
     class_icon:SetTexture(SelectedSkin.message_window.widgets.class_icon.file[SelectedStyle]);
     --WIM_UpdateMessageWindowClassIcon(obj);
     
     --set from font
     local from = obj.widgets.from;
-    WIM:ApplySkinToWidget(from);
-    from:SetFontObject(getglobal(SelectedSkin.message_window.widgets.from.inherits_font));
-    
+    ApplySkinToWidget(from);
     
     --set character details font
     local char_info = obj.widgets.char_info;
-    WIM:ApplySkinToWidget(char_info);
-    char_info:SetFontObject(getglobal(SelectedSkin.message_window.widgets.char_info.inherits_font));
-    char_info:SetTextColor(SelectedSkin.message_window.widgets.char_info.color[1], SelectedSkin.message_window.widgets.char_info.color[2], SelectedSkin.message_window.widgets.char_info.color[3]);
-    --WIM_MessageWindow_RefreshCharacterDetails(obj);
+    ApplySkinToWidget(char_info);
 
     --close button
     local close = obj.widgets.close;
-    WIM:ApplySkinToWidget(close);
+    ApplySkinToWidget(close);
     -- close button is a special case... so do the following extra work.
     if(close.curTextureIndex == 1) then
         close:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_hide.NormalTexture[SelectedStyle]);
@@ -176,22 +185,22 @@ function WIM:ApplySkinToWindow(obj)
     
     --scroll_up button
     local scroll_up = obj.widgets.scroll_up;
-    WIM:ApplySkinToWidget(scroll_up);
+    ApplySkinToWidget(scroll_up);
     
     --scroll_down button
     local scroll_down = obj.widgets.scroll_down;
-    WIM:ApplySkinToWidget(scroll_down);
+    ApplySkinToWidget(scroll_down);
     
     --chat display
     local chat_display = obj.widgets.chat_display;
-    WIM:ApplySkinToWidget(chat_display);
-    local font, height, flags = getglobal(WIM.db.skin.font):GetFont();
-    chat_display:SetFont(font, WIM.db.fontSize+2, WIM.db.skin.font_outline);
+    ApplySkinToWidget(chat_display);
+    local font, height, flags = _G[db.skin.font]:GetFont();
+    chat_display:SetFont(font, db.fontSize+2, db.skin.font_outline);
 
     --msg_box
     local msg_box = obj.widgets.msg_box;
-    WIM:ApplySkinToWidget(msg_box);
-    local font, height, flags = getglobal(WIM.db.skin.font):GetFont();
+    ApplySkinToWidget(msg_box);
+    local font, height, flags = _G[db.skin.font]:GetFont();
     msg_box:SetFont(font, SelectedSkin.message_window.widgets.msg_box.font_height, WIM.db.skin.font_outline);
     msg_box:SetTextColor(SelectedSkin.message_window.widgets.msg_box.font_color[1], SelectedSkin.message_window.widgets.msg_box.font_color[2], SelectedSkin.message_window.widgets.msg_box.font_color[3]);
     
@@ -229,18 +238,18 @@ end
 
 
 
-function WIM:RegisterPrematureSkins()
+function RegisterPrematureSkins()
     for i=1,table.getn(prematureRegisters) do
-        WIM:RegisterSkin(prematureRegisters[i]);
+        RegisterSkin(prematureRegisters[i]);
     end
 end
 
-function WIM:GetSelectedSkin()
+function GetSelectedSkin()
     return SelectedSkin or SkinTable["WIM Classic"];
 end
 
-function WIM:GetSelectedStyle(obj)
-    local SelectedSkin = WIM:GetSelectedSkin();
+function GetSelectedStyle(obj)
+    local SelectedSkin = GetSelectedSkin();
     local SelectedStyle = SelectedStyle;
     if(type(SelectedSkin.smart_style) == "function" and SelectedStyle == "#SMART#") then
         local smartStyleFunction = SelectedSkin.smart_style;
@@ -249,7 +258,7 @@ function WIM:GetSelectedStyle(obj)
     return SelectedStyle;
 end
 
-function WIM:LoadSkin(skinName, style)
+function LoadSkin(skinName, style)
     if(skinName == nil or (not SkinTable[skinName])) then
         skinName = "WIM Classic";
         style = SkinTable[skinName].default_style;
@@ -264,8 +273,8 @@ function WIM:LoadSkin(skinName, style)
     SelectedSkin = SkinTable[skinName];
     SelectedStyle = style;
     
-    WIM.db.skin.selected = skinName;
-    WIM.db.skin.style = style;
+    db.skin.selected = skinName;
+    db.skin.style = style;
     
     -- apply skin to tabs
     --WIM_Tabs.anchorSelf = SkinTable[skinName].tab_strip.rect.anchor_points.self;
@@ -281,11 +290,11 @@ function WIM:LoadSkin(skinName, style)
     -- apply skin to window objects
     local window_objects = WindowSoupBowl.windows;
     for i=1, table.getn(window_objects) do
-        WIM:ApplySkinToWindow(window_objects[i].obj);
+        ApplySkinToWindow(window_objects[i].obj);
     end
 end
 
-function WIM:RegisterFont(objName, title)
+function RegisterFont(objName, title)
     if(objName == nil or objName == "") then
         return;
     end
@@ -300,8 +309,8 @@ function WIM:RegisterFont(objName, title)
 end
 
 
-function WIM:RegisterSkin(skinTable)
-    if(not WIM.isInitialized) then
+function RegisterSkin(skinTable)
+    if(not isInitialized) then
         table.insert(prematureRegisters, skinTable);
         return;
     end
@@ -345,40 +354,16 @@ function WIM:RegisterSkin(skinTable)
     
     if(skinTable.title == "WIM Classic") then
         SkinTable[skinTable.title] = skinTable;
-        if(skinTable.title == WIM.db.skin.selected) then
-            WIM:LoadSkin(WIM.db.skin.selected, WIM.db.skin.style);
+        if(skinTable.title == db.skin.selected) then
+            LoadSkin(WIM.db.skin.selected, db.skin.style);
         end
-        --[[ create skin template from WIM Classic and remove any style references.
-        WIM.copyTable(SkinTable["WIM Classic"], SkinTemplate);
-        deleteStyleFileEntries(SkinTemplate.styles);
-        deleteStyleFileEntries(SkinTemplate.message_window.file);
-        deleteStyleFileEntries(SkinTemplate.message_window.class_icon.file);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.close.NormalTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.close.PushedTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.close.HighlightTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.history.NormalTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.history.PushedTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.history.HighlightTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.w2w.NormalTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.w2w.PushedTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.w2w.HighlightTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.chatting.NormalTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.chatting.PushedTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_up.NormalTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_up.PushedTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_up.HighlightTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_up.DisabledTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_down.NormalTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_down.PushedTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_down.HighlightTexture);
-        deleteStyleFileEntries(SkinTemplate.message_window.buttons.scroll_down.DisabledTexture);]]
         
         populateFemaleClassInfo(SkinTable[skinTable.title]);
         return;
     end
     
     -- inherrit missing data from default skin.
-    WIM.copyTable(SkinTable["WIM Classic"], skinTable);
+    copyTable(SkinTable["WIM Classic"], skinTable);
         
     populateFemaleClassInfo(skinTable);    
         
@@ -439,11 +424,11 @@ function WIM:RegisterSkin(skinTable)
     
     -- if this is the selected skin, load it now
     if(skinTable.title == WIM.db.skin.selected) then
-        WIM:LoadSkin(WIM.db.skin.selected, WIM.db.skin.style);
+        LoadSkin(WIM.db.skin.selected, WIM.db.skin.style);
     end
 end
 
-function WIM:GetFontKeyByName(fontName)
+function GetFontKeyByName(fontName)
 	for key, val in pairs(fontTable) do
 		if(val == fontName) then
 			return key;
@@ -453,8 +438,26 @@ function WIM:GetFontKeyByName(fontName)
 end
 
 
+function SetWidgetFont(obj, widgetSkinTable)
+    -- first check what font is being requested, height is applied here.
+    if(widgetSkinTable.font) then
+        if(_G[widgetSkinTable.font]) then
+            -- font is to be inherrited
+            obj:SetFontObject(_G[widgetSkinTable.font]);
+            local font, height, flags = obj:GetFont();
+            obj:SetFont(font, widgetSkinTable.font_height or height, widgetSkinTable.font_flags or flags);
+        else
+            -- font is a path, lets load the font
+            obj:SetFont(widgetSkinTable.font, widgetSkinTable.font_height or 12, widgetSkinTable.font_flags or "");
+        end
+    end
+    -- next, lets add the extra properties to it.
+    if(widgetSkinTable.font_color) then
+        obj:SetTextColor(RGBHexToPercent(widgetSkinTable.font_color));
+    end
+end
 
-function WIM:SetWidgetRect(obj, widgetSkinTable)
+function SetWidgetRect(obj, widgetSkinTable)
     if(type(widgetSkinTable) == "table") then
         if(type(widgetSkinTable.width) == "number") then
             obj:SetWidth(widgetSkinTable.width);
@@ -468,24 +471,24 @@ function WIM:SetWidgetRect(obj, widgetSkinTable)
     end
 end
 
-function WIM:ApplySkinToWidget(obj)
+function ApplySkinToWidget(obj)
     if(obj.GetObjectType) then
-        local widgetSkin = WIM:GetSelectedSkin().message_window.widgets[obj.widgetName] or obj.defaultSkin;
-        local SelectedStyle = WIM:GetSelectedStyle();
+        local SelectedSkin = GetSelectedSkin();
+        local widgetSkin = SelectedSkin.message_window.widgets[obj.widgetName] or obj.defaultSkin;
+        local SelectedStyle = GetSelectedStyle();
         local oType = obj:GetObjectType();
-        WIM:SetWidgetRect(obj, widgetSkin);
+        SetWidgetRect(obj, widgetSkin);
         if(oType == "Button" or oType == "CheckButton") then
-            if(widgetSkin.NormalTexture) then obj:SetNormalTexture(widgetSkin.NormalTexture[SelectedStyle]); end
-            if(widgetSkin.PushedTexture) then obj:SetPushedTexture(widgetSkin.PushedTexture[SelectedStyle]); end
-            if(widgetSkin.DisabledTexture) then obj:SetDisabledTexture(widgetSkin.DisabledTexture[SelectedStyle]); end
-            if(widgetSkin.HighlightTexture) then obj:SetHighlightTexture(widgetSkin.HighlightTexture[SelectedStyle], widgetSkin.HighlightAlphaMode); end
-        elseif(oType == "FontString") then
-        
-        else
-            
+            if(widgetSkin.NormalTexture) then obj:SetNormalTexture(widgetSkin.NormalTexture[SelectedStyle] or widgetSkin.NormalTexture[SelectedSkin.default_style]); end
+            if(widgetSkin.PushedTexture) then obj:SetPushedTexture(widgetSkin.PushedTexture[SelectedStyle] or widgetSkin.PushedTexture[SelectedSkin.default_style]); end
+            if(widgetSkin.DisabledTexture) then obj:SetDisabledTexture(widgetSkin.DisabledTexture[SelectedStyle] or widgetSkin.DisabledTexture[SelectedSkin.default_style]); end
+            if(widgetSkin.HighlightTexture) then obj:SetHighlightTexture(widgetSkin.HighlightTexture[SelectedStyle] or widgetSkin.HighlightTexture[SelectedSkin.default_style], widgetSkin.HighlightAlphaMode); end
+        end
+        if(oType == "FontString") then
+            SetWidgetFont(obj, widgetSkin);
         end
     else
-        WIM:dPrint("Invalid widget trying to be skinned.");
+        dPrint("Invalid widget trying to be skinned.");
     end
 end
 

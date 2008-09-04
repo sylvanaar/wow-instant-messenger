@@ -4,7 +4,7 @@ WIM.db_defaults.urls = {
     color = "FFFFFF";
 };
 
-local URL = WIM:CreateModule("URLHandler", true);
+local URL = WIM.CreateModule("URLHandler", true);
 
 -- patterns created by Sylvanaar & used in Prat
 local patterns = {
@@ -62,11 +62,11 @@ end
 
 
 function URL:OnEnable()
-    WIM:RegisterStringModifier(modifyURLs, true);
+    WIM.RegisterStringModifier(modifyURLs, true);
 end
 
 function URL:OnDisable()
-    WIM:UnregisterStringModifier(modifyURLs);
+    WIM.UnregisterStringModifier(modifyURLs);
 end
 
 

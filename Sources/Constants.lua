@@ -1,5 +1,17 @@
-WIM.constants.classes = {};
-local classes = WIM.constants.classes;
+local WIM = WIM;
+
+-- imports
+local _G = _G;
+local table = table;
+local type = type;
+local string = string;
+local pairs = pairs;
+
+-- set namespace
+setfenv(1, WIM);
+
+constants.classes = {};
+local classes = constants.classes;
 
 local classList = {
      "WIM_LOCALIZED_DRUID", "WIM_LOCALIZED_HUNTER", "WIM_LOCALIZED_MAGE",
@@ -52,10 +64,10 @@ classes[WIM_LOCALIZED_GM]	= {
 -- propigate female class types and update tags appropriately
 local i;
 for i=1, table.getn(classList) do
-     if(_G[classList[i]] ~= _G[classList[i].."_FEMALE"]) then
-          classes[_G[classList[i].."_FEMALE"]] = {
-               color = classes[_G[classList[i]]].color,
-               tag = classes[_G[classList[i]]].tag.."F"
+     if(WIM[classList[i]] ~= WIM[classList[i].."_FEMALE"]) then
+          classes[WIM[classList[i].."_FEMALE"]] = {
+               color = classes[WIM[classList[i]]].color,
+               tag = classes[WIM[classList[i]]].tag.."F"
           };
      end
 end

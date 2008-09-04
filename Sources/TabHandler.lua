@@ -1,6 +1,18 @@
 local WIM = WIM;
 
-WIM.db_defaults.tabs = {
+-- imports
+local _G = _G;
+local CreateFrame = CreateFrame;
+local IsShiftKeyDown = IsShiftKeyDown;
+local GetMouseFocus = GetMouseFocus;
+local table = table;
+local pairs = pairs;
+local math = math;
+
+-- set namespace
+setfenv(1, WIM);
+
+db_defaults.tabs = {
     enabled = true,
 };
 
@@ -38,26 +50,26 @@ helperFrame.ResetState = function(self)
         helperFrame.obj = nil;
     end
 helperFrame:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", 0, 0);
-helperFrame:SetScript("OnDragStart", function()
-                this:StartMoving();
-                this.isMoving = true;
-                if(this.obj) then
-                    local win = this.obj.childObj;
-                    this.obj.tabStrip:Detach(this.obj.childName);
-                    this.parentWindow = win;
-                    this.parentWindow.isMoving = true;
+helperFrame:SetScript("OnDragStart", function(self)
+                self:StartMoving();
+                self.isMoving = true;
+                if(self.obj) then
+                    local win = self.obj.childObj;
+                    self.obj.tabStrip:Detach(self.obj.childName);
+                    self.parentWindow = win;
+                    self.parentWindow.isMoving = true;
                     win:Show()
                     win:ClearAllPoints();
-                    win:SetPoint("TOPLEFT", this, "TOPLEFT");
+                    win:SetPoint("TOPLEFT", self, "TOPLEFT");
                 else
-                    WIM:dPrint("TabHelperFrame couldn't find 'obj'. Reseting State.");
-                    this:StopMovingOrSizing();
-                    this.isMoving = false;
+                    dPrint("TabHelperFrame couldn't find 'obj'. Reseting State.");
+                    self:StopMovingOrSizing();
+                    self.isMoving = false;
                     helperFrame:ResetState();
                 end
             end);
-helperFrame:SetScript("OnDragStop", function()
-                local win = this.parentWindow;
+helperFrame:SetScript("OnDragStop", function(self)
+                local win = self.parentWindow;
                 local x,y = win:GetLeft(), win:GetTop();
                 win:ClearAllPoints();
                 win:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y);
@@ -78,48 +90,48 @@ helperFrame:SetScript("OnDragStop", function()
                         end
                     end
                 end
-                this:StopMovingOrSizing();
-                this.isMoving = false;
+                self:StopMovingOrSizing();
+                self.isMoving = false;
                 win.isMoving = false;
                 helperFrame:ResetState();
             end);
-helperFrame:SetScript("OnUpdate", function()
-                if(this.isMoving and this.isAttached) then
+helperFrame:SetScript("OnUpdate", function(self)
+                if(self.isMoving and self.isAttached) then
                     helperFrame.flash:Hide();
                     return;
                 end
                 
                 if(IsShiftKeyDown()) then
                     local obj = GetMouseFocus();
-                    if(obj and obj.isWimTab and not this.isAttached) then
+                    if(obj and obj.isWimTab and not self.isAttached) then
                         -- attach to tab + position window
-                        this.attachedTo = obj;
-                        this:RegisterForDrag("LeftButton");
-                        this.tabStrip = obj.tabStrip;
-                        this.isTabHelper = true;
-                        this:ClearAllPoints();
-                        this:SetPoint("TOPLEFT", obj, "TOPLEFT", 0, 0);
-                        this:SetPoint("BOTTOMRIGHT", obj, "BOTTOMRIGHT", 0, 0);
-                        this.isAttached = true;
-                        this.obj = obj;
-                    elseif(obj and this.isAttached) then
+                        self.attachedTo = obj;
+                        self:RegisterForDrag("LeftButton");
+                        self.tabStrip = obj.tabStrip;
+                        self.isTabHelper = true;
+                        self:ClearAllPoints();
+                        self:SetPoint("TOPLEFT", obj, "TOPLEFT", 0, 0);
+                        self:SetPoint("BOTTOMRIGHT", obj, "BOTTOMRIGHT", 0, 0);
+                        self.isAttached = true;
+                        self.obj = obj;
+                    elseif(obj and self.isAttached) then
                         if(obj ~= helperFrame) then
-                            this:ResetState();
+                            self:ResetState();
                         end
                     else
-                        if(this.isAttached) then
-                            this:ResetState();
+                        if(self.isAttached) then
+                            self:ResetState();
                         end
                     end
                 else
-                    if(this.isAttached) then
-                        this:ResetState();
+                    if(self.isAttached) then
+                        self:ResetState();
                     end
                 end
-                if(this.isAttached) then
-                    this.flash:Show();
+                if(self.isAttached) then
+                    self.flash:Show();
                 else
-                    this.flash:Hide();
+                    self.flash:Hide();
                 end
             end);
 helperFrame:Show();
@@ -132,10 +144,10 @@ helperFrame:Show();
 
 -- a simple function to add an item to a table checking for duplicates.
 -- this is ok, since the table is never too large to slow things down.
-local addToTableUnique = WIM.addToTableUnique;
+local addToTableUnique = addToTableUnique;
 
 -- remove item from table. Return true if removed, false otherwise.
-local removeFromTable = WIM.removeFromTable;
+local removeFromTable = removeFromTable;
 
 
 -- get the table index of an item. return's 0 if not found
@@ -151,7 +163,7 @@ end
 
 -- update tabStip with propper skin layout.
 local function applySkin(tabStrip)
-    local skinTable = WIM:GetSelectedSkin().tab_strip;
+    local skinTable = GetSelectedSkin().tab_strip;
     local i;
     for i=1,table.getn(tabStrip.tabs) do
         local tab = tabStrip.tabs[i];
@@ -245,7 +257,7 @@ local function createTabGroup()
             tab.left:SetTexture(pathOrTexture);
             tab.middle:SetTexture(pathOrTexture);
             tab.right:SetTexture(pathOrTexture);
-        tab:SetScript("OnClick", function() tabStrip:JumpToTabName(this.childName); end);
+        tab:SetScript("OnClick", function(self) tabStrip:JumpToTabName(self.childName); end);
         tab.isWimTab = true;
         end
         
@@ -270,10 +282,10 @@ local function createTabGroup()
     
         -- relocate tabStrip to window
         local win = tabStrip.selected.obj;
-        local skinTable = WIM:GetSelectedSkin().tab_strip;
+        local skinTable = GetSelectedSkin().tab_strip;
         tabStrip:SetParent(win);
         tabStrip.parentWindow = win;
-        WIM:SetWidgetRect(tabStrip, skinTable);
+        SetWidgetRect(tabStrip, skinTable);
     
         -- re-order tabs & sizing
         local curSize;
@@ -307,7 +319,7 @@ local function createTabGroup()
             if(i <= count) then
                 local str = tabStrip.attached[i+tabStrip.curOffset];
                 tabStrip.tabs[i]:Show();
-                tabStrip.tabs[i].childObj = WIM.windows.active.whisper[str] or WIM.windows.active.chat[str] or WIM.windows.active.w2w[str];
+                tabStrip.tabs[i].childObj = windows.active.whisper[str] or windows.active.chat[str] or windows.active.w2w[str];
                 tabStrip.tabs[i].childName = str;
                 tabStrip.tabs[i]:SetText(str);
                 if(tabStrip.tabs[i].childObj == tabStrip.selected.obj) then
@@ -330,7 +342,7 @@ local function createTabGroup()
     end
     
     tabStrip.SetSelectedName = function(self, winName)
-        local win = WIM.windows.active.whisper[winName] or WIM.windows.active.chat[winName] or WIM.windows.active.w2w[winName];
+        local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
             tabStrip.selected.name = winName;
             tabStrip.selected.obj = win;
@@ -355,7 +367,7 @@ local function createTabGroup()
         tabStrip:UpdateTabs();
         local i;
         for i=1,table.getn(tabStrip.attached) do
-            local obj = WIM.windows.active.whisper[tabStrip.attached[i]] or WIM.windows.active.chat[tabStrip.attached[i]] or WIM.windows.active.w2w[tabStrip.attached[i]];
+            local obj = windows.active.whisper[tabStrip.attached[i]] or windows.active.chat[tabStrip.attached[i]] or windows.active.w2w[tabStrip.attached[i]];
             if(obj ~= win) then
                 obj:Hide();
             end
@@ -363,7 +375,7 @@ local function createTabGroup()
     end
     
     tabStrip.Detach = function(self, winName)
-        local win = WIM.windows.active.whisper[winName] or WIM.windows.active.chat[winName] or WIM.windows.active.w2w[winName];
+        local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
             local curIndex = getIndexFromTable(tabStrip.attached, winName);
             if(win == tabStrip.selected.obj) then
@@ -384,12 +396,12 @@ local function createTabGroup()
             win.tabStrip = nil;
             tabStrip:UpdateTabs();
             win:Show();
-            WIM:dPrint(win:GetName().." is detached from "..tabStrip:GetName());
+            dPrint(win:GetName().." is detached from "..tabStrip:GetName());
         end
     end
     
     tabStrip.Attach = function(self, winName)
-        local win = WIM.windows.active.whisper[winName] or WIM.windows.active.chat[winName] or WIM.windows.active.w2w[winName];
+        local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
             --if already attached, detach then attach here.
             if(win.tabStrip and win.tabStrip ~= tabStrip) then
@@ -403,7 +415,7 @@ local function createTabGroup()
                 win:Hide();
             end
             tabStrip:UpdateTabs();
-            WIM:dPrint(win:GetName().." is attached to "..tabStrip:GetName());
+            dPrint(win:GetName().." is attached to "..tabStrip:GetName());
         end
     end
     
@@ -436,7 +448,7 @@ end
 --------------------------------------
 
 -- update skin to all tabStrips.
-function WIM:ApplySkinToTabs()
+function ApplySkinToTabs()
     local i;
     for i=1, table.getn(tabGroups) do
         applySkin(tabGroups[i]);
@@ -444,6 +456,6 @@ function WIM:ApplySkinToTabs()
 end
 
 -- give getAvailableTabGroup() a global reference.
-function WIM:GetAvailableTabGroup()
+function GetAvailableTabGroup()
     return getAvailableTabGroup();
 end
