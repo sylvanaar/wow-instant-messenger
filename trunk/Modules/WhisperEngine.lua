@@ -11,14 +11,32 @@
 ]]
 
 
-
+-- imports
 local WIM = WIM;
+local _G = _G;
+local CreateFrame = CreateFrame;
+local hooksecurefunc = hooksecurefunc;
+local table = table;
+local pairs = pairs;
+local strupper = strupper;
+local gsub = gsub;
+local strlen = strlen;
+local strsub = strsub;
+local string = string;
+local IsShiftKeyDown = IsShiftKeyDown;
+local select = select;
+local unpack = unpack;
+
+-- set name space
+setfenv(1, WIM);
 
 -- create WIM Module
-local WhisperEngine = WIM:CreateModule("WhisperEngine");
+local WhisperEngine = CreateModule("WhisperEngine");
 
 -- declare default settings for whispers.
-WhisperEngine.db_defaults.whispers = {
+-- if new global env wasn't set to WIM's namespace, then your module would call as follows:
+--      WhisperEngine.db_defaults... or WIM.db_defaults...
+db_defaults.whispers = {
     pop_rules = {
         --pop-up rule sets based off of your location
         resting = {
@@ -69,12 +87,12 @@ WhisperEngine.db_defaults.whispers = {
     playSound = true,
 }
 
-WhisperEngine.db_defaults.displayColors.wispIn = {
+db_defaults.displayColors.wispIn = {
 	r=0.5607843137254902, 
 	g=0.03137254901960784, 
 	b=0.7607843137254902
     }
-WhisperEngine.db_defaults.displayColors.wispOut = {
+db_defaults.displayColors.wispOut = {
         r=1, 
 	g=0.07843137254901961, 
 	b=0.9882352941176471
@@ -87,7 +105,7 @@ WhisperEngine:RegisterEvent("CHAT_MSG_AFK");
 WhisperEngine:RegisterEvent("CHAT_MSG_DND");
 WhisperEngine:RegisterEvent("CHAT_MSG_SYSTEM");
 
-local Windows = WIM.windows.active.whisper;
+local Windows = windows.active.whisper;
 
 local WhisperQueue_Bowl = {}; -- used to recycle tables for queue
 local WhisperQueue = {}; -- active event queue
@@ -95,19 +113,19 @@ local WhisperQueue_Index = {}; -- a quick reference to an active index
 
 local CF_MessageEventHandler_orig; -- used for a hook of the chat frame. Messaage filter handlers aren't sufficient.
 
-local addToTableUnique = WIM.addToTableUnique;
-local removeFromTable = WIM.removeFromTable;
+local addToTableUnique = addToTableUnique;
+local removeFromTable = removeFromTable;
 
 function WhisperEngine:OnEnableWIM()
-
+    -- this exists for documenation purposes and is not used in this module.
 end
 
 function WhisperEngine:OnDisableWIM()
-
+    -- this exists for documenation purposes and is not used in this module.
 end
 
 local function getWhisperWindowByUser(user)
-    user = WIM:FormatUserName(user);
+    user = FormatUserName(user);
     if(not user or user == "") then
         -- if invalid user, then return nil;
         return nil;
@@ -118,24 +136,24 @@ local function getWhisperWindowByUser(user)
         return obj;
     else
         -- otherwise, create a new one.
-        Windows[user] = WIM:CreateWhisperWindow(user);
+        Windows[user] = CreateWhisperWindow(user);
         return Windows[user];
     end
 end
 
-local function windowDestroyed()
+local function windowDestroyed(self)
     if(IsShiftKeyDown()) then
-        local user = this:GetParent().theUser;
+        local user = self:GetParent().theUser;
         Windows[user] = nil;
     end
 end
 
-WIM:RegisterWidgetTrigger("close", "whisper", "OnClick", windowDestroyed);
+RegisterWidgetTrigger("close", "whisper", "OnClick", windowDestroyed);
 
-WIM:RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function()
-        local obj = this:GetParent();
-        SendChatMessage(this:GetText(), "WHISPER", nil, obj.theUser);
-        this:SetText("");
+RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
+        local obj = self:GetParent();
+        _G.SendChatMessage(self:GetText(), "WHISPER", nil, obj.theUser);
+        self:SetText("");
     end);
 
 local function CHAT_MSG_WHISPER(...)
@@ -145,22 +163,22 @@ local function CHAT_MSG_WHISPER(...)
     win:AddUserMessage(arg2, arg1, color.r, color.g, color.b);
     win:Pop("in");
 
-    if(WIM.db.whispers.pop_rules[WIM.curState].supress) then
-        ChatEdit_SetLastTellTarget(arg2);
+    if(db.whispers.pop_rules[WIM.curState].supress) then
+        _G.ChatEdit_SetLastTellTarget(arg2);
     end
-    WIM:CallModuleFunction("PostEvent_Whisper", ...);
+    CallModuleFunction("PostEvent_Whisper", ...);
 end
 
 local function CHAT_MSG_WHISPER_INFORM(...)
     local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
-    local color = WIM.db.displayColors.wispOut; -- color contains .r, .g & .b
+    local color = db.displayColors.wispOut; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
-    win:AddUserMessage(UnitName("player"), arg1, color.r, color.g, color.b);
+    win:AddUserMessage(_G.UnitName("player"), arg1, color.r, color.g, color.b);
     win:Pop("out");
-    if(WIM.db.whispers.pop_rules[WIM.curState].supress) then
-        ChatEdit_SetLastToldTarget(arg2);
+    if(db.whispers.pop_rules[curState].supress) then
+        _G.ChatEdit_SetLastToldTarget(arg2);
     end
-    WIM:CallModuleFunction("PostEvent_WhisperInform", ...);
+    CallModuleFunction("PostEvent_WhisperInform", ...);
 end
 
 local function getNewEventTable(msgID)
@@ -269,7 +287,7 @@ local function popEvents()
                 end
                 if(not eventItem.flags.supress) then
                     -- temproary hack for compatibility with TBC & WOTK -- REMOVE UPON RELEASE OF WOTK
-                    if(ACHIEVEMENTS_COMPLETED) then
+                    if(WIM.isWOTLK) then
                             local j;
                             for j=1, table.getn(eventItem.ChatFrames) do
                                 CF_MessageEventHandler_orig(eventItem.ChatFrames[j], eventItem.event, unpack(eventItem.arg, 1, eventItem.argCount));
@@ -310,9 +328,9 @@ local function pushEvent(event, ...)
     -- notify all modules.
     if(eventItem.argCount > 0) then
         if(eventItem.event == "CHAT_MSG_WHISPER") then
-            WIM:CallModuleFunction("OnEvent_Whisper", eventItem);
+            CallModuleFunction("OnEvent_Whisper", eventItem);
         else
-            WIM:CallModuleFunction("OnEvent_WhisperInform", eventItem);
+            CallModuleFunction("OnEvent_WhisperInform", eventItem);
         end
     end
     eventItem.flags.passedToModules = true;
@@ -322,10 +340,10 @@ end
 
 local function bumpWhisperEventToEnd()
     --WIM:dPrint("WhisperEngine: Moving WIM to the end of the event chain.");
-    WIM_workerFrame:UnregisterEvent("CHAT_MSG_WHISPER_INFORM");
-    WIM_workerFrame:RegisterEvent("CHAT_MSG_WHISPER_INFORM");
-    WIM_workerFrame:UnregisterEvent("CHAT_MSG_WHISPER");
-    WIM_workerFrame:RegisterEvent("CHAT_MSG_WHISPER");
+    _G.WIM_workerFrame:UnregisterEvent("CHAT_MSG_WHISPER_INFORM");
+    _G.WIM_workerFrame:RegisterEvent("CHAT_MSG_WHISPER_INFORM");
+    _G.WIM_workerFrame:UnregisterEvent("CHAT_MSG_WHISPER");
+    _G.WIM_workerFrame:RegisterEvent("CHAT_MSG_WHISPER");
 end
 
 --------------------------------------
@@ -366,62 +384,62 @@ end
 --------------------------------------
 
 local function replyTellTarget(TellNotTold)
-    if(WIM.db.enabled) then
-        if(WIM.db.whispers.pop_rules.intercept and WIM.db.whispers.pop_rules[WIM.curState].onSend) then
+    if(db.enabled) then
+        if(db.whispers.pop_rules.intercept and db.whispers.pop_rules[curState].onSend) then
             local lastTell;
             if(TellNotTold) then
-                lastTell = ChatEdit_GetLastTellTarget();
+                lastTell = _G.ChatEdit_GetLastTellTarget();
             else
-                lastTell = ChatEdit_GetLastToldTarget();
+                lastTell = _G.ChatEdit_GetLastToldTarget();
             end
             if ( lastTell ~= "" ) then
                 local win = getWhisperWindowByUser(lastTell);
                 win.widgets.msg_box.setText = 1;
                 win:Pop(true); -- force popup
                 win.widgets.msg_box:SetFocus();
-		ChatEdit_OnEscapePressed(ChatFrameEditBox);
+		_G.ChatEdit_OnEscapePressed(_G.ChatFrameEditBox);
             end
         end
     end
 end
 
 local function CF_extractTellTarget(editBox, msg)
-    if(WIM.db.enabled) then
+    if(db.enabled) then
         -- Grab the first "word" in the string
         local target = gsub(msg, "(%s*)([^%s]+)(.*)", "%2", 1);
         if ( (strlen(target) <= 0) or (strsub(target, 1, 1) == "|") ) then
             return;
         end
 	
-        if(WIM.db.whispers.pop_rules.intercept and WIM.db.whispers.pop_rules[WIM.curState].onSend) then
+        if(db.whispers.pop_rules.intercept and db.whispers.pop_rules[curState].onSend) then
             target = string.gsub(target, "^%l", string.upper)
 	    local win = getWhisperWindowByUser(target);
             win.widgets.msg_box.setText = 1;
             win:Pop(true); -- force popup
             win.widgets.msg_box:SetFocus();
-	    ChatEdit_OnEscapePressed(ChatFrameEditBox);
+	    _G.ChatEdit_OnEscapePressed(_G.ChatFrameEditBox);
         end
     end
 end
 
 local function CF_sendTell(name) -- needed in order to UnitPopups to work with whispers.
-    if(WIM.db.enabled) then
-	if(WIM.db.whispers.pop_rules.intercept and WIM.db.whispers.pop_rules[WIM.curState].onSend) then
+    if(db.enabled) then
+	if(db.whispers.pop_rules.intercept and db.whispers.pop_rules[curState].onSend) then
             -- Remove spaces from the server name for slash command parsing
             name = gsub(name, " ", "");
 	    local win = getWhisperWindowByUser(name);
             win.widgets.msg_box.setText = 1;
             win:Pop(true); -- force popup
             win.widgets.msg_box:SetFocus();
-	    ChatEdit_OnEscapePressed(ChatFrameEditBox);
+	    _G.ChatEdit_OnEscapePressed(_G.ChatFrameEditBox);
 	end
     end
 end
 
 local function CF_HandleChatType(editBox, msg, command, send)
-	for index, value in pairs(ChatTypeInfo) do
+	for index, value in pairs(_G.ChatTypeInfo) do
 		local i = 1;
-		local cmdString = getglobal("SLASH_"..index..i);
+		local cmdString = _G["SLASH_"..index..i];
 		while ( cmdString ) do
 			cmdString = strupper(cmdString);
 			if ( cmdString == command ) then
@@ -430,15 +448,15 @@ local function CF_HandleChatType(editBox, msg, command, send)
 				return;
 			end
 			i = i + 1;
-			cmdString = getglobal("SLASH_"..index..i);
+			cmdString = _G["SLASH_"..index..i];
 		end
 	end
 end
 
 ---- THIS SECTION IS A HACK TO WORK WITH BOTH TBC AND WOTLK - UPDATE FOR RELEASE OF WOTK
-CF_MessageEventHandler_orig = ChatFrame_MessageEventHandler;
+CF_MessageEventHandler_orig = _G.ChatFrame_MessageEventHandler;
 local function CF_MessageEventHandler(self, event, ...)
-    if(WIM.db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
+    if(db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
         local eventItem = WhisperQueue[select(11, ...)];
         if(eventItem) then
             addToTableUnique(eventItem.ChatFrames, self);
@@ -451,22 +469,22 @@ local function CF_MessageEventHandler(self, event, ...)
     end
 end
 local function CF_MessageEventHandlerTBC(event)
-    if(WIM.db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
+    if(db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
         local eventItem = WhisperQueue[arg11];
         if(eventItem) then
             addToTableUnique(eventItem.ChatFrames, this);
         else
-            eventItem = pushEvent(event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
+            eventItem = pushEvent(event, _G.arg1, _G.arg2, _G.arg3, _G.arg4, _G.arg5, _G.arg6, _G.arg7, _G.arg8, _G.arg9, _G.arg10, _G.arg11);
             addToTableUnique(eventItem.ChatFrames, this);
         end
     else
         CF_MessageEventHandler_orig(event);
     end
 end
-if(ACHIEVEMENTS_COMPLETED) then
-    ChatFrame_MessageEventHandler = CF_MessageEventHandler;
+if(isWOTLK) then
+    _G.ChatFrame_MessageEventHandler = CF_MessageEventHandler;
 else
-    ChatFrame_MessageEventHandler = CF_MessageEventHandlerTBC;
+    _G.ChatFrame_MessageEventHandler = CF_MessageEventHandlerTBC;
 end
 --------------------------------------------------------
 

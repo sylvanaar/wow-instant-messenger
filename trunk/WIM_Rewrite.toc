@@ -12,8 +12,8 @@
 ## SavedVariables: WIM3_Data, WIM_Alias, WIM_Filters, WIM_History, WIM3_Cache, WIM_FuBarDB
 ## X-Embeds: PratPlugin-1.0, WhoLib
 
+Sources\Namespace.lua
 Localization\Includes.xml
-
 Libs\Includes.xml
 
 WIM.lua
