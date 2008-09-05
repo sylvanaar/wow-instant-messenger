@@ -8,6 +8,8 @@ local string = string;
 local debugstack = debugstack;
 local type = type;
 local unpack = unpack;
+local setmetatable = setmetatable;
+local getmetatable = getmetatable;
 
 -- set namespace
 setfenv(1, WIM);
@@ -32,6 +34,67 @@ local fontTable = {};
 local prematureRegisters = {};
 
 local WindowSoupBowl = WIM:GetWindowSoupBowl();
+
+local ProtectedSkinKeys = {
+    points = "nil",
+    file = "style",
+    NormalTexture = "style",
+    PushedTexture = "style",
+    DisabledTexture = "style",
+    HighlightTexture = "style",
+    font = "nil",
+    font_height = "nil",
+    font_flags = "nil",
+    inherrits_font = "nil",
+    width = "nil",
+    height = "nil"
+};
+
+local function configureStyleTable(dest, styleDeclareTable)
+    return {};
+end
+
+local function preserveProtectedKeys(theKey, src, dest, styleDeclareTable)
+    local ttype = type(ProtectedSkinKeys[theKey])=="string" and ProtectedSkinKeys[theKey] or nil;
+    if(ttype) then
+        if(ttype == "table") then
+            return {}, true;
+        elseif(ttype == "style") then
+            return configureStyleTable(dest, styleDeclareTable), true;
+        else
+            return nil, true;
+        end
+    else
+        return nil, false;
+    end
+end
+
+local function linkSkinTable(src, dest, styleDeclareTable)
+        if(type(src) == "table") then
+                --if(type(dest) ~= "table") then dest = {}; end
+                --setmetatable
+                setmetatable(dest, {__index = function(t, k)
+                                                local val, ignoredKey = preserveProtectedKeys(k, src, dest, styleDeclareTable);
+                                                if(ignoredKey) then
+                                                    t[k] = val;
+                                                    return t[k];
+                                                else
+                                                    return src[k];
+                                                end
+                                            end});
+                for k, v in pairs(src) do
+                        local val, ignoredKey = nil, false;
+                        if(dest[k] == nil) then
+                            val, ignoredKey = preserveProtectedKeys(k, src, dest, styleDeclareTable);
+                            dest[k] = ignoredKey and val or nil;
+                        end
+                        if(not ignoredKey and type(v) == "table") then
+                            linkSkinTable(v, dest[k], styleDeclareTable);
+                        end
+                end
+        end
+end
+
 
 local function setPointsToObj(obj, pointsTable)
     obj:ClearAllPoints();
@@ -493,4 +556,7 @@ function ApplySkinToWidget(obj)
 end
 
 
-
+function test()
+    _G.test = {message_window = {}};
+    linkSkinTable(SkinTable["WIM Classic"], _G.test);
+end

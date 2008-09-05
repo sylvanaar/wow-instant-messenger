@@ -423,7 +423,7 @@ local function CF_extractTellTarget(editBox, msg)
 end
 
 local function CF_sendTell(name) -- needed in order to UnitPopups to work with whispers.
-    if(db.enabled) then
+    if(db and db.enabled) then
 	if(db.whispers.pop_rules.intercept and db.whispers.pop_rules[curState].onSend) then
             -- Remove spaces from the server name for slash command parsing
             name = gsub(name, " ", "");
@@ -456,7 +456,7 @@ end
 ---- THIS SECTION IS A HACK TO WORK WITH BOTH TBC AND WOTLK - UPDATE FOR RELEASE OF WOTK
 CF_MessageEventHandler_orig = _G.ChatFrame_MessageEventHandler;
 local function CF_MessageEventHandler(self, event, ...)
-    if(db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
+    if(db and db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
         local eventItem = WhisperQueue[select(11, ...)];
         if(eventItem) then
             addToTableUnique(eventItem.ChatFrames, self);
@@ -469,7 +469,7 @@ local function CF_MessageEventHandler(self, event, ...)
     end
 end
 local function CF_MessageEventHandlerTBC(event)
-    if(db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
+    if(db and db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
         local eventItem = WhisperQueue[arg11];
         if(eventItem) then
             addToTableUnique(eventItem.ChatFrames, this);
