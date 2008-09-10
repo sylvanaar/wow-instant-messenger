@@ -27,7 +27,7 @@ local icon;
 local function getNotificationTable(tag)
     local i;
     local emptyNote;
-    for i=1, table.getn(Notification_Bowl) do
+    for i=1, #Notification_Bowl do
         if(Notification_Bowl[i].tag == "") then
             emptyNote = Notification_Bowl[i];
         end
@@ -53,7 +53,7 @@ local function pushNote(tag, color, num, desc)
             note.color, note.text, note.desc = color, num, (desc or "");
             if(not note.index) then
                 table.insert(Notifications, note);
-                note.index = table.getn(Notifications);
+                note.index = #Notifications;
             end
         end
         icon.flash:Show();
@@ -62,7 +62,7 @@ end
 
 local function popNote(tag)
     local i, note;
-    for i=1, table.getn(Notifications) do
+    for i=1, #Notifications do
         if(Notifications[i].tag == tag) then
             local note = Notifications[i];
             table.remove(Notifications, i);
@@ -121,7 +121,7 @@ local function createMinimapIcon()
 			    self.timeElapsed = (self.timeElapsed or 0) + elapsed;
 			    while(self.timeElapsed > 1) do
 				local minimap = self:GetParent();
-				if(NotificationIndex > table.getn(Notifications)) then
+				if(NotificationIndex > #Notifications) then
 				    minimap.icon:Show();
 				    minimap.backGround:SetGradient("VERTICAL", getGradientFromColor("!000000"));
 				    minimap.text:Hide();
@@ -135,7 +135,7 @@ local function createMinimapIcon()
 				self.timeElapsed = 0;
 				NotificationIndex = NotificationIndex + 1
 			    end
-			    if(table.getn(Notifications) == 0) then
+			    if(#Notifications == 0) then
 				NotificationIndex = 1;
 				self.timeElapsed = 0;
 				local minimap = self:GetParent();

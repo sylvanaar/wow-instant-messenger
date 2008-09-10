@@ -8,4 +8,7 @@
     <script file="TabHandler.lua" />
     <Script file="Hooks.lua"/>
     
+    <Script file="Options\Options.lua"/>
+    <Script file="Options\OptionsTookKit.lua"/>
+    <Script file="Options\CoreOptions.lua"/>
 </Ui>
