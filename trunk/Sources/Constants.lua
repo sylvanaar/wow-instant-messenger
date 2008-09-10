@@ -14,49 +14,52 @@ constants.classes = {};
 local classes = constants.classes;
 
 local classList = {
-     "WIM_LOCALIZED_DRUID", "WIM_LOCALIZED_HUNTER", "WIM_LOCALIZED_MAGE",
-     "WIM_LOCALIZED_PALADIN", "WIM_LOCALIZED_PRIEST", "WIM_LOCALIZED_ROGUE",
-     "WIM_LOCALIZED_SHAMAN", "WIM_LOCALIZED_WARLOCK", "WIM_LOCALIZED_WARRIOR"
+     "Druid", "Hunter", "Mage", "Paladin", "Priest", "Rogue",
+     "Shaman", "Warlock", "Warrior",  "Death Knight"
 };
 
 --Male Classes - this doesn't apply to every locale
-classes[WIM_LOCALIZED_DRUID]	= {
+classes[L["Druid"]]	= {
                                     color = "ff7d0a",
                                     tag = "DRUID"
                                 };
-classes[WIM_LOCALIZED_HUNTER]	= {
+classes[L["Hunter"]]	= {
                                     color = "abd473",
                                     tag = "HUNTER"
                                 };
-classes[WIM_LOCALIZED_MAGE]	= {
+classes[L["Mage"]]	= {
                                     color = "69ccf0",
                                     tag = "MAGE"
                                 };
-classes[WIM_LOCALIZED_PALADIN]	= {
+classes[L["Paladin"]]	= {
                                     color = "f58cba",
                                     tag = "PALADIN"
                                 };
-classes[WIM_LOCALIZED_PRIEST]	= {
+classes[L["Priest"]]	= {
                                     color = "ffffff",
                                     tag = "PRIEST"
                                 };
-classes[WIM_LOCALIZED_ROGUE]	= {
+classes[L["Rogue"]]	= {
                                     color = "fff569",
                                     tag = "ROGUE"
                                 };
-classes[WIM_LOCALIZED_SHAMAN]	= {
+classes[L["Shaman"]]	= {
                                     color = "00dbba",
                                     tag = "SHAMAN"
                                 };
-classes[WIM_LOCALIZED_WARLOCK]	= {
+classes[L["Warlock"]]	= {
                                     color = "9482ca",
                                     tag = "WARLOCK"
                                 };
-classes[WIM_LOCALIZED_WARRIOR]	= {
+classes[L["Warrior"]]	= {
                                     color = "c79c6e",
                                     tag = "WARRIOR"
                                 };
-classes[WIM_LOCALIZED_GM]	= {
+classes[L["Death Knight"]]	= {
+                                    color = "c41f3b",
+                                    tag = "DEATHKNIGHT"
+                                };
+classes[L["Game Master"]]	= {
                                     color = "00c0ff",
                                     tag = "GM"
                                 };
@@ -64,10 +67,10 @@ classes[WIM_LOCALIZED_GM]	= {
 -- propigate female class types and update tags appropriately
 local i;
 for i=1, table.getn(classList) do
-     if(WIM[classList[i]] ~= WIM[classList[i].."_FEMALE"]) then
-          classes[WIM[classList[i].."_FEMALE"]] = {
-               color = classes[WIM[classList[i]]].color,
-               tag = classes[WIM[classList[i]]].tag.."F"
+     if(L[classList[i]] ~= L[classList[i].."F"]) then
+          classes[L[classList[i].."F"]] = {
+               color = classes[L[classList[i]]].color,
+               tag = classes[L[classList[i]]].tag.."F"
           };
      end
 end

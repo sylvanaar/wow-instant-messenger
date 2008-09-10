@@ -188,7 +188,7 @@ local function getNewEventTable(msgID)
         end
     end
     local i;
-    for i=1, table.getn(WhisperQueue_Bowl) do
+    for i=1, #WhisperQueue_Bowl do
         if(WhisperQueue_Bowl[i].argCount == 0) then
             if(msgID) then
                 WhisperQueue_Index[msgID] = WhisperQueue_Bowl[i];
@@ -208,7 +208,7 @@ local function getNewEventTable(msgID)
         msgID = msgID or 0,
         ChatFrames = {}
     });
-    local eventItem = WhisperQueue_Bowl[table.getn(WhisperQueue_Bowl)];
+    local eventItem = WhisperQueue_Bowl[#WhisperQueue_Bowl];
     eventItem.Suspend = function(self)
                             if(self.arg[6] ~= "GM") then -- not allowed when talking to a GM
                                 self.flags.suspend = true;
@@ -254,7 +254,7 @@ end
 local function removeEventTable(index)
     local i, eventItem = 0, WhisperQueue[index];
     WhisperQueue_Index[eventItem.msgID] = nil;
-    for i=1, table.getn(eventItem.arg) do
+    for i=1, #eventItem.arg do
         table.remove(eventItem.arg, 1);
     end
     eventItem.flags.suspend = false;
@@ -265,7 +265,7 @@ local function removeEventTable(index)
     eventItem.msgID = 0;
     eventItem.argCount = 0;
     -- remove registered chat frame objects.
-    for i=1, table.getn(eventItem.ChatFrames) do
+    for i=1, #eventItem.ChatFrames do
         table.remove(eventItem.ChatFrames, 1);
     end
     table.remove(WhisperQueue, index);
@@ -273,7 +273,7 @@ end
 
 local function popEvents()
     local i = 1;
-    while(table.getn(WhisperQueue) > 0 and i <= table.getn(WhisperQueue)) do
+    while(#WhisperQueue > 0 and i <= #WhisperQueue) do
         --WIM:dPrint("Processing "..i.." of "..table.getn(WhisperQueue));
         local eventItem = WhisperQueue[i];
         if(not eventItem.flags.suspend) then
@@ -289,13 +289,13 @@ local function popEvents()
                     -- temproary hack for compatibility with TBC & WOTK -- REMOVE UPON RELEASE OF WOTK
                     if(WIM.isWOTLK) then
                             local j;
-                            for j=1, table.getn(eventItem.ChatFrames) do
+                            for j=1, #eventItem.ChatFrames do
                                 CF_MessageEventHandler_orig(eventItem.ChatFrames[j], eventItem.event, unpack(eventItem.arg, 1, eventItem.argCount));
                             end
                     else
                             -- TBC
                             local tthis, targ1, targ2, targ3, targ4, targ5, targ6, targ7, targ8, targ9, targ10, targ11 = this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11;
-                            for j=1, table.getn(eventItem.ChatFrames) do
+                            for j=1, #eventItem.ChatFrames do
                                 this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = eventItem.ChatFrames[j], unpack(eventItem.arg, 1, eventItem.argCount);
                                 CF_MessageEventHandler_orig(eventItem.event);
                             end

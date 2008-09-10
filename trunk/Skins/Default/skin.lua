@@ -104,6 +104,7 @@ local WIM_ClassicSkin = {
                 shaman = {.5, .25, .5, .5, .75, .25, .75, .5},
                 warlock = {.75, .25, .75, .5, 1, .25, 1, .5},
                 warrior = {0, .5, 0, .75, .25, .5, .25, .75},
+                deathknight = {0, .5, 0, .75, .25, .5, .25, .75},
                 gm = {.25, .5, .25, .75, .5, .5, .5, .75}
             },
             from = {
@@ -395,10 +396,10 @@ local WIM_ClassicSkin = {
         files = {
             tabs = {
                 normal = {
-                    default = "Interface\AddOns\WIM_Rewrite\Skins\Default\tab_normal"
+                    default = "Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_normal"
                 },
                 selected = {
-                    default = "Interface\AddOns\WIM_Rewrite\Skins\Default\tab_selected"
+                    default = "Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_selected"
                 },
                 hover = {
                     default = ""

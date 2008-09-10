@@ -95,7 +95,7 @@ local Widget_Triggers = {};
 
 local function getFormatByName(format)
 	local i;
-	for i=1, table.getn(FormattingCalls) do
+	for i=1, #FormattingCalls do
 		if(FormattingCalls[i].name == format) then
 			return FormattingCalls[i].fun;
 		end
@@ -110,7 +110,7 @@ end
 
 
 local function applyStringModifiers(str)
-	for i=1, table.getn(StringModifiers) do
+	for i=1, #StringModifiers do
 		str = StringModifiers[i](str);
 	end
 	return str;
@@ -137,11 +137,11 @@ local windowListByLevel_Recycle = {};
 local function getActiveWindowListByLevel()
 	-- first remove items from previously used list.
 	local i;
-	for i=1,table.getn(windowListByLevel_Recycle) do
+	for i=1,#windowListByLevel_Recycle do
 		table.remove(windowListByLevel_Recycle, 1);
 	end
 	-- load all used windows into table
-	for i=1, table.getn(WindowSoupBowl.windows) do
+	for i=1, #WindowSoupBowl.windows do
 		if(WindowSoupBowl.windows[i].inUse and WindowSoupBowl.windows[i].obj:IsVisible()) then
 			table.insert(windowListByLevel_Recycle, WindowSoupBowl.windows[i].obj);
 		end
@@ -158,7 +158,7 @@ function getWindowAtCursorPosition(excludeObj)
 	local x,y = _G.GetCursorPosition();
 	local windows = getActiveWindowListByLevel();
 	local i;
-	for i=1,table.getn(windows) do
+	for i=1,#windows do
 		if(excludeObj ~= windows[i]) then
 			local x1, y1 = windows[i]:GetLeft()*windows[i]:GetEffectiveScale(), windows[i]:GetTop()*windows[i]:GetEffectiveScale();
 			local x2, y2 = x1 + windows[i]:GetWidth()*windows[i]:GetEffectiveScale(), y1 - windows[i]:GetHeight()*windows[i]:GetEffectiveScale();
@@ -301,7 +301,7 @@ local function executeHandlers(WidgetName, wType, HandlerName, ...)
 		tbl = Widget_Triggers[WidgetName][HandlerName][wType];
 	end
 	if(type(tbl) == "table") then
-		for i=1,table.getn(tbl) do
+		for i=1,#tbl do
 			fun = tbl[i];
 			fun(...);
 		end
@@ -313,7 +313,7 @@ local function getWindowBy(userName)
     if(type(userName) ~= "string") then
         return nil;
     end
-    for i=1,table.getn(WindowSoupBowl.windows) do
+    for i=1,#WindowSoupBowl.windows do
         if(WindowSoupBowl.windows[i].user == userName) then
             return WindowSoupBowl.windows[i].obj, i;
         end
@@ -564,7 +564,7 @@ local function setAllChildrenParentWindow(parent, child)
 		child.parentWindow = parent;
 	end
 	local children = {child:GetChildren()};
-	for i=1,table.getn(children) do
+	for i=1,#children do
 		setAllChildrenParentWindow(parent, children[i]);
 	end
 end
@@ -580,6 +580,7 @@ local function loadRegisteredWidgets(obj)
 				if(type(widgets[widget].SetDefaults) == "function") then
 					widgets[widget]:SetDefaults(); -- load defaults for this widget
 				end
+				PrepareDefaultSkin();
 			end
 		else
 			if(type(widgets[widget].SetDefaults) == "function") then
@@ -595,7 +596,7 @@ local function loadRegisteredWidgets(obj)
 end
 
 local function updateActiveObjects()
-	for i=1, table.getn(WindowSoupBowl.windows) do
+	for i=1, #WindowSoupBowl.windows do
 		if(WindowSoupBowl.windows[i].inUse) then
 			loadRegisteredWidgets(WindowSoupBowl.windows[i].obj);
 			loadHandlers(WindowSoupBowl.windows[i].obj);
@@ -973,7 +974,7 @@ local function createWindow(userName, wtype)
     local func = function ()
                         if(WindowSoupBowl.available > 0) then
                             local i;
-                            for i=1,table.getn(WindowSoupBowl.windows) do
+                            for i=1,#WindowSoupBowl.windows do
                                 if(WindowSoupBowl.windows[i].inUse == false) then
                                     return WindowSoupBowl.windows[i].obj, i;
                                 end
@@ -1026,7 +1027,7 @@ local function getWindowByName(userName)
     if(type(userName) ~= "string") then
         return nil;
     end
-    for i=1,table.getn(WindowSoupBowl.windows) do
+    for i=1,#WindowSoupBowl.windows do
         if(WindowSoupBowl.windows[i].user == userName) then
             return WindowSoupBowl.windows[i].obj, i;
         end
@@ -1130,7 +1131,7 @@ end
 
 function HideAllWindows(type)
 	type = type and string.lower(type) or nil;
-	for i=1, table.getn(WindowSoupBowl.windows) do
+	for i=1, #WindowSoupBowl.windows do
 		if(WindowSoupBowl.windows[i].obj.type == (type or WindowSoupBowl.windows[i].obj.type)) then
 			WindowSoupBowl.windows[i].obj:Hide(true);
 		end
@@ -1139,7 +1140,7 @@ end
 
 function ShowAllWindows(type)
 	type = type and string.lower(type) or nil;
-	for i=1, table.getn(WindowSoupBowl.windows) do
+	for i=1, #WindowSoupBowl.windows do
 		if(WindowSoupBowl.windows[i].obj.type == (type or WindowSoupBowl.windows[i].obj.type)) then
 			WindowSoupBowl.windows[i].obj:Pop(true);
 		end
@@ -1153,7 +1154,7 @@ end
 RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnEnter", function(self)
 		if(db.showToolTips == true) then
 			_G.GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
-			_G.GameTooltip:SetText(WIM_LOCALIZED_TOOLTIP_SHIFT_CLICK_TO_CLOSE);
+			_G.GameTooltip:SetText(L["<Shift-Click> to close window."]);
 		end
 	end);
 	

@@ -14,13 +14,12 @@ setfenv(1, WIM);
 -- Core information
 addonTocName = "WIM_Rewrite";
 version = "3.0.0";
-beta = true;
-
+beta = true; -- flags current version as beta.
+debug = true; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight
 isWOTLK = select(4, _G.GetBuildInfo()) >= 30000;
 
-debug = true; -- turn debugging on and off.
 constants = {}; -- constants such as class colors will be stored here. (includes female class names).
 modules = {}; -- module table. consists of all registerd WIM modules/plugins/skins. (treated the same).
 windows = {active = {whisper = {}, chat = {}, w2w = {}}}; -- table of WIM windows.

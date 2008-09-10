@@ -10,6 +10,7 @@ local type = type;
 local unpack = unpack;
 local setmetatable = setmetatable;
 local getmetatable = getmetatable;
+local rawget = rawget;
 
 -- set namespace
 setfenv(1, WIM);
@@ -50,17 +51,38 @@ local ProtectedSkinKeys = {
     height = "nil"
 };
 
-local function configureStyleTable(dest, styleDeclareTable)
-    return {};
+local function configureDefaultStyleTable(tbl)
+    setmetatable(tbl, {__index = function(t, k)
+        return rawget(t, "default");
+    end});
 end
 
-local function preserveProtectedKeys(theKey, src, dest, styleDeclareTable)
+local function prepareDefaultSkin(tbl)
+    tbl = type(tbl) == "table" and tbl or SkinTable["WIM Classic"];
+    for k, v in pairs(tbl) do
+        if(ProtectedSkinKeys[k] == "style") then
+            configureDefaultStyleTable(v);
+        elseif(type(v) == "table") then
+            prepareDefaultSkin(v);
+        end
+    end
+end
+
+local function configureStyleTable(k, src, dest, defaultStyle)
+    local t = (type(dest[k]) == "table") and dest[k] or {};
+    setmetatable(t, {__index = function(tbl, key)
+        return defaultStyle and rawget(tbl, defaultStyle) or src[k].default;
+    end})
+    return t;
+end
+
+local function preserveProtectedKeys(theKey, src, dest, defaultStyle)
     local ttype = type(ProtectedSkinKeys[theKey])=="string" and ProtectedSkinKeys[theKey] or nil;
     if(ttype) then
         if(ttype == "table") then
             return {}, true;
         elseif(ttype == "style") then
-            return configureStyleTable(dest, styleDeclareTable), true;
+            return configureStyleTable(theKey, src, dest, defaultStyle), true;
         else
             return nil, true;
         end
@@ -69,29 +91,30 @@ local function preserveProtectedKeys(theKey, src, dest, styleDeclareTable)
     end
 end
 
-local function linkSkinTable(src, dest, styleDeclareTable)
+local function linkSkinTable(src, dest, defaultStyle)
         if(type(src) == "table") then
-                --if(type(dest) ~= "table") then dest = {}; end
-                --setmetatable
-                setmetatable(dest, {__index = function(t, k)
-                                                local val, ignoredKey = preserveProtectedKeys(k, src, dest, styleDeclareTable);
-                                                if(ignoredKey) then
-                                                    t[k] = val;
-                                                    return t[k];
-                                                else
-                                                    return src[k];
-                                                end
-                                            end});
+                if(type(dest) ~= "table") then dest = {}; end
+                --clear current meta table if there is one.
+                setmetatable(dest, nil);
                 for k, v in pairs(src) do
                         local val, ignoredKey = nil, false;
-                        if(dest[k] == nil) then
-                            val, ignoredKey = preserveProtectedKeys(k, src, dest, styleDeclareTable);
-                            dest[k] = ignoredKey and val or nil;
-                        end
+                        defaultStyle = (k=="default_style") and v or defaultStyle;
+                        val, ignoredKey = preserveProtectedKeys(k, src, dest, defaultStyle);
+                        dest[k] = ignoredKey and val or dest[k];
                         if(not ignoredKey and type(v) == "table") then
-                            linkSkinTable(v, dest[k], styleDeclareTable);
+                            linkSkinTable(v, dest[k], defaultStyle);
                         end
                 end
+                --setmetatable
+                setmetatable(dest, {__index = function(t, k)
+                    local val, ignoredKey = preserveProtectedKeys(k, src, dest);
+                    if(ignoredKey) then
+                        t[k] = val;
+                        return t[k];
+                    else
+                        return src[k];
+                    end
+                end});
         end
 end
 
@@ -99,7 +122,7 @@ end
 local function setPointsToObj(obj, pointsTable)
     obj:ClearAllPoints();
     local i;
-    for i=1, table.getn(pointsTable) do
+    for i=1, #pointsTable do
         local point, relativeTo, relativePoint, offx, offy = unpack(pointsTable[i]);
         -- first we need to convert the string representation of objects into actual objects.
         if(relativeTo and type(relativeTo) == "string") then
@@ -302,7 +325,7 @@ end
 
 
 function RegisterPrematureSkins()
-    for i=1,table.getn(prematureRegisters) do
+    for i=1,#prematureRegisters do
         RegisterSkin(prematureRegisters[i]);
     end
 end
@@ -422,6 +445,7 @@ function RegisterSkin(skinTable)
         end
         
         populateFemaleClassInfo(SkinTable[skinTable.title]);
+        prepareDefaultSkin();
         return;
     end
     
@@ -430,54 +454,6 @@ function RegisterSkin(skinTable)
         
     populateFemaleClassInfo(skinTable);    
         
-    --check if default style images exist. if not, inherrit from 'WIM Classic'
-    if(not skinTable.message_window.file[skinTable.default_style]) then skinTable.message_window.file[skinTable.default_style] = SkinTable["WIM Classic"].message_window.file.default; end
-    if(not skinTable.message_window.class_icon.file[skinTable.default_style]) then skinTable.message_window.class_icon.file[skinTable.default_style] = SkinTable["WIM Classic"].message_window.class_icon.file.default; end
-    if(not skinTable.message_window.buttons.close.NormalTexture[skinTable.default_style]) then skinTable.message_window.buttons.close.NormalTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.close.NormalTexture.default; end
-    if(not skinTable.message_window.buttons.close.PushedTexture[skinTable.default_style]) then skinTable.message_window.buttons.close.PushedTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.close.PushedTexture.default; end
-    if(not skinTable.message_window.buttons.close.HighlightTexture[skinTable.default_style]) then skinTable.message_window.buttons.close.HighlightTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.close.HighlightTexture.default; end
-    if(not skinTable.message_window.buttons.history.NormalTexture[skinTable.default_style]) then skinTable.message_window.buttons.history.NormalTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.history.NormalTexture.default; end
-    if(not skinTable.message_window.buttons.history.PushedTexture[skinTable.default_style]) then skinTable.message_window.buttons.history.PushedTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.history.PushedTexture.default; end
-    if(not skinTable.message_window.buttons.history.HighlightTexture[skinTable.default_style]) then skinTable.message_window.buttons.history.HighlightTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.history.HighlightTexture.default; end
-    if(not skinTable.message_window.buttons.w2w.NormalTexture[skinTable.default_style]) then skinTable.message_window.buttons.w2w.NormalTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.w2w.NormalTexture.default; end
-    if(not skinTable.message_window.buttons.w2w.PushedTexture[skinTable.default_style]) then skinTable.message_window.buttons.w2w.PushedTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.w2w.PushedTexture.default; end
-    if(not skinTable.message_window.buttons.w2w.HighlightTexture[skinTable.default_style]) then skinTable.message_window.buttons.w2w.HighlightTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.w2w.HighlightTexture.default; end
-    if(not skinTable.message_window.buttons.chatting.NormalTexture[skinTable.default_style]) then skinTable.message_window.buttons.chatting.NormalTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.chatting.NormalTexture.default; end
-    if(not skinTable.message_window.buttons.chatting.PushedTexture[skinTable.default_style]) then skinTable.message_window.buttons.chatting.PushedTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.chatting.PushedTexture.default; end
-    if(not skinTable.message_window.buttons.scroll_up.NormalTexture[skinTable.default_style]) then skinTable.message_window.buttons.scroll_up.NormalTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.scroll_up.NormalTexture.default; end
-    if(not skinTable.message_window.buttons.scroll_up.PushedTexture[skinTable.default_style]) then skinTable.message_window.buttons.scroll_up.PushedTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.scroll_up.PushedTexture.default; end
-    if(not skinTable.message_window.buttons.scroll_up.HighlightTexture[skinTable.default_style]) then skinTable.message_window.buttons.scroll_up.HighlightTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.scroll_up.HighlightTexture.default; end
-    if(not skinTable.message_window.buttons.scroll_up.DisabledTexture[skinTable.default_style]) then skinTable.message_window.buttons.scroll_up.DisabledTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.scroll_up.DisabledTexture.default; end
-    if(not skinTable.message_window.buttons.scroll_down.NormalTexture[skinTable.default_style]) then skinTable.message_window.buttons.scroll_down.NormalTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.scroll_down.NormalTexture.default; end
-    if(not skinTable.message_window.buttons.scroll_down.PushedTexture[skinTable.default_style]) then skinTable.message_window.buttons.scroll_down.PushedTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.scroll_down.PushedTexture.default; end
-    if(not skinTable.message_window.buttons.scroll_down.HighlightTexture[skinTable.default_style]) then skinTable.message_window.buttons.scroll_down.HighlightTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.scroll_down.HighlightTexture.default; end
-    if(not skinTable.message_window.buttons.scroll_down.DisabledTexture[skinTable.default_style]) then skinTable.message_window.buttons.scroll_down.DisabledTexture[skinTable.default_style] = SkinTable["WIM Classic"].message_window.buttons.scroll_down.DisabledTexture.default; end
-    
-    
-    -- enforce the existance of style file declarations.
-    for i=1,table.getn(styles) do
-        if(not skinTable.message_window.file[styles[i]]) then skinTable.message_window.file[styles[i]] = skinTable.message_window.file[skinTable.default_style]; end
-        if(not skinTable.message_window.class_icon.file[styles[i]]) then skinTable.message_window.class_icon.file[styles[i]] = skinTable.message_window.class_icon.file[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.close.NormalTexture[styles[i]]) then skinTable.message_window.buttons.close.NormalTexture[styles[i]] = skinTable.message_window.buttons.close.NormalTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.close.PushedTexture[styles[i]]) then skinTable.message_window.buttons.close.PushedTexture[styles[i]] = skinTable.message_window.buttons.close.PushedTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.close.HighlightTexture[styles[i]]) then skinTable.message_window.buttons.close.HighlightTexture[styles[i]] = skinTable.message_window.buttons.close.HighlightTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.history.NormalTexture[styles[i]]) then skinTable.message_window.buttons.history.NormalTexture[styles[i]] = skinTable.message_window.buttons.history.NormalTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.history.PushedTexture[styles[i]]) then skinTable.message_window.buttons.history.PushedTexture[styles[i]] = skinTable.message_window.buttons.history.PushedTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.history.HighlightTexture[styles[i]]) then skinTable.message_window.buttons.history.HighlightTexture[styles[i]] = skinTable.message_window.buttons.history.HighlightTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.w2w.NormalTexture[styles[i]]) then skinTable.message_window.buttons.w2w.NormalTexture[styles[i]] = skinTable.message_window.buttons.w2w.NormalTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.w2w.PushedTexture[styles[i]]) then skinTable.message_window.buttons.w2w.PushedTexture[styles[i]] = skinTable.message_window.buttons.w2w.PushedTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.w2w.HighlightTexture[styles[i]]) then skinTable.message_window.buttons.w2w.HighlightTexture[styles[i]] = skinTable.message_window.buttons.w2w.HighlightTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.chatting.NormalTexture[styles[i]]) then skinTable.message_window.buttons.chatting.NormalTexture[styles[i]] = skinTable.message_window.buttons.chatting.NormalTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.chatting.PushedTexture[styles[i]]) then skinTable.message_window.buttons.chatting.PushedTexture[styles[i]] = skinTable.message_window.buttons.chatting.PushedTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.scroll_up.NormalTexture[styles[i]]) then skinTable.message_window.buttons.scroll_up.NormalTexture[styles[i]] = skinTable.message_window.buttons.scroll_up.NormalTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.scroll_up.PushedTexture[styles[i]]) then skinTable.message_window.buttons.scroll_up.PushedTexture[styles[i]] = skinTable.message_window.buttons.scroll_up.PushedTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.scroll_up.HighlightTexture[styles[i]]) then skinTable.message_window.buttons.scroll_up.HighlightTexture[styles[i]] = skinTable.message_window.buttons.scroll_up.HighlightTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.scroll_up.DisabledTexture[styles[i]]) then skinTable.message_window.buttons.scroll_up.DisabledTexture[styles[i]] = skinTable.message_window.buttons.scroll_up.DisabledTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.scroll_down.NormalTexture[styles[i]]) then skinTable.message_window.buttons.scroll_down.NormalTexture[styles[i]] = skinTable.message_window.buttons.scroll_down.NormalTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.scroll_down.PushedTexture[styles[i]]) then skinTable.message_window.buttons.scroll_down.PushedTexture[styles[i]] = skinTable.message_window.buttons.scroll_down.PushedTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.scroll_down.HighlightTexture[styles[i]]) then skinTable.message_window.buttons.scroll_down.HighlightTexture[styles[i]] = skinTable.message_window.buttons.scroll_down.HighlightTexture[skinTable.default_style]; end
-        if(not skinTable.message_window.buttons.scroll_down.DisabledTexture[styles[i]]) then skinTable.message_window.buttons.scroll_down.DisabledTexture[styles[i]] = skinTable.message_window.buttons.scroll_down.DisabledTexture[skinTable.default_style]; end
-    end
     
 
     
@@ -555,6 +531,9 @@ function ApplySkinToWidget(obj)
     end
 end
 
+function PrepareDefaultSkin()
+    prepareDefaultSkin();
+end
 
 function test()
     _G.test = {message_window = {}};

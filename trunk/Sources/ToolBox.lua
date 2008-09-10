@@ -117,7 +117,6 @@ end
 
 function WIM.RGBHextoHSVPerc(rgbStr)
     local R, G, B = WIM.RGBHexToPercent(rgbStr);
-    R, G, B = tonumber(R, 16)/255, tonumber(G, 16)/255, tonumber(B, 16)/255;
     local i, x, v, f;
     x = math.min(R, G);
     x = math.min(x, B);

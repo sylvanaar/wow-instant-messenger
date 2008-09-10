@@ -1,18 +1,19 @@
 ## Interface: 20400
 ## Title: WIM Rewrite
 ## Author: Pazza (Bronzebeard)
-## Version: 3.0.1
+## Version: 3.0.0
 ## Notes: Give whispers an instant messenger feel.
 ## eMail: johnlangone@gmail.com
 ## X-Email: johnlangone@gmail.com
 ## X-Website: http://www.wimaddon.com/
 ## X-Category: MYADDONS_CATEGORY_CHAT
 ## DefaultState: Enabled
-## OptionalDeps: Titan, AllInOneInventory, EngInventory, LootLink, FuBar, ItemSync, AdvancedTradeSkillWindow
-## SavedVariables: WIM3_Data, WIM_Alias, WIM_Filters, WIM_History, WIM3_Cache, WIM_FuBarDB
+## OptionalDeps: Prat, Prat-3
+## SavedVariables: WIM3_Data, WIM3_Cache
 ## X-Embeds: PratPlugin-1.0, WhoLib
 
 Sources\Namespace.lua
+Sources\Locale.lua
 Localization\Includes.xml
 Libs\Includes.xml
 
