@@ -57,6 +57,7 @@ db_defaults.winCascade = {
 	};
 db_defaults.winFade = true;
 db_defaults.winAnimation = true;
+db_defaults.wordwrap_indent = false;
 
 
 local WindowSoupBowl = {
@@ -78,8 +79,16 @@ local FormattingCalls = {}; -- functions which are passed events to be formatted
 --insert default - always need a fallback.
 table.insert(FormattingCalls, 1, {
 	name = "Default",
-	fun = function(user, message)
-		return "[|Hplayer:"..user.."|h"..user.."|h]: "..message;
+	fun = function(smf, event, ...)
+		local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
+		if(event == "CHAT_MSG_WHISPER") then
+			arg11 = arg11 or 0;
+			return "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]: "..arg1;
+		elseif(event == "CHAT_MSG_WHISPER_INFORM") then
+			return "[|Hplayer:".._G.UnitName("player").."|h".._G.UnitName("player").."|h]: "..arg1;
+		else
+			return "Unknown event received...";
+		end
 	end
 });
 	
@@ -103,13 +112,13 @@ local function getFormatByName(format)
 	return FormattingCalls[1].fun;
 end
 
-local function applyMessageFormatting(user, message)
+function applyMessageFormatting(...)
 	local fun = getFormatByName(db.selectedFormat);
-	return fun(user, message);
+	return fun(...);
 end
 
 
-local function applyStringModifiers(str)
+function applyStringModifiers(str)
 	for i=1, #StringModifiers do
 		str = StringModifiers[i](str);
 	end
@@ -732,9 +741,9 @@ local function instantiateWindow(obj)
 	obj.widgets.chat_display:AddMessage(msg, ...);
     end
     
-    obj.AddUserMessage = function(self, user, msg, ...)
-	local str = applyMessageFormatting(user, msg);
-	obj:AddMessage(str, ...);
+    obj.AddEventMessage = function(self, r, g, b, event, ...)
+	local str = applyMessageFormatting(obj.widgets.chat_display, event, ...);
+	obj:AddMessage(str, r, g, b);
 	obj.msgWaiting = true;
     end
     
@@ -1122,7 +1131,7 @@ function UnregisterStringModifier(fun)
 	removeFromTable(StringModifiers, fun);
 end
 
-function RegisterUserMessageFormatting(name, fun)
+function RegisterMessageFormatting(name, fun)
 	table.insert(FormattingCalls, {
 		name = name,
 		fun = fun
