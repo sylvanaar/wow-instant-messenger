@@ -51,7 +51,7 @@ local function createOptionsFrame()
     win.title:SetPoint("TOPLEFT", 50 , -20);
     local font = win.title:GetFont();
     win.title:SetFont(font, 16, "");
-    win.title:SetText(L["WIM (WoW Instant Messenger)"].." - "..L["Options"]);
+    win.title:SetText(L["WIM (WoW Instant Messenger)"].." v"..version);
     
     -- create navigation menu
     win.nav = CreateFrame("Frame", win:GetName().."Nav", win);
@@ -77,7 +77,7 @@ local function createOptionsFrame()
     -- win.container.bg:SetTexture(1, 1, 1, .25); -- for testing only to see bounds.
     win.container:SetPoint("TOPLEFT", win.nav, "TOPRIGHT", 10, -2);
     win.container:SetPoint("BOTTOMLEFT", win.nav, "BOTTOMRIGHT", 10, 2);
-    win.container:SetPoint("RIGHT", win, -20, 0);
+    win.container:SetPoint("RIGHT", win, -25, 0);
 
     -- allow this window to close when escape is pressed.
     table.insert(_G.UISpecialFrames,win:GetName());
@@ -118,6 +118,10 @@ local function createSubCategory(index)
     sub:SetWidth(sub:GetParent():GetWidth());
     sub:SetHeight(20);
     sub.text = _G.getglobal(sub:GetName().."Text");
+    sub.text:SetJustifyH("LEFT");
+    sub.text:ClearAllPoints();
+    sub.text:SetPoint("TOPLEFT", 10, 0);
+    sub.text:SetPoint("BOTTOMRIGHT", -2, 0);
     local font, _, _ = _G.ChatFontNormal:GetFont();
     sub.text:SetFont(font, 14, "");
     sub:SetScript("OnClick", function(self, button)

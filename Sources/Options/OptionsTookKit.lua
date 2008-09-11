@@ -192,7 +192,15 @@ local function CreateFramedPanel(parent)
     return frame;
 end
 
-local function InherritOptionFrameProperties(obj)
+local function ImportCustomObject(parent, obj)
+    statObject("CustomObj");
+    obj:SetParent(parent);
+    options.InherritOptionFrameProperties(obj);
+    SetNextAnchor(obj);
+    return obj;
+end
+
+function options.InherritOptionFrameProperties(obj)
     obj.CreateSection = CreateSection;
     obj.CreateText = CreateText;
     obj.SetFullSize = SetFullSize;
@@ -201,21 +209,12 @@ local function InherritOptionFrameProperties(obj)
     obj.CreateFramedPanel = CreateFramedPanel;
 end
 
-local function ImportCustomObject(parent, obj)
-    statObject("CustomObj");
-    obj:SetParent(parent);
-    InherritOptionFrameProperties(obj);
-    SetNextAnchor(obj);
-    return obj;
-end
-
-
 -- Global usage for modules
 function options.CreateOptionsFrame()
     local frame = CreateFrame("Frame", "WIM3_OptionFrame"..statObject("Frame"));
     frame:Hide();
     -- declare the following tools.
-    InherritOptionFrameProperties(frame);
+    options.InherritOptionFrameProperties(frame);
     return frame;
 end
 

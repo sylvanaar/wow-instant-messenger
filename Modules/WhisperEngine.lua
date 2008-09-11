@@ -160,7 +160,7 @@ local function CHAT_MSG_WHISPER(...)
     local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
     local color = WIM.db.displayColors.wispIn; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
-    win:AddUserMessage(arg2, arg1, color.r, color.g, color.b);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER", ...);
     win:Pop("in");
 
     if(db.whispers.pop_rules[WIM.curState].supress) then
@@ -173,7 +173,7 @@ local function CHAT_MSG_WHISPER_INFORM(...)
     local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
     local color = db.displayColors.wispOut; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
-    win:AddUserMessage(_G.UnitName("player"), arg1, color.r, color.g, color.b);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER_INFORM", ...);
     win:Pop("out");
     if(db.whispers.pop_rules[curState].supress) then
         _G.ChatEdit_SetLastToldTarget(arg2);
