@@ -711,7 +711,7 @@ local function instantiateWindow(obj)
     widgets.chat_display:SetMovable(true);
     widgets.chat_display:SetScript("OnDragStart", function(self) MessageWindow_MovementControler_OnDragStart(self); end);
     widgets.chat_display:SetScript("OnDragStop", function(self) MessageWindow_MovementControler_OnDragStop(self); end);
-    widgets.chat_display:SetScript("OnHyperlinkClick", function() _G.ChatFrame_OnHyperlinkShow(arg1, arg2, arg3); end);
+    widgets.chat_display:SetScript("OnHyperlinkClick", function(self, ...) _G.SetItemRef(...); end);
     widgets.chat_display:SetScript("OnMessageScrollChanged", function(self) updateScrollBars(self:GetParent()); end);
     widgets.chat_display:SetJustifyH("LEFT");
     widgets.chat_display:EnableMouse(true);

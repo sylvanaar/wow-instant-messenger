@@ -17,7 +17,7 @@ L = {};
 -- we never want nil, so if string is undecalred, return the requested key
 setmetatable(L, {
     __index = function(t, k)
-        dPrint("String not localized: '"..tostring(k).."'"); -- for debugging purposes only.
+        --dPrint("String not localized: '"..tostring(k).."'"); -- for debugging purposes only.
         table.insert(UnlocalizedStrings, tostring(k));
         return tostring(k);    
     end

@@ -263,3 +263,5 @@ function ShowOptions()
     end
     options.frame:Show();
 end
+
+RegisterSlashCommand("options", ShowOptions, L["Display WIM's options."]);

@@ -16,6 +16,7 @@ WIM.AddLocale("enUS", {
     ["Cancel"] = true,
     ["Unknown"] = true,
     ["Click to update..."] = true,
+    ["Usage"] = true,
     
     ["<Shift-Click> to close window."] = true,
     
