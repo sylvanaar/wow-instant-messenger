@@ -269,3 +269,18 @@ function ShowOptions()
 end
 
 RegisterSlashCommand("options", ShowOptions, L["Display WIM's options."]);
+RegisterSlashCommand("reset", function()
+                _G.StaticPopupDialogs["WIM_RESET_DEFAULTS"] = {
+                    text = L["Resetting WIM will clear all of your settings!"].."\n"..L["A reset will reload your user interface."].."\n"..L["Do you want to continue?"],
+                    button1 = _G.YES,
+                    button2 = _G.NO,
+                    OnAccept = function()
+                        _G.WIM3_Data = nil;
+                        _G.ReloadUI();
+                    end,
+                    timeout = 0,
+                    whileDead = 1,
+                    hideOnEscape = 1
+                };
+                _G.StaticPopup_Show ("WIM_RESET_DEFAULTS");
+            end, L["Reset all options to default."]);

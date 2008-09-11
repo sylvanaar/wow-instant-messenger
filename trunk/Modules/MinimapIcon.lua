@@ -17,11 +17,13 @@ db_defaults.minimap = {
     position = 200
 };
 
-
 local Notifications = {};	-- list of current notifications
 local NotificationIndex = 1;	-- index for update messages
 local Notification_Bowl = {};
 
+local colorEnabled = "!000000";
+local colorDisabled = "!c41f3b";
+local IconColor = colorEnabled;
 local icon;
 
 local function getNotificationTable(tag)
@@ -123,7 +125,7 @@ local function createMinimapIcon()
 				local minimap = self:GetParent();
 				if(NotificationIndex > #Notifications) then
 				    minimap.icon:Show();
-				    minimap.backGround:SetGradient("VERTICAL", getGradientFromColor("!000000"));
+				    minimap.backGround:SetGradient("VERTICAL", getGradientFromColor(IconColor));
 				    minimap.text:Hide();
 				    NotificationIndex = 0; -- will be incremented at end of loop
 				else
@@ -141,7 +143,7 @@ local function createMinimapIcon()
 				local minimap = self:GetParent();
 				minimap.text:Hide();
 				minimap.icon:Show();
-				minimap.backGround:SetGradient("VERTICAL", getGradientFromColor("!000000"));
+				minimap.backGround:SetGradient("VERTICAL", getGradientFromColor(IconColor));
 				flash:Hide();
 			    end
 			end
@@ -262,11 +264,21 @@ end
 
 
 function MinimapIcon:OnEnableWIM()
-
+    IconColor = colorEnabled;
+    if(WIM.MinimapIcon) then
+        WIM.MinimapIcon.icon:SetAlpha(1);
+        WIM.MinimapIcon.flash:Show();
+    end
+    dPrint("enable event received");
 end
 
 function MinimapIcon:OnDisableWIM()
-
+    IconColor = colorDisabled;
+    if(WIM.MinimapIcon) then
+        WIM.MinimapIcon.icon:SetAlpha(.75);
+        WIM.MinimapIcon.flash:Show();
+    end
+    dPrint("disable event received");
 end
 
 function MinimapIcon:OnEnable()

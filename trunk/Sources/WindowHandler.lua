@@ -815,8 +815,10 @@ local function instantiateWindow(obj)
 		if(forceResult == true) then
 			setWindowAsFadedIn(obj);
 			if(obj.tabStrip) then
+				
 				self.tabStrip:JumpToTabName(obj.theUser);
 			else
+				
 				self:ResetAnimation();
 				self:Show();
 			end
@@ -846,19 +848,20 @@ local function instantiateWindow(obj)
     end
     
     obj.UpdateProps = function(self)
-	obj:SetScale(db.winSize.scale);
-	obj.widgets.Backdrop:SetAlpha(db.windowAlpha);
-	local Path,_,Flags = obj.widgets.chat_display:GetFont();
-	obj.widgets.chat_display:SetFont(Path,db.fontSize+2,Flags);
-	obj.widgets.chat_display:SetAlpha(1);
-	obj.widgets.msg_box:SetAlpha(1);
-	obj.widgets.msg_box:SetAltArrowKeyMode(db.ignoreArrowKeys);
+	self:SetScale(db.winSize.scale);
+	self.widgets.Backdrop:SetAlpha(db.windowAlpha);
+	local Path,_,Flags = self.widgets.chat_display:GetFont();
+	self.widgets.chat_display:SetFont(Path,db.fontSize+2,Flags);
+	self.widgets.chat_display:SetAlpha(1);
+	self.widgets.chat_display:SetIndentedWordWrap(db.wordwrap_indent);
+	self.widgets.msg_box:SetAlpha(1);
+	self.widgets.msg_box:SetAltArrowKeyMode(db.ignoreArrowKeys);
 	
-	obj.widgets.from:SetAlpha(1);
-	obj.widgets.char_info:SetAlpha(1);
-	obj.widgets.close:SetAlpha(db.windowAlpha);
-	obj.widgets.scroll_up:SetAlpha(db.windowAlpha);
-	obj.widgets.scroll_down:SetAlpha(db.windowAlpha);
+	self.widgets.from:SetAlpha(1);
+	self.widgets.char_info:SetAlpha(1);
+	self.widgets.close:SetAlpha(db.windowAlpha);
+	self.widgets.scroll_up:SetAlpha(db.windowAlpha);
+	self.widgets.scroll_down:SetAlpha(db.windowAlpha);
 	
 	-- process registered widgets
 	local widgetName, widgetObj;
@@ -1141,7 +1144,7 @@ end
 function HideAllWindows(type)
 	type = type and string.lower(type) or nil;
 	for i=1, #WindowSoupBowl.windows do
-		if(WindowSoupBowl.windows[i].obj.type == (type or WindowSoupBowl.windows[i].obj.type)) then
+		if(WindowSoupBowl.windows[i].inUse and WindowSoupBowl.windows[i].obj.type == (type or WindowSoupBowl.windows[i].obj.type)) then
 			WindowSoupBowl.windows[i].obj:Hide(true);
 		end
 	end
@@ -1150,12 +1153,19 @@ end
 function ShowAllWindows(type)
 	type = type and string.lower(type) or nil;
 	for i=1, #WindowSoupBowl.windows do
-		if(WindowSoupBowl.windows[i].obj.type == (type or WindowSoupBowl.windows[i].obj.type)) then
+		if(WindowSoupBowl.windows[i].inUse and WindowSoupBowl.windows[i].obj.type == (type or WindowSoupBowl.windows[i].obj.type)) then
 			WindowSoupBowl.windows[i].obj:Pop(true);
 		end
 	end
 end
 
+function UpdateAllWindowProps()
+	for i=1, #WindowSoupBowl.windows do
+		if(WindowSoupBowl.windows[i].inUse) then
+			WindowSoupBowl.windows[i].obj:UpdateProps();
+		end
+	end
+end
 ----------------------------------
 -- Set default widget triggers	--
 ----------------------------------
@@ -1173,6 +1183,7 @@ RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnClick", function(self)
 		if(IsShiftKeyDown()) then
 			destroyWindow(self:GetParent());
 		else
+			DisplayTutorial(L["Message Window Hidden"], L["WIM's message window has been hidden to WIM's Minimap Icon. If you want to end a conversation, you may do so by <Shift-Clicking> the close button."]);
 			self:GetParent():Hide(true);
 		end
 	end);

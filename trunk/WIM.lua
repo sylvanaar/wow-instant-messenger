@@ -114,14 +114,12 @@ local function onEnable()
         workerFrame:RegisterEvent(tEvent);
     end
     
-    local module = modules[moduleName];
-    if(module) then
-        module.enabled = enabled;
+    for _, module in pairs(modules) do
         if(type(module.OnEnableWIM) == "function") then
             module:OnEnableWIM();
         end
     end
-    
+    DisplayTutorial(L["WIM (WoW Instant Messenger)"], L["WIM is currently running. To access WIM's wide array of options type:"].." |cff69ccf0/wim|r");
     dPrint("WIM is now enabled.");
 end
 
@@ -134,9 +132,7 @@ local function onDisable()
         workerFrame:UnregisterEvent(tEvent);
     end
     
-    local module = modules[moduleName];
-    if(module) then
-        module.enabled = enabled;
+    for _, module in pairs(modules) do
         if(type(module.OnDisableWIM) == "function") then
             module:OnDisableWIM();
         end
