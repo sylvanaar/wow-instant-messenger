@@ -18,7 +18,7 @@ db_defaults.stats = {
 
 local credits = {
     "|cff69ccf0"..L["Created by:"].."|r Pazza <Bronzebeard>",
-    "|cff69ccf0"..L["Special Thanks:"].."|r Stewarta, Zeke, Lothaer",
+    "|cff69ccf0"..L["Special Thanks:"].."|r Stewarta, Zeke <Coilfang>,\n     Morphieus <Spinebreaker>",
 };
 
 local function General_Main()
@@ -28,7 +28,8 @@ local function General_Main()
     frame.welcome.cb1 = frame.welcome:CreateCheckButton(L["Enable WIM"], WIM.db, "enabled", nil, function(self, button) SetEnabled(self:GetChecked()); end);
     frame.welcome.nextOffSetY = -20;
     frame.welcome.cb2 = frame.welcome:CreateCheckButton(L["Display Minimap Icon"], WIM.modules.MinimapIcon, "enabled", nil, function(self, button) EnableModule("MinimapIcon", self:GetChecked()); end);
-    frame.nextOffSetY = -100;
+    frame.welcome.nextOffSetY = -20;
+    frame.welcome.cb2 = frame.welcome:CreateCheckButton(L["Display Tutorials"], WIM.modules.Tutorials, "enabled", nil, function(self, button) EnableModule("Tutorials", self:GetChecked()); end);
     frame.credits = frame:CreateSection(L["Credits"], table.concat(credits, "\n"));
     frame.credits:ClearAllPoints();
     frame.credits:SetFullSize();
@@ -72,7 +73,7 @@ local function General_MessageFormatting()
     f.nextOffSetY = -10
     f:CreateCheckButton(L["Display Emoticons"], modules.Emoticons, "enabled", nil, function(self, button) EnableModule("Emoticons", self:GetChecked()); f.prev:Hide(); f.prev:Show(); end);
     f:CreateCheckButton(L["Display URLs as Links"], modules.URLHandler, "enabled", nil, function(self, button) EnableModule("URLHandler", self:GetChecked()); f.prev:Hide(); f.prev:Show(); end);
-    f:CreateCheckButton(L["Indent long messages."], db, "wordwrap_indent", nil, function(self, button) f.prev:Hide(); f.prev:Show(); end);
+    f:CreateCheckButton(L["Indent long messages."], db, "wordwrap_indent", nil, function(self, button) UpdateAllWindowProps(); f.prev:Hide(); f.prev:Show(); end);
     return frame;
 end
 

@@ -6,5 +6,6 @@
     <Script file="URLHandler.lua"/>
     <Script file="Sounds.lua"/>
     <Script file="Emoticons.lua"/>
+    <Script file="Tutorials.lua"/>
     
 </Ui>
