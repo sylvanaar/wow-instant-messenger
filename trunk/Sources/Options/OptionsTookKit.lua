@@ -5,6 +5,7 @@ local CreateFrame = CreateFrame;
 local unpack = unpack;
 local tostring = tostring;
 local type = type;
+local table = table;
 
 --set namespace
 setfenv(1, WIM);
@@ -16,10 +17,15 @@ setfenv(1, WIM);
     - frame:SetFullSize()
     - frame:CreateText(inherritFrom[, fontHeight]) returns FontString
     - frame:ImportCustomObject(theObject) returns theObject
+    - frame:CreateFramedPanel() returns Frame
+    
+    Frame Modifying Tools:
+    - WIM.options.AddFramedBackdrop(theFrame)
 ]]
 
 local DefaultFont = "ChatFontNormal";
 local TitleColor = {_G.GameFontNormal:GetTextColor()};
+local DisabledColor = {.5, .5, .5};
 
 local ObjectStats = {};
 
@@ -35,9 +41,9 @@ local function SetNextAnchor(obj)
     local relativePoint = parent.lastObj;
     --obj:ClearAllPoints();
     if(relativePoint) then
-        obj:SetPoint("TOPLEFT", relativePoint, "BOTTOMLEFT", parent.nextOffsetX or 0, parent.nextOffSetY or 0);
+        obj:SetPoint("TOPLEFT", relativePoint, "BOTTOMLEFT", parent.nextOffSetX or 0, parent.nextOffSetY or 0);
     else
-        obj:SetPoint("TOPLEFT", parent.nextOffsetX or 0, parent.nextOffSetY or 0);
+        obj:SetPoint("TOPLEFT", parent.nextOffSetX or 0, parent.nextOffSetY or 0);
     end
     parent.nextOffsetX, parent.nextOffSetY = 0, 0;
     parent.lastObj = obj;
@@ -51,19 +57,78 @@ end
 local function CreateCheckButton(parent, title, dbTree, varName, tooltip, valChanged)
     local cb = CreateFrame("CheckButton", parent:GetName()..statObject("CheckButton"), parent, "UICheckButtonTemplate");
     cb.text = _G.getglobal(cb:GetName().."Text");
+    cb.children = {};
+    cb.isCheckButton = true;
+    cb.disabledByParent = nil; -- used to track enable and disables.
+    cb.CreateCheckButton = CreateCheckButton;
+    cb._Disable = cb.Disable;
+    cb._Enable = cb.Enable;
     cb.text:SetText("  "..tostring(title));
-    cb.text:SetTextColor(unpack(TitleColor));
     cb.text:SetFontObject(DefaultFont);
     cb:SetScript("OnShow", function(self)
             self:SetChecked(dbTree[varName]);
+            self:UpdateChildren();
         end);
     cb:SetScript("OnClick", function(self, button)
             _G.PlaySound("igMainMenuOptionCheckBoxOn");
+            for i=1, #self.children do
+                if(self:GetChecked()) then
+                    self.children[i]:Enable(self);
+                else
+                    self.children[i]:Disable(self);
+                end
+            end
             dbTree[varName] = self:GetChecked();
             if(type(valChanged) == "function") then
                 valChanged(self, button);
             end
         end);
+    cb.Enable = function(self, enabler)
+            enabler = _enabler or self;
+            for i=1, #self.children do
+                if(not self.children[i]:IsEnabled() and self.children[i].disabledByParent == enabler) then
+                    self.children[i]:Enable(enabler);
+                end
+            end
+            self:UpdateChildren();
+            self.disabledByParent = nil;
+            self.text:SetTextColor(unpack(TitleColor));
+            self:_Enable();
+        end
+    cb.Disable = function(self, disabler)
+            disabler = disabler or self;
+            for i=1, #self.children do
+                if(self.children[i]:IsEnabled()) then
+                    --self.children[i]:UpdateChildren();
+                    self.children[i]:Disable(disabler);
+                end
+            end
+            self.disabledByParent = disabler;
+            self.text:SetTextColor(unpack(DisabledColor));
+            self:_Disable();
+        end
+    cb.UpdateChildren = function(self)
+            for i=1, #self.children do
+                if(self:GetChecked()) then
+                    self.children[i].text:SetTextColor(unpack(TitleColor));
+                    self.children[i]:_Enable(self);
+                else
+                    self.children[i].text:SetTextColor(unpack(DisabledColor));
+                    self.children[i]:Disable(self);
+                end
+            end
+        end
+        
+    if(parent.isCheckButton) then
+        if(#parent.children == 0) then
+            parent.nextOffSetX = cb:GetWidth();
+            parent.nextOffSetY = -cb:GetHeight();
+        else
+            parent.nextOffSetX = nil;
+            parent.nextOffSetY = -cb:GetHeight()*(#parent.children)
+        end
+        table.insert(parent.children, cb);
+    end
     SetNextAnchor(cb);
     return cb;
 end
@@ -121,12 +186,19 @@ local function CreateSection(parent, title, desc)
     return frame;
 end
 
+local function CreateFramedPanel(parent)
+    local frame = CreateSection(parent, nil, nil);
+    options.AddFramedBackdrop(frame);
+    return frame;
+end
+
 local function InherritOptionFrameProperties(obj)
     obj.CreateSection = CreateSection;
     obj.CreateText = CreateText;
     obj.SetFullSize = SetFullSize;
     obj.CreateCheckButton = CreateCheckButton;
     obj.ImportCustomObject = ImportCustomObject;
+    obj.CreateFramedPanel = CreateFramedPanel;
 end
 
 local function ImportCustomObject(parent, obj)
@@ -145,4 +217,31 @@ function options.CreateOptionsFrame()
     -- declare the following tools.
     InherritOptionFrameProperties(frame);
     return frame;
+end
+
+function options.AddFramedBackdrop(obj)
+    obj.backdrop = {};
+    obj.backdrop.top = obj:CreateTexture(nil, "BACKGROUND");
+    obj.backdrop.top:SetTexture(1, 1, 1, .25);
+    obj.backdrop.top:SetPoint("TOPLEFT",-1 , 1);
+    obj.backdrop.top:SetPoint("TOPRIGHT",1 , 1);
+    obj.backdrop.top:SetHeight(1);
+    obj.backdrop.bottom = obj:CreateTexture(nil, "BACKGROUND");
+    obj.backdrop.bottom:SetTexture(1, 1, 1, .25);
+    obj.backdrop.bottom:SetPoint("BOTTOMLEFT",-1 , -1);
+    obj.backdrop.bottom:SetPoint("BOTTOMRIGHT",1 , -1);
+    obj.backdrop.bottom:SetHeight(1);
+    obj.backdrop.left = obj:CreateTexture(nil, "BACKGROUND");
+    obj.backdrop.left:SetTexture(1, 1, 1, .25);
+    obj.backdrop.left:SetPoint("TOPLEFT", obj.backdrop.top, "BOTTOMLEFT" ,0 , 0);
+    obj.backdrop.left:SetPoint("BOTTOMLEFT", obj.backdrop.bottom, "TOPLEFT" ,0 , 0);
+    obj.backdrop.left:SetWidth(1);
+    obj.backdrop.right = obj:CreateTexture(nil, "BACKGROUND");
+    obj.backdrop.right:SetTexture(1, 1, 1, .25);
+    obj.backdrop.right:SetPoint("TOPRIGHT", obj.backdrop.top, "BOTTOMRIGHT" ,0 , 0);
+    obj.backdrop.right:SetPoint("BOTTOMRIGHT", obj.backdrop.bottom, "TOPRIGHT" ,0 , 0);
+    obj.backdrop.right:SetWidth(1);
+    obj.backdrop.bg = obj:CreateTexture(nil, "BACKGROUND");
+    obj.backdrop.bg:SetTexture(0, 0, 0, .25);
+    obj.backdrop.bg:SetAllPoints();
 end

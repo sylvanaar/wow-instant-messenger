@@ -36,13 +36,19 @@ function WIM.inherritTable(src, dest, ...)
                                 if(type(v) == "table") then
                                         dest[k] = WIM.inherritTable(v, dest[k], ...);
                                 else
-                                        dest[k] = dest[k] or v;
+                                        if(dest[k] == nil) then
+                                                dest[k] = v
+                                        end
                                 end
                         end
                 end
                 return dest;
         else
-                return dest or src;
+                if(dest == nil) then
+                        return src;
+                else
+                        return dest;
+                end
         end
 end
 

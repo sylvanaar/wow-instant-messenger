@@ -194,6 +194,7 @@ function CreateModule(moduleName, enableByDefault)
 end
 
 function EnableModule(moduleName, enabled)
+    if(enabled == nil) then enabled = false; end
     local module = modules[moduleName];
     if(module) then
         if(module.canDisable == false and enabled == false) then
