@@ -11,6 +11,11 @@ db_defaults.shownTutorials = {};
 
 local Tutorials = CreateModule("Tutorials", true);
 
+local function varFriendly(var)
+    var = string.gsub(var, "[^%w_]", "_");
+    return var;
+end
+
 local _FlagTutorial = _G.FlagTutorial;
 function _G.FlagTutorial(id)
     local tut = string.match(tostring(id), "^WIM(.+)");
@@ -18,12 +23,16 @@ function _G.FlagTutorial(id)
         -- flag internally
         _G.TutorialFrame.wimTip = true;
         -- update text.
-        if(tut ~= L["WIM Update Available!"]) then
-            _G.TutorialFrameCheckboxText:SetText(L["Display WIM tips"]);
+        if(tut ~= varFriendly(L["WIM Update Available!"])) then
+            db.shownTutorials[tut] = true;
+            _G.TutorialFrameCheckButton:Enable();
+        else
+            _G.TutorialFrameCheckButton:Disable();
         end
-        db.shownTutorials[tut] = true;
+        _G.TutorialFrameCheckboxText:SetText(L["Display WIM tips"]);
     else
         -- this tutorial isn't WIM's call origional function
+        _G.TutorialFrameCheckButton:Enable();
         _G.TutorialFrameCheckboxText:SetText(_G.ENABLE_TUTORIAL_TEXT);
         _G.TutorialFrame.wimTip = false;
         _FlagTutorial(id);
@@ -46,10 +55,12 @@ function _G.TutorialFrame_OnHide(self)
 end
 
 local function displayTutorial(title, tutorial)
-    if(not db.shownTutorials[title]) then
-        _G["TUTORIAL_TITLEWIM"..title] = title;
-        _G["TUTORIALWIM"..title] = tutorial;
-        _G.TutorialFrame_NewTutorial("WIM"..title);
+    local var = varFriendly(title);
+    if(not db.shownTutorials[var]) then
+        db.shownTutorials[var] = true;
+        _G["TUTORIAL_TITLEWIM"..var] = title;
+        _G["TUTORIALWIM"..var] = tutorial;
+        _G.TutorialFrame_NewTutorial("WIM"..var);
     end
 end
 
@@ -67,3 +78,6 @@ end
 function DisplayTutorial(title, tutorial)
     -- this function is defined when the module is enabled.
 end
+
+-- this is used to show tutorial even if Tutorials are disabled.
+DisplayTutorialForce = displayTutorial; 

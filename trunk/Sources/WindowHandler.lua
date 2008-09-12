@@ -58,6 +58,7 @@ db_defaults.winCascade = {
 db_defaults.winFade = true;
 db_defaults.winAnimation = true;
 db_defaults.wordwrap_indent = false;
+db_defaults.escapeToHide = true;
 
 
 local WindowSoupBowl = {
@@ -75,22 +76,8 @@ local FadeProps = {
 	delay = 1
 };
 
+local FormattingCallsList = {}; -- used to get a list of available Formattings.
 local FormattingCalls = {}; -- functions which are passed events to be formatted. Only one may be used at once.
---insert default - always need a fallback.
-table.insert(FormattingCalls, 1, {
-	name = "Default",
-	fun = function(smf, event, ...)
-		local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
-		if(event == "CHAT_MSG_WHISPER") then
-			arg11 = arg11 or 0;
-			return "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]: "..arg1;
-		elseif(event == "CHAT_MSG_WHISPER_INFORM") then
-			return "[|Hplayer:".._G.UnitName("player").."|h".._G.UnitName("player").."|h]: "..arg1;
-		else
-			return "Unknown event received...";
-		end
-	end
-});
 	
 	
 	
@@ -113,7 +100,7 @@ local function getFormatByName(format)
 end
 
 function applyMessageFormatting(...)
-	local fun = getFormatByName(db.selectedFormat);
+	local fun = getFormatByName(db.messageFormat);
 	return fun(...);
 end
 
@@ -224,7 +211,7 @@ resizeFrame:SetScript("OnUpdate", function(self)
 		if(self.parentWindow.isMoving) then
 			self:Reset();
 		end
-	end)
+	end);
 
 
 -- helperFrame's purpose is to assist with dragging and dropping of Windows into tab strips.
@@ -400,7 +387,7 @@ local function MessageWindow_Frame_OnShow(self)
         if(db.autoFocus == true) then
 		_G[self:GetName().."MsgBox"]:SetFocus();
         end
-        --WIM_WindowOnShow(this);
+
         updateScrollBars(self);
 	local widgetName, widgetObj;
 	for widgetName, widgetObj in pairs(obj.widgets) do
@@ -815,12 +802,19 @@ local function instantiateWindow(obj)
 		if(forceResult == true) then
 			setWindowAsFadedIn(obj);
 			if(obj.tabStrip) then
-				
 				self.tabStrip:JumpToTabName(obj.theUser);
 			else
-				
 				self:ResetAnimation();
 				self:Show();
+				local count = 0;
+				for i=1, #WindowSoupBowl.windows do
+					count = WindowSoupBowl.windows[i].obj:IsShown() and count + 1 or count;
+				end
+				if(count > 1) then
+					DisplayTutorial(L["Creating Tab Groups"], L["You can group two or many windows together by <Shift-Clicking> a window and dragging it on top of another."]);
+				else
+					DisplayTutorial(L["Resizing Windows"], L["You can resize a window by holding <Shift> and dragging the bottom right corner of the window."]);
+				end
 			end
 		end
 	else
@@ -862,6 +856,12 @@ local function instantiateWindow(obj)
 	self.widgets.close:SetAlpha(db.windowAlpha);
 	self.widgets.scroll_up:SetAlpha(db.windowAlpha);
 	self.widgets.scroll_down:SetAlpha(db.windowAlpha);
+	
+	if(db.escapeToHide) then
+		AddEscapeWindow(self);
+	else
+		RemoveEscapeWindow(self);
+	end
 	
 	-- process registered widgets
 	local widgetName, widgetObj;
@@ -1139,6 +1139,11 @@ function RegisterMessageFormatting(name, fun)
 		name = name,
 		fun = fun
 	});
+	table.insert(FormattingCallsList, name);
+end
+
+function GetMessageFormattingList()
+	return FormattingCallsList;
 end
 
 function HideAllWindows(type)
@@ -1163,6 +1168,24 @@ function UpdateAllWindowProps()
 	for i=1, #WindowSoupBowl.windows do
 		if(WindowSoupBowl.windows[i].inUse) then
 			WindowSoupBowl.windows[i].obj:UpdateProps();
+		end
+	end
+end
+
+function AddEscapeWindow(frame)
+	for i=1, #_G.UISpecialFrames do 
+		if(_G.UISpecialFrames[i] == frame:GetName()) then
+			return;
+		end
+	end
+	table.insert(_G.UISpecialFrames, frame:GetName());
+end
+
+function RemoveEscapeWindow(frame)
+	for i=1, #_G.UISpecialFrames do 
+		if(_G.UISpecialFrames[i] == frame:GetName()) then
+			table.remove(_G.UISpecialFrames, i);
+			return;
 		end
 	end
 end
@@ -1332,9 +1355,29 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusGained", functi
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusLost", function(self) EditBoxInFocus = nil; end);
 
 
+RegisterMessageFormatting(L["Default"], function(smf, event, ...)
+		local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
+		if(event == "CHAT_MSG_WHISPER") then
+			arg11 = arg11 or 0;
+			return "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]: "..arg1;
+		elseif(event == "CHAT_MSG_WHISPER_INFORM") then
+			return "[|Hplayer:".._G.UnitName("player").."|h".._G.UnitName("player").."|h]: "..arg1;
+		else
+			return "Unknown event received...";
+		end
+	end);
 
-
-
+RegisterMessageFormatting(L["Test 1"], function(smf, event, ...)
+		local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
+		if(event == "CHAT_MSG_WHISPER") then
+			arg11 = arg11 or 0;
+			return "<|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h>: "..arg1;
+		elseif(event == "CHAT_MSG_WHISPER_INFORM") then
+			return "<|Hplayer:".._G.UnitName("player").."|h".._G.UnitName("player").."|h>: "..arg1;
+		else
+			return "Unknown event received...";
+		end
+	end);
 
 
 

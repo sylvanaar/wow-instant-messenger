@@ -6,6 +6,7 @@ local unpack = unpack;
 local tostring = tostring;
 local type = type;
 local table = table;
+local pairs = pairs;
 
 --set namespace
 setfenv(1, WIM);
@@ -52,6 +53,40 @@ end
 local function SetFullSize(self)
     self:SetPoint("LEFT");
     self:SetPoint("RIGHT");
+end
+
+local function CreateDropDownMenu(parent, dbTree, varName, itemList, width)
+    local menu = CreateFrame("Frame", parent:GetName()..statObject("DropDownMenu"), parent, "UIDropDownMenuTemplate");
+    menu:EnableMouse(true);
+    if(width) then _G.UIDropDownMenu_SetWidth(width, menu); end
+    menu.itemList = itemList or {};
+    menu.init = function()
+            for i=1, #menu.itemList do
+                if(not menu.itemList[i].hooked) then
+                    local func = menu.itemList[i].func or function(self) end;
+                    menu.itemList[i].func = function(self, arg1, arg2)
+                        self = self or _G.this; -- wotlk/tbc hack
+                        dbTree[varName] = self.value;
+                        _G.UIDropDownMenu_SetSelectedValue(menu, self.value);
+                        func(self, arg1, arg2);
+                    end
+                    menu.itemList[i].hooked = true;
+                end
+                local info = _G.UIDropDownMenu_CreateInfo();
+                for k,v in pairs(menu.itemList[i]) do
+                    info[k] = v;
+                end
+                _G.UIDropDownMenu_AddButton(info, _G.UIDROPDOWNMENU_MENU_LEVEL);
+            end
+        end
+    menu:SetScript("OnShow", function(self)
+            _G.UIDropDownMenu_Initialize(self, self.init);
+            _G.UIDropDownMenu_SetSelectedValue(self, dbTree[varName]);
+        end);
+    SetNextAnchor(menu);
+    menu:Hide(); menu:Show();
+    _G.test = menu
+    return menu;
 end
 
 local function CreateCheckButton(parent, title, dbTree, varName, tooltip, valChanged)
@@ -207,6 +242,7 @@ function options.InherritOptionFrameProperties(obj)
     obj.CreateCheckButton = CreateCheckButton;
     obj.ImportCustomObject = ImportCustomObject;
     obj.CreateFramedPanel = CreateFramedPanel;
+    obj.CreateDropDownMenu = CreateDropDownMenu;
 end
 
 -- Global usage for modules
