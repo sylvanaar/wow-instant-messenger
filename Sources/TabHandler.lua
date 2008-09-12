@@ -354,6 +354,7 @@ local function createTabGroup()
     tabStrip.JumpToTabName = function(self, winName)
         local oldWin = tabStrip.selected.obj;
         
+        DisplayTutorial(L["Manipulating Tabs"], L["You can <Shift-Click> a tab and drag it out into it's own window."]);
         tabStrip:SetSelectedName(winName);
         local win = tabStrip.selected.obj;
         if(oldWin and oldWin ~= win) then

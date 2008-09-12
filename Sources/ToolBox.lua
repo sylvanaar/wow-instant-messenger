@@ -80,6 +80,14 @@ function WIM.removeFromTable(tbl, item)
     return false;
 end
 
+function WIM.isInTable(tbl, val)
+        for i=1, #tbl do
+                if(tbl[i] == val) then
+                        return true;
+                end
+        end
+        return false;
+end
 ----------------------------------------------
 --              Text Formatting             --
 ----------------------------------------------

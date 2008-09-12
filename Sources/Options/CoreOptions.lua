@@ -40,13 +40,32 @@ end
 
 local function General_MessageFormatting()
     local Preview = {
-        {"CHAT_MSG_WHISPER", L["This is a sample message containing emoticons :)"], UnitName("player")},
         {"CHAT_MSG_WHISPER", L["This is a long message which contains both emoticons and urls 8). WIM's home is www.WIMAddon.com."], UnitName("player")},
     };
 
     local frame = options.CreateOptionsFrame();
     local f = frame:CreateSection(L["Message Formatting"], L["Manipulate how WIM displays messages."]);
     f.nextOffSetY = -15;
+    local itemList = {};
+    local formats = GetMessageFormattingList();
+    for i=1, #formats do
+        table.insert(itemList, {
+            text = formats[i],
+            value = formats[i],
+            justifyH = "LEFT",
+            func = function() f.prev:Hide(); f.prev:Show(); end,
+        });
+    end
+    _G.test2 = itemList;
+    db.messageFormat = isInTable(formats, db.messageFormat) and db.messageFormat or formats[1];
+    f.mf = f:CreateDropDownMenu(db, "messageFormat", itemList);
+    f.prevTitle = f:CreateText(nil, 12);
+    f.prevTitle:SetFullSize();
+    f.prevTitle:SetText(L["Preview"]);
+    f.prevTitle:SetJustifyH("LEFT");
+    f.nextOffSetY = -10
+    f.prevFrame = f:CreateSection();
+    options.AddFramedBackdrop(f.prevFrame);
     f.prev = CreateFrame("ScrollingMessageFrame", f:GetName().."PrevScrollingMessageFrame");
     f.prev:SetScript("OnShow", function(self)
             local color = db.displayColors.wispIn;
@@ -61,15 +80,12 @@ local function General_MessageFormatting()
     f.prev:SetFading(false);
     f.prev:SetMaxLines(5);
     f.prev:SetJustifyH("LEFT");
-    options.AddFramedBackdrop(f.prev);
-    f.prev:SetHeight(60);
-    f.prev.title = f:CreateText(nil, 12);
-    f.prev.title:SetFullSize();
-    f.prev.title:SetText(L["Preview"]);
-    f.prev.title:SetJustifyH("LEFT");
-    _G.test = f.prev;
-    f.nextOffSetY = -5
-    f:ImportCustomObject(f.prev):SetFullSize();
+    
+    f.prevFrame:SetHeight(60);
+    f.prevFrame:SetScript("OnShow", nil); -- we don't want this to trigger
+    f.prevFrame:ImportCustomObject(f.prev):SetFullSize();
+    f.prev:ClearAllPoints();
+    f.prev:SetPoint("TOPLEFT", 5, -5); f.prev:SetPoint("BOTTOMRIGHT", -5, 5);
     f.nextOffSetY = -10
     f:CreateCheckButton(L["Display Emoticons"], modules.Emoticons, "enabled", nil, function(self, button) EnableModule("Emoticons", self:GetChecked()); f.prev:Hide(); f.prev:Show(); end);
     f:CreateCheckButton(L["Display URLs as Links"], modules.URLHandler, "enabled", nil, function(self, button) EnableModule("URLHandler", self:GetChecked()); f.prev:Hide(); f.prev:Show(); end);

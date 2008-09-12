@@ -45,7 +45,7 @@ local function formatRawURL(theURL)
         return "";
     else
         theURL = theURL:gsub('%%', '%%%%'); --make sure any %'s are escaped in order to preserve them.
-        return "|cff"..WIM.db.urls.color.."|Hwim_url:"..theURL.."|h".."["..theURL.."]".."|h|r";
+        return " |cff"..WIM.db.urls.color.."|Hwim_url:"..theURL.."|h".."["..theURL.."]".."|h|r";
     end
 end
 
