@@ -1,3 +1,11 @@
+--[[
+    Extends Modules by adding:
+        Module:OnWindowCreated(winObj)
+        Module:OnWindowDestroyed(winObj)
+        Module:OnWindowPopped(winObj)
+	Module:OnWindowMessageAdded(winObj, msg, r, g, b)
+]]
+
 local WIM = WIM;
 
 -- imports
@@ -14,6 +22,7 @@ local pairs = pairs;
 local type = type;
 local unpack = unpack;
 local strsub = strsub;
+local time = time;
 
 -- set namespace
 setfenv(1, WIM);
@@ -726,12 +735,14 @@ local function instantiateWindow(obj)
     obj.AddMessage = function(self, msg, ...)
 	msg = applyStringModifiers(msg);
 	obj.widgets.chat_display:AddMessage(msg, ...);
+	CallModuleFunction("OnWindowMessageAdded", self, msg, ...);
     end
     
     obj.AddEventMessage = function(self, r, g, b, event, ...)
 	local str = applyMessageFormatting(obj.widgets.chat_display, event, ...);
 	obj:AddMessage(str, r, g, b);
 	obj.msgWaiting = true;
+	obj.lastActivity = time();
     end
     
     obj.UpdateIcon = function(self)
@@ -839,6 +850,7 @@ local function instantiateWindow(obj)
 	
 	-- at this state the message is no longer classified as a new window, reset flag.
 	obj.isNew = false;
+	CallModuleFunction("OnWindowPopped", self);
     end
     
     obj.UpdateProps = function(self)
@@ -932,6 +944,8 @@ end
 local function loadWindowDefaults(obj)
 	obj:Hide();
 
+	obj.lastActivity = time();
+
 	obj.guild = "";
 	obj.level = "";
 	obj.race = "";
@@ -1007,6 +1021,7 @@ local function createWindow(userName, wtype)
 	obj.isGM = IsGM(userName);
         loadWindowDefaults(obj); -- clear contents of window and revert back to it's initial state.
         dPrint("Window recycled '"..obj:GetName().."'");
+	CallModuleFunction("OnWindowCreated", obj);
         return obj;
     else
         -- must create new object
@@ -1029,6 +1044,7 @@ local function createWindow(userName, wtype)
         --f.icon.theUser = userName;
         loadWindowDefaults(f);
         dPrint("Window created '"..f:GetName().."'");
+	CallModuleFunction("OnWindowCreated", f);
         return f;
     end
 end
@@ -1070,6 +1086,7 @@ local function destroyWindow(userNameOrObj)
         obj.widgets.chat_display:Clear();
         obj:Hide();
 	dPrint("Window '"..obj:GetName().."' destroyed.");
+	CallModuleFunction("OnWindowDestroyed", obj);
     end
 end
 
@@ -1203,7 +1220,7 @@ RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnEnter", function(self)
 RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnLeave", function(self) _G.GameTooltip:Hide(); end);
 	
 RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnClick", function(self)
-		if(IsShiftKeyDown()) then
+		if(IsShiftKeyDown() or self.forceShift) then
 			destroyWindow(self:GetParent());
 		else
 			DisplayTutorial(L["Message Window Hidden"], L["WIM's message window has been hidden to WIM's Minimap Icon. If you want to end a conversation, you may do so by <Shift-Clicking> the close button."]);

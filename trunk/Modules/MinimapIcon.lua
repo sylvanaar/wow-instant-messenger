@@ -78,6 +78,16 @@ end
 --          Minimap Icon Creation           --
 ----------------------------------------------
 
+local function toggleMenu(parent)
+    Menu:ClearAllPoints();
+    if(Menu:IsShown()) then
+        Menu:Hide();
+    else
+        Menu:SetPoint("TOPRIGHT", parent, "BOTTOMLEFT", 20, 20);
+        Menu:Show();
+    end
+end
+
 local function createMinimapIcon()
     local icon = CreateFrame('Button', 'WIM3MinimapButton', _G.Minimap);
     icon.Load = function(self)
@@ -172,7 +182,7 @@ local function createMinimapIcon()
 	icon.text:SetText(text);
     end
     icon.OnClick = function(self, button)
-    
+        toggleMenu(self);
     end
     icon.OnMouseDown = function(self)
         self.icon:SetTexCoord(0, 1, 0, 1);
