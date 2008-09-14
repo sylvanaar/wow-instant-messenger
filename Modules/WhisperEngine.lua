@@ -142,7 +142,7 @@ local function getWhisperWindowByUser(user)
 end
 
 local function windowDestroyed(self)
-    if(IsShiftKeyDown()) then
+    if(IsShiftKeyDown() or self.forceShift) then
         local user = self:GetParent().theUser;
         Windows[user] = nil;
     end
