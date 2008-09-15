@@ -32,6 +32,22 @@ local function sortWindows(a, b)
     end
 end
 
+function isMouseOver()
+	-- can optionaly exclude an object
+	local x,y = _G.GetCursorPosition();
+	local menu = WIM.Menu;
+        if(not menu) then
+            return false;
+        else
+            local x1, y1 = menu:GetLeft()*menu:GetEffectiveScale(), menu:GetTop()*menu:GetEffectiveScale();
+            local x2, y2 = x1 + menu:GetWidth()*menu:GetEffectiveScale(), y1 - menu:GetHeight()*menu:GetEffectiveScale();
+            if(x >= x1 and x <= x2 and y <= y1 and y >= y2) then
+                return true;
+            end
+            return false;
+        end
+end
+
 local function createCloseButton(parent)
     local button = CreateFrame("Button", nil, parent);
     button:SetNormalTexture("Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\xNormal");
@@ -65,6 +81,7 @@ local function createButton(parent)
     
     button:SetScript("OnClick", function(self, b)
             self.win:Pop(true);
+            WIM.Menu:Hide();
         end);
     button:SetScript("OnUpdate", function(self, elapsed)
             if(self.win and not self.win:IsShown()) then
@@ -198,6 +215,18 @@ local function createMenu()
             self:SetWidth(groupWidth);
         end
         
+    menu:SetScript("OnUpdate", function(self)
+            if(isMouseOver()) then
+                self.mouseStamp = _G.time();
+            else
+                if((_G.time() - self.mouseStamp) > 1) then
+                    self:Hide();
+                end
+            end
+        end);
+    menu:SetScript("OnShow", function(self)
+            self.mouseStamp = _G.time();
+        end);
         
     return menu;
 end

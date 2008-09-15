@@ -142,13 +142,20 @@ local function getWhisperWindowByUser(user)
 end
 
 local function windowDestroyed(self)
+    _G.test = self;
     if(IsShiftKeyDown() or self.forceShift) then
         local user = self:GetParent().theUser;
         Windows[user] = nil;
     end
 end
 
-RegisterWidgetTrigger("close", "whisper", "OnClick", windowDestroyed);
+function WhisperEngine:OnWindowDestroyed(self)
+    if(self.type == "whisper") then
+        local user = self.theUser;
+        Windows[user] = nil;
+    end
+end
+
 
 RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
         local obj = self:GetParent();
