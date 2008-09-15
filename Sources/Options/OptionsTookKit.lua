@@ -19,6 +19,8 @@ setfenv(1, WIM);
     - frame:CreateText(inherritFrom[, fontHeight]) returns FontString
     - frame:ImportCustomObject(theObject) returns theObject
     - frame:CreateFramedPanel() returns Frame
+    - CreateCheckButton(parent, title, dbTree, varName, tooltip, valChanged) returns CheckButton
+    - CreateCheckButtonMenu(parent, title, dbTree, varName, tooltip, valChanged, itemList, dbTree2, varName2, valChanged2) returns CheckButton
     
     Frame Modifying Tools:
     - WIM.options.AddFramedBackdrop(theFrame)
@@ -54,6 +56,7 @@ local function SetFullSize(self)
     self:SetPoint("LEFT");
     self:SetPoint("RIGHT");
 end
+
 
 local function CreateDropDownMenu(parent, dbTree, varName, itemList, width)
     local menu = CreateFrame("Frame", parent:GetName()..statObject("DropDownMenu"), parent, "UIDropDownMenuTemplate");
@@ -96,6 +99,7 @@ local function CreateCheckButton(parent, title, dbTree, varName, tooltip, valCha
     cb.isCheckButton = true;
     cb.disabledByParent = nil; -- used to track enable and disables.
     cb.CreateCheckButton = CreateCheckButton;
+    cb.CreateCheckButtonMenu = CreateCheckButtonMenu;
     cb._Disable = cb.Disable;
     cb._Enable = cb.Enable;
     cb.text:SetText("  "..tostring(title));
@@ -168,6 +172,54 @@ local function CreateCheckButton(parent, title, dbTree, varName, tooltip, valCha
     return cb;
 end
 
+local function CreateCheckButtonMenu(parent, title, dbTree, varName, tooltip, valChanged, itemList, dbTree2, varName2, valChanged2)
+    local cbm = CreateCheckButton(parent, title, dbTree, varName, tooltip, valChanged);
+    cbm.menu = CreateFrame("Button", cbm:GetName().."MenuButton", cbm);
+    cbm.menu:SetWidth(26); cbm.menu:SetHeight(cbm.menu:GetWidth());
+    cbm.menu:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up");
+    cbm.menu:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Down");
+    cbm.menu:SetDisabledTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Disabled");
+    cbm.menu:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight", "ADD");
+    cbm.menu:SetPoint("LEFT", cbm:GetWidth()-2, 0);
+    cbm.menu.dropdown = CreateFrame("Frame", cbm.menu:GetName().."DropDownFrame", cbm.menu, "UIDropDownMenuTemplate");
+    cbm.menu.dropdown:Hide();
+    cbm.menu.itemList = itemList;
+    
+    cbm.text:ClearAllPoints(); cbm.text:SetPoint("LEFT", cbm.menu, "RIGHT");
+    -- some hooks to enherit disabled functionality.
+    local Enable, Disable = cbm.Enable, cbm.Disable;
+    cbm.Enable = function(...) cbm.menu:Enable(); Enable(...); end
+    cbm.Disable = function(...) cbm.menu:Disable();  Disable(...); end
+    
+    -- now the menu work...
+    cbm.menu:SetScript("OnClick", function(self, button)
+            _G.PlaySound("igChatScrollDown");
+	    _G.ToggleDropDownMenu(1, nil, self.dropdown, self, 0, 0)
+        end);
+    cbm.menu.dropdown.init = function()
+        for i=1, #cbm.menu.itemList do
+            if(not cbm.menu.itemList[i].hooked) then
+                local func = cbm.menu.itemList[i].func or function(self) end;
+                cbm.menu.itemList[i].func = function(self, arg1, arg2)
+                    self = self or _G.this; -- wotlk/tbc hack
+                    dbTree2[varName2] = self.value;
+                    _G.UIDropDownMenu_SetSelectedValue(cbm.menu.dropdown, self.value);
+                    func(self, arg1, arg2);
+                end
+                cbm.menu.itemList[i].hooked = true;
+            end
+            local info = _G.UIDropDownMenu_CreateInfo();
+            for k,v in pairs(cbm.menu.itemList[i]) do
+                info[k] = v;
+            end
+            _G.UIDropDownMenu_AddButton(info, _G.UIDROPDOWNMENU_MENU_LEVEL);
+        end
+    end
+    _G.UIDropDownMenu_Initialize(cbm.menu.dropdown, cbm.menu.dropdown.init, "MENU");
+    _G.UIDropDownMenu_SetSelectedValue(cbm.menu.dropdown, db.timeStampFormat);
+    
+    return cbm;
+end
 
 local function CreateText(parent, inherritFrom, fontHeight)
     inherritFrom = inherritFrom or DefaultFont;
@@ -243,6 +295,7 @@ function options.InherritOptionFrameProperties(obj)
     obj.ImportCustomObject = ImportCustomObject;
     obj.CreateFramedPanel = CreateFramedPanel;
     obj.CreateDropDownMenu = CreateDropDownMenu;
+    obj.CreateCheckButtonMenu = CreateCheckButtonMenu;
 end
 
 -- Global usage for modules

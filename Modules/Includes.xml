@@ -8,5 +8,6 @@
     <Script file="Emoticons.lua"/>
     <Script file="Tutorials.lua"/>
     <Script file="Menu.lua"/>
+    <Script file="TimeStamps.lua"/>
     
 </Ui>

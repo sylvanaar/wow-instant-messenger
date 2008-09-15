@@ -124,6 +124,10 @@ end
 -- linear and as such, can now be given any color and
 -- have the same gradient effect applied.
 
+function WIM.RGBPercentToHex(r, g, b)
+        return string.format ("%.2x%.2x%.2x",r*255,g*255,b*255);
+end
+
 function WIM.RGBHexToPercent(rgbStr)
         local R, G, B = string.sub(rgbStr, 1, 2), string.sub(rgbStr, 3, 4), string.sub(rgbStr, 5, 6);
         return tonumber(R, 16)/255, tonumber(G, 16)/255, tonumber(B, 16)/255;
