@@ -243,7 +243,7 @@ local function honorChatFrameEventFilter(event, msg)
     local chatFilters = _G.ChatFrame_GetMessageEventFilters(event);
     if chatFilters then 
 	local filter, newmsg = false;
-        for _, filterFunc in next, chatFilters do
+        for _, filterFunc in pairs(chatFilters) do
             filter, newmsg = filterFunc(msg);
             if filter then 
 		return true; 
