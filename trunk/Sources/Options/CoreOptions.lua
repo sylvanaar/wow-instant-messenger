@@ -87,6 +87,17 @@ local function General_MessageFormatting()
     f.prev:ClearAllPoints();
     f.prev:SetPoint("TOPLEFT", 5, -5); f.prev:SetPoint("BOTTOMRIGHT", -5, 5);
     f.nextOffSetY = -10
+    formats = GetTimeStampFormats();
+    tsList = {};
+    for i=1, #formats do
+        table.insert(tsList, {
+            text = _G.date(formats[i]),
+            value = formats[i],
+            justifyH = "LEFT",
+            func = function() f.prev:Hide(); f.prev:Show(); end,
+        });
+    end
+    f:CreateCheckButtonMenu(L["Display Time Stamps"], modules.TimeStamps, "enabled", nil, function(self, button) EnableModule("TimeStamps", self:GetChecked()); f.prev:Hide(); f.prev:Show(); end, tsList, db, "timeStampFormat", function(self, button) f.prev:Hide(); f.prev:Show(); end);
     f:CreateCheckButton(L["Display Emoticons"], modules.Emoticons, "enabled", nil, function(self, button) EnableModule("Emoticons", self:GetChecked()); f.prev:Hide(); f.prev:Show(); end);
     f:CreateCheckButton(L["Display URLs as Links"], modules.URLHandler, "enabled", nil, function(self, button) EnableModule("URLHandler", self:GetChecked()); f.prev:Hide(); f.prev:Show(); end);
     f:CreateCheckButton(L["Indent long messages."], db, "wordwrap_indent", nil, function(self, button) UpdateAllWindowProps(); f.prev:Hide(); f.prev:Show(); end);

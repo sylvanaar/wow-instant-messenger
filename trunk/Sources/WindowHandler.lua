@@ -734,8 +734,12 @@ local function instantiateWindow(obj)
     --Addmessage functions
     obj.AddMessage = function(self, msg, ...)
 	msg = applyStringModifiers(msg);
-	obj.widgets.chat_display:AddMessage(msg, ...);
+	self.widgets.chat_display:AddMessage(msg, ...);
 	CallModuleFunction("OnWindowMessageAdded", self, msg, ...);
+    end
+    
+    obj.AddMessageRaw = function(self, msg, ...)
+        self.widgets.chat_display:AddMessage(msg, ...);
     end
     
     obj.AddEventMessage = function(self, r, g, b, event, ...)
@@ -747,13 +751,13 @@ local function instantiateWindow(obj)
     end
     
     obj.UpdateIcon = function(self)
-	local icon = obj.widgets.class_icon;
+	local icon = self.widgets.class_icon;
 	local classTag = obj.class;
-	if(obj.class == "") then
+	if(self.class == "") then
 		classTag = "blank"
 	else
-		if(constants.classes[obj.class]) then
-			classTag = string.lower(constants.classes[obj.class].tag);
+		if(constants.classes[self.class]) then
+			classTag = string.lower(constants.classes[self.class].tag);
 		else
 			classTag = "blank";
 		end
@@ -762,7 +766,7 @@ local function instantiateWindow(obj)
     end
     
     obj.UpdateCharDetails = function(self)
-	obj.widgets.char_info:SetText(GetSelectedSkin().message_window.widgets.char_info.format(obj.guild, obj.level, obj.race, obj.class));
+	self.widgets.char_info:SetText(GetSelectedSkin().message_window.widgets.char_info.format(self.guild, self.level, self.race, self.class));
     end
     
     obj.WhoCallback = function(result)
@@ -783,12 +787,12 @@ local function instantiateWindow(obj)
     obj.SendWho = function(self)
 	local whoLib = libs.WhoLib;
 	if(whoLib) then
-		whoLib:UserInfo(obj.theUser, 
+		whoLib:UserInfo(self.theUser, 
 			{
 				queue = whoLib.WHOLIB_QUEUE_QUIET, 
 				timeout = 0,
 				flags = whoLib.WHOLIB_FLAG_ALLWAYS_CALLBACK,
-				callback = obj.WhoCallback
+				callback = self.WhoCallback
 			});
 	else
 		dPrint("WhoLib-1.0 not loaded... Skipping who lookup!");
@@ -806,15 +810,15 @@ local function instantiateWindow(obj)
 	end
     
 	-- pass isNew to pop ruleset.
-	if(obj.isNew) then
-		obj:SendWho();
+	if(self.isNew) then
+		self:SendWho();
 	end
 	if(forceResult ~= nil) then
 		-- go by forceResult and ignore rules
 		if(forceResult == true) then
-			setWindowAsFadedIn(obj);
-			if(obj.tabStrip) then
-				self.tabStrip:JumpToTabName(obj.theUser);
+			setWindowAsFadedIn(self);
+			if(self.tabStrip) then
+				self.tabStrip:JumpToTabName(self.theUser);
 			else
 				self:ResetAnimation();
 				self:Show();
@@ -832,19 +836,19 @@ local function instantiateWindow(obj)
 	else
 		-- execute pop rules.
 		local rules = db.whispers.pop_rules[curState]; -- defaults incase unknown
-		if(obj.type == "whisper") then
+		if(self.type == "whisper") then
 			rules = db.whispers.pop_rules[curState];
 		end
 		if((rules.onSend and msgDirection == "out") or
 				(rules.onReceive and msgDirection == "in") or
-				(rules.onNew and obj.isNew and msgDirection == "in")) then 
-			setWindowAsFadedIn(obj);
-			if(obj.tabStrip) then
+				(rules.onNew and self.isNew and msgDirection == "in")) then 
+			setWindowAsFadedIn(self);
+			if(self.tabStrip) then
 				self:ResetAnimation();
-				obj.tabStrip:JumpToTabName(obj.theUser);
+				self.tabStrip:JumpToTabName(self.theUser);
 			else
 				self:ResetAnimation();
-				obj:Show();
+				self:Show();
 			end
 		end
 	end
