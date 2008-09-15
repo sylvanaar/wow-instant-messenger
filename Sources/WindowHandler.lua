@@ -433,7 +433,7 @@ end
 local function MessageWindow_Frame_OnUpdate(self, elapsed)
 	-- window is visible, there aren't any messages waiting...
 	self.msgWaiting = false;
-	
+	self.unreadCount = 0;
 	-- fading segment
 	if(db.winFade) then
 		self.fadeElapsed = (self.fadeElapsed or 0) + elapsed;
@@ -739,10 +739,11 @@ local function instantiateWindow(obj)
     end
     
     obj.AddEventMessage = function(self, r, g, b, event, ...)
-	local str = applyMessageFormatting(obj.widgets.chat_display, event, ...);
-	obj:AddMessage(str, r, g, b);
-	obj.msgWaiting = true;
-	obj.lastActivity = time();
+	local str = applyMessageFormatting(self.widgets.chat_display, event, ...);
+	self:AddMessage(str, r, g, b);
+	self.msgWaiting = true;
+	self.lastActivity = time();
+        self.unreadCount = self.unreadCount and (self.unreadCount + 1) or 1;
     end
     
     obj.UpdateIcon = function(self)
@@ -972,6 +973,8 @@ local function loadWindowDefaults(obj)
 	obj.widgets.chat_display:AddMessage("  ");
 	obj.widgets.chat_display:AddMessage("  ");
 	updateScrollBars(obj);
+        
+        obj.widgets.close.forceShift = false;
     
 	-- load Registered Widgets (if not created already) & set defaults
 	loadRegisteredWidgets(obj);
