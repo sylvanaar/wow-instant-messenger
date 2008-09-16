@@ -68,6 +68,7 @@ db_defaults.winFade = true;
 db_defaults.winAnimation = true;
 db_defaults.wordwrap_indent = false;
 db_defaults.escapeToHide = true;
+db_defaults.pop_rules = {};
 
 
 local WindowSoupBowl = {
@@ -389,45 +390,32 @@ end
 
 -- this needs to be looked at. it isn't doing anything atm...
 local function MessageWindow_Frame_OnShow(self)
-    local user = self.theUser;
-    if(user ~= nil and windows[user]) then
-        windows[user].newMSG = false;
-        windows[user].is_visible = true;
         if(db.autoFocus == true) then
-		_G[self:GetName().."MsgBox"]:SetFocus();
+		--_G[self:GetName().."MsgBox"]:SetFocus();
         end
-
         updateScrollBars(self);
-	local widgetName, widgetObj;
-	for widgetName, widgetObj in pairs(obj.widgets) do
+        if(self.tabStrip) then
+                self.tabStrip:JumpToTabName(self.theUser);
+        end
+	for widgetName, widgetObj in pairs(self.widgets) do
 		if(type(widgetObj.OnWindowShow) == "function") then
 			widgetObj:OnWindowShow();
 		end
 	end
-    end
 end
 
 -- this needs to be looked at. it isn't doing anything atm...
 local function MessageWindow_Frame_OnHide(self)
-    local user = self.theUser;
-    if(user ~= nil and windows[user]) then
-        --WIM_Tabs.lastParent = nil;
-        --WIM_TabStrip:Hide();
-        self.isMouseOver = false;
-        if(windows[user]) then
-            windows[user].is_visible = false;
-        end
         if ( self.isMoving ) then
 		self:StopMovingOrSizing();
 		self.isMoving = false;
         end
-	local widgetName, widgetObj;
-	for widgetName, widgetObj in pairs(obj.widgets) do
+        self:ResetAnimation();
+	for widgetName, widgetObj in pairs(self.widgets) do
 		if(type(widgetObj.OnWindowHide) == "function") then
 			widgetObj:OnWindowHide();
 		end
-	end
-    end
+        end
 end
 
 local function MessageWindow_Frame_OnUpdate(self, elapsed)
@@ -516,40 +504,6 @@ end
 --end
 
 
---local function MessageWindow_MsgBox_OnTabPressed()
---    --cycle through windows
---    if(WIM_Tabs.enabled == true) then
---        if(IsShiftKeyDown()) then
---            WIM_TabStep(-1);
---        else
---            WIM_TabStep(1);
---        end
---    else
---        WIM_ToggleWindow_Toggle();
---    end
---end
-
---local function MessageWindow_MsgBox_OnTextChanged()
-    --[[if(WIM_W2W[this:GetParent().theUser]) then
-	if(not this.w2w_typing) then 
-	    this.w2w_typing = 0;
-	end
-	if(this:GetText() ~= "") then
-	    if(time() - this.w2w_typing > 2) then
-		this.w2w_typing = time();
-                if(WIM.db.w2w.typing) then
-        	    --WIM_W2W_SendAddonMessage(this:GetParent().theUser , "IS_TYPING#TRUE");
-                end
-	    end
-	else
-	    this.w2w_typing = 0;
-            if(WIM.db.w2w.typing) then
-                --WIM_W2W_SendAddonMessage(this:GetParent().theUser , "IS_TYPING#FALSE");
-            end
-	end
-    end]]
-    --WIM_EditBox_OnChanged();
---end
 
 local function loadHandlers(obj)
 	local widgets = obj.widgets;
@@ -644,12 +598,6 @@ local function instantiateWindow(obj)
     obj.SetScale_Orig = obj.SetScale;
     obj.SetScale = scaleWindow;
     
-    --obj.icon = createMipmapDodad(fName);
-    
-    --obj.w2w_menu = CreateFrame("Frame", fName.."W2WMenu", obj, "UIDropDownMenuTemplate");
-    --obj.w2w_menu:SetClampedToScreen(true);
-    
-    
     obj.widgets = {};
     local widgets = obj.widgets;
     
@@ -680,26 +628,6 @@ local function instantiateWindow(obj)
     widgets.close.curTextureIndex = 1;
     widgets.close.parentWindow = obj;
     widgets.close.widgetName = "close";
-
-    --buttons.history = CreateFrame("Button", fName.."HistoryButton", obj);
-    --history:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-    --history:SetScript("OnEnter", MessageWindow_HistoryButton_OnEnter);
-    --history:SetScript("OnLeave", MessageWindow_HistoryButton_OnLeave);
-    --history:SetScript("OnClick", MessageWindow_HistoryButton_OnClick);
-
-    --local w2w = CreateFrame("Button", fName.."W2WButton", obj);
-    --w2w:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-    --w2w:SetScript("OnEnter", MessageWindow_W2WButton_OnEnter);
-    --w2w:SetScript("OnLeave", MessageWindow_W2WButton_OnLeave);
-    --w2w:SetScript("OnClick", MessageWindow_W2WButton_OnClick);
-    
-    --local chatting = CreateFrame("Button", fName.."IsChattingButton", obj);
-    --chatting:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-    --chatting:SetScript("OnEnter", MessageWindow_IsChattingButton_OnEnter);
-    --chatting:SetScript("OnLeave", MessageWindow_IsChattingButton_OnLeave);
-    --chatting:SetScript("OnUpdate", MessageWindow_IsChattingButton_OnUpdate);
-    --chatting.time_elapsed = 0;
-    --chatting.typing_stamp = 0;
     
     widgets.scroll_up = CreateFrame("Button", fName.."ScrollUp", obj);
     widgets.scroll_up:RegisterForClicks("LeftButtonUp", "RightButtonUp");
@@ -810,9 +738,6 @@ local function instantiateWindow(obj)
 	end
     
 	-- pass isNew to pop ruleset.
-	if(self.isNew) then
-		self:SendWho();
-	end
 	if(forceResult ~= nil) then
 		-- go by forceResult and ignore rules
 		if(forceResult == true) then
@@ -835,13 +760,15 @@ local function instantiateWindow(obj)
 		end
 	else
 		-- execute pop rules.
-		local rules = db.whispers.pop_rules[curState]; -- defaults incase unknown
-		if(self.type == "whisper") then
-			rules = db.whispers.pop_rules[curState];
-		end
-		if((rules.onSend and msgDirection == "out") or
-				(rules.onReceive and msgDirection == "in") or
-				(rules.onNew and self.isNew and msgDirection == "in")) then 
+                local curState = curState;
+		local rules; -- defaults incase unknown
+		if(db.pop_rules[self.type]) then
+                        curState = db.pop_rules[self.type].alwaysOther and "other" or curState
+			rules = db.pop_rules[self.type][curState];
+		else
+                        rules = db.pop_rules.whisper.other;
+                end
+		if((rules.onSend and msgDirection == "out") or (rules.onReceive and msgDirection == "in")) then 
 			setWindowAsFadedIn(self);
 			if(self.tabStrip) then
 				self:ResetAnimation();
@@ -918,6 +845,7 @@ local function instantiateWindow(obj)
 	if(self.animation.mode) then
 		obj:SetClampedToScreen(true);
 		self:SetScale(db.winSize.scale);
+                self:ClearAllPoints();
 		self:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", self.animation.initLeft, self.animation.initTop);
 		dPrint("Animation Reset: "..self:GetName());
 	end
@@ -1291,7 +1219,7 @@ RegisterWidgetTrigger("scroll_down", "whisper,chat,w2w", "OnClick", function(sel
 	end);
 
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnMouseWheel", function(self, ...)
-	    if(select("#", ...) > 0) then
+	    if(select(1, ...) > 0) then
 		if( _G.IsControlKeyDown() ) then
 		    self:ScrollToTop();
 		else

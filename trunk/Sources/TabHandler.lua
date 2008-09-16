@@ -236,7 +236,11 @@ local function createTabGroup()
     tabStrip.tabs = {};
     local i;
     for i=1,tabsPerStrip do
-        local tab = CreateFrame("Button", stripName.."_Tab"..i, tabStrip);
+        local tab = CreateFrame("Button", stripName.."_Tab"..i, tabStrip, "UIPanelButtonTemplate");
+        tab:SetNormalTexture(nil); tab:SetPushedTexture(nil); tab:SetDisabledTexture(nil);
+        tab.text = _G[tab:GetName().."Text"];
+        tab.text:ClearAllPoints();
+        tab.text:SetAllPoints();
         tab.tabIndex = i;
         tab.tabStrip = tabStrip;
         tab.left = tab:CreateTexture(stripName.."_Tab"..i.."Backdrop_L", "BORDER");
@@ -273,102 +277,104 @@ local function createTabGroup()
     -- tabStip functions
     tabStrip.UpdateTabs = function(self)
         -- first check to see if we have more than one tab to show...
-        if(table.getn(tabStrip.attached) > 1) then
-            tabStrip:Show();
+        if(#self.attached > 1) then
+            self:Show();
         else
-            tabStrip:Hide();
+            if(#self.attached == 1) then
+                self:Detach(self.attached[i])
+            end
+            self:Hide();
             return;
         end
     
         -- relocate tabStrip to window
-        local win = tabStrip.selected.obj;
+        local win = self.selected.obj;
         local skinTable = GetSelectedSkin().tab_strip;
-        tabStrip:SetParent(win);
-        tabStrip.parentWindow = win;
-        SetWidgetRect(tabStrip, skinTable);
+        self:SetParent(win);
+        self.parentWindow = win;
+        SetWidgetRect(self, skinTable);
     
         -- re-order tabs & sizing
         local curSize;
         if(skinTable.vertical) then
-            curSize = tabStrip:GetHeight();
+            curSize = self:GetHeight();
         else
-            curSize = tabStrip:GetWidth();
+            curSize = self:GetWidth();
         end
         local count = math.floor(curSize / minimumWidth);
-        if(count >= table.getn(tabStrip.attached)) then
-		count = table.getn(tabStrip.attached)
-		tabStrip.nextButton:Hide();
-		tabStrip.prevButton:Hide();
+        if(count >= #self.attached) then
+		count = #self.attached;
+		self.nextButton:Hide();
+		self.prevButton:Hide();
 	else
-		tabStrip.nextButton:Show();
-		tabStrip.prevButton:Show();
-		if(tabStrip.curOffset <= 0) then
-			tabStrip.prevButton:Disable();
+		self.nextButton:Show();
+		self.prevButton:Show();
+		if(self.curOffset <= 0) then
+			self.prevButton:Disable();
 		else
-			tabStrip.prevButton:Enable();
+			self.prevButton:Enable();
 		end
-		if(tabStrip.curOffset >= table.getn(tabStrip.attached) - count) then
-			tabStrip.nextButton:Disable();
+		if(self.curOffset >= #self.attached - count) then
+			self.nextButton:Disable();
 		else
-			tabStrip.nextButton:Enable();
+			self.nextButton:Enable();
 		end
 	end
-        tabStrip.visibleCount = count;
-        local i;
+        self.visibleCount = count;
+        local selectedStyle = GetSelectedStyle();
         for i=1,tabsPerStrip do
             if(i <= count) then
-                local str = tabStrip.attached[i+tabStrip.curOffset];
-                tabStrip.tabs[i]:Show();
-                tabStrip.tabs[i].childObj = windows.active.whisper[str] or windows.active.chat[str] or windows.active.w2w[str];
-                tabStrip.tabs[i].childName = str;
-                tabStrip.tabs[i]:SetText(str);
-                if(tabStrip.tabs[i].childObj == tabStrip.selected.obj) then
-                    tabStrip.tabs[i]:SetAlpha(1);
-                    tabStrip.tabs[i]:SetTexture("Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_selected");
+                local str = self.attached[i+self.curOffset];
+                self.tabs[i]:Show();
+                self.tabs[i].childObj = windows.active.whisper[str] or windows.active.chat[str] or windows.active.w2w[str];
+                self.tabs[i].childName = str;
+                self.tabs[i].text:SetText(str);
+                if(self.tabs[i].childObj == self.selected.obj) then
+                    self.tabs[i]:SetAlpha(1);
+                    self.tabs[i]:SetTexture(skinTable.files.tabs.selected[selectedStyle]);
                 else
-                    tabStrip.tabs[i]:SetAlpha(.7);
-                    tabStrip.tabs[i]:SetTexture("Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_normal");
+                    self.tabs[i]:SetAlpha(.7);
+                    self.tabs[i]:SetTexture(skinTable.files.tabs.normal[selectedStyle]);
                 end
             else
-                tabStrip.tabs[i]:Hide();
-                tabStrip.tabs[i].childName = "";
-                tabStrip.tabs[i].childObj = nil;
-                tabStrip.tabs[i]:SetText("");
+                self.tabs[i]:Hide();
+                self.tabs[i].childName = "";
+                self.tabs[i].childObj = nil;
+                self.tabs[i]:SetText("");
             end
             --include logic here to show selected tab or not.
-            tabStrip.tabs[i]:SetWidth(curSize/count);
-            tabStrip.tabs[i]:SetHeight(curSize/count);
+            self.tabs[i]:SetWidth(curSize/count);
+            self.tabs[i]:SetHeight(curSize/count);
         end
     end
     
     tabStrip.SetSelectedName = function(self, winName)
         local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
-            tabStrip.selected.name = winName;
-            tabStrip.selected.obj = win;
-            tabStrip:UpdateTabs();
-            tabStrip.parentWindow = win;
+            self.selected.name = winName;
+            self.selected.obj = win;
+            --self:UpdateTabs();
+            self.parentWindow = win;
         end
     end
     
     tabStrip.JumpToTabName = function(self, winName)
-        local oldWin = tabStrip.selected.obj;
-        
+        local oldWin = self.selected.obj;
+
         DisplayTutorial(L["Manipulating Tabs"], L["You can <Shift-Click> a tab and drag it out into it's own window."]);
-        tabStrip:SetSelectedName(winName);
-        local win = tabStrip.selected.obj;
+        self:SetSelectedName(winName);
+        local win = self.selected.obj;
         if(oldWin and oldWin ~= win) then
             win:SetWidth(oldWin:GetWidth());
             win:SetHeight(oldWin:GetHeight());
             win:ClearAllPoints();
-            win:SetPoint("TOPLEFT", "UIParent", "BOTTOMLEFT", oldWin:GetLeft(), oldWin:GetTop());
+            win:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", oldWin:GetLeft(), oldWin:GetTop());
             win:SetAlpha(oldWin:GetAlpha());
         end
         win:Show();
-        tabStrip:UpdateTabs();
-        local i;
-        for i=1,table.getn(tabStrip.attached) do
-            local obj = windows.active.whisper[tabStrip.attached[i]] or windows.active.chat[tabStrip.attached[i]] or windows.active.w2w[tabStrip.attached[i]];
+        self:UpdateTabs();
+        for i=1,#self.attached do
+            local obj = windows.active.whisper[self.attached[i]] or windows.active.chat[self.attached[i]] or windows.active.w2w[self.attached[i]];
             if(obj ~= win) then
                 obj:Hide();
             end
@@ -379,10 +385,10 @@ local function createTabGroup()
         local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
             local curIndex = getIndexFromTable(tabStrip.attached, winName);
-            if(win == tabStrip.selected.obj) then
-                if(table.getn(tabStrip.attached) <= 1) then
-                    tabStrip.selected.name = "";
-                    tabStrip.selected.obj = nil;
+            if(win == self.selected.obj) then
+                if(#self.attached <= 1) then
+                    self.selected.name = "";
+                    self.selected.obj = nil;
                 else
                     local nextIndex;
                     if(curIndex > 1) then
@@ -390,14 +396,14 @@ local function createTabGroup()
                     else
                         nextIndex = curIndex + 1;
                     end
-                    tabStrip:JumpToTabName(tabStrip.attached[nextIndex]);
+                    self:JumpToTabName(self.attached[nextIndex]);
                 end
             end
-            removeFromTable(tabStrip.attached, winName);
+            removeFromTable(self.attached, winName);
             win.tabStrip = nil;
-            tabStrip:UpdateTabs();
+            self:UpdateTabs();
             win:Show();
-            dPrint(win:GetName().." is detached from "..tabStrip:GetName());
+            dPrint(win:GetName().." is detached from "..self:GetName());
         end
     end
     
@@ -405,18 +411,18 @@ local function createTabGroup()
         local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
             --if already attached, detach then attach here.
-            if(win.tabStrip and win.tabStrip ~= tabStrip) then
+            if(win.tabStrip and win.tabStrip ~= self) then
                 win.tabStrip:Detach(winName);
             end
-            addToTableUnique(tabStrip.attached, winName);
-            win.tabStrip = tabStrip;
-            if(table.getn(tabStrip.attached) == 1 or win:IsVisible()) then
-                tabStrip:JumpToTabName(winName);
+            addToTableUnique(self.attached, winName);
+            win.tabStrip = self;
+            if(#self.attached == 1 or win:IsVisible()) then
+                self:JumpToTabName(winName);
             else
                 win:Hide();
             end
-            tabStrip:UpdateTabs();
-            dPrint(win:GetName().." is attached to "..tabStrip:GetName());
+            self:UpdateTabs();
+            dPrint(win:GetName().." is attached to "..self:GetName());
         end
     end
     
