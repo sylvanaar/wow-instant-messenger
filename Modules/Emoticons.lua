@@ -1,10 +1,13 @@
--- needs table optimization
-
+--imports
 local WIM = WIM;
+local _G = _G;
+local table = table;
+local unpack = unpack;
+local string = string;
+local pairs = pairs;
 
-WIM.db_defaults.urls = {
-    color = "FFFFFF";
-};
+--set namespace
+setfenv(1, WIM);
 
 local Emote = WIM.CreateModule("Emoticons", true);
 
@@ -13,7 +16,7 @@ local Emote = WIM.CreateModule("Emoticons", true);
 -----------------------------------------------------
 
 local LinkRepository = {}; -- used for emotes and link parsing.
-
+local tmpList = {};
 
 local function convertEmoteToPattern(theEmote)
     local special = {"%", ":", "-", "^", "$", ")", "(", "]", "]", "~", "@", "#", "&", "*", "_", "+", "=", ",", ".", "?", "/", "\\", "{", "}", "|", "`", ";", "\"", "'"};
@@ -25,7 +28,7 @@ local function convertEmoteToPattern(theEmote)
 end
 
 local function getEmoteFilePath(theEmote)
-    local emoteTable = WIM.GetSelectedSkin().emoticons;
+    local emoteTable = GetSelectedSkin().emoticons;
 
     local tmp = emoteTable.definitions[theEmote];
     -- if emote not found or if mal formed/linked emote, prevent infinate loop.
@@ -51,15 +54,14 @@ local function filterEmoticons(theMsg)
     if ( 1 ) then
 	local term;
 	for tag in string.gmatch(theMsg, "%b{}") do
-	    term = strlower(string.gsub(tag, "[{}]", ""));
+	    term = string.lower(string.gsub(tag, "[{}]", ""));
 	    if ( ICON_TAG_LIST[term] and ICON_LIST[ICON_TAG_LIST[term]] ) then
 		theMsg = string.gsub(theMsg, tag, ICON_LIST[ICON_TAG_LIST[term]] .. "0|t");
 	    end
 	end
     end
 
-    local SelectedSkin = WIM.GetSelectedSkin();
-    local emoteTable = SelectedSkin.emoticons;
+    local emoteTable = GetSelectedSkin().emoticons;
         
     -- first as to not disrupt any links, lets remove them and put them back later.
     local results, orig;
@@ -96,31 +98,45 @@ end
 
 
 function Emote:OnEnable()
-    WIM.RegisterStringModifier(filterEmoticons);
+    RegisterStringModifier(filterEmoticons, true);
 end
 
 function Emote:OnDisable()
-    WIM.UnregisterStringModifier(filterEmoticons);
+    UnregisterStringModifier(filterEmoticons);
 end
 
 
+local function clearTempTable()
+    for key, _ in pairs(tmpList) do
+        tmpList[key] = nil;
+    end
+end
 
 
 -- Extended Global
-function WIM.GetEmoteTable()
-    local SelectedSkin = WIM.GetSelectedSkin();
-    local list = {};
-    local tmp;
-    for key,_ in pairs(SelectedSkin.emoticons.definitions) do
-        tmp = WIM.getEmoteFilePath(key);
-        if(tmp ~= "") then
-            if(not list[tmp]) then
-                list[tmp] = {
-                    triggers = {}
-                };
-            end
-            table.insert(list[tmp].triggers, key)
-        end
+function GetEmotes()
+    clearTempTable();
+    local emotes = GetSelectedSkin().emoticons.definitions;
+    for k, v in pairs(emotes) do
+       if(emotes[v] == nil) then
+            table.insert(tmpList, k);
+       end
     end
-    return list;
+    return unpack(tmpList);
 end
+
+function GetEmoteAlias(emote)
+    clearTempTable();
+    local emotes = GetSelectedSkin().emoticons.definitions;
+    for k, v in pairs(emotes) do
+       if(string.lower(v) == string.lower(emote)) then
+            table.insert(tmpList, k);
+       end
+    end
+    return unpack(tmpList);
+end
+
+function GetEmoteTexture(emote)
+    return getEmoteFilePath(emote);
+end
+

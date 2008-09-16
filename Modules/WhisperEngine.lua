@@ -36,55 +36,45 @@ local WhisperEngine = CreateModule("WhisperEngine");
 -- declare default settings for whispers.
 -- if new global env wasn't set to WIM's namespace, then your module would call as follows:
 --      WhisperEngine.db_defaults... or WIM.db_defaults...
-db_defaults.whispers = {
-    pop_rules = {
+db_defaults.pop_rules.whisper = {
         --pop-up rule sets based off of your location
         resting = {
             onSend = true,
             onReceive = true,
-            onNew = true,
             supress = true,
         },
         combat = {
             onSend = false,
             onReceive = false,
-            onNew = false,
             supress = false,
         },
         pvp = {
             onSend = true,
             onReceive = true,
-            onNew = true,
             supress = true,
         },
         arena = {
             onSend = false,
             onReceive = false,
-            onNew = false,
             supress = false,
         },
         party = {
             onSend = true,
             onReceive = true,
-            onNew = true,
             supress = true,
         },
         raid = {
             onSend = true,
             onReceive = true,
-            onNew = true,
             supress = true,
         },
         other = {
             onSend = true,
             onReceive = true,
-            onNew = true,
             supress = true,
         },
         alwaysOther = true,
         intercept = true,
-    },
-    playSound = true,
 }
 
 db_defaults.displayColors.wispIn = {
@@ -137,6 +127,7 @@ local function getWhisperWindowByUser(user)
     else
         -- otherwise, create a new one.
         Windows[user] = CreateWhisperWindow(user);
+        Windows[user]:SendWho(); -- send who request
         return Windows[user];
     end
 end
@@ -359,12 +350,16 @@ end
 
 function WhisperEngine:OnEvent_Whisper(eventItem)
     -- execute appropriate supression rules
-    eventItem:SetSupress(WIM.db.whispers.pop_rules[WIM.curState].supress);
+    local curState = curState;
+    curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+    eventItem:SetSupress(WIM.db.pop_rules.whisper[curState].supress);
 end
 
 function WhisperEngine:OnEvent_WhisperInform(eventItem)
     -- execute appropriate supression rules
-    eventItem:SetSupress(WIM.db.whispers.pop_rules[WIM.curState].supress);
+    local curState = curState;
+    curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+    eventItem:SetSupress(WIM.db.pop_rules.whisper[curState].supress);
 end
 
 function WhisperEngine:CHAT_MSG_WHISPER(...)
@@ -392,7 +387,9 @@ end
 
 local function replyTellTarget(TellNotTold)
     if(db.enabled) then
-        if(db.whispers.pop_rules.intercept and db.whispers.pop_rules[curState].onSend) then
+        local curState = curState;
+        curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+        if(db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
             local lastTell;
             if(TellNotTold) then
                 lastTell = _G.ChatEdit_GetLastTellTarget();
@@ -417,8 +414,10 @@ local function CF_extractTellTarget(editBox, msg)
         if ( (strlen(target) <= 0) or (strsub(target, 1, 1) == "|") ) then
             return;
         end
-	
-        if(db.whispers.pop_rules.intercept and db.whispers.pop_rules[curState].onSend) then
+        
+	local curState = curState;
+        curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+        if(db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
             target = string.gsub(target, "^%l", string.upper)
 	    local win = getWhisperWindowByUser(target);
             win.widgets.msg_box.setText = 1;
@@ -431,7 +430,9 @@ end
 
 local function CF_sendTell(name) -- needed in order to UnitPopups to work with whispers.
     if(db and db.enabled) then
-	if(db.whispers.pop_rules.intercept and db.whispers.pop_rules[curState].onSend) then
+        local curState = curState;
+        curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+	if(db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
             -- Remove spaces from the server name for slash command parsing
             name = gsub(name, " ", "");
 	    local win = getWhisperWindowByUser(name);
