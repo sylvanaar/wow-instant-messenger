@@ -21,6 +21,8 @@ local credits = {
     "|cff69ccf0"..L["Special Thanks:"].."|r Stewarta, Zeke <Coilfang>,\n     Morphieus <Spinebreaker>",
 };
 
+local states = {"resting", "combat", "pvp", "arena", "party", "raid", "other"};
+
 local function General_Main()
     local frame = options.CreateOptionsFrame()
     frame.welcome = frame:CreateSection(L["Welcome!"], L["_Description"]);
@@ -56,7 +58,6 @@ local function General_MessageFormatting()
             func = function() f.prev:Hide(); f.prev:Show(); end,
         });
     end
-    _G.test2 = itemList;
     db.messageFormat = isInTable(formats, db.messageFormat) and db.messageFormat or formats[1];
     f.mf = f:CreateDropDownMenu(db, "messageFormat", itemList);
     f.prevTitle = f:CreateText(nil, 12);
@@ -105,7 +106,67 @@ local function General_MessageFormatting()
 end
 
 
+local function createPopRuleFrame(winType)
+    local frame = options.CreateOptionsFrame();
+    frame.type = winType;
+    frame.main = frame:CreateSection(L["Window Behavior"], L["You can control how windows behave while you are in different situations."]);
+    frame.main.nextOffSetY = -20;
+    frame.main.intercept = frame.main:CreateCheckButton(L["Intercept Slash Commands"], db.pop_rules[frame.type], "intercept");
+    frame.main.nextOffSetY = -20;
+    frame.main.alwaysOther = frame.main:CreateCheckButton(L["Use the same rules for all states."], db.pop_rules[frame.type], "alwaysOther", nil, function(self)
+            if(self:GetChecked()) then
+                frame.main.selectedState = "other";
+                frame:Hide();
+                frame:Show();
+            else
+                frame:Hide();
+                frame:Show();
+            end
+        end);
+    frame.main.nextOffSetY = -20;
+    frame.main.selectedState = "other";
+    local itemList = {};
+    for i=1, #states do
+        table.insert(itemList, {
+            text = L["Behaviors for state:"].." "..L["state_"..states[i]],
+            value = states[i],
+            justifyH = "LEFT",
+            func = function(self)
+                frame.main.selectedState = self.value;
+                frame.main.options:Hide();
+                frame.main.options:Show();
+            end,
+        });
+    end
+    frame.main.stateList = frame.main:CreateDropDownMenu(frame.main, "selectedState", itemList, 300);
+    frame.main.options = frame.main:CreateSection();
+    options.AddFramedBackdrop(frame.main.options);
+    frame.main.options.getDBTree = function() return db.pop_rules[frame.type][frame.main.selectedState]; end;
+    frame.main.options:CreateCheckButton(L["Pop-Up window when message is sent."], frame.main.options.getDBTree, "onSend");
+    frame.main.options:CreateCheckButton(L["Pop-Up window when message is received."], frame.main.options.getDBTree, "onReceive");
+    frame.main.options:CreateCheckButton(L["Auto focus a window when it is shown."], frame.main.options.getDBTree, "autofocus");
+    frame.main.options:CreateCheckButton(L["Keep focus on window after sending a message."], frame.main.options.getDBTree, "keepfocus");
+    frame.main.options:CreateCheckButton(L["Suppress messages from the default chat frame."], frame.main.options.getDBTree, "supress");
+    
+    frame:SetScript("OnShow", function(self)
+            if(self.main.alwaysOther:GetChecked()) then
+                self.main.stateList:Hide();
+            else
+                self.main.stateList:Show();
+            end
+        end);
+    
+    return frame;
+end
+
+
+local function WhisperPopRules()
+    return createPopRuleFrame("whisper");
+end
+
 
 
 RegisterOptionFrame(L["General"], L["Main"], "This is just a test Category", General_Main, "Display WIM's options.");
 RegisterOptionFrame(L["General"], L["Message Formatting"], "This is just a test Category", General_MessageFormatting, "Display WIM's options.");
+
+RegisterOptionFrame(L["Whispers"], L["Window Behavior"], "This is just a test Category", WhisperPopRules, "Display WIM's options.");
