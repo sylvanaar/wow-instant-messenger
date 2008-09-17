@@ -727,15 +727,26 @@ local function instantiateWindow(obj)
 	end
     end
     
+    obj.GetRuleSet = function(self)
+        if(db.pop_rules[self.type]) then
+                local curState = db.pop_rules[self.type].alwaysOther and "other" or curState
+		return db.pop_rules[self.type][curState];
+	else
+                return db.pop_rules.whisper.other;
+        end
+    end
+    
     -- PopUp rules
-    obj.Pop = function(self, msgDirection, forceResult) -- true to force show, false it ignore rules and force quiet.
+    obj.Pop = function(self, msgDirection, forceResult, forceFocus) -- true to force show, false it ignore rules and force quiet.
 	-- account for variable arguments.
 	if(type(msgDirection) ~= "string" and type(msgDirection) == "boolean") then
-		forceResult = msgDirection;
+		forceResult, forceFocus = msgDirection, forceResult;
 		msgDirection = "in";
 	elseif(msgDirection == nil) then
 		msgDirection = "in";
 	end
+        
+	local rules = self:GetRuleSet(); -- defaults incase unknown
     
 	-- pass isNew to pop ruleset.
 	if(forceResult ~= nil) then
@@ -744,9 +755,15 @@ local function instantiateWindow(obj)
 			setWindowAsFadedIn(self);
 			if(self.tabStrip) then
 				self.tabStrip:JumpToTabName(self.theUser);
+                                if(rules.autofocus or forceFocus) then
+                                        self.widgets.msg_box:SetFocus();
+                                end
 			else
 				self:ResetAnimation();
 				self:Show();
+                                if((not EditBoxInFocus and rules.autofocus) or forceFocus) then
+                                        self.widgets.msg_box:SetFocus();
+                                end
 				local count = 0;
 				for i=1, #WindowSoupBowl.windows do
 					count = WindowSoupBowl.windows[i].obj:IsShown() and count + 1 or count;
@@ -760,22 +777,19 @@ local function instantiateWindow(obj)
 		end
 	else
 		-- execute pop rules.
-                local curState = curState;
-		local rules; -- defaults incase unknown
-		if(db.pop_rules[self.type]) then
-                        curState = db.pop_rules[self.type].alwaysOther and "other" or curState
-			rules = db.pop_rules[self.type][curState];
-		else
-                        rules = db.pop_rules.whisper.other;
-                end
 		if((rules.onSend and msgDirection == "out") or (rules.onReceive and msgDirection == "in")) then 
 			setWindowAsFadedIn(self);
 			if(self.tabStrip) then
 				self:ResetAnimation();
-				self.tabStrip:JumpToTabName(self.theUser);
+                                if(EditBoxInFocus ~= self.tabStrip.selected.obj.widgets.msg_box) then
+        				self.tabStrip:JumpToTabName(self.theUser);
+                                end
 			else
 				self:ResetAnimation();
 				self:Show();
+                                if(not EditBoxInFocus and rules.autofocus) then
+                                        self.widgets.msg_box:SetFocus();
+                                end
 			end
 		end
 	end
@@ -1283,11 +1297,20 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEnterPressed", function(
 			self:SetText("");
 			EditBoxInFocus = self;
 		else
-			if(self:GetText() == "") then
+                        if(self:GetText() == "") then
 				self:Hide();
 				self:Show();
+                                return;
 			end
-		end
+                end
+                -- keep focus or not
+                if(self:GetParent():GetRuleSet().keepfocus) then
+                        self:SetFocus();
+                else
+                        self:Hide();
+			self:Show();
+                end
+                
 	end);
 	
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEscapePressed", function(self)

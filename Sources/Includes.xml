@@ -8,6 +8,7 @@
     <script file="TabHandler.lua" />
     <Script file="Hooks.lua" />
     <Script file="SlashHandler.lua" />
+    <Script file="Stewmat.lua" />
     
     <Script file="Options\Options.lua" />
     <Script file="Options\OptionsTookKit.lua" />
