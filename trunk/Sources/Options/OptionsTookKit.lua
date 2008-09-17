@@ -86,6 +86,9 @@ local function CreateDropDownMenu(parent, dbTree, varName, itemList, width)
             _G.UIDropDownMenu_Initialize(self, self.init);
             _G.UIDropDownMenu_SetSelectedValue(self, dbTree[varName]);
         end);
+    menu.SetValue = function(self, value)
+            _G.UIDropDownMenu_SetSelectedValue(self, value);
+        end;
     SetNextAnchor(menu);
     menu:Hide(); menu:Show();
     _G.test = menu
@@ -105,7 +108,11 @@ local function CreateCheckButton(parent, title, dbTree, varName, tooltip, valCha
     cb.text:SetText("  "..tostring(title));
     cb.text:SetFontObject(DefaultFont);
     cb:SetScript("OnShow", function(self)
-            self:SetChecked(dbTree[varName]);
+            local dbTbl = dbTree;
+            if(type(dbTree) == "function") then
+                dbTbl = dbTree();
+            end
+            self:SetChecked(dbTbl[varName]);
             self:UpdateChildren();
         end);
     cb:SetScript("OnClick", function(self, button)
@@ -117,7 +124,11 @@ local function CreateCheckButton(parent, title, dbTree, varName, tooltip, valCha
                     self.children[i]:Disable(self);
                 end
             end
-            dbTree[varName] = self:GetChecked();
+            local dbTbl = dbTree;
+            if(type(dbTree) == "function") then
+                dbTbl = dbTree();
+            end
+            dbTbl[varName] = self:GetChecked();
             if(type(valChanged) == "function") then
                 valChanged(self, button);
             end

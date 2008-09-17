@@ -18,6 +18,14 @@ WIM.AddLocale("enUS", {
     ["Click to update..."] = true,
     ["Usage"] = true,
     
+    ["state_resting"] = "Resting",
+    ["state_combat"] = "Combat",
+    ["state_pvp"] = "PVP",
+    ["state_arena"] = "Arena",
+    ["state_party"] = "Party Instance",
+    ["state_raid"] = "Raid Instance",
+    ["state_other"] = "Normal (Other)",
+    
     ["<Shift-Click> to close window."] = true,
     
     ["A new version of WIM is available!\nYou can download the latest version by going to:\n\n http://www.wimaddon.com"] = true,
