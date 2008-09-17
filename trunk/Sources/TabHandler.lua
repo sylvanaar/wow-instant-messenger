@@ -321,7 +321,6 @@ local function createTabGroup()
 		end
 	end
         self.visibleCount = count;
-        local selectedStyle = GetSelectedStyle();
         for i=1,tabsPerStrip do
             if(i <= count) then
                 local str = self.attached[i+self.curOffset];
@@ -331,10 +330,10 @@ local function createTabGroup()
                 self.tabs[i].text:SetText(str);
                 if(self.tabs[i].childObj == self.selected.obj) then
                     self.tabs[i]:SetAlpha(1);
-                    self.tabs[i]:SetTexture(skinTable.files.tabs.selected[selectedStyle]);
+                    self.tabs[i]:SetTexture(skinTable.textures.selected);
                 else
                     self.tabs[i]:SetAlpha(.7);
-                    self.tabs[i]:SetTexture(skinTable.files.tabs.normal[selectedStyle]);
+                    self.tabs[i]:SetTexture(skinTable.textures.normal);
                 end
             else
                 self.tabs[i]:Hide();

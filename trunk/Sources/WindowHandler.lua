@@ -1178,28 +1178,23 @@ RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnClick", function(self)
 	end);
 	
 RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnUpdate", function(self)
+                local SelectedSkin = WIM:GetSelectedSkin();
 		if(GetMouseFocus() == self) then
 			if(IsShiftKeyDown() and self.curTextureIndex == 1) then
-				local SelectedSkin = GetSelectedSkin();
-				local SelectedStyle = GetSelectedStyle(self.parentWindow);
-				self:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_close.NormalTexture[SelectedStyle] or SelectedSkin.message_window.widgets.close.state_close.NormalTexture[SelectedSkin.default_style]);
-				self:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_close.PushedTexture[SelectedStyle] or SelectedSkin.message_window.widgets.close.state_close.PushedTexture[SelectedSkin.default_style]);
-				self:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_close.HighlightTexture[SelectedStyle] or SelectedSkin.message_window.widgets.close.state_close.HighlightTexture[SelectedSkin.default_style], SelectedSkin.message_window.widgets.close.state_close.HighlightAlphaMode);
+				self:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_close.NormalTexture);
+				self:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_close.PushedTexture);
+				self:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_close.HighlightTexture, SelectedSkin.message_window.widgets.close.state_close.HighlightAlphaMode);
 				self.curTextureIndex = 2;
 			elseif(not IsShiftKeyDown() and self.curTextureIndex == 2) then
-				local SelectedSkin = GetSelectedSkin();
-				local SelectedStyle = GetSelectedStyle(self.parentWindow);
-				self:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_hide.NormalTexture[SelectedStyle] or SelectedSkin.message_window.widgets.close.state_hide.NormalTexture[SelectedSkin.default_style]);
-				self:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_hide.PushedTexture[SelectedStyle] or SelectedSkin.message_window.widgets.close.state_hide.PushedTexture[SelectedSkin.default_style]);
-				self:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_hide.HighlightTexture[SelectedStyle] or SelectedSkin.message_window.widgets.close.state_hide.HighlightTexture[SelectedSkin.default_style], SelectedSkin.message_window.widgets.close.state_hide.HighlightAlphaMode);
+				self:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_hide.NormalTexture);
+				self:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_hide.PushedTexture);
+				self:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_hide.HighlightTexture, SelectedSkin.message_window.widgets.close.state_hide.HighlightAlphaMode);
 				self.curTextureIndex = 1;
 			end
 		elseif(self.curTextureIndex == 2) then
-			local SelectedSkin = WIM:GetSelectedSkin();
-			local SelectedStyle = WIM:GetSelectedStyle(self.parentWindow);
-			self:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_hide.NormalTexture[SelectedStyle] or SelectedSkin.message_window.widgets.close.state_hide.NormalTexture[SelectedSkin.default_style]);
-			self:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_hide.PushedTexture[SelectedStyle] or SelectedSkin.message_window.widgets.close.state_hide.PushedTexture[SelectedSkin.default_style]);
-			self:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_hide.HighlightTexture[SelectedStyle] or SelectedSkin.message_window.widgets.close.state_hide.HighlightTexture[SelectedSkin.default_style], SelectedSkin.message_window.widgets.close.state_hide.HighlightAlphaMode);
+			self:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_hide.NormalTexture);
+			self:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_hide.PushedTexture);
+			self:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_hide.HighlightTexture, SelectedSkin.message_window.widgets.close.state_hide.HighlightAlphaMode);
 			self.curTextureIndex = 1;
 		end
 	end);
