@@ -13,24 +13,8 @@ local WIM_ClassicSkin = {
     version = "1.0.0",
     author = "Pazza [Bronzebeard]",
     website = "http://www.wimaddon.com",
-    default_style = "default",
-    default_font = "ChatFontNormal",
-    smart_style = nil, -- acknowledge that this parameter exists although not needed.
-    styles = {
-        default = "Default",
-        blue = "Blue",
-        green = "Green",
-        red = "Red",
-        yellow = "Yellow"
-    },
     message_window = {
-        file = {
-            default = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window",
-            blue = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window_blue",
-            green = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window_green",
-            red = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window_red",
-            yellow = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window_yellow"
-        },
+        texture = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window",
         min_width = 256,
         min_height = 128,
         backdrop = {
@@ -81,13 +65,7 @@ local WIM_ClassicSkin = {
         },
         widgets = {
             class_icon = {
-                file = {
-                    default = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
-                    blue = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
-                    green = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
-                    red = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
-                    yellow = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons"
-                },
+                texture = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\class_icons",
                 width = 64,
                 height = 64,
                 points = {
@@ -127,51 +105,15 @@ local WIM_ClassicSkin = {
             },
             close = {
                 state_hide = {
-                    NormalTexture = {
-                        default = "Interface\\Minimap\\UI-Minimap-MinimizeButtonDown-Up",
-                        blue = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Up",
-                        green = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Up",
-                        red = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Up",
-                        yellow = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Up"
-                    },
-                    PushedTexture = {
-                        default = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Down",
-                        blue = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Down",
-                        green = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Down",
-                        red = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Down",
-                        yellow = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Down"
-                    },
-                    HighlightTexture = {
-                        default = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
-                        blue = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
-                        green = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
-                        red = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
-                        yellow = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight"
-                    },
+                    NormalTexture = "Interface\\Minimap\\UI-Minimap-MinimizeButtonDown-Up",
+                    PushedTexture = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Down",
+                    HighlightTexture = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
                     HighlightAlphaMode = "ADD"
                 },
                 state_close = {
-                    NormalTexture = {
-                        default = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
-                        blue = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
-                        green = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
-                        red = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
-                        yellow = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up"
-                    },
-                    PushedTexture = {
-                        default = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
-                        blue = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
-                        green = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
-                        red = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
-                        yellow = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down"
-                    },
-                    HighlightTexture = {
-                        default = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
-                        blue = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
-                        green = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
-                        red = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
-                        yellow = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight"
-                    },
+                    NormalTexture = "Interface\\Buttons\\UI-Panel-MinimizeButton-Up",
+                    PushedTexture = "Interface\\Buttons\\UI-Panel-MinimizeButton-Down",
+                    HighlightTexture = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
                     HighlightAlphaMode = "ADD"
                 },
                 width = 32,
@@ -181,27 +123,9 @@ local WIM_ClassicSkin = {
                 }
             },
             history = {
-                NormalTexture = {
-                    default = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
-                    blue = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
-                    green = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
-                    red = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
-                    yellow = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up"
-                },
-                PushedTexture = {
-                    default = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
-                    blue = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
-                    green = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
-                    red = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
-                    yellow = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up"
-                },
-                HighlightTexture = {
-                    default = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
-                    blue = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
-                    green = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
-                    red = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
-                    yellow = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up"
-                },
+                NormalTexture = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
+                PushedTexture = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
+                HighlightTexture = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
                 HighlightAlphaMode = "ADD",
                 rect = {
                     size = {
@@ -216,27 +140,9 @@ local WIM_ClassicSkin = {
                 }
             },
             w2w = {
-                NormalTexture = {
-                    default = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                    blue = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                    green = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                    red = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                    yellow = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga"
-                },
-                PushedTexture = {
-                    default = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                    blue = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                    green = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                    red = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                    yellow = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga"
-                },
-                HighlightTexture = {
-                    default = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                    blue = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                    green = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                    red = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                    yellow = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga"
-                },
+                NormalTexture = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
+                PushedTexture = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
+                HighlightTexture = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
                 HighlightAlphaMode = "ADD",
                 rect = {
                     size = {
@@ -251,20 +157,8 @@ local WIM_ClassicSkin = {
                 }
             },
             chatting = {
-                NormalTexture = {
-                    default = "Interface\\GossipFrame\\PetitionGossipIcon",
-                    blue = "Interface\\GossipFrame\\PetitionGossipIcon",
-                    green = "Interface\\GossipFrame\\PetitionGossipIcon",
-                    red = "Interface\\GossipFrame\\PetitionGossipIcon",
-                    yellow = "Interface\\GossipFrame\\PetitionGossipIcon"
-                },
-                PushedTexture = {
-                    default = "Interface\\GossipFrame\\PetitionGossipIcon",
-                    blue = "Interface\\GossipFrame\\PetitionGossipIcon",
-                    green = "Interface\\GossipFrame\\PetitionGossipIcon",
-                    red = "Interface\\GossipFrame\\PetitionGossipIcon",
-                    yellow = "Interface\\GossipFrame\\PetitionGossipIcon"
-                },
+                NormalTexture = "Interface\\GossipFrame\\PetitionGossipIcon",
+                PushedTexture = "Interface\\GossipFrame\\PetitionGossipIcon",
                 rect = {
                     size = {
                         x = 16,
@@ -278,84 +172,38 @@ local WIM_ClassicSkin = {
                 }
             },
             scroll_up = {
-                NormalTexture = {
-                    default = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up",
-                    blue = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up",
-                    green = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up",
-                    red = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up",
-                    yellow = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up"
-                },
-                PushedTexture = {
-                    default = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Down",
-                    blue = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Down",
-                    green = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Down",
-                    red = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Down",
-                    yellow = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Down"
-                },
-                HighlightTexture = {
-                    default = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Highlight",
-                    blue = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Highlight",
-                    green = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Highlight",
-                    red = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Highlight",
-                    yellow = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Highlight"
-                },
-                DisabledTexture = {
-                    default = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Disabled",
-                    blue = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Disabled",
-                    green = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Disabled",
-                    red = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Disabled",
-                    yellow = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Disabled"
-                },
+                NormalTexture = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Up",
+                PushedTexture = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Down",
+                HighlightTexture = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Highlight",
+                DisabledTexture = "Interface\\Buttons\\UI-ScrollBar-ScrollUpButton-Disabled",
                 HighlightAlphaMode = "ADD",
                 width = 32,
                 height = 32,
                 points = {
                     {"TOPRIGHT", "window", "TOPRIGHT", -4, -39}
-                },
+                }
             },
             scroll_down = {
-                NormalTexture = {
-                    default = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Up",
-                    blue = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Up",
-                    green = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Up",
-                    red = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Up",
-                    yellow = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Up"
-                },
-                PushedTexture = {
-                    default = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Down",
-                    blue = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Down",
-                    green = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Down",
-                    red = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Down",
-                    yellow = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Down"
-                },
-                HighlightTexture = {
-                    default = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Highlight",
-                    blue = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Highlight",
-                    green= "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Highlight",
-                    red = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Highlight",
-                    yellow = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Highlight"
-                },
-                DisabledTexture = {
-                    default = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Disabled",
-                    blue = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Disabled",
-                    green = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Disabled",
-                    red = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Disabled",
-                    yellow = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Disabled"
-                },
+                NormalTexture = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Up",
+                PushedTexture = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Down",
+                HighlightTexture = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Highlight",
+                DisabledTexture = "Interface\\Buttons\\UI-ScrollBar-ScrollDownButton-Disabled",
                 HighlightAlphaMode = "ADD",
                 width = 32,
                 height = 32,
                 points = {
                     {"BOTTOMRIGHT", "window", "BOTTOMRIGHT", -4, 24}
-                },
+                }
             },
             chat_display = {
                 points = {
                     {"TOPLEFT", "window", "TOPLEFT", 24, -46},
                     {"BOTTOMRIGHT", "window", "BOTTOMRIGHT", -38, 39}
                 },
+                font = "ChatFontNormal"
             },
             msg_box = {
+                font = "ChatFontNormal",
                 font_height = 14,
                 font_color = {1,1,1},
                 points = {
@@ -364,13 +212,7 @@ local WIM_ClassicSkin = {
                 },
             },
             resize = {
-                NormalTexture = {
-                    default = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\resize",
-                    blue = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\resize",
-                    green = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\resize",
-                    red = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\resize",
-                    yellow = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\resize"
-                },
+                NormalTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\resize",
                 width = 25,
                 height = 25,
                 points = {
@@ -393,18 +235,10 @@ local WIM_ClassicSkin = {
         },
     },
     tab_strip = {
-        files = {
-            tabs = {
-                normal = {
-                    default = "Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_normal"
-                },
-                selected = {
-                    default = "Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_selected"
-                },
-                hover = {
-                    default = ""
-                }
-            },
+        textures = {
+            normal = "Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_normal",
+            selected = "Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_selected",
+            hover = ""
         },
 
         height = 32,

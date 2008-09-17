@@ -17,13 +17,11 @@ setfenv(1, WIM);
 
 db_defaults.skin = {
     selected = "WIM Classic",
-    style = "default",
     font = "ChatFontNormal",
     font_outline = ""
 };
 
 local SelectedSkin;
-local SelectedStyle = "default";
 
 local SkinTemplate = {}; -- for inherritence excluding default styles.
 
@@ -38,11 +36,6 @@ local WindowSoupBowl = WIM:GetWindowSoupBowl();
 
 local ProtectedSkinKeys = {
     points = "nil",
-    file = "style",
-    NormalTexture = "style",
-    PushedTexture = "style",
-    DisabledTexture = "style",
-    HighlightTexture = "style",
     font = "nil",
     font_height = "nil",
     font_flags = "nil",
@@ -148,65 +141,64 @@ function ApplySkinToWindow(obj)
     end
     
     local SelectedSkin = WIM:GetSelectedSkin();
-    local SelectedStyle = WIM:GetSelectedStyle(obj);
     
     obj:SetMinResize(SelectedSkin.message_window.min_width, SelectedSkin.message_window.min_height);
     
     --set backdrop edges and background textures.
     local tl = obj.widgets.Backdrop.tl;
-    tl:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
+    tl:SetTexture(SelectedSkin.message_window.texture);
     tl:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.top_left.texture_coord));
     tl:ClearAllPoints();
     tl:SetPoint("TOPLEFT", fName.."Backdrop", "TOPLEFT", unpack(SelectedSkin.message_window.backdrop.top_left.offset));
     tl:SetWidth(SelectedSkin.message_window.backdrop.top_left.width);
     tl:SetHeight(SelectedSkin.message_window.backdrop.top_left.height);
     local tr = obj.widgets.Backdrop.tr;
-    tr:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
+    tr:SetTexture(SelectedSkin.message_window.texture);
     tr:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.top_right.texture_coord));
     tr:ClearAllPoints();
     tr:SetPoint("TOPRIGHT", fName.."Backdrop", "TOPRIGHT", unpack(SelectedSkin.message_window.backdrop.top_right.offset));
     tr:SetWidth(SelectedSkin.message_window.backdrop.top_right.width);
     tr:SetHeight(SelectedSkin.message_window.backdrop.top_right.height);
     local bl = obj.widgets.Backdrop.bl;
-    bl:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
+    bl:SetTexture(SelectedSkin.message_window.texture);
     bl:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.bottom_left.texture_coord));
     bl:ClearAllPoints();
     bl:SetPoint("BOTTOMLEFT", fName.."Backdrop", "BOTTOMLEFT", unpack(SelectedSkin.message_window.backdrop.bottom_left.offset));
     bl:SetWidth(SelectedSkin.message_window.backdrop.bottom_left.width);
     bl:SetHeight(SelectedSkin.message_window.backdrop.bottom_left.height);
     local br = obj.widgets.Backdrop.br;
-    br:SetTexture(SelectedSkin.message_window.file[SelectedStyle]);
+    br:SetTexture(SelectedSkin.message_window.texture);
     br:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.bottom_right.texture_coord));
     br:ClearAllPoints();
     br:SetPoint("BOTTOMRIGHT", fName.."Backdrop", "BOTTOMRIGHT", unpack(SelectedSkin.message_window.backdrop.bottom_right.offset));
     br:SetWidth(SelectedSkin.message_window.backdrop.bottom_right.width);
     br:SetHeight(SelectedSkin.message_window.backdrop.bottom_right.height);
     local t = obj.widgets.Backdrop.t;
-    t:SetTexture(SelectedSkin.message_window.file[SelectedStyle], SelectedSkin.message_window.backdrop.top.tile or nil);
+    t:SetTexture(SelectedSkin.message_window.texture, SelectedSkin.message_window.backdrop.top.tile or nil);
     t:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.top.texture_coord));
     t:ClearAllPoints();
     t:SetPoint("TOPLEFT", fName.."Backdrop_TL", "TOPRIGHT", 0, 0);
     t:SetPoint("BOTTOMRIGHT", fName.."Backdrop_TR", "BOTTOMLEFT", 0, 0);
     local b = obj.widgets.Backdrop.b;
-    b:SetTexture(SelectedSkin.message_window.file[SelectedStyle], SelectedSkin.message_window.backdrop.bottom.tile or nil);
+    b:SetTexture(SelectedSkin.message_window.texture, SelectedSkin.message_window.backdrop.bottom.tile or nil);
     b:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.bottom.texture_coord));
     b:ClearAllPoints();
     b:SetPoint("TOPLEFT", fName.."Backdrop_BL", "TOPRIGHT", 0, 0);
     b:SetPoint("BOTTOMRIGHT", fName.."Backdrop_BR", "BOTTOMLEFT", 0, 0);
     local l = obj.widgets.Backdrop.l;
-    l:SetTexture(SelectedSkin.message_window.file[SelectedStyle], SelectedSkin.message_window.backdrop.left.tile or nil);
+    l:SetTexture(SelectedSkin.message_window.texture, SelectedSkin.message_window.backdrop.left.tile or nil);
     l:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.left.texture_coord));
     l:ClearAllPoints();
     l:SetPoint("TOPLEFT", fName.."Backdrop_TL", "BOTTOMLEFT", 0, 0);
     l:SetPoint("BOTTOMRIGHT", fName.."Backdrop_BL", "TOPRIGHT", 0, 0);
     local r = obj.widgets.Backdrop.r;
-    r:SetTexture(SelectedSkin.message_window.file[SelectedStyle], SelectedSkin.message_window.backdrop.right.tile or nil);
+    r:SetTexture(SelectedSkin.message_window.texture, SelectedSkin.message_window.backdrop.right.tile or nil);
     r:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.right.texture_coord));
     r:ClearAllPoints();
     r:SetPoint("TOPLEFT", fName.."Backdrop_TR", "BOTTOMLEFT", 0, 0);
     r:SetPoint("BOTTOMRIGHT", fName.."Backdrop_BR", "TOPRIGHT", 0, 0);
     local bg = obj.widgets.Backdrop.bg;
-    bg:SetTexture(SelectedSkin.message_window.file[SelectedStyle], SelectedSkin.message_window.backdrop.background.tile or nil);
+    bg:SetTexture(SelectedSkin.message_window.texture, SelectedSkin.message_window.backdrop.background.tile or nil);
     bg:SetTexCoord(unpack(SelectedSkin.message_window.backdrop.background.texture_coord));
     bg:ClearAllPoints();
     bg:SetPoint("TOPLEFT", fName.."Backdrop_TL", "BOTTOMRIGHT", 0, 0);
@@ -215,7 +207,7 @@ function ApplySkinToWindow(obj)
     --set class icon
     local class_icon = obj.widgets.class_icon;
     ApplySkinToWidget(class_icon);
-    class_icon:SetTexture(SelectedSkin.message_window.widgets.class_icon.file[SelectedStyle]);
+    class_icon:SetTexture(SelectedSkin.message_window.widgets.class_icon.texture);
     --WIM_UpdateMessageWindowClassIcon(obj);
     
     --set from font
@@ -231,43 +223,14 @@ function ApplySkinToWindow(obj)
     ApplySkinToWidget(close);
     -- close button is a special case... so do the following extra work.
     if(close.curTextureIndex == 1) then
-        close:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_hide.NormalTexture[SelectedStyle]);
-        close:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_hide.PushedTexture[SelectedStyle]);
-        close:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_hide.HighlightTexture[SelectedStyle], SelectedSkin.message_window.widgets.close.state_hide.HighlightAlphaMode);
+        close:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_hide.NormalTexture);
+        close:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_hide.PushedTexture);
+        close:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_hide.HighlightTexture, SelectedSkin.message_window.widgets.close.state_hide.HighlightAlphaMode);
     else
-        close:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_close.NormalTexture[SelectedStyle]);
-        close:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_close.PushedTexture[SelectedStyle]);
-        close:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_close.HighlightTexture[SelectedStyle], SelectedSkin.message_window.widgets.close.state_close.HighlightAlphaMode);
+        close:SetNormalTexture(SelectedSkin.message_window.widgets.close.state_close.NormalTexture);
+        close:SetPushedTexture(SelectedSkin.message_window.widgets.close.state_close.PushedTexture);
+        close:SetHighlightTexture(SelectedSkin.message_window.widgets.close.state_close.HighlightTexture, SelectedSkin.message_window.widgets.close.state_close.HighlightAlphaMode);
     end
-    
-    --history button
-    --local history = getglobal(fName.."HistoryButton");
-    --history:ClearAllPoints();
-    --history:SetPoint(SelectedSkin.message_window.buttons.history.rect.anchor, fName, SelectedSkin.message_window.buttons.history.rect.anchor, SelectedSkin.message_window.buttons.history.rect.offset.x, SelectedSkin.message_window.buttons.history.rect.offset.y);
-    --history:SetWidth(SelectedSkin.message_window.buttons.history.rect.size.x);
-    --history:SetHeight(SelectedSkin.message_window.buttons.history.rect.size.y);
-    --history:SetNormalTexture(SelectedSkin.message_window.buttons.history.NormalTexture[SelectedStyle]);
-    --history:SetPushedTexture(SelectedSkin.message_window.buttons.history.PushedTexture[SelectedStyle]);
-    --history:SetHighlightTexture(SelectedSkin.message_window.buttons.history.HighlightTexture[SelectedStyle], SelectedSkin.message_window.buttons.history.HighlightAlphaMode);
-    
-    --w2w button
-    --local w2w = getglobal(fName.."W2WButton");
-    --w2w:ClearAllPoints();
-    --w2w:SetPoint(SelectedSkin.message_window.buttons.w2w.rect.anchor, fName, SelectedSkin.message_window.buttons.w2w.rect.anchor, SelectedSkin.message_window.buttons.w2w.rect.offset.x, SelectedSkin.message_window.buttons.w2w.rect.offset.y);
-    --w2w:SetWidth(SelectedSkin.message_window.buttons.w2w.rect.size.x);
-    --w2w:SetHeight(SelectedSkin.message_window.buttons.w2w.rect.size.y);
-    --w2w:SetNormalTexture(SelectedSkin.message_window.buttons.w2w.NormalTexture[SelectedStyle]);
-    --w2w:SetPushedTexture(SelectedSkin.message_window.buttons.w2w.PushedTexture[SelectedStyle]);
-    --w2w:SetHighlightTexture(SelectedSkin.message_window.buttons.w2w.HighlightTexture[SelectedStyle], SelectedSkin.message_window.buttons.w2w.HighlightAlphaMode);
-    
-    --chatting button
-    --local chatting = getglobal(fName.."IsChattingButton");
-    --chatting:ClearAllPoints();
-    --chatting:SetPoint(SelectedSkin.message_window.buttons.chatting.rect.anchor, fName, SelectedSkin.message_window.buttons.chatting.rect.anchor, SelectedSkin.message_window.buttons.chatting.rect.offset.x, SelectedSkin.message_window.buttons.chatting.rect.offset.y);
-    --chatting:SetWidth(SelectedSkin.message_window.buttons.chatting.rect.size.x);
-    --chatting:SetHeight(SelectedSkin.message_window.buttons.chatting.rect.size.y);
-    --chatting:SetNormalTexture(SelectedSkin.message_window.buttons.chatting.NormalTexture[SelectedStyle]);
-    --chatting:SetPushedTexture(SelectedSkin.message_window.buttons.chatting.PushedTexture[SelectedStyle]);
     
     --scroll_up button
     local scroll_up = obj.widgets.scroll_up;
@@ -344,33 +307,14 @@ function GetSelectedStyle(obj)
     return SelectedStyle;
 end
 
-function LoadSkin(skinName, style)
+function LoadSkin(skinName)
     if(skinName == nil or (not SkinTable[skinName])) then
         skinName = "WIM Classic";
-        style = SkinTable[skinName].default_style;
     end
-    if(style == nil or (not SkinTable[skinName].styles[style])) then
-        if(style == "#SMART#" and SkinTable[skinName].smart_style) then
-            -- do nothing here. we want the #SMART# style to pass...
-        else
-            style = SkinTable[skinName].default_style;
-        end
-    end
+    
     SelectedSkin = SkinTable[skinName];
-    SelectedStyle = style;
     
     db.skin.selected = skinName;
-    db.skin.style = style;
-    
-    -- apply skin to tabs
-    --WIM_Tabs.anchorSelf = SkinTable[skinName].tab_strip.rect.anchor_points.self;
-    --WIM_Tabs.anchorRelative = SkinTable[skinName].tab_strip.rect.anchor_points.relative;
-    --WIM_Tabs.topOffset = SkinTable[skinName].tab_strip.rect.offsets.top;
-    --WIM_Tabs.marginLeft = SkinTable[skinName].tab_strip.rect.offsets.margins.left;
-    --WIM_Tabs.marginRight = SkinTable[skinName].tab_strip.rect.offsets.margins.right;
-    --if(WIM_Windows[WIM_Tabs.selectedUser]) then
-    --    WIM_JumpToUserTab(WIM_Tabs.selectedUser);
-    --end
     
     SKIN_DEBUG = SKIN_DEBUG..skinName.." loaded..\n";
     -- apply skin to window objects
@@ -403,7 +347,6 @@ function RegisterSkin(skinTable)
     local required = {"title", "author", "version"};
     local error_list = "";
     local addonName;
-    local styles = {};
     
     local stack = {string.split("\n", debugstack())};
     if(table.getn(stack) >= 2) then
@@ -416,21 +359,7 @@ function RegisterSkin(skinTable)
     for i=1,table.getn(required) do
         if(skinTable[required[i]] == nil or skinTable[required[i]] == "") then error_list = error_list.."- Required field '"..required[i].."' was not defined.\n"; end
     end
-
-    if(skinTable.styles == nil) then
-        error_list = error_list.."- Skin must have at least one style defined!\n";
-    else
-        local style, title;
-        for style,title in pairs(skinTable.styles) do
-            if(style and title and title ~= "") then
-                if(not skinTable.default_style) then skinTable.default_style = style; end
-                table.insert(styles, style);
-            end
-        end
-        if(table.getn(styles) == 0) then error_list = error_list.."- Skin must have at least one style defined!\n"; end
-    end
     
-    if(not skinTable.default_font) then skinTable.default_font = SkinTable["WIM Classic"].default_font; end
     
     if(error_list ~= "") then
         SKIN_DEBUG = SKIN_DEBUG.."\n\n---------------------------------------------------------\nSKIN ERROR FROM: "..addonName.."\n---------------------------------------------------------\n";
@@ -441,7 +370,7 @@ function RegisterSkin(skinTable)
     if(skinTable.title == "WIM Classic") then
         SkinTable[skinTable.title] = skinTable;
         if(skinTable.title == db.skin.selected) then
-            LoadSkin(WIM.db.skin.selected, db.skin.style);
+            LoadSkin(WIM.db.skin.selected);
         end
         
         populateFemaleClassInfo(SkinTable[skinTable.title]);
@@ -463,7 +392,7 @@ function RegisterSkin(skinTable)
     
     -- if this is the selected skin, load it now
     if(skinTable.title == WIM.db.skin.selected) then
-        LoadSkin(WIM.db.skin.selected, WIM.db.skin.style);
+        LoadSkin(WIM.db.skin.selected, WIM.db.skin);
     end
 end
 
@@ -514,14 +443,13 @@ function ApplySkinToWidget(obj)
     if(obj.GetObjectType) then
         local SelectedSkin = GetSelectedSkin();
         local widgetSkin = SelectedSkin.message_window.widgets[obj.widgetName] or obj.defaultSkin;
-        local SelectedStyle = GetSelectedStyle();
         local oType = obj:GetObjectType();
         SetWidgetRect(obj, widgetSkin);
         if(oType == "Button" or oType == "CheckButton") then
-            if(widgetSkin.NormalTexture) then obj:SetNormalTexture(widgetSkin.NormalTexture[SelectedStyle] or widgetSkin.NormalTexture[SelectedSkin.default_style]); end
-            if(widgetSkin.PushedTexture) then obj:SetPushedTexture(widgetSkin.PushedTexture[SelectedStyle] or widgetSkin.PushedTexture[SelectedSkin.default_style]); end
-            if(widgetSkin.DisabledTexture) then obj:SetDisabledTexture(widgetSkin.DisabledTexture[SelectedStyle] or widgetSkin.DisabledTexture[SelectedSkin.default_style]); end
-            if(widgetSkin.HighlightTexture) then obj:SetHighlightTexture(widgetSkin.HighlightTexture[SelectedStyle] or widgetSkin.HighlightTexture[SelectedSkin.default_style], widgetSkin.HighlightAlphaMode); end
+            if(widgetSkin.NormalTexture) then obj:SetNormalTexture(widgetSkin.NormalTexture); end
+            if(widgetSkin.PushedTexture) then obj:SetPushedTexture(widgetSkin.PushedTexture); end
+            if(widgetSkin.DisabledTexture) then obj:SetDisabledTexture(widgetSkin.DisabledTexture); end
+            if(widgetSkin.HighlightTexture) then obj:SetHighlightTexture(widgetSkin.HighlightTexture, widgetSkin.HighlightAlphaMode); end
         end
         if(oType == "FontString") then
             SetWidgetFont(obj, widgetSkin);

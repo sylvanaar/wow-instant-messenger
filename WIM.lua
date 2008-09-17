@@ -15,7 +15,7 @@ setfenv(1, WIM);
 addonTocName = "WIM_Rewrite";
 version = "3.0.0";
 beta = true; -- flags current version as beta.
-debug = true; -- turn debugging on and off.
+debug = false; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight
 isWOTLK = select(4, _G.GetBuildInfo()) >= 30000;
