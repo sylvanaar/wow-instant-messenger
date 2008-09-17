@@ -201,7 +201,7 @@ local function getNewEventTable(msgID)
     end
     local i;
     for i=1, #WhisperQueue_Bowl do
-        if(WhisperQueue_Bowl[i].argCount == 0) then
+        if(WhisperQueue_Bowl[i].event == nil) then
             if(msgID) then
                 WhisperQueue_Index[msgID] = WhisperQueue_Bowl[i];
             end
@@ -259,16 +259,17 @@ local function getNewEventTable(msgID)
                                 self.flags.supress = supress;
                         end
 
-    WhisperQueue_Index[msgID or arg1] = eventItem;
+    WhisperQueue_Index[msgID] = eventItem;
     return eventItem;
 end
 
 local function removeEventTable(index)
-    local i, eventItem = 0, WhisperQueue[index];
+    local eventItem = WhisperQueue[index];
     WhisperQueue_Index[eventItem.msgID] = nil;
-    for i=1, #eventItem.arg do
-        table.remove(eventItem.arg, 1);
+    for i, _ in pairs(eventItem.arg) do
+        eventItem.arg[i] = nil;
     end
+    eventItem.event = nil;
     eventItem.flags.suspend = false;
     eventItem.flags.block = false;
     eventItem.flags.ignore = false;
@@ -306,12 +307,12 @@ local function popEvents()
                             end
                     else
                             -- TBC
-                            local tthis, targ1, targ2, targ3, targ4, targ5, targ6, targ7, targ8, targ9, targ10, targ11 = this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11;
+                            local this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = _G.this, _G.arg1, _G.arg2, _G.arg3, _G.arg4, _G.arg5, _G.arg6, _G.arg7, _G.arg8, _G.arg9, _G.arg10, _G.arg11;
                             for j=1, #eventItem.ChatFrames do
-                                this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = eventItem.ChatFrames[j], unpack(eventItem.arg, 1, eventItem.argCount);
+                                _G.this, _G.arg1, _G.arg2, _G.arg3, _G.arg4, _G.arg5, _G.arg6, _G.arg7, _G.arg8, _G.arg9, _G.arg10, _G.arg11 = eventItem.ChatFrames[j], unpack(eventItem.arg, 1, eventItem.argCount);
                                 CF_MessageEventHandler_orig(eventItem.event);
                             end
-                            this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = tthis, targ1, targ2, targ3, targ4, targ5, targ6, targ7, targ8, targ9, targ10, targ11;
+                            _G.this, _G.arg1, _G.arg2, _G.arg3, _G.arg4, _G.arg5, _G.arg6, _G.arg7, _G.arg8, _G.arg9, _G.arg10, _G.arg11 = this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11;
                     end
                 end
             end
@@ -331,7 +332,7 @@ local function pushEvent(event, ...)
         return eventItem;
     end
     eventItem.event = event;
-    local i, argCount = 0, select("#", ...);
+    local argCount = select("#", ...);
     eventItem.argCount = argCount;
     for i=1, argCount do
         table.insert(eventItem.arg, select(i, ...) or nil);
@@ -341,7 +342,7 @@ local function pushEvent(event, ...)
     if(eventItem.argCount > 0) then
         if(eventItem.event == "CHAT_MSG_WHISPER") then
             CallModuleFunction("OnEvent_Whisper", eventItem);
-        else
+        elseif(eventItem.event == "CHAT_MSG_WHISPER_INFORM") then
             CallModuleFunction("OnEvent_WhisperInform", eventItem);
         end
     end
@@ -479,7 +480,7 @@ end
 CF_MessageEventHandler_orig = _G.ChatFrame_MessageEventHandler;
 local function CF_MessageEventHandler(self, event, ...)
     if(db and db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
-        local eventItem = WhisperQueue[select(11, ...)];
+        local eventItem = WhisperQueue_Index[select(11, ...)];
         if(eventItem) then
             addToTableUnique(eventItem.ChatFrames, self);
         else
@@ -492,12 +493,12 @@ local function CF_MessageEventHandler(self, event, ...)
 end
 local function CF_MessageEventHandlerTBC(event)
     if(db and db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
-        local eventItem = WhisperQueue[arg11];
+        local eventItem = WhisperQueue_Index[_G.arg11];
         if(eventItem) then
-            addToTableUnique(eventItem.ChatFrames, this);
+            addToTableUnique(eventItem.ChatFrames, _G.this);
         else
             eventItem = pushEvent(event, _G.arg1, _G.arg2, _G.arg3, _G.arg4, _G.arg5, _G.arg6, _G.arg7, _G.arg8, _G.arg9, _G.arg10, _G.arg11);
-            addToTableUnique(eventItem.ChatFrames, this);
+            addToTableUnique(eventItem.ChatFrames, _G.this);
         end
     else
         CF_MessageEventHandler_orig(event);
