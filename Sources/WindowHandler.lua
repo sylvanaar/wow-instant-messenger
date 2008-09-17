@@ -126,7 +126,7 @@ end
 local RegisteredWidgets = {}; -- a list of registered widgets added to windows from modules.
 windows.widgets = RegisteredWidgets;
 
--- Sample Widget with triggers
+--[[ Sample Widget with triggers
 RegisteredWidgets["Test"] = function(parentWindow)
 	_G.DEFAULT_CHAT_FRAME:AddMessage("Test Widget created!");
 	local t = CreateFrame("Frame");
@@ -138,6 +138,7 @@ RegisteredWidgets["Test"] = function(parentWindow)
 		end
 	return t;
 end
+]]
 
 local windowListByLevel_Recycle = {};
 local function getActiveWindowListByLevel()
@@ -539,7 +540,6 @@ local function loadRegisteredWidgets(obj)
 				if(type(widgets[widget].SetDefaults) == "function") then
 					widgets[widget]:SetDefaults(); -- load defaults for this widget
 				end
-				PrepareDefaultSkin();
 			end
 		else
 			if(type(widgets[widget].SetDefaults) == "function") then
@@ -686,6 +686,7 @@ local function instantiateWindow(obj)
 	else
 		if(constants.classes[self.class]) then
 			classTag = string.lower(constants.classes[self.class].tag);
+                        classTag = string.gsub(classTag, "f$", "");
 		else
 			classTag = "blank";
 		end
@@ -694,7 +695,7 @@ local function instantiateWindow(obj)
     end
     
     obj.UpdateCharDetails = function(self)
-	self.widgets.char_info:SetText(GetSelectedSkin().message_window.widgets.char_info.format(self.guild, self.level, self.race, self.class));
+	self.widgets.char_info:SetText(GetSelectedSkin().message_window.widgets.char_info.format(self, self.guild, self.level, self.race, self.class));
     end
     
     obj.WhoCallback = function(result)
@@ -890,6 +891,8 @@ end
 -- load object into it's default state.
 local function loadWindowDefaults(obj)
 	obj:Hide();
+
+        obj.age = _G.time();
 
 	obj.lastActivity = time();
 

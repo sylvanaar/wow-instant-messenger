@@ -36,7 +36,9 @@ local function processCommand(cmd)
     else
         showCommands();
     end
-    DisplayTutorial(L["WIM Slash Commands"], L["To see a list of available WIM slash commands type:"].." |cff69ccf0/wim help|r");
+    if(cmd ~= "HELP") then
+        DisplayTutorial(L["WIM Slash Commands"], L["To see a list of available WIM slash commands type:"].." |cff69ccf0/wim help|r");
+    end
 end
 
 

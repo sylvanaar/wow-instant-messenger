@@ -34,80 +34,18 @@ local prematureRegisters = {};
 
 local WindowSoupBowl = WIM:GetWindowSoupBowl();
 
-local ProtectedSkinKeys = {
-    points = "nil",
-    font = "nil",
-    font_height = "nil",
-    font_flags = "nil",
-    inherrits_font = "nil",
-    width = "nil",
-    height = "nil"
-};
-
-local function configureDefaultStyleTable(tbl)
-    setmetatable(tbl, {__index = function(t, k)
-        return rawget(t, "default");
-    end});
-end
-
-local function prepareDefaultSkin(tbl)
-    tbl = type(tbl) == "table" and tbl or SkinTable["WIM Classic"];
-    for k, v in pairs(tbl) do
-        if(ProtectedSkinKeys[k] == "style") then
-            configureDefaultStyleTable(v);
-        elseif(type(v) == "table") then
-            prepareDefaultSkin(v);
-        end
-    end
-end
-
-local function configureStyleTable(k, src, dest, defaultStyle)
-    local t = (type(dest[k]) == "table") and dest[k] or {};
-    setmetatable(t, {__index = function(tbl, key)
-        return defaultStyle and rawget(tbl, defaultStyle) or src[k].default;
-    end})
-    return t;
-end
-
-local function preserveProtectedKeys(theKey, src, dest, defaultStyle)
-    local ttype = type(ProtectedSkinKeys[theKey])=="string" and ProtectedSkinKeys[theKey] or nil;
-    if(ttype) then
-        if(ttype == "table") then
-            return {}, true;
-        elseif(ttype == "style") then
-            return configureStyleTable(theKey, src, dest, defaultStyle), true;
-        else
-            return nil, true;
-        end
-    else
-        return nil, false;
-    end
-end
-
-local function linkSkinTable(src, dest, defaultStyle)
+local function linkSkinTable(src, dest)
         if(type(src) == "table") then
                 if(type(dest) ~= "table") then dest = {}; end
                 --clear current meta table if there is one.
                 setmetatable(dest, nil);
                 for k, v in pairs(src) do
-                        local val, ignoredKey = nil, false;
-                        defaultStyle = (k=="default_style") and v or defaultStyle;
-                        val, ignoredKey = preserveProtectedKeys(k, src, dest, defaultStyle);
-                        dest[k] = ignoredKey and val or dest[k];
-                        if(not ignoredKey and type(v) == "table") then
-                            linkSkinTable(v, dest[k], defaultStyle);
+                        if(not (k == "points" and type(dest[k]) == "table") and type(v) == "table") then
+                            linkSkinTable(v, dest[k]);
                         end
                 end
                 --setmetatable
-                setmetatable(dest, {__index = function(t, k)
-                    local val, ignoredKey = preserveProtectedKeys(k, src, dest);
-                    if(ignoredKey) then
-                        t[k] = val;
-                        return t[k];
-                    else
-                        return src[k];
-                    end
-                end});
+                setmetatable(dest, {__index = src});
         end
 end
 
@@ -252,17 +190,6 @@ function ApplySkinToWindow(obj)
     local font, height, flags = _G[db.skin.font]:GetFont();
     msg_box:SetFont(font, SelectedSkin.message_window.widgets.msg_box.font_height, WIM.db.skin.font_outline);
     msg_box:SetTextColor(SelectedSkin.message_window.widgets.msg_box.font_color[1], SelectedSkin.message_window.widgets.msg_box.font_color[2], SelectedSkin.message_window.widgets.msg_box.font_color[3]);
-    
-    --shorcuts
-    --local shortcuts = getglobal(fName.."ShortcutFrame");
-    --shortcuts:ClearAllPoints();
-    --shortcuts:SetPoint(SelectedSkin.message_window.shortcuts.rect.anchor, fName, SelectedSkin.message_window.shortcuts.rect.anchor, SelectedSkin.message_window.shortcuts.rect.offset.x, SelectedSkin.message_window.shortcuts.rect.offset.y);
-    --shortcuts:SetWidth(10);
-    --shortcuts:SetHeight(10);
-    --MessageWindow_ArrangeShortcutBar(shortcuts);
-    
-    --WIM_SetWindowProps(obj);
-    
 end
 
 local function deleteStyleFileEntries(theTable)
@@ -273,20 +200,6 @@ local function deleteStyleFileEntries(theTable)
     end
 end
 
-local function populateFemaleClassInfo(tbl)
-    tbl.message_window.widgets.class_icon["druidf"] = tbl.message_window.widgets.class_icon["druid"];
-    tbl.message_window.widgets.class_icon["hunterf"] = tbl.message_window.widgets.class_icon["hunter"];
-    tbl.message_window.widgets.class_icon["magef"] = tbl.message_window.widgets.class_icon["mage"];
-    tbl.message_window.widgets.class_icon["paladinf"] = tbl.message_window.widgets.class_icon["paladin"];
-    tbl.message_window.widgets.class_icon["priestf"] = tbl.message_window.widgets.class_icon["priest"];
-    tbl.message_window.widgets.class_icon["roguef"] = tbl.message_window.widgets.class_icon["rogue"];
-    tbl.message_window.widgets.class_icon["shamanf"] = tbl.message_window.widgets.class_icon["shaman"];
-    tbl.message_window.widgets.class_icon["warlockf"] = tbl.message_window.widgets.class_icon["warlock"];
-    tbl.message_window.widgets.class_icon["warriorf"] = tbl.message_window.widgets.class_icon["warrior"];
-end
-
-
-
 function RegisterPrematureSkins()
     for i=1,#prematureRegisters do
         RegisterSkin(prematureRegisters[i]);
@@ -295,16 +208,6 @@ end
 
 function GetSelectedSkin()
     return SelectedSkin or SkinTable["WIM Classic"];
-end
-
-function GetSelectedStyle(obj)
-    local SelectedSkin = GetSelectedSkin();
-    local SelectedStyle = SelectedStyle;
-    if(type(SelectedSkin.smart_style) == "function" and SelectedStyle == "#SMART#") then
-        local smartStyleFunction = SelectedSkin.smart_style;
-        SelectedStyle = smartStyleFunction(obj.theUser, obj.theGuild, obj.theLevel, obj.theRace, obj.theClass);
-    end
-    return SelectedStyle;
 end
 
 function LoadSkin(skinName)
@@ -372,23 +275,14 @@ function RegisterSkin(skinTable)
         if(skinTable.title == db.skin.selected) then
             LoadSkin(WIM.db.skin.selected);
         end
-        
-        populateFemaleClassInfo(SkinTable[skinTable.title]);
-        prepareDefaultSkin();
-        return;
+        return; -- this is the main skin, we don't need to do anything further...
     end
     
     -- inherrit missing data from default skin.
-    copyTable(SkinTable["WIM Classic"], skinTable);
-        
-    populateFemaleClassInfo(skinTable);    
-        
-    
+    linkSkinTable(SkinTable["WIM Classic"], skinTable);
 
-    
     -- finalize registration
     SkinTable[skinTable.title] = skinTable;
-    populateFemaleClassInfo(SkinTable[skinTable.title]);
     
     -- if this is the selected skin, load it now
     if(skinTable.title == WIM.db.skin.selected) then
@@ -459,11 +353,14 @@ function ApplySkinToWidget(obj)
     end
 end
 
-function PrepareDefaultSkin()
-    prepareDefaultSkin();
-end
 
 function test()
-    _G.test = {message_window = {}};
+    _G.test = {message_window = {
+        widgets = {
+            close= {
+                points = {}
+            }
+        }
+    }};
     linkSkinTable(SkinTable["WIM Classic"], _G.test);
 end

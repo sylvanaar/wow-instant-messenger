@@ -1,5 +1,5 @@
 -- Custom Skin handlers (In this situation, this must be declared before the skin table. If loaded after, it would not have a chance to load and an error would be thrown.)
-local function formatDetails(guild, level, race, class)
+local function formatDetails(window, guild, level, race, class)
     if(guild ~= "") then
 	guild = "<"..guild.."> ";
     end
@@ -240,7 +240,6 @@ local WIM_ClassicSkin = {
             selected = "Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_selected",
             hover = ""
         },
-
         height = 32,
         points = {
             {"BOTTOMLEFT", "window", "TOPLEFT", 38, -4},
