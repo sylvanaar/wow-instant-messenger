@@ -80,7 +80,7 @@ local function createButton(parent)
     button.close:SetPoint("LEFT", button, "RIGHT");
     
     button:SetScript("OnClick", function(self, b)
-            self.win:Pop(true);
+            self.win:Pop(true, true);
             WIM.Menu:Hide();
         end);
     button:SetScript("OnUpdate", function(self, elapsed)

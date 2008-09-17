@@ -42,38 +42,52 @@ db_defaults.pop_rules.whisper = {
             onSend = true,
             onReceive = true,
             supress = true,
+            autofocus = true,
+            keepfocus = true,
         },
         combat = {
             onSend = false,
             onReceive = false,
             supress = false,
+            autofocus = false,
+            keepfocus = false,
         },
         pvp = {
             onSend = true,
             onReceive = true,
             supress = true,
+            autofocus = false,
+            keepfocus = false,
         },
         arena = {
             onSend = false,
             onReceive = false,
             supress = false,
+            autofocus = false,
+            keepfocus = false,
         },
         party = {
             onSend = true,
             onReceive = true,
             supress = true,
+            autofocus = false,
+            keepfocus = false,
         },
         raid = {
             onSend = true,
             onReceive = true,
             supress = true,
+            autofocus = false,
+            keepfocus = false,
         },
         other = {
             onSend = true,
             onReceive = true,
             supress = true,
+            autofocus = false,
+            keepfocus = false,
         },
-        alwaysOther = true,
+        alwaysOther = false,
         intercept = true,
 }
 
@@ -161,7 +175,7 @@ local function CHAT_MSG_WHISPER(...)
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER", ...);
     win:Pop("in");
 
-    if(db.whispers.pop_rules[WIM.curState].supress) then
+    if(db.pop_rules.whisper[WIM.curState].supress) then
         _G.ChatEdit_SetLastTellTarget(arg2);
     end
     CallModuleFunction("PostEvent_Whisper", ...);
@@ -173,7 +187,7 @@ local function CHAT_MSG_WHISPER_INFORM(...)
     local win = getWhisperWindowByUser(arg2);
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER_INFORM", ...);
     win:Pop("out");
-    if(db.whispers.pop_rules[curState].supress) then
+    if(db.pop_rules.whisper[curState].supress) then
         _G.ChatEdit_SetLastToldTarget(arg2);
     end
     CallModuleFunction("PostEvent_WhisperInform", ...);
