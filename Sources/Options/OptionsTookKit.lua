@@ -7,6 +7,7 @@ local tostring = tostring;
 local type = type;
 local table = table;
 local pairs = pairs;
+local tonumber = tonumber;
 
 --set namespace
 setfenv(1, WIM);
@@ -55,6 +56,49 @@ end
 local function SetFullSize(self)
     self:SetPoint("LEFT");
     self:SetPoint("RIGHT");
+end
+
+
+local function CreateSlider(parent, title, minText, maxText, min, max, step, dbTree, varName, valChanged)
+    local s = CreateFrame("Slider", parent:GetName()..statObject("Slider"), parent);
+    -- set backdrop
+    s:SetBackdrop({bgFile = "Interface\\Buttons\\UI-SliderBar-Background", 
+        edgeFile = "Interface\\Buttons\\UI-SliderBar-Border", 
+        tile = true, tileSize = 8, edgeSize = 8, 
+        insets = { left = 3, right = 3, top = 6, bottom = 6 }});
+    s:SetHeight(17);
+    s:SetPoint("LEFT");
+    s:SetPoint("RIGHT", -75, 0);
+    s:SetThumbTexture("Interface\\Buttons\\UI-SliderBar-Button-Horizontal");
+    s:SetOrientation("HORIZONTAL");
+    s:SetMinMaxValues(min, max);
+    s.title = s:CreateFontString(s:GetName().."Title", "OVERLAY", DefaultFont);
+    s.title:SetPoint("BOTTOMLEFT", s, "TOPLEFT", 0, 5);
+    s.title:SetText(title);
+    s.minText = s:CreateFontString(s:GetName().."Min", "OVERLAY", "ChatFontSmall");
+    s.minText:SetPoint("TOPLEFT", s, "BOTTOMLEFT", 5, 0);
+    s.minText:SetText(minText);
+    s.maxText = s:CreateFontString(s:GetName().."Max", "OVERLAY", "ChatFontSmall");
+    s.maxText:SetPoint("TOPRIGHT", s, "BOTTOMRIGHT", -5, 0);
+    s.maxText:SetText(maxText);
+    s.valText = s:CreateFontString(s:GetName().."Val", "OVERLAY", "ChatFontSmall");
+    s.valText:SetPoint("LEFT", s, "RIGHT", 15, 2);
+    s.valText:SetTextColor(unpack(TitleColor));
+    s.valText:SetText("");
+    s:SetValueStep(step);
+    s:SetScript("OnValueChanged", function(self)
+            self.valText:SetText(self:GetValue());
+            dbTree[varName] = self:GetValue();
+            if(type(valChanged) == "function") then
+                valChanged(self, self:GetValue());
+            end
+        end);
+    s:SetScript("OnShow", function(self)
+            self:SetValue(tonumber(dbTree[varName]));
+        end);
+        
+    SetNextAnchor(s);
+    return s;
 end
 
 
@@ -307,6 +351,7 @@ function options.InherritOptionFrameProperties(obj)
     obj.CreateFramedPanel = CreateFramedPanel;
     obj.CreateDropDownMenu = CreateDropDownMenu;
     obj.CreateCheckButtonMenu = CreateCheckButtonMenu;
+    obj.CreateSlider = CreateSlider;
 end
 
 -- Global usage for modules

@@ -46,7 +46,7 @@ db_defaults.displayColors = {
 			},
 	};
 db_defaults.fontSize = 12;
-db_defaults.windowAlpha = .8;
+db_defaults.windowAlpha = 80;
 db_defaults.windowOnTop = true;
 db_defaults.keepFocus = true;
 db_defaults.keepFocusRested = true;
@@ -54,7 +54,7 @@ db_defaults.autoFocus = false;
 db_defaults.winSize = {
 		width = 384,
 		height = 256,
-		scale = .85
+		scale = 85
 	};
 db_defaults.winLoc = {
 		left =242 ,
@@ -68,6 +68,7 @@ db_defaults.winFade = true;
 db_defaults.winAnimation = true;
 db_defaults.wordwrap_indent = false;
 db_defaults.escapeToHide = true;
+db_defaults.ignoreArrowKeys = true;
 db_defaults.pop_rules = {};
 
 
@@ -200,11 +201,13 @@ resizeFrame.Reset = function(self)
 	end
 resizeFrame:SetScript("OnMouseDown", function(self)
 		self.isSizing = true;
+                self.parentWindow.customSize = true;
 		self.parentWindow:SetResizable(true);
 		self.parentWindow:StartSizing("BOTTOMRIGHT");
 	end);
 resizeFrame:SetScript("OnMouseUp", function(self)
 		self.isSizing = false;
+                self.parentWindow.customSize = true;
 		self.parentWindow:StopMovingOrSizing();
 		local tabStrip = self.parentWindow.tabStrip;
 		if(tabStrip) then
@@ -342,6 +345,17 @@ local function getParentMessageWindow(obj)
     end
 end
 
+local function setWindowAsFadedIn(obj)
+	if(WIM.db.winFade) then
+		obj.delayFadeElapsed = 0;
+		obj.delayFade = true;
+		obj.fadedIn = true;
+		UIFrameFadeIn(obj, FadeProps.interval, obj:GetAlpha(), FadeProps.max)
+	else
+		obj:SetAlpha(FadeProps.max);
+	end
+end
+
 --------------------------------------
 --       Widget Script Handlers     --
 --------------------------------------
@@ -457,7 +471,9 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
 			end
 			self.fadeElapsed = 0;
 		end
-	end
+	elseif(not self.fadedIn) then
+                setWindowAsFadedIn(self);
+        end
 	
 	-- animation segment
 	if(self.animation.mode) then
@@ -468,7 +484,7 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
 				self:Hide_Normal();
 			else
 				local prct = animate.elapsed/animate.time;
-				self:SetScale(db.winSize.scale*(1-prct));
+				self:SetScale(db.winSize.scale/100*(1-prct));
 				if(animate.to) then
 					local x1, y1, x2, y2 = animate.initLeft*self:GetEffectiveScale(), animate.initTop*self:GetEffectiveScale(),
 								animate.to:GetLeft()*animate.to:GetEffectiveScale(), animate.to:GetTop()*animate.to:GetEffectiveScale();
@@ -481,19 +497,6 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
 		end
 	end
 end
-
-local function setWindowAsFadedIn(obj)
-	if(WIM.db.winFade) then
-		obj.delayFadeElapsed = 0;
-		obj.delayFade = true;
-		obj.fadedIn = true;
-		UIFrameFadeIn(obj, FadeProps.interval, obj:GetAlpha(), FadeProps.max)
-	else
-		obj:SetAlpha(FadeProps.max);
-	end
-end
-
-
 
 --local function MessageWindow_MsgBox_OnMouseUp()
 --    CloseDropDownMenus();
@@ -788,7 +791,7 @@ local function instantiateWindow(obj)
 			else
 				self:ResetAnimation();
 				self:Show();
-                                if(not EditBoxInFocus and rules.autofocus) then
+                                if(not EditBoxInFocus and rules.autofocus and msgDirection == "in") then
                                         self.widgets.msg_box:SetFocus();
                                 end
 			end
@@ -801,8 +804,8 @@ local function instantiateWindow(obj)
     end
     
     obj.UpdateProps = function(self)
-	self:SetScale(db.winSize.scale);
-	self.widgets.Backdrop:SetAlpha(db.windowAlpha);
+	self:SetScale(db.winSize.scale/100);
+	self.widgets.Backdrop:SetAlpha(db.windowAlpha/100);
 	local Path,_,Flags = self.widgets.chat_display:GetFont();
 	self.widgets.chat_display:SetFont(Path,db.fontSize+2,Flags);
 	self.widgets.chat_display:SetAlpha(1);
@@ -822,6 +825,11 @@ local function instantiateWindow(obj)
 		RemoveEscapeWindow(self);
 	end
 	
+        if(not self.customSize) then
+                self:SetWidth(db.winSize.width);
+                self:SetHeight(db.winSize.height);
+        end
+        
 	-- process registered widgets
 	local widgetName, widgetObj;
 	for widgetName, widgetObj in pairs(obj.widgets) do
@@ -859,7 +867,7 @@ local function instantiateWindow(obj)
     obj.ResetAnimation = function(self)
 	if(self.animation.mode) then
 		obj:SetClampedToScreen(true);
-		self:SetScale(db.winSize.scale);
+		self:SetScale(db.winSize.scale/100);
                 self:ClearAllPoints();
 		self:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", self.animation.initLeft, self.animation.initTop);
 		dPrint("Animation Reset: "..self:GetName());
@@ -895,6 +903,8 @@ local function loadWindowDefaults(obj)
         obj.age = _G.time();
 
 	obj.lastActivity = time();
+
+        obj.customSize = false;
 
 	obj.guild = "";
 	obj.level = "";
