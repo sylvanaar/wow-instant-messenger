@@ -62,6 +62,15 @@ local function createCloseButton(parent)
     return button;
 end
 
+local function createStatusIcon(parent)
+    local icon = parent:CreateTexture(nil, "OVERLAY");
+    icon:SetWidth(13); icon:SetHeight(13);
+    icon:SetPoint("RIGHT", parent.close, "LEFT", -2, -1);
+    icon:SetAlpha(.85);
+    icon:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipClear");
+    return icon;
+end
+
 local function createButton(parent)
     buttonCount = buttonCount + 1;
     local button = CreateFrame("Button", "WIM3MenuButton"..buttonCount, parent, "UIPanelButtonTemplate");
@@ -78,6 +87,7 @@ local function createButton(parent)
     
     button.close = createCloseButton(button);
     button.close:SetPoint("LEFT", button, "RIGHT");
+    button.status = createStatusIcon(button);
     
     button:SetScript("OnClick", function(self, b)
             self.win:Pop(true, true);
@@ -86,12 +96,14 @@ local function createButton(parent)
     button:SetScript("OnUpdate", function(self, elapsed)
             if(self.win and not self.win:IsShown()) then
                 self.text:SetAlpha(.65);
+                self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipClear");
             else
                 self.text:SetAlpha(1);
+                self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipAmber");
             end
         end);
     button.GetMinimumWidth = function(self)
-            return self.text:GetStringWidth()+22;
+            return self.text:GetStringWidth()+40;
         end
     return button;
 end
@@ -157,6 +169,7 @@ local function createGroup(title, list, maxButtons, showNone)
             else
                 button.win = self.list[i];
                 button.close:Show();
+                button.status:Show();
                 button.text:SetText(button.win.theUser);
                 button:Show();
                 button:Enable();
@@ -169,6 +182,7 @@ local function createGroup(title, list, maxButtons, showNone)
         if(#self.list == 0) then
             if(self.showNone) then
                 self.buttons[1].close:Hide();
+                self.buttons[1].status:Hide();
                 self.buttons[1]:Show();
                 self.buttons[1].shown = true;
                 self.buttons[1]:Disable();
