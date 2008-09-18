@@ -53,6 +53,17 @@ local function createOptionsFrame()
     win.title:SetFont(font, 16, "");
     win.title:SetText(L["WIM (WoW Instant Messenger)"].." v"..version);
     
+    -- create close button
+    win.close = CreateFrame("Button", win:GetName().."Close", win);
+    win.close:SetWidth(16); win.close:SetHeight(16);
+    win.close:SetPoint("TOPRIGHT", -20, -18);
+    win.close:SetNormalTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipRed");
+    win.close:SetHighlightTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\close", "BLEND");
+    win.close:SetScript("OnClick", function(self)
+            self:GetParent():Hide();
+        end);
+    
+    
     -- create navigation menu
     win.nav = CreateFrame("Frame", win:GetName().."Nav", win);
     win.nav.bg = win.nav:CreateTexture(win.nav:GetName().."BG", "BACKGROUND");
