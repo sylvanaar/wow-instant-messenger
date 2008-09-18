@@ -165,8 +165,44 @@ local function WhisperPopRules()
 end
 
 
+local function General_WindowSettings()
+    local frame = options.CreateOptionsFrame();
+    frame.menu = frame:CreateSection(L["Window Settings"], L["Some settings may be limited by certain skins."]);
+    frame.menu.nextOffSetY = -35;
+    frame.menu.width = frame.menu:CreateSlider(L["Default Width"], "150", "800", 150, 800, 1, db.winSize, "width", function(self) UpdateAllWindowProps(); end);
+    frame.menu.nextOffSetY = -45;
+    frame.menu.height = frame.menu:CreateSlider(L["Default Height"], "150", "600", 150, 600, 1, db.winSize, "height", function(self) UpdateAllWindowProps(); end);
+    frame.menu.nextOffSetY = -45;
+    frame.menu.scale = frame.menu:CreateSlider(L["Window Scale"], "10", "400", 10, 400, 1, db.winSize, "scale", function(self) UpdateAllWindowProps(); end);
+    frame.menu.nextOffSetY = -45;
+    frame.menu.alpha = frame.menu:CreateSlider(L["Window Alpha"], "1", "100", 1, 100, 1, db, "windowAlpha", function(self) UpdateAllWindowProps(); end);
+    frame.menu.nextOffSetY = -40;
+    frame.menu.sub = frame.menu:CreateSection();
+    options.AddFramedBackdrop(frame.menu.sub);
+    frame.menu.sub:CreateCheckButton(L["Ignore arrow keys in message box."], db, "ignoreArrowKeys", nil, function(self) UpdateAllWindowProps(); end);
+    return frame;
+end
+
+local function General_VisualSettings()
+    local frame = options.CreateOptionsFrame();
+    frame.menu = frame:CreateSection(L["Visual Settings"], L["Configure general window settings."]);
+    frame.menu.nextOffSetY = -10
+    
+    
+    frame.menu.sub = frame.menu:CreateSection();
+    options.AddFramedBackdrop(frame.menu.sub);
+    frame.menu.sub:CreateCheckButton(L["Enable window fading effects."], db, "winFade");
+    frame.menu.sub:CreateCheckButton(L["Enable window animation effects."], db, "winAnimation");
+    
+    return frame;
+end
+
+
+
 
 RegisterOptionFrame(L["General"], L["Main"], "This is just a test Category", General_Main, "Display WIM's options.");
+RegisterOptionFrame(L["General"], L["Window Settings"], "This is just a test Category", General_WindowSettings, "Display WIM's options.");
+RegisterOptionFrame(L["General"], L["Visual Settings"], "This is just a test Category", General_VisualSettings, "Display WIM's options.");
 RegisterOptionFrame(L["General"], L["Message Formatting"], "This is just a test Category", General_MessageFormatting, "Display WIM's options.");
 
 RegisterOptionFrame(L["Whispers"], L["Window Behavior"], "This is just a test Category", WhisperPopRules, "Display WIM's options.");
