@@ -100,7 +100,8 @@ local function initialize()
     end
     -- notify all modules of current state.
     CallModuleFunction("OnStateChange", WIM.curState);
-    
+    RegisterSlashCommand("enable", function() SetEnabled(not db.enabled) end, L["Toggle WIM 'On' and 'Off'."]);
+    RegisterSlashCommand("debug", function() debug = not debug; end, L["Toggle Debugging Mode 'On' and 'Off'."]);
     dPrint("WIM initialized...");
 end
 

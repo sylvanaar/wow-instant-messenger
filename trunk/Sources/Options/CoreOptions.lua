@@ -185,10 +185,16 @@ end
 
 local function General_VisualSettings()
     local frame = options.CreateOptionsFrame();
-    frame.menu = frame:CreateSection(L["Visual Settings"], L["Configure general window settings."]);
-    frame.menu.nextOffSetY = -10
+    frame.menu = frame:CreateSection(L["Display Settings"], L["Configure general window display settings."]);
+    frame.menu.nextOffSetY = -10;
     
+    frame.menu:CreateColorPicker(L["Color: System Messages"], db.displayColors, "sysMsg");
+    frame.menu:CreateColorPicker(L["Color: Error Messages"], db.displayColors, "errorMsg");
+    frame.menu:CreateColorPicker(L["Color: URL - Web Addresses"], db.displayColors, "webAddress");
+    frame.menu.nextOffSetY = -10;
+    frame.menu:CreateCheckButton(L["Use colors suggested by skin."], db.displayColors, "useSkin");
     
+    frame.menu.nextOffSetY = -20;
     frame.menu.sub = frame.menu:CreateSection();
     options.AddFramedBackdrop(frame.menu.sub);
     frame.menu.sub:CreateCheckButton(L["Enable window fading effects."], db, "winFade");
@@ -197,12 +203,25 @@ local function General_VisualSettings()
     return frame;
 end
 
-
+local function Whispers_DisplaySettings()
+    local frame = options.CreateOptionsFrame();
+    frame.menu = frame:CreateSection(L["Display Settings"], L["Configure general display settings when dealing with whispers."]);
+    frame.menu.nextOffSetY = -10;
+    
+    frame.menu:CreateColorPicker(L["Color: Messages Sent"], db.displayColors, "wispOut");
+    frame.menu:CreateColorPicker(L["Color: Messages Received"], db.displayColors, "wispIn");
+    
+    frame.menu.nextOffSetY = -10;
+    frame.menu:CreateCheckButton(L["Use colors suggested by skin."], db.displayColors, "useSkin");
+    
+    return frame;
+end
 
 
 RegisterOptionFrame(L["General"], L["Main"], "This is just a test Category", General_Main, "Display WIM's options.");
 RegisterOptionFrame(L["General"], L["Window Settings"], "This is just a test Category", General_WindowSettings, "Display WIM's options.");
-RegisterOptionFrame(L["General"], L["Visual Settings"], "This is just a test Category", General_VisualSettings, "Display WIM's options.");
+RegisterOptionFrame(L["General"], L["Display Settings"], "This is just a test Category", General_VisualSettings, "Display WIM's options.");
 RegisterOptionFrame(L["General"], L["Message Formatting"], "This is just a test Category", General_MessageFormatting, "Display WIM's options.");
 
+RegisterOptionFrame(L["Whispers"], L["Display Settings"], "This is just a test Category", Whispers_DisplaySettings, "Display WIM's options.");
 RegisterOptionFrame(L["Whispers"], L["Window Behavior"], "This is just a test Category", WhisperPopRules, "Display WIM's options.");

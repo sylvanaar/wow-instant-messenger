@@ -39,11 +39,7 @@ db_defaults.displayColors = {
 				g=0, 
 				b=0
 			},
-		webAddress = {
-				r=0, 
-				g=0, 
-				b=1
-			},
+                useSkin = true,
 	};
 db_defaults.fontSize = 12;
 db_defaults.windowAlpha = 80;

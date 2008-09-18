@@ -1,10 +1,22 @@
+--imports
 local WIM = WIM;
+local _G = _G;
+local strsub = strsub;
+local string = string;
+local format = format;
+local table = table;
+local type = type;
 
-WIM.db_defaults.urls = {
-    color = "FFFFFF";
+--set namespace
+setfenv(1, WIM);
+
+db_defaults.displayColors.webAddress = {
+    r = 1,
+    g = 1,
+    b = 1
 };
 
-local URL = WIM.CreateModule("URLHandler", true);
+local URL = CreateModule("URLHandler", true);
 
 -- patterns created by Sylvanaar & used in Prat
 local patterns = {
@@ -45,7 +57,7 @@ local function formatRawURL(theURL)
         return "";
     else
         theURL = theURL:gsub('%%', '%%%%'); --make sure any %'s are escaped in order to preserve them.
-        return " |cff"..WIM.db.urls.color.."|Hwim_url:"..theURL.."|h".."["..theURL.."]".."|h|r";
+        return " |cff"..RGBPercentToHex(db.displayColors.webAddress.r, db.displayColors.webAddress.g, db.displayColors.webAddress.b).."|Hwim_url:"..theURL.."|h".."["..theURL.."]".."|h|r";
     end
 end
 
@@ -62,11 +74,11 @@ end
 
 
 function URL:OnEnable()
-    WIM.RegisterStringModifier(modifyURLs, true);
+    RegisterStringModifier(modifyURLs, true);
 end
 
 function URL:OnDisable()
-    WIM.UnregisterStringModifier(modifyURLs);
+    UnregisterStringModifier(modifyURLs);
 end
 
 
@@ -84,24 +96,24 @@ local function displayURL(link)
 	theLink = string.sub(link,9, string.len(link));
     end
     -- The following code was written by Sylvannar.
-    StaticPopupDialogs["WIM_SHOW_URL"] = {
+    _G.StaticPopupDialogs["WIM_SHOW_URL"] = {
         text = "URL : %s",
-        button2 = TEXT(ACCEPT),
+        button2 = _G.TEXT(ACCEPT),
         hasEditBox = 1,
         hasWideEditBox = 1,
         showAlert = 1, -- HACK : it"s the only way I found to make de StaticPopup have sufficient width to show WideEditBox :(
         OnShow = function()
-                local editBox = getglobal(this:GetName().."WideEditBox");
+                local editBox = _G.getglobal(this:GetName().."WideEditBox");
                 editBox:SetText(format(theLink));
                 editBox:SetFocus();
                 editBox:HighlightText(0);
     
-                local button = getglobal(this:GetName().."Button2");
+                local button = _G.getglobal(this:GetName().."Button2");
                 button:ClearAllPoints();
                 button:SetWidth(200);
                 button:SetPoint("CENTER", editBox, "CENTER", 0, -30);
     
-                getglobal(this:GetName().."AlertIcon"):Hide();  -- HACK : we hide the false AlertIcon
+                _G.getglobal(this:GetName().."AlertIcon"):Hide();  -- HACK : we hide the false AlertIcon
         end,
         OnHide = function() end,
         OnAccept = function() end,
@@ -111,12 +123,12 @@ local function displayURL(link)
         whileDead = 1,
         hideOnEscape = 1
     };        
-    StaticPopup_Show ("WIM_SHOW_URL", theLink);
+    _G.StaticPopup_Show ("WIM_SHOW_URL", theLink);
 end
 
 
 --Hook SetItemRef
-local SetItemRef_orig = SetItemRef;
+local SetItemRef_orig = _G.SetItemRef;
 local function setItemRef (link, text, button)
 	if (isLinkTypeURL(link)) then
 		displayURL(link);
@@ -124,4 +136,4 @@ local function setItemRef (link, text, button)
 	end
 	SetItemRef_orig(link, text, button);
 end
-SetItemRef = setItemRef;
+_G.SetItemRef = setItemRef;
