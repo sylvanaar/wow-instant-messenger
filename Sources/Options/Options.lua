@@ -78,6 +78,14 @@ local function createOptionsFrame()
     win.container:SetPoint("TOPLEFT", win.nav, "TOPRIGHT", 10, -2);
     win.container:SetPoint("BOTTOMLEFT", win.nav, "BOTTOMRIGHT", 10, 2);
     win.container:SetPoint("RIGHT", win, -25, 0);
+    
+    win.Enable = function(self)
+        self:SetAlpha(1);
+    end
+    
+    win.Disable = function(self)
+        self:SetAlpha(.5);
+    end
 
     -- allow this window to close when escape is pressed.
     table.insert(_G.UISpecialFrames,win:GetName());

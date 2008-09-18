@@ -22,6 +22,8 @@ setfenv(1, WIM);
     - frame:CreateFramedPanel() returns Frame
     - CreateCheckButton(parent, title, dbTree, varName, tooltip, valChanged) returns CheckButton
     - CreateCheckButtonMenu(parent, title, dbTree, varName, tooltip, valChanged, itemList, dbTree2, varName2, valChanged2) returns CheckButton
+    - CreateSlider(parent, title, minText, maxText, min, max, step, dbTree, varName, valChanged) returns Slider
+    - CreateColorPicker(parent, title, dbTree, varName, valChanged) returns Frame
     
     Frame Modifying Tools:
     - WIM.options.AddFramedBackdrop(theFrame)
@@ -56,6 +58,58 @@ end
 local function SetFullSize(self)
     self:SetPoint("LEFT");
     self:SetPoint("RIGHT");
+end
+
+local function CreateColorPicker(parent, title, dbTree, varName, valChanged)
+    local frame = CreateFrame("Frame", parent:GetName()..statObject("ColorPicker"), parent);
+    frame:SetWidth(22); frame:SetHeight(22);
+    frame.swatch = CreateFrame("Button", frame:GetName().."Swatch", frame);
+    frame.swatch:SetWidth(20); frame.swatch:SetHeight(20);
+    frame.swatch:SetPoint("LEFT");
+    frame.swatch.bg = frame.swatch:CreateTexture(frame.swatch:GetName().."Bg", "BACKGROUND");
+    frame.swatch.bg:SetWidth(18); frame.swatch.bg:SetHeight(18);
+    frame.swatch.bg:SetPoint("CENTER");
+    frame.swatch.bg:SetTexture(1, 1, 1);
+    frame.swatch:SetNormalTexture("Interface\\ChatFrame\\ChatFrameColorSwatch");
+    frame.swatch:SetScript("OnEnter", function(self)
+            self.bg:SetVertexColor(_G.NORMAL_FONT_COLOR.r, _G.NORMAL_FONT_COLOR.g, _G.NORMAL_FONT_COLOR.b);
+        end);
+    frame.swatch:SetScript("OnLeave", function(self)
+            self.bg:SetVertexColor(_G.HIGHLIGHT_FONT_COLOR.r, _G.HIGHLIGHT_FONT_COLOR.g, _G.HIGHLIGHT_FONT_COLOR.b);
+        end);
+    frame.swatch:SetScript("OnClick", function(self, button)
+            _G.ColorPickerFrame.hasOpacity = false;
+            _G.ColorPickerFrame.func = function()
+                    local r,g,b = _G.ColorPickerFrame:GetColorRGB();
+                    dbTree[varName].r = r;
+                    dbTree[varName].g = g;
+                    dbTree[varName].b = b;
+                    self:Hide();
+                    self:Show();
+                    options.frame:Enable();
+                end
+            _G.ColorPickerFrame.prev = {dbTree[varName].r, dbTree[varName].g, dbTree[varName].b};
+            _G.ColorPickerFrame:SetColorRGB(dbTree[varName].r, dbTree[varName].g, dbTree[varName].b);
+            _G.ColorPickerFrame.cancelFunc = function()
+                    dbTree[varName].r = _G.ColorPickerFrame.prev[1];
+                    dbTree[varName].g = _G.ColorPickerFrame.prev[2];
+                    dbTree[varName].b = _G.ColorPickerFrame.prev[3];
+                    self:Hide();
+                    self:Show();
+                    options.frame:Enable();
+                end
+            _G.ColorPickerFrame:SetFrameStrata("DIALOG");
+            _G.ColorPickerFrame:Show();
+            options.frame:Disable();
+        end);
+    frame.swatch:SetScript("OnShow", function(self)
+            self:GetNormalTexture():SetVertexColor(dbTree[varName].r, dbTree[varName].g, dbTree[varName].b);
+        end);
+    frame.swatch.title = frame.swatch:CreateFontString(frame.swatch:GetName().."Text", "OVERLAY", DefaultFont);
+    frame.swatch.title:SetPoint("LEFT", frame.swatch, "RIGHT", 10, 0);
+    frame.swatch.title:SetText(title);
+    SetNextAnchor(frame);
+    return frame;
 end
 
 
@@ -352,6 +406,7 @@ function options.InherritOptionFrameProperties(obj)
     obj.CreateDropDownMenu = CreateDropDownMenu;
     obj.CreateCheckButtonMenu = CreateCheckButtonMenu;
     obj.CreateSlider = CreateSlider;
+    obj.CreateColorPicker = CreateColorPicker;
 end
 
 -- Global usage for modules
