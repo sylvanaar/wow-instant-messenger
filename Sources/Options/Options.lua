@@ -55,8 +55,8 @@ local function createOptionsFrame()
     
     -- create close button
     win.close = CreateFrame("Button", win:GetName().."Close", win);
-    win.close:SetWidth(16); win.close:SetHeight(16);
-    win.close:SetPoint("TOPRIGHT", -20, -18);
+    win.close:SetWidth(18); win.close:SetHeight(18);
+    win.close:SetPoint("TOPRIGHT", -24, -20);
     win.close:SetNormalTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipRed");
     win.close:SetHighlightTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\close", "BLEND");
     win.close:SetScript("OnClick", function(self)
@@ -92,11 +92,22 @@ local function createOptionsFrame()
     
     win.Enable = function(self)
         self:SetAlpha(1);
+        self.disableFrame:Hide();
+        win:SetToplevel(true);
     end
     
     win.Disable = function(self)
         self:SetAlpha(.5);
+        self.disableFrame:Show();
+        win:SetToplevel(false);
     end
+
+    -- create disableFrame
+    win.disableFrame = CreateFrame("Frame", nil, win);
+    win.disableFrame:SetAllPoints();
+    win.disableFrame:EnableMouse(true);
+    win.disableFrame:Hide();
+    win.disableFrame:SetFrameStrata("DIALOG");
 
     -- allow this window to close when escape is pressed.
     table.insert(_G.UISpecialFrames,win:GetName());
