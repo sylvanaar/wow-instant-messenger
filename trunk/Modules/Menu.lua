@@ -64,8 +64,7 @@ end
 
 local function createStatusIcon(parent)
     local icon = parent:CreateTexture(nil, "OVERLAY");
-    icon:SetWidth(13); icon:SetHeight(13);
-    icon:SetPoint("RIGHT", parent.close, "LEFT", -2, -1);
+    icon:SetWidth(14); icon:SetHeight(14);
     icon:SetAlpha(.85);
     icon:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipClear");
     return icon;
@@ -85,9 +84,10 @@ local function createButton(parent)
     button:GetHighlightTexture():ClearAllPoints();
     button:GetHighlightTexture():SetAllPoints();
     
-    button.close = createCloseButton(button);
-    button.close:SetPoint("LEFT", button, "RIGHT");
     button.status = createStatusIcon(button);
+    button.status:SetPoint("LEFT", button, "RIGHT", 0, -1);
+    button.close = createCloseButton(button);
+    button.close:SetPoint("LEFT", button.status, "RIGHT", 2, 0);
     
     button:SetScript("OnClick", function(self, b)
             self.win:Pop(true, true);
@@ -131,7 +131,7 @@ local function createGroup(title, list, maxButtons, showNone)
     group.title.text:SetJustifyH("RIGHT");
     group.buttons = {};
     local lastButton = group.title;
-    local offSet = -16;
+    local offSet = -32;
     for i=1, maxButtons do
         local button = createButton(group);
         button:SetPoint("TOPLEFT", lastButton, "BOTTOMLEFT");
