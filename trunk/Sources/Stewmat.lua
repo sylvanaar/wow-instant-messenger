@@ -44,6 +44,10 @@ function createCanvas()
         local count = 0;
         for color in string.gmatch(img, "[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]") do
             count = count + 1;
+            if(count > #self.pixels) then
+                dPrint("Received more then alotted pixels.");
+                break;
+            end
             self.pixels[count]:SetTexture(RGBHexToPercent(color));
         end
         dPrint(count.." points laoded.");

@@ -51,17 +51,25 @@ local function createNewSocket(user, socketIndex, dataLength)
 end
 
 local function ProcessData(channel, from, data)
-    local err;
-    data, err = libs.LibCompress:Decompress(data);
+    local str, err = libs.LibCompress:DecompressLZW(data);
     if(err) then
         dPrint(err);
         return;
     end
-    local cmd, args = string.match(data, "(%w+):(.*)");
+    dPrint(string.sub(str, -25))
+    dPrint(string.sub(str, 1, 50))
+    local cmd, args = string.match(str, "(%w+):(.*)");
     if(cmd and args) then
         if(cmd == "TEST") then
             local canvas = createCanvas()
             canvas:LoadImage(args);
+            --[[if(args == _G.orig) then
+                dPrint("EQUAL");
+            else
+                dPrint("NOT EQUAL");
+            end
+            dPrint(string.len(_G.orig));
+            dPrint(string.len(args));]]
         else
             dPrint("Command Other than TEST received");
         end
@@ -184,7 +192,7 @@ function _G.test()
 89bcff88bcff88bdff87bdff87beff85befe84bffe83c0fe83c1fe83c1fe83c1fa83c1fa83c0fa84c0fa84c0fa84c0fa85bffa86bffc87bffc87befc8bbbf28dbbec8cc3f381c2f77cc0f87fc1fb87c2fe8abaf989b5f18fbaf392c0f78cc5f87cbee894c9f28bb7dd688cae293d5f353a5e303e5d283e591f37530f3f6f699acb8bbef18fc2f883baf086bef788c2fb8ac5fd8ac5fd85c0fa86bff886bff887bff887bff887bff886bff986bffa84c0fc83c0ff83c0ff83c0fe84c0fe84c0fe
 86befe86befe85befe85befe85bffe84bffe84bffe83c0fe83c0fe83c0fe83c0fc83c0fc83c0fc84c0fc84c0fc84c0fc84bffc85bffd85bffd85bffd87bdf788bdf388c1f682c0f880c0f981c0fc84c1fe87befc87bbf88cbdf78cbff885c1fa81c0f28cc3f192c3ec85afd33b4e6f24335226395d263c621e35590b3055557aa082afd996cdf988beed80bcf585c1f989c4fc8ac3fe84c0f883c1f883c0f884c0f985c0f985bffa85bffb85bffc84c0fd81c1fd81c1fd82c0fd84c0fe84c0fe
 84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe83bffc84bffb84bff984bff984bffb82c0fc81c0fe83c0fe84c0fc87bff986bef97ebefb87c4fd86beef90c6f294c4eb6073941d344f1e355d233a6a1f3762122d4a3e59776f99bb94cdf490c5ef7dbdf681c0f786c1fa89c0fe81bef580c2f780c2f981c1fa84c1fa84c0fb85bffd84bffe83c0fd81c2fc80c2fc82c0fd84c0fe84c0fe
-84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe85c1fe86c2fd87c2fc86c1fb84c0fb82c0fc81c0fe82bffe82befa85bcf786bdf882c2ff89c6ff86beef8bc1ee96c6f0a5b8d9304863213760263c6c3047721a3552233e5c4e789b80b9e29bd0fa84c4fc80bef582bdf688bffd7ebbf27fc1f680c2f981c1fa84c1fa84c0fb85bffd84bffe83c0fd81c2fc80c2fc82c0fd84c0fe84c0fe
-]];
-SendData("Telesmom", "test", _G.orig);
+84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe85c1fe86c2fd87c2fc86c1fb84c0fb82c0fc81c0fe82bffe82befa85bcf786bdf882c2ff89c6ff86beef8bc1ee96c6f0a5b8d9304863213760263c6c3047721a3552233e5c4e789b80b9e29bd0fa84c4fc80bef582bdf688bffd7ebbf27fc1f680c2f981c1fa84c1fa84c0fb85bffd84bffe83c0fd81c2fc80c2fc82c0fd84c0fe84c0fe]];
+_G.orig = string.gsub(_G.orig, "[^0-9a-fA-F]", "")
+SendData("Stewstew", "test", _G.orig);
 end
