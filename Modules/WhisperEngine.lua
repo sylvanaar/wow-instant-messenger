@@ -164,7 +164,8 @@ end
 
 RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
         local obj = self:GetParent();
-        _G.SendChatMessage(self:GetText(), "WHISPER", nil, obj.theUser);
+        --_G.SendChatMessage(self:GetText(), "WHISPER", nil, obj.theUser);
+        _G.ChatThrottleLib:SendChatMessage("NORMAL", "WIM", self:GetText(), "WHISPER", nil, obj.theUser);
         self:SetText("");
     end);
 

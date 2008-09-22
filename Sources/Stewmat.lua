@@ -7,6 +7,7 @@ local WIM = WIM;
 local _G = _G;
 local string = string;
 local CreateFrame = CreateFrame;
+local table = table;
 
 -- set namespace
 setfenv(1, WIM);
@@ -41,7 +42,7 @@ function createCanvas()
         img = string.trim(img);
         self:Clear();
         local count = 0;
-        for color in string.gmatch(img, "[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]") do
+        for color in string.gmatch(img, "[0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z][0-9a-zA-Z]") do
             count = count + 1;
             self.pixels[count]:SetTexture(RGBHexToPercent(color));
         end
