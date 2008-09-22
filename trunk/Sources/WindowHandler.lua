@@ -662,6 +662,7 @@ local function instantiateWindow(obj)
     obj.AddMessage = function(self, msg, ...)
 	msg = applyStringModifiers(msg);
 	self.widgets.chat_display:AddMessage(msg, ...);
+        updateScrollBars(self);
 	CallModuleFunction("OnWindowMessageAdded", self, msg, ...);
     end
     

@@ -94,6 +94,8 @@ local function OnEvent(self, event, ...)
             dPrint(string.len(socket.data)/socket.len*100 .. "%")
             if(string.len(socket.data) == socket.len) then
                 ProcessData(channel, from, socket.data);
+                SocketPool[from][tonumber(cmd)] = nil;
+                recycleTable(socket);
             end
             return;
         end

@@ -226,7 +226,7 @@ local function CreateCheckButton(parent, title, dbTree, varName, tooltip, valCha
             if(type(dbTree) == "function") then
                 dbTbl = dbTree();
             end
-            dbTbl[varName] = self:GetChecked();
+            dbTbl[varName] = self:GetChecked() and true or false;
             if(type(valChanged) == "function") then
                 valChanged(self, button);
             end

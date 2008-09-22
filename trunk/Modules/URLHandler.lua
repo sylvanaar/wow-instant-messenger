@@ -98,27 +98,31 @@ local function displayURL(link)
     -- The following code was written by Sylvannar.
     _G.StaticPopupDialogs["WIM_SHOW_URL"] = {
         text = "URL : %s",
-        button2 = _G.TEXT(ACCEPT),
+        button2 = _G.TEXT(_G.ACCEPT),
         hasEditBox = 1,
         hasWideEditBox = 1,
         showAlert = 1, -- HACK : it"s the only way I found to make de StaticPopup have sufficient width to show WideEditBox :(
-        OnShow = function()
-                local editBox = _G.getglobal(this:GetName().."WideEditBox");
+        OnShow = function(self)
+                self = self or _G.this; -- tbc hack
+                local editBox = _G.getglobal(self:GetName().."WideEditBox");
                 editBox:SetText(format(theLink));
                 editBox:SetFocus();
                 editBox:HighlightText(0);
     
-                local button = _G.getglobal(this:GetName().."Button2");
+                local button = _G.getglobal(self:GetName().."Button2");
                 button:ClearAllPoints();
-                button:SetWidth(200);
+                button:SetWidth(100);
                 button:SetPoint("CENTER", editBox, "CENTER", 0, -30);
     
-                _G.getglobal(this:GetName().."AlertIcon"):Hide();  -- HACK : we hide the false AlertIcon
-        end,
+                _G.getglobal(self:GetName().."AlertIcon"):Hide();  -- HACK : we hide the false AlertIcon
+            end,
         OnHide = function() end,
         OnAccept = function() end,
         OnCancel = function() end,
-        EditBoxOnEscapePressed = function() this:GetParent():Hide(); end,
+        EditBoxOnEscapePressed = function(self)
+                self = self or _G.this; -- tbc hack
+                self:GetParent():Hide();
+            end,
         timeout = 0,
         whileDead = 1,
         hideOnEscape = 1
