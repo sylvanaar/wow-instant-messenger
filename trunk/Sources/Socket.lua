@@ -51,11 +51,23 @@ local function createNewSocket(user, socketIndex, dataLength)
 end
 
 local function ProcessData(channel, from, data)
-    --data = libs.LibCompress:DecompressLZW(data);
-    local data = string.match(data, "TEST:(.*)");
-    local canvas = createCanvas()
-    canvas:LoadImage(data);
-    --dPrint(data);
+    local err;
+    data, err = libs.LibCompress:Decompress(data);
+    if(err) then
+        dPrint(err);
+        return;
+    end
+    local cmd, args = string.match(data, "(%w+):(.*)");
+    if(cmd and args) then
+        if(cmd == "TEST") then
+            local canvas = createCanvas()
+            canvas:LoadImage(args);
+        else
+            dPrint("Command Other than TEST received");
+        end
+    else
+        dPrint("Transmission received, invalid WIM data.");
+    end
 end
 
 local function OnEvent(self, event, ...)
@@ -71,6 +83,7 @@ local function OnEvent(self, event, ...)
         if(cmd and args) then
             local socket = getSocket(from, tonumber(cmd));
             socket.data = socket.data..args;
+            dPrint(string.len(socket.data)/socket.len*100 .. "%")
             if(string.len(socket.data) == socket.len) then
                 ProcessData(channel, from, socket.data);
             end
@@ -89,8 +102,8 @@ socketFrame:SetScript("OnEvent", OnEvent);
 
 -- outbound Traffic:
 function SendData(user, cmd, data)
-    --local msg = libs.LibCompress:CompressLZW(string.upper(cmd)..":"..data);
-    local msg = string.upper(cmd)..":"..data
+    local msg = libs.LibCompress:CompressLZW(string.upper(cmd)..":"..data);
+    --local msg = string.upper(cmd)..":"..data
     local msgCount = math.ceil(string.len(msg)/200);
     if(msgCount == 1) then
         _G.ChatThrottleLib:SendAddonMessage("NORMAL", "WIM", "!"..msg, "WHISPER", user);
@@ -108,7 +121,7 @@ end
 
 
 function _G.test()
-    SendData("Pantiless", "test", [[88bff587bff786bff984c0fc84c0ff84bfff84bfff84bfff84c0fe84c0fe85c2fa85c2f985c2f886c2f886c0f787c0f786bff786bef986befb85bcfb88bffd8bc2fe8ac2ff82befc7dbbfb7bbbfb7cbdfd81c2ff82c4ff83c5ff81c3fd7ec1f87fc1fe82c3fd84c4fd85c2fe81bdfc81bdfa85bffd86bffe83bdfc7ebaf888c5fd86c3f981bef381bff287c4fa85c2fa84c0fb83bfff80bbff82bfff83c0fe83c1fd83c1fa83c1f784c1f784c1f784c1f784c1fa84c0fb84c0fd84c0fe84c0fe
+    _G.orig = [[88bff587bff786bff984c0fc84c0ff84bfff84bfff84bfff84c0fe84c0fe85c2fa85c2f985c2f886c2f886c0f787c0f786bff786bef986befb85bcfb88bffd8bc2fe8ac2ff82befc7dbbfb7bbbfb7cbdfd81c2ff82c4ff83c5ff81c3fd7ec1f87fc1fe82c3fd84c4fd85c2fe81bdfc81bdfa85bffd86bffe83bdfc7ebaf888c5fd86c3f981bef381bff287c4fa85c2fa84c0fb83bfff80bbff82bfff83c0fe83c1fd83c1fa83c1f784c1f784c1f784c1f784c1fa84c0fb84c0fd84c0fe84c0fe
 87bff687bff886bffb84bffd84c0ff84bfff84bfff84bffe84c0fe84c0fc84c1f984c1f884c1f785c1f785c0f786bff786bff886bef986befd86bdfd88befc8abefb87bbf983bbfb83befd84c0fe84c1fe83c1ff81bffd7fbffc80c2fb85c9fc79bcec7cbef481c1fa87c5fd88c5fe80bcfd7db8f67fb9f687c0fe87c3fd87c4fc83c0f880bdf485c2f888c5fc85c2fb83c0fc82c0fe7fbbfc82bffd83c0fd83c1fb83c1fa83c1f784c1f784c1f784c1f784c1fa84c0fa84c0fc84c0fe84c0fe
 86c0f886bffa85bffc84bffe84bfff84bfff84bffe84c0fd84c0fc84c0fa82c0f782c0f682c0f684c0f684c0f786bff787bff987bffb88befe88befe83bcfa80bbf786c0fb86c0fb86c0f889c1f78cc4f789c0f283b9ea83b9e983bce782bee48ec9ed8fcaf58cc5f385beec84bcec87bcf486baf187baef8bbdf387c3fa85c1f982bff782bff787c4fc88c4fd85c1fc83c0fc82bffc80befa82c0fd83c1fc83c1fb83c1fa83c1f884c1f784c1f784c1f884c1fa84c1fa84c0fc84c0fe84c0fe
 84c0fa84c0fb84bffd84bffe85bfff84bffe84bffe84c0fc84c1f984c1f781c0f581c0f581c0f582c0f684c0f786bff887bffa88bffd8abfff8abfff7dbbf876bbf484c6fc89c6fb89c2f38bc1ed8fc1e98cb9dd8ab4d590bbd78ebad47aabc2acddf8aee0fb9acceb80b0d57aaad192c0e897c3ef95bfed8eb8e481bcf181bcf383bef785c1fb87c3fe86c2fe84c1fd82c0fb81bff983c1fa83c1fc83c1fc83c1fb83c1fa83c0fa84c0f884c1f884c1f884c1f984c1f984c0fc84c0fe84c0fe
@@ -172,5 +185,6 @@ function _G.test()
 86befe86befe85befe85befe85bffe84bffe84bffe83c0fe83c0fe83c0fe83c0fc83c0fc83c0fc84c0fc84c0fc84c0fc84bffc85bffd85bffd85bffd87bdf788bdf388c1f682c0f880c0f981c0fc84c1fe87befc87bbf88cbdf78cbff885c1fa81c0f28cc3f192c3ec85afd33b4e6f24335226395d263c621e35590b3055557aa082afd996cdf988beed80bcf585c1f989c4fc8ac3fe84c0f883c1f883c0f884c0f985c0f985bffa85bffb85bffc84c0fd81c1fd81c1fd82c0fd84c0fe84c0fe
 84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe83bffc84bffb84bff984bff984bffb82c0fc81c0fe83c0fe84c0fc87bff986bef97ebefb87c4fd86beef90c6f294c4eb6073941d344f1e355d233a6a1f3762122d4a3e59776f99bb94cdf490c5ef7dbdf681c0f786c1fa89c0fe81bef580c2f780c2f981c1fa84c1fa84c0fb85bffd84bffe83c0fd81c2fc80c2fc82c0fd84c0fe84c0fe
 84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe85c1fe86c2fd87c2fc86c1fb84c0fb82c0fc81c0fe82bffe82befa85bcf786bdf882c2ff89c6ff86beef8bc1ee96c6f0a5b8d9304863213760263c6c3047721a3552233e5c4e789b80b9e29bd0fa84c4fc80bef582bdf688bffd7ebbf27fc1f680c2f981c1fa84c1fa84c0fb85bffd84bffe83c0fd81c2fc80c2fc82c0fd84c0fe84c0fe
-]])
+]];
+SendData("Telesmom", "test", _G.orig);
 end
