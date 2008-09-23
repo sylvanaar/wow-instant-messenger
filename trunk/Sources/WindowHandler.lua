@@ -4,6 +4,8 @@
         Module:OnWindowDestroyed(winObj)
         Module:OnWindowPopped(winObj)
 	Module:OnWindowMessageAdded(winObj, msg, r, g, b)
+        Module:OnWindowShow(winObj)
+        Module:OnWindowHide(winObj)
 ]]
 
 local WIM = WIM;
@@ -384,6 +386,8 @@ local function MessageWindow_MovementControler_OnDragStop(self)
 	helperFrame:ResetState();
         window:StopMovingOrSizing();
         window.isMoving = false;
+        window.widgets.chat_display:Hide();
+        window.widgets.chat_display:Show();
 	if(dropTo) then
 		if(window.tabStrip) then
 			window.tabStrip:Detach(window.theUser);
@@ -408,6 +412,7 @@ local function MessageWindow_Frame_OnShow(self)
         if(self.tabStrip) then
                 self.tabStrip:JumpToTabName(self.theUser);
         end
+        CallModuleFunction("OnWindowShow", self);
 	for widgetName, widgetObj in pairs(self.widgets) do
 		if(type(widgetObj.OnWindowShow) == "function") then
 			widgetObj:OnWindowShow();
@@ -422,6 +427,7 @@ local function MessageWindow_Frame_OnHide(self)
 		self.isMoving = false;
         end
         self:ResetAnimation();
+        CallModuleFunction("OnWindowHide", self);
 	for widgetName, widgetObj in pairs(self.widgets) do
 		if(type(widgetObj.OnWindowHide) == "function") then
 			widgetObj:OnWindowHide();
@@ -637,12 +643,12 @@ local function instantiateWindow(obj)
     widgets.scroll_down.widgetName = "scroll_down";
     
     widgets.chat_display = CreateFrame("ScrollingMessageFrame", fName.."ScrollingMessageFrame", obj);
-    widgets.chat_display:RegisterForDrag("LeftButton");
+    --widgets.chat_display:RegisterForDrag("LeftButton");
     widgets.chat_display:SetFading(false);
     widgets.chat_display:SetMaxLines(128);
     widgets.chat_display:SetMovable(true);
-    widgets.chat_display:SetScript("OnDragStart", function(self) MessageWindow_MovementControler_OnDragStart(self); end);
-    widgets.chat_display:SetScript("OnDragStop", function(self) MessageWindow_MovementControler_OnDragStop(self); end);
+    --widgets.chat_display:SetScript("OnDragStart", function(self) MessageWindow_MovementControler_OnDragStart(self); end);
+    --widgets.chat_display:SetScript("OnDragStop", function(self) MessageWindow_MovementControler_OnDragStop(self); end);
     widgets.chat_display:SetScript("OnHyperlinkClick", function(self, ...) _G.SetItemRef(...); end);
     widgets.chat_display:SetScript("OnMessageScrollChanged", function(self) updateScrollBars(self:GetParent()); end);
     widgets.chat_display:SetJustifyH("LEFT");
@@ -675,7 +681,6 @@ local function instantiateWindow(obj)
 	self:AddMessage(str, r, g, b);
 	self.msgWaiting = true;
 	self.lastActivity = time();
-        self.unreadCount = self.unreadCount and (self.unreadCount + 1) or 1;
     end
     
     obj.UpdateIcon = function(self)
@@ -1263,25 +1268,31 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnMouseWheel", functi
 	end);
 
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnMouseDown", function(self)
-	    self:GetParent().prevLeft = self:GetParent():GetLeft();
-	    self:GetParent().prevTop = self:GetParent():GetTop();
+                self:GetParent().prevLeft = self:GetParent():GetLeft();
+                self:GetParent().prevTop = self:GetParent():GetTop();
+                self:GetParent():StartMoving();
+                self:GetParent().isMoving = true;
 	end);
 
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnMouseUp", function(self)
-	    if(self:GetParent().prevLeft == self:GetParent():GetLeft() and self:GetParent().prevTop == self:GetParent():GetTop()) then
-		--[ Frame was clicked not dragged
-		local msg_box = self:GetParent().widgets.msg_box;
-		if(EditBoxInFocus == nil) then
-		    msg_box:SetFocus();
-		else
-		    if(EditBoxInFocus == msg_box) then
-			msg_box:Hide();
-			msg_box:Show();
-		    else
-			msg_box:SetFocus();
-		    end
-		end
-	    end
+                self:GetParent():StopMovingOrSizing();
+                self:GetParent().isMoving = false;
+                self:Hide();
+                self:Show();
+                if(self:GetParent().prevLeft == self:GetParent():GetLeft() and self:GetParent().prevTop == self:GetParent():GetTop()) then
+                        --[ Frame was clicked not dragged
+                        local msg_box = self:GetParent().widgets.msg_box;
+                        if(EditBoxInFocus == nil) then
+                            msg_box:SetFocus();
+                        else
+                            if(EditBoxInFocus == msg_box) then
+                        	msg_box:Hide();
+                        	msg_box:Show();
+                            else
+                        	msg_box:SetFocus();
+                            end
+                        end
+                end
 	end);
 	
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkEnter", function(self)
