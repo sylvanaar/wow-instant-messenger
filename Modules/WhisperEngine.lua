@@ -120,6 +120,25 @@ local CF_MessageEventHandler_orig; -- used for a hook of the chat frame. Messaag
 local addToTableUnique = addToTableUnique;
 local removeFromTable = removeFromTable;
 
+local alertPushed = false;
+
+local function updateMinimapAlerts()
+    local count = 0;
+    for _, win in pairs(Windows) do
+        if(not win:IsShown()) then
+            count = count + (win.unreadCount or 0);
+        end
+    end
+    if(count == 0 and alertPushed) then
+        alertPushed = false;
+        MinimapPopAlert("WhisperAlert");
+    elseif(count > 0) then
+        alertPushed = true;
+        local color = db.displayColors.wispIn;
+        MinimapPushAlert("WhisperAlert", RGBPercentToHex(color.r, color.g, color.b), count);
+    end
+end
+
 function WhisperEngine:OnEnableWIM()
     -- this exists for documenation purposes and is not used in this module.
 end
@@ -162,6 +181,10 @@ function WhisperEngine:OnWindowDestroyed(self)
 end
 
 
+function WhisperEngine:OnWindowShow(win)
+    updateMinimapAlerts();
+end
+
 RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
         local obj = self:GetParent();
         --_G.SendChatMessage(self:GetText(), "WHISPER", nil, obj.theUser);
@@ -169,16 +192,18 @@ RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
         self:SetText("");
     end);
 
+
 local function CHAT_MSG_WHISPER(...)
     local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
     local color = WIM.db.displayColors.wispIn; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
+    win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER", ...);
     win:Pop("in");
-
     if(db.pop_rules.whisper[WIM.curState].supress) then
         _G.ChatEdit_SetLastTellTarget(arg2);
     end
+    updateMinimapAlerts();
     CallModuleFunction("PostEvent_Whisper", ...);
 end
 

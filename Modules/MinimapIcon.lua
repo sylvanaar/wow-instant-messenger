@@ -17,7 +17,7 @@ db_defaults.minimap = {
     position = 200
 };
 
-local Notifications = {};	-- list of current notifications
+ Notifications = {};	-- list of current notifications
 local NotificationIndex = 1;	-- index for update messages
 local Notification_Bowl = {};
 
@@ -68,7 +68,9 @@ local function popNote(tag)
         if(Notifications[i].tag == tag) then
             local note = Notifications[i];
             table.remove(Notifications, i);
-            note.tag, note.color, note.text, note.desc, note.index = "", "", "", "", nil;
+            for key, _ in pairs(note) do
+                note[key] = nil;
+            end
             return;
         end
     end
@@ -133,7 +135,7 @@ local function createMinimapIcon()
 			    self.timeElapsed = (self.timeElapsed or 0) + elapsed;
 			    while(self.timeElapsed > 1) do
 				local minimap = self:GetParent();
-				if(NotificationIndex > #Notifications) then
+				if(NotificationIndex > #Notifications or not Notifications[NotificationIndex]) then
 				    minimap.icon:Show();
 				    minimap.backGround:SetGradient("VERTICAL", getGradientFromColor(IconColor));
 				    minimap.text:Hide();
