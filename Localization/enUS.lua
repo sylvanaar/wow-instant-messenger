@@ -7,6 +7,8 @@ WIM.AddLocale("enUS", {
     ["WIM (WoW Instant Messenger)"] = true,
     ["_Description"] = "WIM is an addon that brings a familiar feel to communicating through chat in The World of Warcraft. On this screen you will be able to customize WIM to tailor it to your needs. If you have any questions, comments or suggestions please go to http://www.WIMAddon.com.",
 
+    ["_DemoText"] = "This is a demonstration window and is not fully functional. Place this window in the location where you want all other windows to spawn. When finished, you may close this window and your settings will be saved.",
+
     ["Yes"] = true,
     ["No"] = true,
     ["None"] = true,

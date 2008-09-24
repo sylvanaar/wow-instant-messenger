@@ -261,7 +261,10 @@ function options.OnShow(self)
 end
 
 function options.OnHide(self)
-
+    if(DemoWindow) then
+        DemoWindow:Hide();
+    end
+    options.frame:Enable();
 end
 
 local function getCategoryIndexByName(cat)

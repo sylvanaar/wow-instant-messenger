@@ -136,6 +136,7 @@ local function updateMinimapAlerts()
         alertPushed = true;
         local color = db.displayColors.wispIn;
         MinimapPushAlert("WhisperAlert", RGBPercentToHex(color.r, color.g, color.b), count);
+        DisplayTutorial(L["Whisper Received!"], L["You received a whisper which was hidden due to your current activity. You can change how whispers behave in WIM's options by typing"].." |cff69ccf0/wim|r");
     end
 end
 
@@ -160,7 +161,9 @@ local function getWhisperWindowByUser(user)
     else
         -- otherwise, create a new one.
         Windows[user] = CreateWhisperWindow(user);
-        Windows[user]:SendWho(); -- send who request
+        if(db.whoLookups) then
+            Windows[user]:SendWho(); -- send who request
+        end
         return Windows[user];
     end
 end

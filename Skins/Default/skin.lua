@@ -236,14 +236,42 @@ local WIM_ClassicSkin = {
     },
     tab_strip = {
         textures = {
-            normal = "Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_normal",
-            selected = "Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_selected",
-            hover = ""
+            tab = {
+                NormalTexture = "Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_normal",
+                PushedTexture = "Interface\\AddOns\\WIM_Rewrite\\Skins\\Default\\tab_selected",
+                HighlightTexture = "Interface\\PaperDollInfoFrame\\UI-Character-Tab-Highlight",
+                HighlightAlphaMode = "ADD"
+            },
+            prev = {
+                NormalTexture = "Interface\\MoneyFrame\\Arrow-Left-Up",
+                PushedTexture = "Interface\\MoneyFrame\\Arrow-Left-Down",
+                DisabledTexture = "Interface\\MoneyFrame\\Arrow-Left-Disabled",
+                HighlightTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\TabArrowLeft",
+                HighlightAlphaMode = "ADD",
+                height = 20,
+                width = 20,
+            },
+            next = {
+                NormalTexture = "Interface\\MoneyFrame\\Arrow-Right-Up",
+                PushedTexture = "Interface\\MoneyFrame\\Arrow-Right-Down",
+                DisabledTexture = "Interface\\MoneyFrame\\Arrow-Right-Disabled",
+                HighlightTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\TabArrowRight",
+                HighlightAlphaMode = "ADD",
+                height = 20,
+                width = 20,
+            },
         },
         height = 32,
         points = {
             {"BOTTOMLEFT", "window", "TOPLEFT", 38, -4},
             {"BOTTOMRIGHT", "window", "TOPRIGHT", -20, -4}
+        },
+        text = {
+            offsets = {0, 0},
+            font = "ChatFontNormal",
+            font_color = {1, 1, 1},
+            font_height = 12,
+            font_flags = ""
         },
         vertical = false,
     },
