@@ -55,12 +55,12 @@ db_defaults.winSize = {
 		scale = 85
 	};
 db_defaults.winLoc = {
-		left =242 ,
-		top =775
+		left =217,
+		top =664
 	};
 db_defaults.winCascade = {
 		enabled = true,
-		direction = "downright"
+		direction = 8
 	};
 db_defaults.winFade = true;
 db_defaults.winAnimation = true;
@@ -68,6 +68,7 @@ db_defaults.wordwrap_indent = false;
 db_defaults.escapeToHide = true;
 db_defaults.ignoreArrowKeys = true;
 db_defaults.pop_rules = {};
+db_defaults.whoLookups = true;
 
 
 local WindowSoupBowl = {
@@ -84,6 +85,18 @@ local FadeProps = {
 	interval = .25,
 	delay = 1
 };
+
+local cascadeDirection = {
+        {0, 25},        -- Up
+        {0, -25},       -- Down
+        {-50, 0},       -- Left
+        {50, 0},        -- Right
+        {-50, 25},      -- Up & Left
+        {50, 25},       -- Up & Right
+        {-50, -25},     -- Down & Left
+        {50, -25},      -- Down & Right
+};
+ windowsByAge = {};
 
 local FormattingCallsList = {}; -- used to get a list of available Formattings.
 local FormattingCalls = {}; -- functions which are passed events to be formatted. Only one may be used at once.
@@ -181,7 +194,7 @@ local resizeFrame = CreateFrame("Button", "WIM_WindowResizeFrame", _G.UIParent);
 resizeFrame:Hide();
 resizeFrame.widgetName = "resize";
 resizeFrame.Attach = function(self, win)
-		if(win.widgets.close ~= GetMouseFocus() and not EditBoxInFocus) then
+		if(win.widgets.close ~= GetMouseFocus() and not EditBoxInFocus and win.type ~= "demo") then
 			self:SetParent(win);
 			self.parentWindow = win;
 			ApplySkinToWidget(self);
@@ -211,6 +224,7 @@ resizeFrame:SetScript("OnMouseUp", function(self)
 		if(tabStrip) then
 			dPrint("Size sent to tab strip.");
 		end
+                DisplayTutorial(L["Window Resized!"], L["If you want all windows to be this size, you can set the default window size within WIM's options."]);
 	end);
 resizeFrame:SetScript("OnUpdate", function(self)
 		if(self.isSizing and self.parentWindow and self.parentWindow.tabStrip) then
@@ -259,10 +273,13 @@ helperFrame:SetScript("OnUpdate", function(self)
 				else
 					win = obj.parentWindow;
 				end
+                                if(win == WIM.DemoWindow) then
+                                        return;
+                                end
 				resizeFrame:Attach(win);
 				if(win.isMoving and not (win.tabStrip and win.tabStrip:IsVisible())) then
 				local mWin = getWindowAtCursorPosition(win);
-					if(not self.isAttached) then
+					if(not self.isAttached and mWin ~= DemoWindow) then
 						if(mWin) then
 							-- attach to window
 							local skinTable = GetSelectedSkin().tab_strip;
@@ -388,6 +405,7 @@ local function MessageWindow_MovementControler_OnDragStop(self)
         window.isMoving = false;
         window.widgets.chat_display:Hide();
         window.widgets.chat_display:Show();
+        window.hasMoved = true;
 	if(dropTo) then
 		if(window.tabStrip) then
 			window.tabStrip:Detach(window.theUser);
@@ -405,19 +423,25 @@ end
 
 -- this needs to be looked at. it isn't doing anything atm...
 local function MessageWindow_Frame_OnShow(self)
-        if(db.autoFocus == true) then
-		--_G[self:GetName().."MsgBox"]:SetFocus();
+        if(self ~= DemoWindow) then
+                if(db.autoFocus == true) then
+        		--_G[self:GetName().."MsgBox"]:SetFocus();
+                end
+                updateScrollBars(self);
+                if(self.tabStrip) then
+                        self.tabStrip:JumpToTabName(self.theUser);
+                end
+                CallModuleFunction("OnWindowShow", self);
+        	for widgetName, widgetObj in pairs(self.widgets) do
+        		if(type(widgetObj.OnWindowShow) == "function") then
+        			widgetObj:OnWindowShow();
+        		end
+        	end
+        else
+                self.widgets.chat_display:Clear();
+                self.widgets.chat_display:AddMessage(L["_DemoText"]);
+                self.widgets.msg_box:Hide();
         end
-        updateScrollBars(self);
-        if(self.tabStrip) then
-                self.tabStrip:JumpToTabName(self.theUser);
-        end
-        CallModuleFunction("OnWindowShow", self);
-	for widgetName, widgetObj in pairs(self.widgets) do
-		if(type(widgetObj.OnWindowShow) == "function") then
-			widgetObj:OnWindowShow();
-		end
-	end
 end
 
 -- this needs to be looked at. it isn't doing anything atm...
@@ -427,11 +451,21 @@ local function MessageWindow_Frame_OnHide(self)
 		self.isMoving = false;
         end
         self:ResetAnimation();
-        CallModuleFunction("OnWindowHide", self);
-	for widgetName, widgetObj in pairs(self.widgets) do
-		if(type(widgetObj.OnWindowHide) == "function") then
-			widgetObj:OnWindowHide();
-		end
+        if(self.type == "demo" and self.demoSave) then
+                -- save window placement settings.
+                db.winLoc.left = self:GetLeft()*self:GetEffectiveScale();
+                db.winLoc.top = self:GetTop()*self:GetEffectiveScale();
+                options.frame:Enable();
+                self.demoSave = nil;
+                DestroyWindow(self);
+                WIM.DemoWindow = nil;
+        elseif(self.type ~= "demo") then
+                CallModuleFunction("OnWindowHide", self);
+                for widgetName, widgetObj in pairs(self.widgets) do
+                	if(type(widgetObj.OnWindowHide) == "function") then
+                		widgetObj:OnWindowHide();
+                	end
+                end
         end
 end
 
@@ -440,7 +474,7 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
 	self.msgWaiting = false;
 	self.unreadCount = 0;
 	-- fading segment
-	if(db.winFade) then
+	if(db.winFade and self ~= DemoWindow) then
 		self.fadeElapsed = (self.fadeElapsed or 0) + elapsed;
 		while(self.fadeElapsed > .1) do
 			local window = GetMouseFocus();
@@ -719,6 +753,9 @@ local function instantiateWindow(obj)
     end
     
     obj.SendWho = function(self)
+        if(self.type ~= "whisper") then
+                return;
+        end
 	local whoLib = libs.WhoLib;
 	if(whoLib) then
 		whoLib:UserInfo(self.theUser, 
@@ -898,11 +935,30 @@ local function instantiateWindow(obj)
 
 end
 
+local function placeWindow(win)
+        win:ClearAllPoints();
+        local lastWindow = nil;
+        for i=1, #windowsByAge do
+                if(windowsByAge[i] ~= win and windowsByAge[i]:IsShown() and windowsByAge[i].hasMoved == false) then
+                        lastWindow = windowsByAge[i];
+                        break;
+                end
+        end
+        if(not lastWindow or db.winCascade.enabled == false) then
+                win:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", db.winLoc.left/win:GetEffectiveScale(), db.winLoc.top/win:GetEffectiveScale());
+        else
+                local casc = cascadeDirection[db.winCascade.direction];
+                win:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", lastWindow:GetLeft()+casc[1], lastWindow:GetTop()+casc[2]);
+        end
+end
+
+
 -- load object into it's default state.
 local function loadWindowDefaults(obj)
 	obj:Hide();
 
         obj.age = _G.time();
+        obj.hasMoved = false;
 
 	obj.lastActivity = time();
 
@@ -914,6 +970,7 @@ local function loadWindowDefaults(obj)
 	obj.class = "blank";
 	obj.location = "";
 	obj:UpdateIcon();
+        obj.demoSave = nil;
     
 	obj.isNew = true;
 
@@ -929,6 +986,7 @@ local function loadWindowDefaults(obj)
     
 	obj.widgets.msg_box.setText = 0;
 	obj.widgets.msg_box:SetText("");
+        obj.widgets.msg_box:Show();
     
 	obj.widgets.chat_display:Clear();
 	obj.widgets.chat_display:AddMessage("  ");
@@ -950,6 +1008,7 @@ local function loadWindowDefaults(obj)
 	end
 	ApplySkinToWindow(obj);
 	obj:UpdateProps();
+        placeWindow(obj);
 end
 
 --Create (recycle if available) message window. Returns object.
@@ -986,6 +1045,8 @@ local function createWindow(userName, wtype)
         loadWindowDefaults(obj); -- clear contents of window and revert back to it's initial state.
         dPrint("Window recycled '"..obj:GetName().."'");
 	CallModuleFunction("OnWindowCreated", obj);
+        table.insert(windowsByAge, obj);
+        table.sort(windowsByAge, function(a, b) return a.age > b.age; end);
         return obj;
     else
         -- must create new object
@@ -1009,6 +1070,8 @@ local function createWindow(userName, wtype)
         loadWindowDefaults(f);
         dPrint("Window created '"..f:GetName().."'");
 	CallModuleFunction("OnWindowCreated", f);
+        table.insert(windowsByAge, f);
+        table.sort(windowsByAge, function(a, b) return a.age > b.age; end);
         return f;
     end
 end
@@ -1051,6 +1114,7 @@ local function destroyWindow(userNameOrObj)
         obj:Hide();
 	dPrint("Window '"..obj:GetName().."' destroyed.");
 	CallModuleFunction("OnWindowDestroyed", obj);
+        removeFromTable(windowsByAge, obj);
     end
 end
 
@@ -1069,7 +1133,8 @@ function RegisterWidgetTrigger(WidgetName, wType, HandlerName, Function)
 		Widget_Triggers[WidgetName][HandlerName] = {
 			whisper = {},
 			chat = {},
-			w2w = {}
+			w2w = {},
+                        demo = {},
 		};
 	end
 	--register to table
@@ -1098,6 +1163,18 @@ end
 function DestroyWindow(playerNameOrObject)
 	destroyWindow(playerNameOrObject);
 end
+
+function ShowDemoWindow()
+        if(options.frame and options.frame:IsShown()) then
+                options.frame:Disable();
+                if(not WIM.DemoWindow) then
+                        WIM.DemoWindow = createWindow(L["Demo Window"], "demo");
+                end
+                WIM.DemoWindow:Show();
+                WIM.DemoWindow.demoSave = true;
+        end
+end
+
 
 function RegisterWidget(widgetName, createFunction, moduleName)
 	-- moduleName is optional if not being called from a module.
@@ -1183,8 +1260,8 @@ RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnEnter", function(self)
 	
 RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnLeave", function(self) _G.GameTooltip:Hide(); end);
 	
-RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnClick", function(self)
-		if(IsShiftKeyDown() or self.forceShift) then
+RegisterWidgetTrigger("close", "whisper,chat,w2w,demo", "OnClick", function(self)
+		if(IsShiftKeyDown() or self.forceShift or self.parentWindow.type == "demo") then
 			destroyWindow(self:GetParent());
 		else
 			DisplayTutorial(L["Message Window Hidden"], L["WIM's message window has been hidden to WIM's Minimap Icon. If you want to end a conversation, you may do so by <Shift-Clicking> the close button."]);
@@ -1267,19 +1344,19 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnMouseWheel", functi
 	    updateScrollBars(getParentMessageWindow(self));
 	end);
 
-RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnMouseDown", function(self)
+RegisterWidgetTrigger("chat_display", "whisper,chat,w2w,demo", "OnMouseDown", function(self)
                 self:GetParent().prevLeft = self:GetParent():GetLeft();
                 self:GetParent().prevTop = self:GetParent():GetTop();
-                self:GetParent():StartMoving();
-                self:GetParent().isMoving = true;
+                MessageWindow_MovementControler_OnDragStart(self);
 	end);
 
-RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnMouseUp", function(self)
-                self:GetParent():StopMovingOrSizing();
-                self:GetParent().isMoving = false;
-                self:Hide();
-                self:Show();
-                if(self:GetParent().prevLeft == self:GetParent():GetLeft() and self:GetParent().prevTop == self:GetParent():GetTop()) then
+RegisterWidgetTrigger("chat_display", "whisper,chat,w2w,demo", "OnMouseUp", function(self)
+                MessageWindow_MovementControler_OnDragStop(self);
+                if(self.parentWindow ~= DemoWindow) then
+                        self:Hide();
+                        self:Show();
+                end
+                if(self:GetParent().prevLeft == self:GetParent():GetLeft() and self:GetParent().prevTop == self:GetParent():GetTop() and self.parentWindow ~= DemoWindow) then
                         --[ Frame was clicked not dragged
                         local msg_box = self:GetParent().widgets.msg_box;
                         if(EditBoxInFocus == nil) then
@@ -1305,7 +1382,7 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkLeave", fu
 			obj.isOnHyperLink = false;
 		end)
 
-RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEnterPressed", function(self)
+RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnEnterPressed", function(self)
 		if(strsub(self:GetText(), 1, 1) == "/") then
 			EditBoxInFocus = nil;
 			_G.ChatFrameEditBox:SetText(self:GetText());
@@ -1329,13 +1406,13 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEnterPressed", function(
                 
 	end);
 	
-RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEscapePressed", function(self)
+RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnEscapePressed", function(self)
 		self:SetText("");
 		self:Hide();
 		self:Show();
 	end);
 	
-RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnUpdate", function(self)
+RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnUpdate", function(self)
 		if(self.setText == 1) then
 			self.setText = 0;
 			self:SetText("");

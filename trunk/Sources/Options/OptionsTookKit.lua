@@ -24,6 +24,7 @@ setfenv(1, WIM);
     - CreateCheckButtonMenu(parent, title, dbTree, varName, tooltip, valChanged, itemList, dbTree2, varName2, valChanged2) returns CheckButton
     - CreateSlider(parent, title, minText, maxText, min, max, step, dbTree, varName, valChanged) returns Slider
     - CreateColorPicker(parent, title, dbTree, varName, valChanged) returns Frame
+    - CreateButton(parent, title, fun) returns Button
     
     Frame Modifying Tools:
     - WIM.options.AddFramedBackdrop(theFrame)
@@ -58,6 +59,16 @@ end
 local function SetFullSize(self)
     self:SetPoint("LEFT");
     self:SetPoint("RIGHT");
+end
+
+local function CreateButton(parent, text, fun)
+    local button = CreateFrame("Button", parent:GetName()..statObject("Button"), parent, "UIPanelButtonTemplate2");
+    button.text = _G[button:GetName().."Text"];
+    button.text:SetText(text);
+    button:SetWidth(button.text:GetStringWidth()+40);
+    button:SetScript("OnClick", fun);
+    SetNextAnchor(button);
+    return button;
 end
 
 local function CreateColorPicker(parent, title, dbTree, varName, valChanged)
@@ -325,7 +336,7 @@ local function CreateCheckButtonMenu(parent, title, dbTree, varName, tooltip, va
         end
     end
     _G.UIDropDownMenu_Initialize(cbm.menu.dropdown, cbm.menu.dropdown.init, "MENU");
-    _G.UIDropDownMenu_SetSelectedValue(cbm.menu.dropdown, db.timeStampFormat);
+    _G.UIDropDownMenu_SetSelectedValue(cbm.menu.dropdown, dbTree2[varName2]);
     
     return cbm;
 end
@@ -407,6 +418,7 @@ function options.InherritOptionFrameProperties(obj)
     obj.CreateCheckButtonMenu = CreateCheckButtonMenu;
     obj.CreateSlider = CreateSlider;
     obj.CreateColorPicker = CreateColorPicker;
+    obj.CreateButton = CreateButton;
 end
 
 -- Global usage for modules

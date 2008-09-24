@@ -209,6 +209,11 @@ local function setTabOffset(tabStrip, PlusOrMinus)
     tabStrip:UpdateTabs();
 end
 
+local function applySkinToTab(tab, skinTable)
+    tab:SetHighlightTexture(skinTable.textures.tab.HighlightTexture, skinTable.textures.tab.HighlightAlphaMode);
+end
+
+
 -- create a tabStrip object and register it to table TabGroups.
 -- returns the tabStrip just created.
 local function createTabGroup()
@@ -236,9 +241,8 @@ local function createTabGroup()
     tabStrip.tabs = {};
     local i;
     for i=1,tabsPerStrip do
-        local tab = CreateFrame("Button", stripName.."_Tab"..i, tabStrip, "UIPanelButtonTemplate");
-        tab:SetNormalTexture(nil); tab:SetPushedTexture(nil); tab:SetDisabledTexture(nil);
-        tab.text = _G[tab:GetName().."Text"];
+        local tab = CreateFrame("Button", stripName.."_Tab"..i, tabStrip);
+        tab.text = tab:CreateFontString(tab:GetName().."Text", "OVERLAY", "ChatFontNormal")
         tab.text:ClearAllPoints();
         tab.text:SetAllPoints();
         tab.tabIndex = i;
@@ -258,12 +262,21 @@ local function createTabGroup()
         tab.middle:SetPoint("TOPLEFT", tab.left, "TOPRIGHT");
         tab.middle:SetPoint("BOTTOMRIGHT", tab.right, "BOTTOMLEFT");
         tab.SetTexture = function(self, pathOrTexture)
-            tab.left:SetTexture(pathOrTexture);
-            tab.middle:SetTexture(pathOrTexture);
-            tab.right:SetTexture(pathOrTexture);
-        tab:SetScript("OnClick", function(self) tabStrip:JumpToTabName(self.childName); end);
-        tab.isWimTab = true;
+            self.left:SetTexture(pathOrTexture);
+            self.middle:SetTexture(pathOrTexture);
+            self.right:SetTexture(pathOrTexture);
         end
+        tab:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+        tab:SetScript("OnClick", function(self, button)
+            if(button == "RightButton") then
+                self.childObj.widgets.close.forceShift = true;
+                self.childObj.widgets.close:Click();
+                self.childObj.widgets.close.forceShift = false;
+            else
+                tabStrip:JumpToTabName(self.childName);
+            end
+        end);
+        tab.isWimTab = true;
         
         table.insert(tabStrip.tabs, tab);
     end
@@ -307,8 +320,28 @@ local function createTabGroup()
 		self.nextButton:Hide();
 		self.prevButton:Hide();
 	else
+                
 		self.nextButton:Show();
 		self.prevButton:Show();
+                self.nextButton:SetNormalTexture(skinTable.textures.next.NormalTexture);
+                self.nextButton:SetPushedTexture(skinTable.textures.next.PushedTexture);
+                self.nextButton:SetHighlightTexture(skinTable.textures.next.HighlightTexture, skinTable.textures.next.HighlightAlphaMode);
+                self.nextButton:SetDisabledTexture(skinTable.textures.next.DisabledTexture);
+                self.prevButton:SetNormalTexture(skinTable.textures.prev.NormalTexture);
+                self.prevButton:SetPushedTexture(skinTable.textures.prev.PushedTexture);
+                self.prevButton:SetHighlightTexture(skinTable.textures.prev.HighlightTexture, skinTable.textures.prev.HighlightAlphaMode);
+                self.prevButton:SetDisabledTexture(skinTable.textures.prev.DisabledTexture);
+                
+                self.prevButton:ClearAllPoints();
+                self.prevButton:SetPoint("RIGHT", self, "LEFT", 0, 0);
+                self.prevButton:SetWidth(skinTable.textures.prev.width); self.prevButton:SetHeight(skinTable.textures.prev.height);
+                self.nextButton:ClearAllPoints();
+                self.nextButton:SetPoint("LEFT", self, "RIGHT", 0, 0);
+                self.nextButton:SetWidth(skinTable.textures.next.width); self.nextButton:SetHeight(skinTable.textures.next.height);
+                
+                self.prevButton.parentWindow = self:GetParent();
+                self.nextButton.parentWindow = self:GetParent();
+                
 		if(self.curOffset <= 0) then
 			self.prevButton:Disable();
 		else
@@ -328,12 +361,13 @@ local function createTabGroup()
                 self.tabs[i].childObj = windows.active.whisper[str] or windows.active.chat[str] or windows.active.w2w[str];
                 self.tabs[i].childName = str;
                 self.tabs[i].text:SetText(str);
+                applySkinToTab(self.tabs[i], skinTable);
                 if(self.tabs[i].childObj == self.selected.obj) then
                     self.tabs[i]:SetAlpha(1);
-                    self.tabs[i]:SetTexture(skinTable.textures.selected);
+                    self.tabs[i]:SetTexture(skinTable.textures.tab.PushedTexture);
                 else
                     self.tabs[i]:SetAlpha(.7);
-                    self.tabs[i]:SetTexture(skinTable.textures.normal);
+                    self.tabs[i]:SetTexture(skinTable.textures.tab.NormalTexture);
                 end
             else
                 self.tabs[i]:Hide();

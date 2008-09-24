@@ -32,6 +32,10 @@ local function General_Main()
     frame.welcome.cb2 = frame.welcome:CreateCheckButton(L["Display Minimap Icon"], WIM.modules.MinimapIcon, "enabled", nil, function(self, button) EnableModule("MinimapIcon", self:GetChecked()); end);
     frame.welcome.nextOffSetY = -20;
     frame.welcome.cb2 = frame.welcome:CreateCheckButton(L["Display Tutorials"], WIM.modules.Tutorials, "enabled", nil, function(self, button) EnableModule("Tutorials", self:GetChecked()); end);
+    frame.welcome.reset = frame.welcome:CreateButton(L["Reset Tutorials"], function() db.shownTutorials = {}; end);
+    frame.welcome.reset:ClearAllPoints();
+    frame.welcome.reset:SetPoint("LEFT", frame.welcome.cb2, "RIGHT", frame.welcome.cb2.text:GetStringWidth()+30, 0);
+    frame.welcome.lastObj = frame.welcome.cb2;
     frame.credits = frame:CreateSection(L["Credits"], table.concat(credits, "\n"));
     frame.credits:ClearAllPoints();
     frame.credits:SetFullSize();
@@ -176,10 +180,23 @@ local function General_WindowSettings()
     frame.menu.scale = frame.menu:CreateSlider(L["Window Scale"], "10", "400", 10, 400, 1, db.winSize, "scale", function(self) UpdateAllWindowProps(); end);
     frame.menu.nextOffSetY = -45;
     frame.menu.alpha = frame.menu:CreateSlider(L["Window Alpha"], "1", "100", 1, 100, 1, db, "windowAlpha", function(self) UpdateAllWindowProps(); end);
-    frame.menu.nextOffSetY = -40;
+    frame.menu.nextOffSetY = -25;
+    frame.menu:CreateButton(L["Set Window Spawn Location"], ShowDemoWindow);
+    frame.menu.nextOffSetY = -10;
     frame.menu.sub = frame.menu:CreateSection();
     options.AddFramedBackdrop(frame.menu.sub);
+    local cascade = {L["Up"], L["Down"], L["Left"], L["Right"], L["Up"].." & "..L["Left"], L["Up"].." & "..L["Right"], L["Down"].." & "..L["Left"], L["Down"].." & "..L["Right"]};
+    local tsList = {};
+    for i=1, #cascade do
+        table.insert(tsList, {
+            text = cascade[i],
+            value = i,
+            justifyH = "LEFT",
+        });
+    end
+    frame.menu.sub:CreateCheckButtonMenu(L["Cascade overlapping windows."], db.winCascade, "enabled", nil, nil, tsList, db.winCascade, "direction", nil);
     frame.menu.sub:CreateCheckButton(L["Ignore arrow keys in message box."], db, "ignoreArrowKeys", nil, function(self) UpdateAllWindowProps(); end);
+    frame.menu.sub:CreateCheckButton(L["Allow <ESC> to hide windows."], db, "escapeToHide", L["Windows will also be hidden when frames such as the world map are shown."], function(self) UpdateAllWindowProps(); end);
     return frame;
 end
 
@@ -193,8 +210,9 @@ local function General_VisualSettings()
     frame.menu:CreateColorPicker(L["Color: URL - Web Addresses"], db.displayColors, "webAddress");
     frame.menu.nextOffSetY = -10;
     frame.menu:CreateCheckButton(L["Use colors suggested by skin."], db.displayColors, "useSkin");
-    
-    frame.menu.nextOffSetY = -20;
+    frame.menu.nextOffSetY = -40;
+    frame.menu:CreateSlider(L["Chat Font Size"], "8", "50", 8, 50, 1, db, "fontSize", function(self) UpdateAllWindowProps(); end);
+    frame.menu.nextOffSetY = -50;
     frame.menu.sub = frame.menu:CreateSection();
     options.AddFramedBackdrop(frame.menu.sub);
     frame.menu.sub:CreateCheckButton(L["Enable window fading effects."], db, "winFade");
@@ -213,6 +231,9 @@ local function Whispers_DisplaySettings()
     
     frame.menu.nextOffSetY = -10;
     frame.menu:CreateCheckButton(L["Use colors suggested by skin."], db.displayColors, "useSkin");
+    
+    frame.menu.nextOffSetY = -20;
+    frame.menu:CreateCheckButton(L["Display user class icons and details."], db, "whoLookups", L["Requires who lookups."]);
     
     return frame;
 end
