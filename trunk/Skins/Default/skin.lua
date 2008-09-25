@@ -261,13 +261,12 @@ local WIM_ClassicSkin = {
                 width = 20,
             },
         },
-        height = 32,
+        height = 26,
         points = {
             {"BOTTOMLEFT", "window", "TOPLEFT", 38, -4},
             {"BOTTOMRIGHT", "window", "TOPRIGHT", -20, -4}
         },
         text = {
-            offsets = {0, 0},
             font = "ChatFontNormal",
             font_color = {1, 1, 1},
             font_height = 12,

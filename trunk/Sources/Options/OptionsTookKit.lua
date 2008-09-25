@@ -257,7 +257,7 @@ local function CreateCheckButton(parent, title, dbTree, varName, tooltip, valCha
             end
             self:UpdateChildren();
             self.disabledByParent = nil;
-            self.text:SetTextColor(unpack(TitleColor));
+            self.text:SetTextColor(1, 1, 1);
             self:_Enable();
         end
     cb.Disable = function(self, disabler)
@@ -275,7 +275,7 @@ local function CreateCheckButton(parent, title, dbTree, varName, tooltip, valCha
     cb.UpdateChildren = function(self)
             for i=1, #self.children do
                 if(self:GetChecked()) then
-                    self.children[i].text:SetTextColor(unpack(TitleColor));
+                    self.children[i].text:SetTextColor(1, 1, 1);
                     self.children[i]:_Enable(self);
                 else
                     self.children[i].text:SetTextColor(unpack(DisabledColor));
@@ -285,6 +285,7 @@ local function CreateCheckButton(parent, title, dbTree, varName, tooltip, valCha
         end
         
     if(parent.isCheckButton) then
+        cb:SetScale(.90);
         if(#parent.children == 0) then
             parent.nextOffSetX = cb:GetWidth();
             parent.nextOffSetY = -cb:GetHeight();

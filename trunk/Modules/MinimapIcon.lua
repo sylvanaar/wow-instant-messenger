@@ -14,7 +14,8 @@ setfenv(1, WIM);
 local MinimapIcon = CreateModule("MinimapIcon", true);
 
 db_defaults.minimap = {
-    position = 200
+    position = 200,
+    rightClickNew = false
 };
 
  Notifications = {};	-- list of current notifications
@@ -96,7 +97,7 @@ local function createMinimapIcon()
         self:SetFrameStrata('MEDIUM');
 	self:SetWidth(31); self:SetHeight(31);
 	self:SetFrameLevel(8);
-	self:RegisterForClicks('AnyUp');
+	self:RegisterForClicks('LeftButtonUp', "RightButtonUp");
 	self:RegisterForDrag('LeftButton');
 	self:SetHighlightTexture('Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight');
 
@@ -184,7 +185,16 @@ local function createMinimapIcon()
 	icon.text:SetText(text);
     end
     icon.OnClick = function(self, button)
-        toggleMenu(self);
+        if(button == "LeftButton") then
+            toggleMenu(self);
+        else
+            if(db.minimap.rightClickNew) then
+                ShowAllUnreadWindows();
+            else
+                -- display tools menu
+                
+            end
+        end
     end
     icon.OnMouseDown = function(self)
         self.icon:SetTexCoord(0, 1, 0, 1);

@@ -211,6 +211,11 @@ end
 
 local function applySkinToTab(tab, skinTable)
     tab:SetHighlightTexture(skinTable.textures.tab.HighlightTexture, skinTable.textures.tab.HighlightAlphaMode);
+    local hlt = tab:GetHighlightTexture();
+    if(hlt) then
+        hlt:ClearAllPoints();
+        hlt:SetAllPoints();
+    end
 end
 
 
