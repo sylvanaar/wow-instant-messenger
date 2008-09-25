@@ -4,6 +4,8 @@ local _G = _G;
 local CreateFrame = CreateFrame;
 local table = table;
 local type = type;
+local math = math;
+local select = select;
 
 -- set namespace
 setfenv(1, WIM);
@@ -14,6 +16,15 @@ local Categories = {};
 local categorySelected = 1;
 local subCategorySelected = 1;
 
+local function getMaxLevel(obj)
+    local maxLevel = obj:GetFrameLevel();
+    if(type(obj.GetChildren) == "function") then
+        for i=1, select("#", obj:GetChildren()) do
+            maxLevel = math.max(maxLevel, getMaxLevel(select(i, obj:GetChildren())));
+        end
+    end
+    return maxLevel;
+end
 
 local function createOptionsFrame()
     -- create frame object
@@ -99,6 +110,7 @@ local function createOptionsFrame()
     win.Disable = function(self)
         self:SetAlpha(.5);
         self.disableFrame:Show();
+        self.disableFrame:SetFrameLevel(getMaxLevel(self.container)+1);
         win:SetToplevel(false);
     end
 
