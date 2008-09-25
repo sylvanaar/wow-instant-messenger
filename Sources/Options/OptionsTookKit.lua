@@ -170,7 +170,13 @@ end
 local function CreateDropDownMenu(parent, dbTree, varName, itemList, width)
     local menu = CreateFrame("Frame", parent:GetName()..statObject("DropDownMenu"), parent, "UIDropDownMenuTemplate");
     menu:EnableMouse(true);
-    if(width) then _G.UIDropDownMenu_SetWidth(width, menu); end
+    if(width) then
+        if(isWOTLK) then
+            _G.UIDropDownMenu_SetWidth(menu, width);
+        else
+            _G.UIDropDownMenu_SetWidth(width, menu);
+        end
+    end
     menu.itemList = itemList or {};
     menu.init = function()
             for i=1, #menu.itemList do
