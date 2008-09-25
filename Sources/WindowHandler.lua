@@ -226,6 +226,12 @@ resizeFrame:SetScript("OnMouseUp", function(self)
 		end
                 DisplayTutorial(L["Window Resized!"], L["If you want all windows to be this size, you can set the default window size within WIM's options."]);
 	end);
+resizeFrame:SetScript("OnHide", function(self)
+                if(self.parentWindow and self.isSizing) then
+                        local OnMouseUp = self:GetScript("OnMouseUp");
+                        OnMouseUp(self);
+                end
+        end);
 resizeFrame:SetScript("OnUpdate", function(self)
 		if(self.isSizing and self.parentWindow and self.parentWindow.tabStrip) then
 			local curSize = self.parentWindow:GetWidth()..self.parentWindow:GetHeight();
