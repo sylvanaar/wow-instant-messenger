@@ -18,6 +18,19 @@ local socketCount = 0;
 local socketFrame = _G.CreateFrame("Frame");
 socketFrame:RegisterEvent("CHAT_MSG_ADDON");
 
+-- thank you stewarta
+local function huff_encode(thestr)
+	thestr=thestr:gsub("\001","\001\001");
+	thestr=thestr:gsub("%z","\001\255");
+	return thestr;
+end
+
+local function huff_decode(thestr)
+	thestr=thestr:gsub("\001\001","\001");
+	thestr=thestr:gsub("\001\255","\000");
+	return thestr;
+end
+
 local function getNewTable()
     if(#recycled > 0) then
         local tbl = recycled[1];
@@ -51,7 +64,7 @@ local function createNewSocket(user, socketIndex, dataLength)
 end
 
 local function ProcessData(channel, from, data)
-    local str, err = libs.LibCompress:DecompressLZW(data);
+    local str, err = libs.LibCompress:DecompressHuffman(huff_decode(data));
     if(err) then
         dPrint(err);
         return;
@@ -112,7 +125,8 @@ socketFrame:SetScript("OnEvent", OnEvent);
 
 -- outbound Traffic:
 function SendData(user, cmd, data)
-    local msg = libs.LibCompress:CompressLZW(string.upper(cmd)..":"..data);
+    local msg = libs.LibCompress:CompressHuffman(string.upper(cmd)..":"..data);
+    msg = huff_encode(msg);
     --local msg = string.upper(cmd)..":"..data
     local msgCount = math.ceil(string.len(msg)/200);
     if(msgCount == 1) then
@@ -195,6 +209,5 @@ function _G.test()
 86befe86befe85befe85befe85bffe84bffe84bffe83c0fe83c0fe83c0fe83c0fc83c0fc83c0fc84c0fc84c0fc84c0fc84bffc85bffd85bffd85bffd87bdf788bdf388c1f682c0f880c0f981c0fc84c1fe87befc87bbf88cbdf78cbff885c1fa81c0f28cc3f192c3ec85afd33b4e6f24335226395d263c621e35590b3055557aa082afd996cdf988beed80bcf585c1f989c4fc8ac3fe84c0f883c1f883c0f884c0f985c0f985bffa85bffb85bffc84c0fd81c1fd81c1fd82c0fd84c0fe84c0fe
 84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe83bffc84bffb84bff984bff984bffb82c0fc81c0fe83c0fe84c0fc87bff986bef97ebefb87c4fd86beef90c6f294c4eb6073941d344f1e355d233a6a1f3762122d4a3e59776f99bb94cdf490c5ef7dbdf681c0f786c1fa89c0fe81bef580c2f780c2f981c1fa84c1fa84c0fb85bffd84bffe83c0fd81c2fc80c2fc82c0fd84c0fe84c0fe
 84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe84c0fe85c1fe86c2fd87c2fc86c1fb84c0fb82c0fc81c0fe82bffe82befa85bcf786bdf882c2ff89c6ff86beef8bc1ee96c6f0a5b8d9304863213760263c6c3047721a3552233e5c4e789b80b9e29bd0fa84c4fc80bef582bdf688bffd7ebbf27fc1f680c2f981c1fa84c1fa84c0fb85bffd84bffe83c0fd81c2fc80c2fc82c0fd84c0fe84c0fe]];
-_G.orig = string.gsub(_G.orig, "[^0-9a-fA-F]", "")
-SendData("Stewstew", "test", _G.orig);
+SendData("telesmom", "test", _G.orig);
 end
