@@ -58,7 +58,7 @@ function WIM.addToTableUnique(tbl, item, prioritize)
     local i;
     for i=1,table.getn(tbl) do
         if(tbl[i] == item) then
-            return;
+            return false;
         end
     end
     if(prioritize) then
@@ -66,6 +66,7 @@ function WIM.addToTableUnique(tbl, item, prioritize)
     else
         table.insert(tbl, item);
     end
+    return true;
 end
 
 -- remove item from table. Return true if removed, false otherwise.

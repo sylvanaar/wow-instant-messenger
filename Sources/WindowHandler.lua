@@ -1228,6 +1228,30 @@ function ShowAllWindows(type)
 	end
 end
 
+local showAllUnreadTbl = {};
+function ShowAllUnreadWindows(type)
+        type = type and string.lower(type) or nil;
+	for i=1, #WindowSoupBowl.windows do
+		if(WindowSoupBowl.windows[i].inUse and WindowSoupBowl.windows[i].obj.type == (type or WindowSoupBowl.windows[i].obj.type)) then
+                        local obj = WindowSoupBowl.windows[i].obj;
+                        if(obj.unreadCount > 0) then
+                                if(obj.tabStrip) then
+                                        if(addToTableUnique(showAllUnreadTbl, obj.tabStrip)) then
+                        			WindowSoupBowl.windows[i].obj:Pop(true);
+                                        end
+                                else
+                                        WindowSoupBowl.windows[i].obj:Pop(true);
+                                end
+                        end
+		end
+	end
+        -- clean table
+        for i=1, #showAllUnreadTbl do
+                table.remove(showAllUnreadTbl, 1);
+        end
+end
+
+
 function UpdateAllWindowProps()
 	for i=1, #WindowSoupBowl.windows do
 		if(WindowSoupBowl.windows[i].inUse) then
