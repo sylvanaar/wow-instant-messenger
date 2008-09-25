@@ -203,8 +203,36 @@ end
 local function General_VisualSettings()
     local frame = options.CreateOptionsFrame();
     frame.menu = frame:CreateSection(L["Display Settings"], L["Configure general window display settings."]);
-    frame.menu.nextOffSetY = -10;
+    frame.menu.nextOffSetY = -20;
+    frame.menu.skinText = frame.menu:CreateText();
+    frame.menu.skinText:SetText(L["Window Skin:"]);
+    frame.menu.skinTooltipText = function(theSkin)
+            local text, skin  = "", GetSkinTable(theSkin);
+            if(skin.version) then text = text.."\n"..L["Version"]..": |cffffffff"..skin.version.."|r"; end
+            if(skin.author) then text = text.."\n"..skin.author; end
+            if(skin.website) then text = text.."\n"..skin.website; end
+            return text;
+        end
+    local skins = GetRegisteredSkins();
+    local skinList = {};
+    for i=1, #skins do
+        table.insert(skinList, {
+            text = skins[i],
+            value = skins[i],
+            tooltipTitle = skins[i],
+            tooltipText = frame.menu.skinTooltipText(skins[i]),
+            justifyH = "LEFT",
+            func = function(self)
+                LoadSkin(self.value);
+            end,
+        });
+    end
+    frame.menu.skinList = frame.menu:CreateDropDownMenu(db.skin, "selected", skinList, 150);
+    frame.menu.skinList:ClearAllPoints();
+    frame.menu.skinList:SetPoint("LEFT", frame.menu.skinText, "LEFT", frame.menu.skinText:GetStringWidth(), 0);
+    frame.menu.lastObj = frame.menu.skinText;
     
+    frame.menu.nextOffSetY = -15;
     frame.menu:CreateColorPicker(L["Color: System Messages"], db.displayColors, "sysMsg");
     frame.menu:CreateColorPicker(L["Color: Error Messages"], db.displayColors, "errorMsg");
     frame.menu:CreateColorPicker(L["Color: URL - Web Addresses"], db.displayColors, "webAddress");

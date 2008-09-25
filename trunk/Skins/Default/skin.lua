@@ -11,7 +11,7 @@ end
 local WIM_ClassicSkin = {
     title = "WIM Classic",
     version = "1.0.0",
-    author = "Pazza [Bronzebeard]",
+    author = "Pazza <Bronzebeard>",
     website = "http://www.wimaddon.com",
     message_window = {
         texture = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window",
@@ -403,8 +403,47 @@ local WIM_ClassicSkin = {
     }
 };
 
+local WIM_ClassicSkin_Blue = {
+    title = "WIM Classic - Blue",
+    author = WIM_ClassicSkin.author,
+    version = WIM_ClassicSkin.version,
+    message_window = {
+        texture = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window_blue"
+    }
+};
+
+local WIM_ClassicSkin_Green = {
+    title = "WIM Classic - Green",
+    author = WIM_ClassicSkin.author,
+    version = WIM_ClassicSkin.version,
+    message_window = {
+        texture = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window_green"
+    }
+};
+
+local WIM_ClassicSkin_Red = {
+    title = "WIM Classic - Red",
+    author = WIM_ClassicSkin.author,
+    version = WIM_ClassicSkin.version,
+    message_window = {
+        texture = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window_red"
+    }
+};
+
+local WIM_ClassicSkin_Yellow = {
+    title = "WIM Classic - Yellow",
+    author = WIM_ClassicSkin.author,
+    version = WIM_ClassicSkin.version,
+    message_window = {
+        texture = "Interface\\AddOns\\WIM_Rewrite\\skins\\default\\message_window_yellow"
+    }
+};
 ----------------------------------------------------------
 --                  Register Skin                       --
 ----------------------------------------------------------
 
 WIM.RegisterSkin(WIM_ClassicSkin);
+WIM.RegisterSkin(WIM_ClassicSkin_Blue);
+WIM.RegisterSkin(WIM_ClassicSkin_Green);
+WIM.RegisterSkin(WIM_ClassicSkin_Red);
+WIM.RegisterSkin(WIM_ClassicSkin_Yellow);

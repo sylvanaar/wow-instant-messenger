@@ -737,10 +737,13 @@ local function instantiateWindow(obj)
 		end
 	end
 	icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.class_icon[classTag]));
+        if(constants.classes[self.class] and GetSelectedSkin().message_window.widgets.from.use_class_color) then
+		self.widgets.from:SetTextColor(RGBHexToPercent(constants.classes[self.class].color));
+	end
     end
     
     obj.UpdateCharDetails = function(self)
-	self.widgets.char_info:SetText(GetSelectedSkin().message_window.widgets.char_info.format(self, self.guild, self.level, self.race, self.class));
+        self.widgets.char_info:SetText(GetSelectedSkin().message_window.widgets.char_info.format(self, self.guild, self.level, self.race, self.class));
     end
     
     obj.WhoCallback = function(result)
@@ -752,9 +755,6 @@ local function instantiateWindow(obj)
 		obj.location = result.Zone;
 		obj:UpdateIcon();
 		obj:UpdateCharDetails();
-		if(constants.classes[obj.class] and GetSelectedSkin().message_window.widgets.from.use_class_color) then
-			obj.widgets.from:SetTextColor(RGBHexToPercent(constants.classes[obj.class].color));
-		end
 	end
     end
     

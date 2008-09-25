@@ -23,8 +23,6 @@ db_defaults.skin = {
 
 local SelectedSkin;
 
-local SkinTemplate = {}; -- for inherritence excluding default styles.
-
 local SKIN_DEBUG = "";
 
 local SkinTable = {};
@@ -190,6 +188,8 @@ function ApplySkinToWindow(obj)
     local font, height, flags = _G[db.skin.font]:GetFont();
     msg_box:SetFont(font, SelectedSkin.message_window.widgets.msg_box.font_height, WIM.db.skin.font_outline);
     msg_box:SetTextColor(SelectedSkin.message_window.widgets.msg_box.font_color[1], SelectedSkin.message_window.widgets.msg_box.font_color[2], SelectedSkin.message_window.widgets.msg_box.font_color[3]);
+
+    obj:UpdateIcon();
 end
 
 local function deleteStyleFileEntries(theTable)
@@ -353,14 +353,16 @@ function ApplySkinToWidget(obj)
     end
 end
 
+function GetSkinTable(skinName)
+    return SkinTable[skinName];
+end
 
-function test()
-    _G.test = {message_window = {
-        widgets = {
-            close= {
-                points = {}
-            }
-        }
-    }};
-    linkSkinTable(SkinTable["WIM Classic"], _G.test);
+function GetRegisteredSkins()
+    -- this function isn't called much so its ok to create a little garbage.
+    local list = {};
+    for skin, _ in pairs(SkinTable) do
+        table.insert(list, skin);
+    end
+    table.sort(list);
+    return list;
 end
