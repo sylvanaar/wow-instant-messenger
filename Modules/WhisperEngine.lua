@@ -26,6 +26,7 @@ local string = string;
 local IsShiftKeyDown = IsShiftKeyDown;
 local select = select;
 local unpack = unpack;
+local math = math;
 
 -- set name space
 setfenv(1, WIM);
@@ -192,9 +193,18 @@ end
 
 RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
         local obj = self:GetParent();
-        --_G.SendChatMessage(self:GetText(), "WHISPER", nil, obj.theUser);
-        Windows[obj.theUser].msgSent = true;
-        _G.ChatThrottleLib:SendChatMessage("NORMAL", "WIM", self:GetText(), "WHISPER", nil, obj.theUser);
+        local msg = self:GetText();
+        local msgCount = math.ceil(string.len(msg)/255);
+        if(msgCount == 1) then
+            Windows[obj.theUser].msgSent = true;
+            _G.ChatThrottleLib:SendChatMessage("NORMAL", "WIM", msg, "WHISPER", nil, obj.theUser);
+        else
+            Windows[obj.theUser].msgSent = true;
+            for i=1, msgCount do
+                local chunk = string.sub(msg, ((i-1)*255+1), (((i-1)*255)+255));
+                _G.ChatThrottleLib:SendChatMessage("NORMAL", "WIM", chunk, "WHISPER", nil, obj.theUser);
+            end
+        end
         self:SetText("");
     end);
 
