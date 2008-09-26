@@ -83,7 +83,7 @@ local FadeProps = {
 	min = .5,
 	max = 1,
 	interval = .25,
-	delay = 1
+	delay = 2
 };
 
 local cascadeDirection = {

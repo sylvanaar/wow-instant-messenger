@@ -47,7 +47,7 @@ hooksecurefunc(ChatFrameEditBox, "SetText", function(self,theText)
 					WIM.EditBoxInFocus:SetText(theText);
 				end
 			end );
-ChatFrameEditBox.HighlightText = ChatFrameEditBox.HighlightText;
+ChatFrameEditBox.wimHighlightText = ChatFrameEditBox.HighlightText;
 ChatFrameEditBox.HighlightText = function(self, theStart, theEnd)
 				if(WIM.EditBoxInFocus) then
 					WIM.EditBoxInFocus:HighlightText(theStart, theEnd);
