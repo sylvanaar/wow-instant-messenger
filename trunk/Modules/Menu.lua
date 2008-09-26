@@ -94,12 +94,23 @@ local function createButton(parent)
             WIM.Menu:Hide();
         end);
     button:SetScript("OnUpdate", function(self, elapsed)
-            if(self.win and not self.win:IsShown()) then
-                self.text:SetAlpha(.65);
-                self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipClear");
-            else
-                self.text:SetAlpha(1);
-                self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipAmber");
+            if(self.win) then
+                if(self.win.online ~= nil and not self.win.online) then
+                    self.text:SetTextColor(.5, .5, .5);
+                    self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipRed");
+                elseif(self.win.unreadCount > 0) then
+                    self.text:SetTextColor(1, 1, 1);
+                    self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipBlue");                
+                else
+                    self.text:SetTextColor(1, 1, 1);
+                    self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipClear");
+                end
+                -- set opacity of button text.
+                if(self.win and not self.win:IsShown()) then
+                    self.text:SetAlpha(.65);
+                else
+                    self.text:SetAlpha(1);
+                end
             end
         end);
     button.GetMinimumWidth = function(self)
@@ -181,6 +192,7 @@ local function createGroup(title, list, maxButtons, showNone)
         self.title:Show();
         if(#self.list == 0) then
             if(self.showNone) then
+                self.buttons[1].win = nil;
                 self.buttons[1].close:Hide();
                 self.buttons[1].status:Hide();
                 self.buttons[1]:Show();
@@ -188,6 +200,7 @@ local function createGroup(title, list, maxButtons, showNone)
                 self.buttons[1]:Disable();
                 self.buttons[1].text:SetJustifyH("LEFT");
                 self.buttons[1].text:SetText(L["None"]);
+                self.buttons[1].text:SetTextColor(.5, .5, .5);
             else
                 self.title:Hide();
             end

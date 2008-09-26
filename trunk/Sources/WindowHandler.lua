@@ -699,7 +699,7 @@ local function instantiateWindow(obj)
     widgets.msg_box = CreateFrame("EditBox", fName.."MsgBox", obj);
     widgets.msg_box:SetAutoFocus(false);
     widgets.msg_box:SetHistoryLines(32);
-    widgets.msg_box:SetMaxLetters(255);
+    --widgets.msg_box:SetMaxLetters(255);
     widgets.msg_box:SetAltArrowKeyMode(true);
     widgets.msg_box:EnableMouse(true);
     widgets.msg_box.widgetName = "msg_box";
