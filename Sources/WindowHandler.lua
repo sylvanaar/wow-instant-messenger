@@ -1292,6 +1292,7 @@ RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnLeave", function(self) _G.
 	
 RegisterWidgetTrigger("close", "whisper,chat,w2w,demo", "OnClick", function(self)
 		if(IsShiftKeyDown() or self.forceShift or self.parentWindow.type == "demo") then
+                        self.forceShift = false;
 			destroyWindow(self:GetParent());
 		else
 			DisplayTutorial(L["Message Window Hidden"], L["WIM's message window has been hidden to WIM's Minimap Icon. If you want to end a conversation, you may do so by <Shift-Clicking> the close button."]);
