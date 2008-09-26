@@ -276,7 +276,6 @@ local function createTabGroup()
             if(button == "RightButton") then
                 self.childObj.widgets.close.forceShift = true;
                 self.childObj.widgets.close:Click();
-                self.childObj.widgets.close.forceShift = false;
             else
                 tabStrip:JumpToTabName(self.childName);
             end
