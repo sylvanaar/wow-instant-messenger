@@ -206,7 +206,6 @@ local function CreateDropDownMenu(parent, dbTree, varName, itemList, width)
         end;
     SetNextAnchor(menu);
     menu:Hide(); menu:Show();
-    _G.test = menu
     return menu;
 end
 

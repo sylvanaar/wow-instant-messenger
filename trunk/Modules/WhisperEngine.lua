@@ -164,14 +164,16 @@ local function getWhisperWindowByUser(user)
         if(db.whoLookups) then
             Windows[user]:SendWho(); -- send who request
         end
+        Windows[user].online = true;
         return Windows[user];
     end
 end
 
 local function windowDestroyed(self)
-    _G.test = self;
     if(IsShiftKeyDown() or self.forceShift) then
         local user = self:GetParent().theUser;
+        Windows[user].online = nil;
+        Windows[user].msgSent = nil;
         Windows[user] = nil;
     end
 end
@@ -191,6 +193,7 @@ end
 RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
         local obj = self:GetParent();
         --_G.SendChatMessage(self:GetText(), "WHISPER", nil, obj.theUser);
+        Windows[obj.theUser].msgSent = true;
         _G.ChatThrottleLib:SendChatMessage("NORMAL", "WIM", self:GetText(), "WHISPER", nil, obj.theUser);
         self:SetText("");
     end);
@@ -206,6 +209,7 @@ local function CHAT_MSG_WHISPER(...)
     if(db.pop_rules.whisper[WIM.curState].supress) then
         _G.ChatEdit_SetLastTellTarget(arg2);
     end
+    win.online = true;
     updateMinimapAlerts();
     CallModuleFunction("PostEvent_Whisper", ...);
 end
@@ -219,6 +223,8 @@ local function CHAT_MSG_WHISPER_INFORM(...)
     if(db.pop_rules.whisper[curState].supress) then
         _G.ChatEdit_SetLastToldTarget(arg2);
     end
+    win.online = true;
+    win.msgSent = false;
     CallModuleFunction("PostEvent_WhisperInform", ...);
 end
 
@@ -386,6 +392,8 @@ local function bumpWhisperEventToEnd()
     _G.WIM_workerFrame:RegisterEvent("CHAT_MSG_WHISPER_INFORM");
     _G.WIM_workerFrame:UnregisterEvent("CHAT_MSG_WHISPER");
     _G.WIM_workerFrame:RegisterEvent("CHAT_MSG_WHISPER");
+    _G.WIM_workerFrame:UnregisterEvent("CHAT_MSG_SYSTEM");
+    _G.WIM_workerFrame:RegisterEvent("CHAT_MSG_SYSTEM");
 end
 
 --------------------------------------
@@ -419,6 +427,47 @@ function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
     -- All messages can be filtered immidiately from Unit(Player) information.
     local eventItem = pushEvent("CHAT_MSG_WHISPER_INFORM", ...);
     popEvents();
+end
+
+function WhisperEngine:CHAT_MSG_SYSTEM(msg)
+    local user;
+    -- detect player not online
+    user = FormatUserName(libs.Deformat(msg, _G.ERR_CHAT_PLAYER_NOT_FOUND_S));
+    if(Windows[user]) then
+        if(Windows[user].online or Windows[user].msgSent) then
+            Windows[user]:AddMessage(msg, db.displayColors.errorMsg.r, db.displayColors.errorMsg.g, db.displayColors.errorMsg.b);
+        end
+        Windows[user].online = false;
+        Windows[user].msgSent = nil;
+        return;
+    end
+    
+    -- detect player has you ignored
+    user = FormatUserName(libs.Deformat(msg, _G.CHAT_IGNORED));
+    if(Windows[user]) then
+        if(Windows[user].online) then
+            Windows[user]:AddMessage(msg, db.displayColors.errorMsg.r, db.displayColors.errorMsg.g, db.displayColors.errorMsg.b);
+        end
+        Windows[user].online = false;
+        return;
+    end
+    
+    -- detect player has come online
+    user = FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_ONLINE_SS));
+    if(Windows[user]) then
+        Windows[user]:AddMessage(msg, db.displayColors.sysMsg.r, db.displayColors.sysMsg.g, db.displayColors.sysMsg.b);
+        Windows[user].online = true;
+        return;
+    end
+    
+        -- detect player has gone offline
+    user = FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_OFFLINE_S));
+    if(Windows[user]) then
+        Windows[user]:AddMessage(msg, db.displayColors.sysMsg.r, db.displayColors.sysMsg.g, db.displayColors.sysMsg.b);
+        Windows[user].online = false;
+        return;
+    end
+    
 end
 
 function WhisperEngine:ADDON_LOADED(...)
@@ -508,6 +557,29 @@ end
 ---- THIS SECTION IS A HACK TO WORK WITH BOTH TBC AND WOTLK - UPDATE FOR RELEASE OF WOTK
 CF_MessageEventHandler_orig = _G.ChatFrame_MessageEventHandler;
 local function CF_MessageEventHandler(self, event, ...)
+    -- supress status messages
+    if(db and db.enabled and event == "CHAT_MSG_SYSTEM") then
+        local msg, win = select(1, ...);
+        local curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+        -- handle no user online and chat ignored from being shown in default chat frame.
+        win = Windows[FormatUserName(libs.Deformat(msg, _G.ERR_CHAT_PLAYER_NOT_FOUND_S)) or "NIL"];
+        win = win or Windows[FormatUserName(libs.Deformat(msg, _G.CHAT_IGNORED)) or "NIL"];
+        if(win and win.type == "whisper") then
+            if(win:IsShown() and db.pop_rules.whisper[curState].supress) then
+                return;
+            elseif(not win.msgSent) then
+                return;
+            end
+        end
+        -- user comes/goes online/offline.
+        win = Windows[FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_ONLINE_SS)) or "NIL"];
+        win = win or Windows[FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_OFFLINE_S)) or "NIL"];
+        if(win and win:IsShown() and db.pop_rules.whisper[curState].supress) then
+            return;
+        end
+    end
+
+    -- process event whisper events
     if(db and db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
         local eventItem = WhisperQueue_Index[select(11, ...)];
         if(eventItem) then
@@ -521,6 +593,29 @@ local function CF_MessageEventHandler(self, event, ...)
     end
 end
 local function CF_MessageEventHandlerTBC(event)
+    -- supress status messages
+    if(db and db.enabled and event == "CHAT_MSG_SYSTEM") then
+        local msg, win = _G.arg1;
+        local curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+        -- handle no user online and chat ignored from being shown in default chat frame.
+        win = Windows[FormatUserName(libs.Deformat(msg, _G.ERR_CHAT_PLAYER_NOT_FOUND_S)) or "NIL"];
+        win = win or Windows[FormatUserName(libs.Deformat(msg, _G.CHAT_IGNORED)) or "NIL"];
+        if(win and win.type == "whisper") then
+            if(win:IsShown() and db.pop_rules.whisper[curState].supress) then
+                return;
+            elseif(not win.msgSent) then
+                return;
+            end
+        end
+        -- user comes/goes online/offline.
+        win = Windows[FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_ONLINE_SS)) or "NIL"];
+        win = win or Windows[FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_OFFLINE_S)) or "NIL"];
+        if(win and win:IsShown() and db.pop_rules.whisper[curState].supress) then
+            return;
+        end
+    end
+
+    -- process event whisper events
     if(db and db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
         local eventItem = WhisperQueue_Index[_G.arg11];
         if(eventItem) then
@@ -558,7 +653,16 @@ hooksecurefunc("ChatFrame_ReplyTell2", function() replyTellTarget(false) end);
 hooksecurefunc("ChatFrame_AddMessageGroup", function() bumpWhisperEventToEnd(); end);
 hooksecurefunc("ChatFrame_RemoveMessageGroup", function() bumpWhisperEventToEnd(); end);
 
-
+local hookedSendChatMessage = _G.SendChatMessage;
+function _G.SendChatMessage(...)
+    if(select(2, ...) == "WHISPER") then
+        local win = Windows[FormatUserName(select(4, ...)) or "NIL"];
+        if(win) then
+            win.msgSent = true;
+        end
+    end
+    hookedSendChatMessage(...);
+end
 
 -- This is a core module and must always be loaded...
 WhisperEngine.canDisable = false;
