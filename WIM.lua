@@ -53,8 +53,6 @@ local Events = {};
     -- some events we always want to listen to so data is ready upon WIM being enabled.
     workerFrame:RegisterEvent("VARIABLES_LOADED");
     workerFrame:RegisterEvent("ADDON_LOADED");
-    workerFrame:RegisterEvent("GUILD_ROSTER_UPDATE");
-    workerFrame:RegisterEvent("FRIENDLIST_UPDATE");
 
 
 -- called when WIM is first loaded into memory but after variables are loaded.
@@ -67,6 +65,9 @@ local function initialize()
         
         if(type(lists.friends) ~= "table") then lists.friends = {}; end
         if(type(lists.guild) ~= "table") then lists.guild = {}; end
+        
+        workerFrame:RegisterEvent("GUILD_ROSTER_UPDATE");
+        workerFrame:RegisterEvent("FRIENDLIST_UPDATE");
         
         --querie guild roster
         if( _G.IsInGuild() ) then
@@ -281,12 +282,14 @@ function WIM:EventHandler(event, ...)
     end
     
     -- Module Event Handlers
-    local module, tData;
-    for module, tData in pairs(modules) do
-        fun = tData[event];
-        if(type(fun) == "function" and tData.enabled) then
-            dPrint("  +-- "..module..":"..event);
-            fun(modules[module], ...);
+    if(db and db.enabled) then
+        local module, tData;
+        for module, tData in pairs(modules) do
+            fun = tData[event];
+            if(type(fun) == "function" and tData.enabled) then
+                dPrint("  +-- "..module..":"..event);
+                fun(modules[module], ...);
+            end
         end
     end
 end
