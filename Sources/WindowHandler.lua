@@ -579,8 +579,10 @@ local function loadRegisteredWidgets(obj)
 	for widget, createFun in pairs(RegisteredWidgets) do
 		if(widgets[widget] == nil) then
 			if(type(createFun) == "function") then
-				widgets[widget]  = createFun(obj);
-				widgets[widget].widgetName = widget;
+				widgets[widget]  = createFun();
+                                widgets[widget]:SetParent(obj);
+                                widgets[widget].widgetName = widget;
+                                widgets[widget].parentWindow = obj;
 				dPrint("Widget '"..widget.."' added to '"..obj:GetName().."'");
 				if(type(widgets[widget].SetDefaults) == "function") then
 					widgets[widget]:SetDefaults(); -- load defaults for this widget
@@ -881,6 +883,13 @@ local function instantiateWindow(obj)
 		if(type(widgetObj.UpdateProps) == "function") then
 			widgetObj:UpdateProps();
 		end
+                if(widgetObj.type) then
+                        if(string.match(widgetObj.type, obj.type)) then
+                                widgetObj:Show();
+                        else
+                                widgetObj:Hide()
+                        end
+                end
 	end
     end
     
@@ -1184,10 +1193,26 @@ end
 
 function RegisterWidget(widgetName, createFunction, moduleName)
 	-- moduleName is optional if not being called from a module.
+        -- including module name will force the UI to be reloaded before removing the widgets.
 	RegisteredWidgets[widgetName] = createFunction;
 	if(moduleName) then
-		modules[widgetName].hasWidget = true;
+		modules[moduleName].hasWidget = true;
 	end
+        updateActiveObjects();
+end
+
+--iterator: All loaded widgets
+function Widgets(widgetName)
+        local index = 1
+        return function()
+                dPrint(index)
+                for i=index, #WindowSoupBowl.windows do
+                        if(WindowSoupBowl.windows[i].obj.widgets[widgetName]) then
+                                index = i+1;
+                                return WindowSoupBowl.windows[i].obj.widgets[widgetName];
+                        end
+                end
+        end
 end
 
 function RegisterStringModifier(fun, prioritize)
@@ -1277,6 +1302,7 @@ function RemoveEscapeWindow(frame)
 		end
 	end
 end
+
 ----------------------------------
 -- Set default widget triggers	--
 ----------------------------------

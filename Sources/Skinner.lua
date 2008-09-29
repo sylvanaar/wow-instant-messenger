@@ -189,6 +189,16 @@ function ApplySkinToWindow(obj)
     msg_box:SetFont(font, SelectedSkin.message_window.widgets.msg_box.font_height, WIM.db.skin.font_outline);
     msg_box:SetTextColor(SelectedSkin.message_window.widgets.msg_box.font_color[1], SelectedSkin.message_window.widgets.msg_box.font_color[2], SelectedSkin.message_window.widgets.msg_box.font_color[3]);
 
+
+    --apply skin to registered widgets
+    for widget, _ in pairs(windows.widgets) do
+        if(obj.widgets[widget] and SelectedSkin.message_window.widgets[widget]) then
+            dPrint("Applying skin to '"..widget.."'.");
+            ApplySkinToWidget(obj.widgets[widget]);
+        end
+    end
+
+
     obj:UpdateIcon();
 end
 

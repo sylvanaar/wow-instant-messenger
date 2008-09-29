@@ -220,15 +220,22 @@ local WIM_ClassicSkin = {
                 }
             },
             shortcuts = {
-                verticle = true,
-                inverted = false,
-                button_size = 28,
-                buffer = 132,
-                rect = {
-                    anchor = "TOPRIGHT",
-                    offset = {
-                        x = -30,
-                        y = -95
+                stack = "DOWN",
+                width = 22,
+                points = {
+                    {"TOPRIGHT", "window", "TOPRIGHT", -8, -70},
+                    {"BOTTOMRIGHT", "window", "BOTTOMRIGHT", -8, 55}
+                },
+                buttons = {
+                    NormalTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\shortcuts_frame",
+                    PushedTexture = "Interface\\Buttons\\UI-Quickslot-Depress",
+                    HighlightTexture = "Interface\\Buttons\\ButtonHilight-Square",
+                    HighlightAlphaMode = "ADD",
+                    icons = {
+                        location = "Interface\\Icons\\Ability_TownWatch",
+                        invite = "Interface\\Icons\\Spell_Holy_BlessingOfStrength",
+                        friend = "Interface\\Icons\\INV_Misc_GroupNeedMore",
+                        ignore = "Interface\\Icons\\Ability_Physical_Taunt",
                     }
                 }
             }
