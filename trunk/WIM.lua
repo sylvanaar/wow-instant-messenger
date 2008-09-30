@@ -105,6 +105,7 @@ local function initialize()
     CallModuleFunction("OnStateChange", WIM.curState);
     RegisterSlashCommand("enable", function() SetEnabled(not db.enabled) end, L["Toggle WIM 'On' and 'Off'."]);
     RegisterSlashCommand("debug", function() debug = not debug; end, L["Toggle Debugging Mode 'On' and 'Off'."]);
+    FRIENDLIST_UPDATE(); -- pretend event has been fired in order to get cache loaded.
     dPrint("WIM initialized...");
 end
 
@@ -304,7 +305,6 @@ function WIM:VARIABLES_LOADED()
     env.realm = _G.GetCVar("realmName");
     env.character = _G.UnitName("player");
     
-    
     -- inherrit any new default options which wheren't shown in previous releases.
     inherritTable(db_defaults, db);
     lists.gm = {};
@@ -317,7 +317,10 @@ function WIM:VARIABLES_LOADED()
 end
 
 function WIM:FRIENDLIST_UPDATE()
-    env.cache[env.realm][env.character].friendList = {};
+    env.cache[env.realm][env.character].friendList = env.cache[env.realm][env.character].friendList or {};
+    for key, _ in pairs(env.cache[env.realm][env.character].friendList) do
+        env.cache[env.realm][env.character].friendList[key] = nil;
+    end
 	for i=1, _G.GetNumFriends() do 
 		local name, junk = _G.GetFriendInfo(i);
 		if(name) then
@@ -329,12 +332,15 @@ function WIM:FRIENDLIST_UPDATE()
 end
 
 function WIM:GUILD_ROSTER_UPDATE()
-	env.cache[env.realm][env.character].guildList = {};
+	env.cache[env.realm][env.character].guildList = env.cache[env.realm][env.character].guildList or {};
+        for key, _ in pairs(env.cache[env.realm][env.character].guildList) do
+            env.cache[env.realm][env.character].guildList[key] = nil;
+        end
 	if(_G.IsInGuild()) then
 		for i=1, _G.GetNumGuildMembers(true) do 
-			local name, junk = _G.GetGuildRosterInfo(i);
+			local name = _G.GetGuildRosterInfo(i);
 			if(name) then
-				env.cache[env.realm][env.character].guildList[name] = "1"; --[set place holder for quick lookup
+				env.cache[env.realm][env.character].guildList[name] = 1; --[set place holder for quick lookup
 			end
 		end
 	end

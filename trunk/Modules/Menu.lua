@@ -108,8 +108,10 @@ local function createButton(parent)
                 -- set opacity of button text.
                 if(self.win and not self.win:IsShown()) then
                     self.text:SetAlpha(.65);
+                    self.status:SetAlpha(.65);
                 else
                     self.text:SetAlpha(1);
+                    self.status:SetAlpha(1);
                 end
             end
         end);
