@@ -263,7 +263,7 @@ local function Whispers_DisplaySettings()
     
     frame.menu.nextOffSetY = -20;
     frame.menu:CreateCheckButton(L["Display user class icons and details."], db, "whoLookups", L["Requires who lookups."]);
-    
+    frame.menu:CreateCheckButton(L["Display Shortcut Bar"], WIM.modules.ShortcutBar, "enabled", nil, function(self, button) EnableModule("ShortcutBar", self:GetChecked()); end);
     return frame;
 end
 

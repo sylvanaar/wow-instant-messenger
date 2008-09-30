@@ -585,6 +585,18 @@ local function loadRegisteredWidgets(obj)
                                 widgets[widget]:SetParent(obj);
                                 widgets[widget].widgetName = widget;
                                 widgets[widget].parentWindow = obj;
+                                widgets[widget].enabled = true;
+                                widgets[widget].Enable = function(self)
+                                        self.enabled = true;
+                                        self:Show();
+                                        self.parentWindow:UpdateProps();
+                                end
+                                widgets[widget].Disable = function(self)
+                                        self.enabled = false;
+                                        self:Hide();
+                                        self.parentWindow:UpdateProps();
+                                end
+                                ApplySkinToWidget(widgets[widget]);
 				dPrint("Widget '"..widget.."' added to '"..obj:GetName().."'");
 				if(type(widgets[widget].SetDefaults) == "function") then
 					widgets[widget]:SetDefaults(); -- load defaults for this widget
@@ -879,6 +891,8 @@ local function instantiateWindow(obj)
                 self:SetHeight(db.winSize.height);
         end
         
+        local minWidth, minHeight = GetSelectedSkin().message_window.min_width, GetSelectedSkin().message_window.min_height;
+        
 	-- process registered widgets
 	local widgetName, widgetObj;
 	for widgetName, widgetObj in pairs(obj.widgets) do
@@ -886,13 +900,20 @@ local function instantiateWindow(obj)
 			widgetObj:UpdateProps();
 		end
                 if(widgetObj.type) then
-                        if(string.match(widgetObj.type, obj.type)) then
+                        if(widgetObj.enabled and string.match(widgetObj.type, obj.type)) then
                                 widgetObj:Show();
+                                local w, h = widgetObj:GetWidth(), widgetObj:GetHeight();
+                                minWidth = _G.math.max(minWidth, (self:GetLeft() - widgetObj:GetLeft()) + w + (widgetObj:GetRight() - self:GetRight()));
+                                minHeight = _G.math.max(minHeight, (self:GetTop() - widgetObj:GetTop()) + h + (widgetObj:GetBottom() - self:GetBottom()));
                         else
                                 widgetObj:Hide()
                         end
                 end
 	end
+        self:SetMinResize(minWidth, minHeight);
+        self:SetWidth(_G.math.max(minWidth, self:GetWidth()));
+        self:SetHeight(_G.math.max(minHeight, self:GetHeight()));
+        self.initialized = true;
     end
     
     obj.Hide_Normal = obj.Hide;
@@ -1129,6 +1150,7 @@ local function destroyWindow(userNameOrObj)
         obj:Show();
         obj.widgets.chat_display:Clear();
         obj:Hide();
+        obj.initialized = nil;
 	dPrint("Window '"..obj:GetName().."' destroyed.");
 	CallModuleFunction("OnWindowDestroyed", obj);
         removeFromTable(windowsByAge, obj);
@@ -1199,6 +1221,11 @@ function RegisterWidget(widgetName, createFunction, moduleName)
 	RegisteredWidgets[widgetName] = createFunction;
 	if(moduleName) then
 		modules[moduleName].hasWidget = true;
+	end
+        for i=1, #WindowSoupBowl.windows do
+		if(WindowSoupBowl.windows[i].inUse) then
+			loadRegisteredWidgets(WindowSoupBowl.windows[i].obj);
+		end
 	end
         updateActiveObjects();
 end
