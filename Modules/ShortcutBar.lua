@@ -50,6 +50,11 @@ local function createButton(parent)
                 buttons[self.index].scripts.OnClick(self, button);
             end
         end);
+    button.SetDefaults = function(self)
+            if(buttons[self.index].scripts and buttons[self.index].scripts.SetDefaults) then
+                buttons[self.index].scripts.SetDefaults(self);
+            end
+        end
         
         
     button:Enable();
@@ -68,6 +73,7 @@ local function createShortCutBar()
     --frame.test = frame:CreateTexture(nil, "BACKGROUND");
     --frame.test:SetTexture(1,1,1,.5);
     --frame.test:SetAllPoints();
+    frame.visibleCount = 0;
     frame.buttons = {};
     frame.UpdateSkin = function(self)
             -- make sure all the button objects needed are available.
@@ -77,7 +83,8 @@ local function createShortCutBar()
             end
             local skin = GetSelectedSkin().message_window.widgets.shortcuts;
             -- set points for all buttons.
-            local stack = string.upper(skin.stack)
+            local stack = string.upper(skin.stack);
+            local spacing = skin.spacing;
             if(stack == "UP") then
                 for i=#buttons, 1, -1 do
                     self.buttons[i]:ClearAllPoints();
@@ -85,8 +92,8 @@ local function createShortCutBar()
                         self.buttons[i]:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0);
                         self.buttons[i]:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0);
                     else
-                        self.buttons[i]:SetPoint("BOTTOMLEFT", self.buttons[i+1], "TOPLEFT", 0, 0);
-                        self.buttons[i]:SetPoint("BOTTOMRIGHT", self.buttons[i+1], "TOPRIGHT", 0, 0);
+                        self.buttons[i]:SetPoint("BOTTOMLEFT", self.buttons[i+1], "TOPLEFT", 0, spacing);
+                        self.buttons[i]:SetPoint("BOTTOMRIGHT", self.buttons[i+1], "TOPRIGHT", 0, spacing);
                     end
                 end
             end
@@ -97,32 +104,32 @@ local function createShortCutBar()
                         self.buttons[i]:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0);
                         self.buttons[i]:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, 0);
                     else
-                        self.buttons[i]:SetPoint("TOPLEFT", self.buttons[i-1], "BOTTOMLEFT", 0, 0);
-                        self.buttons[i]:SetPoint("TOPRIGHT", self.buttons[i-1], "BOTTOMRIGHT", 0, 0);
+                        self.buttons[i]:SetPoint("TOPLEFT", self.buttons[i-1], "BOTTOMLEFT", 0, -spacing);
+                        self.buttons[i]:SetPoint("TOPRIGHT", self.buttons[i-1], "BOTTOMRIGHT", 0, -spacing);
                     end
                 end
             end
-            if(stack == "LEFT") then
+            if(stack == "RIGHT") then
                 for i=1, #buttons do
                     self.buttons[i]:ClearAllPoints();
                     if(i==1) then
                         self.buttons[i]:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0);
                         self.buttons[i]:SetPoint("BOTTOMLEFT", self, "BOTTOMRIGHT", 0, 0);
                     else
-                        self.buttons[i]:SetPoint("TOPLEFT", self.buttons[i-1], "TOPRIGHT", 0, 0);
-                        self.buttons[i]:SetPoint("BOTTOMLEFT", self.buttons[i-1], "BOTTOMRIGHT", 0, 0);
+                        self.buttons[i]:SetPoint("TOPLEFT", self.buttons[i-1], "TOPRIGHT", spacing, 0);
+                        self.buttons[i]:SetPoint("BOTTOMLEFT", self.buttons[i-1], "BOTTOMRIGHT", spacing, 0);
                     end
                 end
             end
-            if(stack == "RIGHT") then
+            if(stack == "LEFT") then
                 for i=#buttons, 1, -1 do
                     self.buttons[i]:ClearAllPoints();
                     if(i==#buttons) then
                         self.buttons[i]:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, 0);
                         self.buttons[i]:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0);
                     else
-                        self.buttons[i]:SetPoint("TOPRIGHT", self.buttons[i+1], "TOPLEFT", 0, 0);
-                        self.buttons[i]:SetPoint("BOTTOMRIGHT", self.buttons[i+1], "BOTTOMLEFT", 0, 0);
+                        self.buttons[i]:SetPoint("TOPRIGHT", self.buttons[i+1], "TOPLEFT", -spacing, 0);
+                        self.buttons[i]:SetPoint("BOTTOMRIGHT", self.buttons[i+1], "BOTTOMLEFT", -spacing, 0);
                     end
                 end
             end
@@ -138,22 +145,33 @@ local function createShortCutBar()
     frame.UpdateButtons = function(self)
             local skin = GetSelectedSkin().message_window.widgets.shortcuts;
             local stack = string.upper(skin.stack) == "UP" or string.upper(skin.stack) == "DOWN";
+            self.visibleCount = 0;
             for i=1,  #self.buttons do
                 if(stack) then
                     if(self.buttons[i].isEnabled) then
+                        self.visibleCount = self.visibleCount + 1;
                         self.buttons[i]:SetHeight(self:GetWidth());
                     else
-                        self.buttons[i]:SetHeight(.001);
+                        self.buttons[i]:SetHeight(.001 - skin.spacing);
                     end
                 else
                     if(self.buttons[i].isEnabled) then
+                        self.visibleCount = self.visibleCount + 1;
                         self.buttons[i]:SetWidth(self:GetHeight());
                     else
-                        self.buttons[i]:SetWidth(.001);
+                        self.buttons[i]:SetWidth(.001 - skin.spacing);
                     end
                 end
             end
         end
+    frame.SetDefaults = function(self)
+            for i=1, #self.buttons do
+                self.buttons[i]:SetDefaults();
+            end
+        end
+    frame.GetButtonCount = function(self)
+        return self.visibleCount;
+    end
     frame:UpdateSkin();
     return frame;
 end
@@ -177,7 +195,25 @@ function ShortcutBar:OnWindowShow(obj)
     end
 end
 
-
+function ShortcutBar:FRIENDLIST_UPDATE()
+    local friend = nil;
+    for i=1, #buttons do
+        if(buttons[i].id == "friend") then
+            friend = i;
+        end
+    end
+    for widget in Widgets("shortcuts") do
+        if(lists.friends[widget.parentWindow.theUser] or _G.UnitName("player") == widget.parentWindow.theUser) then
+            if(friend) then
+                widget.buttons[friend]:Disable();
+            end
+        else
+            if(friend) then
+                widget.buttons[friend]:Enable();
+            end
+        end
+    end
+end
 
 -- WIM Global API for Shortcut buttons.
 function RegisterShortcut(id, title, scripts)
@@ -194,6 +230,12 @@ end
 RegisterShortcut("location", L["Player Location"], {
         OnClick = function(self)
             self.parentWindow:SendWho();
+        end,
+        OnEnter = function(self)
+            local location = self.parentWindow.location ~= "" and self.parentWindow.location or L["Unknown"];
+            local txt = L["Player Location"]..": |cffffffff"..location.."|r\n|cff69ccf0"..L["Click to update..."].."|r";
+            _G.GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+            _G.GameTooltip:SetText(txt);
         end
     });
 RegisterShortcut("invite", L["Invite to Party"], {
@@ -204,6 +246,9 @@ RegisterShortcut("invite", L["Invite to Party"], {
 RegisterShortcut("friend", L["Add Friend"], {
         OnClick = function(self)
             _G.AddFriend(self.parentWindow.theUser);
+        end,
+        SetDefaults = function(self)
+            ShortcutBar:FRIENDLIST_UPDATE();
         end
     });
 RegisterShortcut("ignore", L["Ignore User"], {

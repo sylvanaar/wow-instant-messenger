@@ -221,9 +221,9 @@ local WIM_ClassicSkin = {
             },
             shortcuts = {
                 stack = "DOWN",
-                width = 22,
+                spacing = 2,
                 points = {
-                    {"TOPRIGHT", "window", "TOPRIGHT", -8, -70},
+                    {"TOPLEFT", "window", "TOPRIGHT", -30, -70},
                     {"BOTTOMRIGHT", "window", "BOTTOMRIGHT", -8, 55}
                 },
                 buttons = {

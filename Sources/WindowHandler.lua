@@ -526,7 +526,9 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
 				self:Hide_Normal();
 			else
 				local prct = animate.elapsed/animate.time;
-				self:SetScale(db.winSize.scale/100*(1-prct));
+                                local scale = (db.winSize.scale/100)*(1-prct);
+                                scale = scale > 0 and scale or .001;
+				self:SetScale(scale);
 				if(animate.to) then
 					local x1, y1, x2, y2 = animate.initLeft*self:GetEffectiveScale(), animate.initTop*self:GetEffectiveScale(),
 								animate.to:GetLeft()*animate.to:GetEffectiveScale(), animate.to:GetTop()*animate.to:GetEffectiveScale();
