@@ -455,6 +455,7 @@ local function createTabGroup()
             win.tabStrip = self;
             if(#self.attached == 1 or win:IsVisible()) then
                 self:JumpToTabName(winName);
+                win:UpdateProps();
             else
                 win:Hide();
             end

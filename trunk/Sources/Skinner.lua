@@ -198,7 +198,7 @@ function ApplySkinToWindow(obj)
         end
     end
 
-
+    obj:UpdateProps();
     obj:UpdateIcon();
 end
 

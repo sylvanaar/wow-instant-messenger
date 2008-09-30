@@ -163,6 +163,10 @@ local function createShortCutBar()
                     end
                 end
             end
+            -- must update window props to account for size restrictions
+            if(self.parentWindow and self.parentWindow.initialized) then
+                self.parentWindow:UpdateProps();
+            end
         end
     frame.SetDefaults = function(self)
             for i=1, #self.buttons do
@@ -170,8 +174,26 @@ local function createShortCutBar()
             end
         end
     frame.GetButtonCount = function(self)
-        return self.visibleCount;
-    end
+            return self.visibleCount;
+        end
+    frame._GetWidth = frame.GetWidth;
+    frame.GetWidth = function(self)
+            local skin = GetSelectedSkin().message_window.widgets.shortcuts;
+            if(string.upper(skin.stack) == "UP" or string.upper(skin.stack) == "DOWN") then
+                return self:_GetWidth();
+            else
+                return self:GetButtonCount()*self:GetHeight() + _G.math.max(self:GetButtonCount()-1, 0)*skin.spacing;
+            end
+        end
+    frame._GetHeight = frame.GetHeight;
+    frame.GetHeight = function(self)
+            local skin = GetSelectedSkin().message_window.widgets.shortcuts;
+            if(string.upper(skin.stack) == "UP" or string.upper(skin.stack) == "DOWN") then
+                return self:GetButtonCount()*self:GetWidth() + _G.math.max(self:GetButtonCount()-1, 0)*skin.spacing;
+            else
+                return self:_GetHeight();
+            end
+        end
     frame:UpdateSkin();
     return frame;
 end
@@ -179,13 +201,16 @@ end
 
 function ShortcutBar:OnEnable()
     RegisterWidget("shortcuts", createShortCutBar);
+    for widget in Widgets("shortcuts") do
+        widget:Enable();
+    end
 end
 
 function ShortcutBar:OnDisable()
     -- WIM.Widgets(widgetName) is an iterator of all loaded widgets.
     -- Since this widget can be disabled, we will hide the widgets already loaded.
     for widget in Widgets("shortcuts") do
-        widget:Hide();
+        widget:Disable();
     end
 end
 
@@ -254,7 +279,7 @@ RegisterShortcut("friend", L["Add Friend"], {
 RegisterShortcut("ignore", L["Ignore User"], {
         OnClick = function(self)
             _G.StaticPopupDialogs["WIM_IGNORE"] = {
-		text = _G.format(L["Are you sure you want to\nignore %s?"], self.parentWindow.theUser),
+		text = _G.format(L["Are you sure you want to\nignore %s?"], "|cff69ccf0"..self.parentWindow.theUser.."|r"),
 		button1 = L["Yes"],
 		button2 = L["No"],
 		OnAccept = function()
