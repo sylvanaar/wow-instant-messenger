@@ -20,14 +20,14 @@ socketFrame:RegisterEvent("CHAT_MSG_ADDON");
 
 -- thank you stewarta
 local function huff_encode(thestr)
-	thestr=thestr:gsub("\001","\001\001");
-	thestr=thestr:gsub("%z","\001\255");
+	thestr=thestr:gsub("\001","\001\002");
+	thestr=thestr:gsub("%z","\001\003");
 	return thestr;
 end
 
 local function huff_decode(thestr)
+	thestr=thestr:gsub("\001\003","\000");
 	thestr=thestr:gsub("\001\001","\001");
-	thestr=thestr:gsub("\001\255","\000");
 	return thestr;
 end
 

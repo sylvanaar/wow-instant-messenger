@@ -300,6 +300,8 @@ function WIM:VARIABLES_LOADED()
     db = _G.WIM3_Data;
     _G.WIM3_Cache = _G.WIM3_Cache or {};
     env.cache = _G.WIM3_Cache;
+    _G.WIM3_Filters = _G.WIM3_Filters or {};
+    filters = _G.WIM3_Filters;
     
     -- load some environment data.
     env.realm = _G.GetCVar("realmName");

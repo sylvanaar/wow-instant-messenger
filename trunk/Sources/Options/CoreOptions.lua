@@ -18,10 +18,12 @@ db_defaults.stats = {
 
 local credits = {
     "|cff69ccf0"..L["Created by:"].."|r Pazza <Bronzebeard>",
-    "|cff69ccf0"..L["Special Thanks:"].."|r Stewarta, Zeke <Coilfang>,\n     Morphieus <Spinebreaker>",
+    "|cff69ccf0"..L["Special Thanks:"].."|r Stewarta, Zeke <Coilfang>,\n     Morphieus <Spinebreaker>, Nachonut <Bronzebeard>",
 };
 
 local states = {"resting", "combat", "pvp", "arena", "party", "raid", "other"};
+
+local filterListCount = 9;
 
 local function General_Main()
     local frame = options.CreateOptionsFrame()
@@ -267,6 +269,162 @@ local function Whispers_DisplaySettings()
     return frame;
 end
 
+local function Whispers_Filters()
+    local filterTypes = {L["Pattern"], L["User Type"], L["User Level"]};
+    local filterActions = {L["Allow"], L["Ignore"], L["Block"]}
+    local frame = options.CreateOptionsFrame();
+    frame.sub = frame:CreateSection(L["Filtering"], L["Filtering allows you to control which messages are handled as well as how they are handlef by WIM."]);
+    frame.sub.nextOffSetY = -10;
+    frame.sub:CreateCheckButton(L["Enable Filtering"], WIM.modules.Filters, "enabled", nil, function(self, button) EnableModule("Filters", self:GetChecked()); end);
+    frame.sub.nextOffSetY = -15;
+    frame.list = frame.sub:ImportCustomObject(CreateFrame("Frame"));
+    options.frame.filterList = frame.list;
+    options.AddFramedBackdrop(frame.list);
+    frame.list:SetFullSize();
+    frame.list:SetHeight(filterListCount * 32);
+    frame.list.scroll = CreateFrame("ScrollFrame", frame.sub:GetName().."FilterScroll", frame.list, "FauxScrollFrameTemplate");
+    frame.list.scroll:SetPoint("TOPLEFT", 0, -1);
+    frame.list.scroll:SetPoint("BOTTOMRIGHT", -23, 0);
+    frame.list.scroll.update = function(self)
+            self = self or _G.this;
+            local offset = _G.FauxScrollFrame_GetOffset(self);
+            for i=1, #frame.list.buttons do
+                local index = i+offset;
+                if(index <= #filters) then
+                    frame.list.buttons[i]:SetFilterIndex(index);
+                    frame.list.buttons[i]:Show();
+                    if(frame.list.selected == frame.list.buttons[i].index) then
+                        frame.list.buttons[i]:LockHighlight();
+                    else
+                        frame.list.buttons[i]:UnlockHighlight();
+                    end
+                else
+                    frame.list.buttons[i]:Hide();
+                end
+            end
+            _G.FauxScrollFrame_Update(self, #filters, #frame.list.buttons, 32);
+            if(not frame.list.selected) then
+                frame.edit:Disable();
+                frame.delete:Disable();
+            else
+                frame.edit:Enable();
+                if(frame.list.selected and filters[frame.list.selected] and filters[frame.list.selected].protected) then
+                    frame.delete:Disable();
+                else
+                    frame.delete:Enable();
+                end
+            end
+        end
+    frame.list.scroll:SetScript("OnVerticalScroll", function(self)
+            _G.FauxScrollFrame_OnVerticalScroll(32, frame.list.scroll.update);
+        end);
+    frame.list:SetScript("OnShow", function(self)
+            self.scroll:update();
+        end);
+    frame.list.createButton = function(self)
+            self.buttons = self.buttons or {};
+            local button = CreateFrame("Button", nil, self);
+            button:SetHeight(32);
+            button:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD");
+            button.cb = CreateFrame("CheckButton", nil, button, "UICheckButtonTemplate");
+            button.cb:SetPoint("TOPLEFT");
+            button.cb:SetScale(.75);
+            button.cb:SetScript("OnClick", function(self)
+                    self:GetParent().filter.enabled = self:GetChecked() and true or false;
+                    frame.list:Hide(); frame.list:Show();
+                end);
+            button.title = button:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+            button.title:SetPoint("TOPLEFT", button.cb, "TOPRIGHT", 0, -4);
+            button.title:SetPoint("RIGHT");
+            button.title:SetJustifyH("LEFT")
+            button.title:SetTextColor(_G.GameFontNormal:GetTextColor());
+            button.title:SetText("Test Filter |cffffffff- User Type|r");
+            button.action = button:CreateFontString(nil, "OVERLAY", "ChatFontSmall");
+            button.action:SetPoint("TOPLEFT", button.title, "BOTTOMLEFT", 0, 0);
+            button.action:SetText("Action: Ignore");
+            button.stats = button:CreateFontString(nil, "OVERLAY", "ChatFontSmall");
+            button.stats:SetPoint("TOPLEFT", button.action, "TOPRIGHT");
+            button.stats:SetPoint("RIGHT");
+            button.stats:SetJustifyH("RIGHT");
+            button.stats:SetText("Total Filtered: 100");
+            button.down = CreateFrame("Button", nil, button);
+            button.down:SetWidth(14); button.down:SetHeight(14);
+            button.down:SetPoint("TOPRIGHT", 0, 0);
+            button.down:SetNormalTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\down");
+            button.down:SetHighlightTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\down", "ADD");
+            button.down:SetScript("OnClick", function(self)
+                    local index = self:GetParent().index;
+                    filters[index], filters[index+1] = filters[index+1], filters[index];
+                    if(frame.list.selected == index) then frame.list.selected = frame.list.selected + 1; end
+                    frame.list:Hide(); frame.list:Show();
+                end);
+            button.up = CreateFrame("Button", nil, button);
+            button.up:SetWidth(14); button.up:SetHeight(14);
+            button.up:SetPoint("RIGHT", button.down, "LEFT", -5, 0);
+            button.up:SetNormalTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\up");
+            button.up:SetHighlightTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\up", "ADD");
+            button.up:SetScript("OnClick", function(self)
+                    local index = self:GetParent().index;
+                    filters[index], filters[index-1] = filters[index-1], filters[index];
+                    if(frame.list.selected == index) then frame.list.selected = frame.list.selected - 1; end
+                    frame.list:Hide(); frame.list:Show();
+                end);
+            
+            button.SetFilterIndex = function(self, index)
+                self.index = index;
+                self.filter = filters[index];
+                local alpha = self.filter.enabled and 1 or .65;
+                self.title:SetText(self.filter.name.."|cffffffff - "..filterTypes[self.filter.type]..(self.filter.protected and " ("..L["Protected"]..")" or "").."|r");
+                self.title:SetAlpha(alpha);
+                self.action:SetText(L["Action:"].." "..filterActions[self.filter.action]);
+                self.action:SetAlpha(alpha);
+                self.cb:SetChecked(self.filter.enabled);
+                self.stats:SetText(L["Total Filtered:"].." "..(self.filter.stats or "0"));
+                self.stats:SetAlpha(alpha);
+                if(index == 1) then self.up:Hide(); else self.up:Show(); end
+                if(index == #filters) then self.down:Hide(); else self.down:Show(); end
+            end
+            
+            button:SetScript("OnClick", function(self)
+                    _G.PlaySound("igMainMenuOptionCheckBoxOn");
+                    frame.list.selected = self.index;
+                    frame.list:Hide(); frame.list:Show();
+                end);
+            
+            if(#self.buttons == 0) then
+                button:SetPoint("TOPLEFT");
+                button:SetPoint("TOPRIGHT", -25, 0);
+            else
+                button:SetPoint("TOPLEFT", self.buttons[#self.buttons], "BOTTOMLEFT");
+                button:SetPoint("TOPRIGHT", self.buttons[#self.buttons], "BOTTOMRIGHT");
+            end
+            
+            table.insert(self.buttons, button);
+        end
+    for i=1, filterListCount do
+        frame.list:createButton();
+    end
+    frame.nextOffSetY = -5;
+    frame.add = frame:CreateButton(L["Add Filter"], function(self) ShowFilterFrame(); end);
+    frame.edit = frame:CreateButton(L["Edit Filter"], function(self) ShowFilterFrame(filters[frame.list.selected], frame.list.selected); end);
+    frame.edit:ClearAllPoints();
+    frame.edit:SetPoint("LEFT", frame.add, "RIGHT", 0, 0);
+    frame.delete = frame:CreateButton(L["Delete Filter"], function(self)
+            table.remove(filters, frame.list.selected);
+            if(frame.list.selected == 1) then
+                if(#filters > 0) then frame.list.selected = 1 else frame.list.selected = nil; end
+            else
+                frame.list.selected = frame.list.selected - 1;
+            end
+            frame.list:Hide(); frame.list:Show();
+        end);
+    frame.delete:ClearAllPoints();
+    frame.delete:SetPoint("TOP", frame.edit, "TOP");
+    frame.delete:SetPoint("RIGHT", 0, 0);
+    return frame;
+end
+
+
 
 RegisterOptionFrame(L["General"], L["Main"], "This is just a test Category", General_Main, "Display WIM's options.");
 RegisterOptionFrame(L["General"], L["Window Settings"], "This is just a test Category", General_WindowSettings, "Display WIM's options.");
@@ -275,3 +433,4 @@ RegisterOptionFrame(L["General"], L["Message Formatting"], "This is just a test 
 
 RegisterOptionFrame(L["Whispers"], L["Display Settings"], "This is just a test Category", Whispers_DisplaySettings, "Display WIM's options.");
 RegisterOptionFrame(L["Whispers"], L["Window Behavior"], "This is just a test Category", WhisperPopRules, "Display WIM's options.");
+RegisterOptionFrame(L["Whispers"], L["Filtering"], "This is just a test Category", Whispers_Filters, "Display WIM's options.");
