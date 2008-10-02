@@ -10,5 +10,6 @@
     <Script file="Menu.lua"/>
     <Script file="TimeStamps.lua"/>
     <Script file="ShortcutBar.lua"/>
+    <Script file="Filters.lua"/>
     
 </Ui>

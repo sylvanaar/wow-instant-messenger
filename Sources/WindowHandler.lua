@@ -194,7 +194,7 @@ local resizeFrame = CreateFrame("Button", "WIM_WindowResizeFrame", _G.UIParent);
 resizeFrame:Hide();
 resizeFrame.widgetName = "resize";
 resizeFrame.Attach = function(self, win)
-		if(win.widgets.close ~= GetMouseFocus() and not EditBoxInFocus and win.type ~= "demo") then
+		if(win.widgets.close ~= GetMouseFocus() and win.type ~= "demo") then
 			self:SetParent(win);
 			self.parentWindow = win;
 			ApplySkinToWidget(self);
