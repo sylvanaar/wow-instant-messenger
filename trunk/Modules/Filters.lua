@@ -7,6 +7,7 @@ local pairs = pairs;
 local CreateFrame = CreateFrame;
 local type = type;
 local tonumber = tonumber;
+local unpack = unpack;
 
 --set namespace
 setfenv(1, WIM);
@@ -21,12 +22,217 @@ setfenv(1, WIM);
             3 - Block
 ]]
 
+--Default Filters
+local DefaultFilters = {
+    {
+        name = L["Whispers Sent by Addons"],
+        type = 1,
+        tag = "addons",
+        pattern = "^<T>PartyQuests[^A-Z]+\n"..
+                    "^<M_N>\n"..
+                    "^ItemDB-Request:\n"..
+                    "^LVBM\n"..
+                    "^YOU ARE BEING WATCHED!\n"..
+                    "^YOU ARE MARKED!\n"..
+                    "^YOU ARE CURSED!\n"..
+                    "^YOU HAVE THE PLAGUE!\n"..
+                    "^YOU ARE BURNING!\n"..
+                    "^YOU ARE THE BOMB!\n"..
+                    "VOLATILE INFECTION\n"..
+                    "^GA[^A-Z]+\n"..
+                    "^/\n"..
+                    "^<METAMAP\n"..
+                    "^<CT",
+        action = 2,
+        stats = 0,
+        protected = true,
+        enabled = true,
+        received = true,
+        sent = true
+    },
+    {
+        name = L["WhisperSelect Part 1"],
+        enabled = false;
+        type = 2,
+        action = 1,
+        friend = true,
+        party = true,
+        raid = true,
+        guild = true,
+        received = true,
+        stats = 0
+    },
+    {
+        name = L["Example Spam Blocker"],
+        enabled = false;
+        type = 3,
+        action = 3,
+        level = 2,
+        received = true,
+        stats = 0
+    },
+    {
+        name = L["WhisperSelect Part 2"],
+        enabled = false;
+        type = 2,
+        action = 2,
+        all = true,
+        received = true,
+        stats = 0
+    }
+};
+
 
 local filterFrame;
 
 local maxLevel = isWOTLK and 80 or 70;
 
 local Filters = CreateModule("Filters", true);
+
+-- filtering
+
+local userCache = {};
+
+local function processFilter(eventItem, filter)
+    local message, name = unpack(eventItem.arg)
+    if(filter.type == 1) then
+        message = string.trim(message);
+        local patterns = filter.pattern.."\n";
+        local start, stop, pattern = string.find(patterns, "([^\n]+)\n", 1);
+        while(pattern) do
+            pattern = string.trim(pattern);
+            if(pattern ~= "" and string.find(message, pattern)) then
+                filter.stats = filter.stats + 1;
+                return filter.action;
+            end
+            start, stop, pattern = string.find(patterns, "([^\n]+)\n", stop + 1);
+        end
+        return; -- no patterns matched.
+    elseif(filter.type == 2) then
+        if(filter.all or (filter.friend and (lists.friends[name] or _G.UnitName("player") == name)) or (filter.guild and (lists.guild[name] or _G.UnitName("player") == name)) or
+            (filter.party and (IsInParty(name) or _G.UnitName("player") == name)) or (filter.raid and (IsInRaid(name) or _G.UnitName("player") == name)) or
+            (filter.xrealm and string.find(name, "%-"))) then
+                filter.stats = filter.stats + 1;
+                return filter.action;
+        end
+    elseif(filter.type == 3) then
+        -- do not do look up if user has window opened already. Defeats the purpose.
+        if(not windows.active.whisper[name] and not userCache[user]) then
+            eventItem.suspendedByFilter = true;
+            eventItem:Suspend();
+            libs.WhoLib:UserInfo(name, 
+    	    {
+    		queue = libs.WhoLib.WHOLIB_QUEUE_QUIET, 
+    		timeout = 0,
+    		flags = libs.WhoLib.WHOLIB_FLAG_ALLWAYS_CALLBACK,
+    		callback = function(result)
+                        if(result.Online and result.Name == name) then
+                            userCache[name] = result.Level;
+                            if(result.Level < filter.level) then
+                                if(filter.action == 1) then
+                                    eventItem.suspendedByFilter = false;
+                                    eventItem:Release();
+                                elseif(filter.action == 2) then
+                                    eventItem.suspendedByFilter = false;
+                                    eventItem:Ignore();
+                                    eventItem:Release();
+                                elseif(filter.action == 3) then
+                                    eventItem.suspendedByFilter = false;
+                                    eventItem:Block();
+                                    eventItem:Release();
+                                else
+                                    Filters:OnEvent_Whisper(eventItem, eventItem.continueFrom);
+                                end
+                            else
+                                Filters:OnEvent_Whisper(eventItem, eventItem.continueFrom);
+                            end
+                        else
+                            Filters:OnEvent_Whisper(eventItem, eventItem.continueFrom);
+                        end
+                    end
+    	    });
+            return 0;
+        elseif(windows.active.whisper[name]) then
+            return;
+        elseif(userCache[name]) then
+            if(userCache[name] < filter.level) then
+                return filter.action;
+            else
+                return;
+            end
+        else
+            return;
+        end
+    else
+        return; -- not a valid filter, return nil.
+    end
+end
+
+function Filters:OnEvent_Whisper(eventItem, startFrom)
+    startFrom = startFrom or 1;
+    for i=startFrom, #filters do
+        if(filters[i].received and filters[i].enabled) then
+            eventItem.continueFrom = startFrom + 1;
+            local result = processFilter(eventItem, filters[i]);
+            if(result == 0) then
+                -- event suspended... will resume later.
+                return;
+            elseif(result == 1) then
+                break;
+            elseif(result == 2) then
+                eventItem:Ignore();
+                break;
+            elseif(result == 3) then
+                eventItem:Block();
+                break;
+            end
+        end
+    end
+    if(eventItem.suspendedByFilter) then
+        eventItem.suspendedByFilter = false;
+        eventItem:Release();
+    end
+    if(options.frame and options.frame.filterList) then
+        options.frame.filterList:Hide();
+        options.frame.filterList:Show();
+    end
+end
+
+function Filters:OnEvent_WhisperInform(eventItem, startFrom)
+    startFrom = startFrom or 1;
+    for i=startFrom, #filters do
+        if(filters[i].sent and filters[i].type == 1 and filters[i].enabled) then
+            local result = processFilter(eventItem, filters[i]);
+            if(result == 0) then
+                -- event suspended... will resume later.
+                break;
+            elseif(result == 1) then
+                break;
+            elseif(result == 2) then
+                eventItem:Ignore();
+                break;
+            elseif(result == 3) then
+                eventItem:Block();
+                break;
+            end
+        end
+    end
+    if(options.frame and options.frame.filterList) then
+        options.frame.filterList:Hide();
+        options.frame.filterList:Show();
+    end
+end
+
+
+
+-- Globals
+function GetDefaultFilters()
+    return DefaultFilters;
+end
+
+
+
+-- Options UI
 
 local function createFilterFrame()
     local win = CreateFrame("Frame", "WIM3_FilterFrame", _G.UIParent);
@@ -270,21 +476,21 @@ local function createFilterFrame()
     win.received.text = _G.getglobal(win.received:GetName().."Text");
     win.received.text:SetText(L["Apply to messages received."]);
     win.received:SetScript("OnShow", function(self)
-            win.filter.received = win.filter.received or true;
+            win.filter.received = win.filter.received;
             self:SetChecked(win.filter.received);
         end);
     win.received:SetScript("OnClick", function(self)
-            win.filter.received = self:GetChecked() and true or false;
+            win.filter.received = self:GetChecked() and true or nil;
         end);
     win.sent = CreateFrame("CheckButton", win:GetName().."Out", win, "UICheckButtonTemplate");
     win.sent:SetPoint("TOPLEFT", win.received, "TOPRIGHT", win.received.text:GetStringWidth() + 10, 0);
     _G.getglobal(win.sent:GetName().."Text"):SetText(L["Apply to messages sent."]);
     win.sent:SetScript("OnShow", function(self)
-            win.filter.sent = win.filter.sent or true;
+            win.filter.sent = win.filter.sent;
             self:SetChecked(win.filter.sent);
         end);
     win.sent:SetScript("OnClick", function(self)
-            win.filter.sent = self:GetChecked() and true or false;
+            win.filter.sent = self:GetChecked() and true or nil;
         end);
         
         

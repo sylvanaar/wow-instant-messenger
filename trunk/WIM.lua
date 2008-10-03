@@ -300,7 +300,10 @@ function WIM:VARIABLES_LOADED()
     db = _G.WIM3_Data;
     _G.WIM3_Cache = _G.WIM3_Cache or {};
     env.cache = _G.WIM3_Cache;
-    _G.WIM3_Filters = _G.WIM3_Filters or {};
+    _G.WIM3_Filters = _G.WIM3_Filters or GetDefaultFilters();
+    if(#_G.WIM3_Filters == 0) then
+        _G.WIM3_Filters = GetDefaultFilters();
+    end
     filters = _G.WIM3_Filters;
     
     -- load some environment data.
@@ -368,4 +371,20 @@ function IsGM(name)
 	end
 end
 
+function IsInParty(user)
+    for i=1, 4 do
+        if(_G.UnitName("party"..i) == user) then
+            return true;
+        end
+    end
+    return false;
+end
 
+function IsInRaid(user)
+    for i=1, 40 do
+        if(_G.UnitName("raid"..i) == user) then
+            return true;
+        end
+    end
+    return false;
+end

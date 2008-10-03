@@ -379,7 +379,7 @@ local function Whispers_Filters()
                 self.action:SetText(L["Action:"].." "..filterActions[self.filter.action]);
                 self.action:SetAlpha(alpha);
                 self.cb:SetChecked(self.filter.enabled);
-                self.stats:SetText(L["Total Filtered:"].." "..(self.filter.stats or "0"));
+                self.stats:SetText(L["Occurrences:"].." "..(self.filter.stats or "0"));
                 self.stats:SetAlpha(alpha);
                 if(index == 1) then self.up:Hide(); else self.up:Show(); end
                 if(index == #filters) then self.down:Hide(); else self.down:Show(); end

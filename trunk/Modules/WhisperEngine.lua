@@ -238,75 +238,6 @@ local function CHAT_MSG_WHISPER_INFORM(...)
     CallModuleFunction("PostEvent_WhisperInform", ...);
 end
 
-local function getNewEventTable(msgID)
-    if(msgID) then
-        if(WhisperQueue_Index[msgID]) then
-            return WhisperQueue_Index[msgID];
-        end
-    end
-    local i;
-    for i=1, #WhisperQueue_Bowl do
-        if(WhisperQueue_Bowl[i].event == nil) then
-            if(msgID) then
-                WhisperQueue_Index[msgID] = WhisperQueue_Bowl[i];
-            end
-            return WhisperQueue_Bowl[i];
-        end
-    end
-    table.insert(WhisperQueue_Bowl, {
-        arg = {},
-        argCount = 0,
-        flags = {
-            suspend = false,
-            block = false,
-            ignore = false,
-            supress = false,
-        },
-        msgID = msgID or 0,
-        ChatFrames = {}
-    });
-    local eventItem = WhisperQueue_Bowl[#WhisperQueue_Bowl];
-    eventItem.Suspend = function(self)
-                            if(self.arg[6] ~= "GM") then -- not allowed when talking to a GM
-                                self.flags.suspend = true;
-                            end
-                        end
-    eventItem.Release = function(self)
-                            if(self.arg[6] ~= "GM") then -- not allowed when talking to a GM
-                                if(self.flags.suspend) then
-                                    self.flags.suspend = false;
-                                    popEvents();
-                                end
-                            end
-                        end
-    eventItem.Block = function(self)
-                            if(self.arg[6] ~= "GM") then -- not allowed when talking to a GM
-                                self.flags.block = true;
-                                if(self.flags.suspend) then
-                                    self.flags.supress = true;
-                                    self.flags.suspend = false;
-                                    popEvents();
-                                end
-                            end
-                        end
-    eventItem.Ignore = function(self)
-                            if(self.arg[6] ~= "GM") then -- not allowed when talking to a GM
-                                self.flags.ignore = true;
-                                if(self.flags.suspend) then
-                                    self.flags.supress = false;
-                                    self.flags.suspend = false;
-                                    popEvents();
-                                end
-                            end
-                        end
-    eventItem.SetSupress = function(self, supress)
-                                supress = supress or false;
-                                self.flags.supress = supress;
-                        end
-
-    WhisperQueue_Index[msgID] = eventItem;
-    return eventItem;
-end
 
 local function removeEventTable(index)
     local eventItem = WhisperQueue[index];
@@ -368,6 +299,75 @@ local function popEvents()
         end
     end
 end
+
+
+local function getNewEventTable(msgID)
+    if(msgID) then
+        if(WhisperQueue_Index[msgID]) then
+            return WhisperQueue_Index[msgID];
+        end
+    end
+    local i;
+    for i=1, #WhisperQueue_Bowl do
+        if(WhisperQueue_Bowl[i].event == nil) then
+            if(msgID) then
+                WhisperQueue_Index[msgID] = WhisperQueue_Bowl[i];
+            end
+            return WhisperQueue_Bowl[i];
+        end
+    end
+    table.insert(WhisperQueue_Bowl, {
+        arg = {},
+        argCount = 0,
+        flags = {
+            suspend = false,
+            block = false,
+            ignore = false,
+            supress = false
+        },
+        msgID = msgID or 0,
+        ChatFrames = {}
+    });
+    local eventItem = WhisperQueue_Bowl[#WhisperQueue_Bowl];
+    eventItem.Suspend = function(self)
+                            if(self.arg[6] ~= "GM" and not self.flags.ignore and not self.flags.block) then -- not allowed when talking to a GM
+                                self.flags.suspend = true;
+                            end
+                        end
+    eventItem.Release = function(self)
+                            if(self.arg[6] ~= "GM") then -- not allowed when talking to a GM
+                                --if(self.flags.suspend) then
+                                    self.flags.suspend = false;
+                                    popEvents();
+                                --end
+                            end
+                        end
+    eventItem.Block = function(self)
+                            if(self.arg[6] ~= "GM") then -- not allowed when talking to a GM
+                                self.flags.block = true;
+                                self.flags.ignore = false;
+                                self.flags.supress = true;
+                                self.flags.suspend = false;
+                            end
+                        end
+    eventItem.Ignore = function(self)
+                            if(self.arg[6] ~= "GM" and not self.flags.block) then -- not allowed when talking to a GM
+                                self.flags.ignore = true;
+                                self.flags.supress = false;
+                                self.flags.suspend = false;
+                            end
+                        end
+    eventItem.SetSupress = function(self, supress)
+                                if(not self.flags.ignore and not self.flags.block) then
+                                    self.flags.supress = supress or false;
+                                end
+                            end
+
+    WhisperQueue_Index[msgID] = eventItem;
+    return eventItem;
+end
+
+
 
 -- this function returns the EventItem so it can have be additionally modified.
 local function pushEvent(event, ...)
