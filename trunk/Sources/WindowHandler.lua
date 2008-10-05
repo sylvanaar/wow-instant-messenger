@@ -127,9 +127,9 @@ function applyMessageFormatting(...)
 end
 
 
-function applyStringModifiers(str)
+function applyStringModifiers(str, chatDisplay)
 	for i=1, #StringModifiers do
-		str = StringModifiers[i](str);
+		str = StringModifiers[i](str, chatDisplay);
 	end
 	return str;
 end
@@ -722,7 +722,7 @@ local function instantiateWindow(obj)
     
     --Addmessage functions
     obj.AddMessage = function(self, msg, ...)
-	msg = applyStringModifiers(msg);
+	msg = applyStringModifiers(msg, self.widgets.chat_display);
 	self.widgets.chat_display:AddMessage(msg, ...);
         updateScrollBars(self);
 	CallModuleFunction("OnWindowMessageAdded", self, msg, ...);

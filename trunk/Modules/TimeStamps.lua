@@ -22,8 +22,8 @@ local formats = {
 db_defaults.timeStampFormat = formats[3];
 
 
-local function addTimeStamp(msg)
-    return GetTimeStamp().." "..msg;
+local function addTimeStamp(msg, chatDisplay)
+    return GetTimeStamp(nil, chatDisplay).." "..msg;
 end
 
 
@@ -35,11 +35,27 @@ function TimeStamps:OnDisable()
     UnregisterStringModifier(addTimeStamp);
 end
 
+function TimeStamps:OnWindowDestroyed(win)
+    win.lastDate = nil;
+end
+
 -- Global
-function GetTimeStamp(cTime)
-    cTime = cTime or nextStamp or time();
-    local stamp = "|cff"..RGBPercentToHex(db.displayColors.sysMsg.r, db.displayColors.sysMsg.g, db.displayColors.sysMsg.b)..date(db.timeStampFormat, cTime).."|r";
-    nextStamp = nil;
+function GetTimeStamp(cTime, chatDisplay)
+    local win = chatDisplay and chatDisplay.parentWindow;
+    cTime = cTime or (win and win.nextStamp) or time();
+    local cDate = _G.date(L["_DateFormat"], cTime);
+    local color = win and win.nextStampColor or db.displayColors.sysMsg;
+    if(win and win.lastDate ~= cDate) then
+        chatDisplay:AddMessage(" ");
+        chatDisplay:AddMessage("["..cDate.."]", color.r, color.g, color.b);
+    end
+    local stamp = "|cff"..RGBPercentToHex(color.r, color.g, color.b)..date(db.timeStampFormat, cTime).."|r";
+    if(win) then
+        win.lastDate = cDate;
+        win.nextChatDisplay = nil;
+        win.nextStamp = nil;
+        win.nextStampColor = nil;
+    end
     return stamp;
 end
 

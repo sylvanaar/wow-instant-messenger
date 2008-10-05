@@ -18,10 +18,11 @@ local Emote = WIM.CreateModule("Emoticons", true);
 local LinkRepository = {}; -- used for emotes and link parsing.
 local tmpList = {};
 
+local special = {"%", ":", "-", "^", "$", ")", "(", "]", "]", "~", "@", "#", "&", "*", "_", "+", "=", ",", ".", "?", "/", "\\", "{", "}", "|", "`", ";", "\"", "'"};
+
 local function convertEmoteToPattern(theEmote)
-    local special = {"%", ":", "-", "^", "$", ")", "(", "]", "]", "~", "@", "#", "&", "*", "_", "+", "=", ",", ".", "?", "/", "\\", "{", "}", "|", "`", ";", "\"", "'"};
     local i;
-    for i=1, table.getn(special) do
+    for i=1, #special do
         theEmote = string.gsub(theEmote, "%"..special[i], "%%"..special[i]);
     end
     return theEmote;
@@ -52,11 +53,10 @@ local function filterEmoticons(theMsg)
 
     --accomodate WoW's built in symbols and inherrit WoW's options whether to display them or not.
     if ( 1 ) then
-	local term;
 	for tag in string.gmatch(theMsg, "%b{}") do
-	    term = string.lower(string.gsub(tag, "[{}]", ""));
-	    if ( ICON_TAG_LIST[term] and ICON_LIST[ICON_TAG_LIST[term]] ) then
-		theMsg = string.gsub(theMsg, tag, ICON_LIST[ICON_TAG_LIST[term]] .. "0|t");
+	    local term = string.lower(string.gsub(tag, "[{}]", ""));
+	    if ( _G.ICON_TAG_LIST[term] and _G.ICON_LIST[_G.ICON_TAG_LIST[term]] ) then
+		theMsg = string.gsub(theMsg, tag, _G.ICON_LIST[_G.ICON_TAG_LIST[term]] .. "0|t");
 	    end
 	end
     end
@@ -66,12 +66,10 @@ local function filterEmoticons(theMsg)
     -- first as to not disrupt any links, lets remove them and put them back later.
     local results, orig;
     orig = theMsg;
-    LinkRepository[orig] = {};
-    local msgRepository = LinkRepository[orig];
     repeat
         theMsg, results = string.gsub(theMsg, "(|H[^|]+|h[^|]+|h)", function(theLink)
-            table.insert(msgRepository, theLink);
-            return "#LINK"..table.getn(msgRepository).."#";
+            table.insert(LinkRepository, theLink);
+            return "#LINK"..#LinkRepository.."#";
         end, 1);
     until results == 0;
     
@@ -85,11 +83,14 @@ local function filterEmoticons(theMsg)
     end
         
     -- put all the links back into the string...
-    for i=1, table.getn(msgRepository) do
-        theMsg = string.gsub(theMsg, "#LINK"..i.."#", msgRepository[i]);
+    for i=1, #LinkRepository do
+        theMsg = string.gsub(theMsg, "#LINK"..i.."#", LinkRepository[i]);
     end
-        
-    LinkRepository[orig] = nil;
+    
+    -- clear table to be recycled by next process
+    for key, _ in pairs(LinkRepository) do
+        LinkRepository[key] = nil;
+    end
     
     return theMsg;
 end

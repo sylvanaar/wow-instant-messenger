@@ -98,15 +98,18 @@ local function createButton(parent)
                 if(self.win.online ~= nil and not self.win.online) then
                     self.text:SetTextColor(.5, .5, .5);
                     self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipRed");
+                    self.canFade = true;
                 elseif(self.win.unreadCount > 0) then
                     self.text:SetTextColor(1, 1, 1);
-                    self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipBlue");                
+                    self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipBlue");
+                    self.canFade = false;
                 else
                     self.text:SetTextColor(1, 1, 1);
                     self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipClear");
+                    self.canFade = true;
                 end
                 -- set opacity of button text.
-                if(self.win and not self.win:IsShown()) then
+                if(self.win and not self.win:IsShown() and self.canFade) then
                     self.text:SetAlpha(.65);
                     self.status:SetAlpha(.65);
                 else

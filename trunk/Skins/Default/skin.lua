@@ -127,16 +127,10 @@ local WIM_ClassicSkin = {
                 PushedTexture = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
                 HighlightTexture = "Interface\\Buttons\\UI-GuildButton-PublicNote-Up",
                 HighlightAlphaMode = "ADD",
-                rect = {
-                    size = {
-                        x = 19,
-                        y = 19
-                    },
-                    anchor = "TOPRIGHT",
-                    offset = {
-                        x = -28,
-                        y = -6
-                    }
+                width = 18,
+                height = 18,
+                points = {
+                    {"TOPRIGHT", "window", "TOPRIGHT", -28, -6}
                 }
             },
             w2w = {
