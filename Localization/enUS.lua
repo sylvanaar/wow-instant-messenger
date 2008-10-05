@@ -9,6 +9,8 @@ WIM.AddLocale("enUS", {
 
     ["_DemoText"] = "This is a demonstration window and is not fully functional. Place this window in the location where you want all other windows to spawn. When finished, you may close this window and your settings will be saved.",
 
+    ["_DateFormat"] = "%m/%d/%Y",
+
     ["Yes"] = true,
     ["No"] = true,
     ["None"] = true,

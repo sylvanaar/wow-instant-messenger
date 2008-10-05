@@ -73,6 +73,7 @@ local function initialize()
         if( _G.IsInGuild() ) then
             _G.GuildRoster();
         end
+        
     
     libs.WhoLib = _G.AceLibrary and _G.AceLibrary('WhoLib-1.0');
     libs.Astrolabe = _G.DongleStub("Astrolabe-0.4");
@@ -306,6 +307,9 @@ function WIM:VARIABLES_LOADED()
     end
     filters = _G.WIM3_Filters;
     
+    _G.WIM3_History = _G.WIM3_History or {};
+    history = _G.WIM3_History;
+    
     -- load some environment data.
     env.realm = _G.GetCVar("realmName");
     env.character = _G.UnitName("player");
@@ -329,7 +333,7 @@ function WIM:FRIENDLIST_UPDATE()
 	for i=1, _G.GetNumFriends() do 
 		local name, junk = _G.GetFriendInfo(i);
 		if(name) then
-			env.cache[env.realm][env.character].friendList[name] = "1"; --[set place holder for quick lookup
+			env.cache[env.realm][env.character].friendList[name] = true; --[set place holder for quick lookup
 		end
 	end
     lists.friends = env.cache[env.realm][env.character].friendList;
@@ -345,7 +349,7 @@ function WIM:GUILD_ROSTER_UPDATE()
 		for i=1, _G.GetNumGuildMembers(true) do 
 			local name = _G.GetGuildRosterInfo(i);
 			if(name) then
-				env.cache[env.realm][env.character].guildList[name] = 1; --[set place holder for quick lookup
+				env.cache[env.realm][env.character].guildList[name] = true; --[set place holder for quick lookup
 			end
 		end
 	end

@@ -11,5 +11,7 @@
     <Script file="TimeStamps.lua"/>
     <Script file="ShortcutBar.lua"/>
     <Script file="Filters.lua"/>
+    <Script file="TabManagement.lua"/>
+    <Script file="History.lua"/>
     
 </Ui>
