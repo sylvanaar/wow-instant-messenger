@@ -582,7 +582,6 @@ local function createFilterFrame()
     
     table.insert(_G.UISpecialFrames,win:GetName());
     
-    _G.test = win.filter;
     return win;
 end
 
