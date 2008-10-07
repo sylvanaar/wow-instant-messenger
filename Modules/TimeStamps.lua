@@ -41,7 +41,7 @@ end
 
 -- Global
 function GetTimeStamp(cTime, chatDisplay)
-    local win = chatDisplay and chatDisplay.parentWindow;
+    local win = chatDisplay and chatDisplay.parentWindow or chatDisplay;
     cTime = cTime or (win and win.nextStamp) or time();
     local cDate = _G.date(L["_DateFormat"], cTime);
     local color = win and win.nextStampColor or db.displayColors.sysMsg;

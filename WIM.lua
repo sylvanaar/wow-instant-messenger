@@ -107,6 +107,7 @@ local function initialize()
     RegisterSlashCommand("enable", function() SetEnabled(not db.enabled) end, L["Toggle WIM 'On' and 'Off'."]);
     RegisterSlashCommand("debug", function() debug = not debug; end, L["Toggle Debugging Mode 'On' and 'Off'."]);
     FRIENDLIST_UPDATE(); -- pretend event has been fired in order to get cache loaded.
+    CallModuleFunction("OnInitialized");
     dPrint("WIM initialized...");
 end
 
