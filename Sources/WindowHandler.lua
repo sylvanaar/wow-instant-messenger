@@ -731,7 +731,7 @@ local function instantiateWindow(obj)
     end
     
     obj.AddEventMessage = function(self, r, g, b, event, ...)
-	local str = applyMessageFormatting(self.widgets.chat_display, event, ...);
+	local str = applyMessageFormatting(self.widgets.chat_display, event, ..., r, g, b);
 	self:AddMessage(str, r, g, b);
 	self.msgWaiting = true;
 	self.lastActivity = time();
@@ -1517,7 +1517,8 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
 			arg11 = arg11 or 0;
 			return "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]: "..arg1;
 		elseif(event == "CHAT_MSG_WHISPER_INFORM") then
-			return "[|Hplayer:".._G.UnitName("player").."|h".._G.UnitName("player").."|h]: "..arg1;
+                        arg11 = arg11 or 0;
+			return "[|Hplayer:".._G.UnitName("player")..":"..arg11.."|h".._G.UnitName("player").."|h]: "..arg1;
 		else
 			return "Unknown event received...";
 		end
