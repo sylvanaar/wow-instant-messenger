@@ -731,7 +731,7 @@ local function instantiateWindow(obj)
     end
     
     obj.AddEventMessage = function(self, r, g, b, event, ...)
-	local str = applyMessageFormatting(self.widgets.chat_display, event, ..., r, g, b);
+	local str = applyMessageFormatting(self.widgets.chat_display, event, ...);
 	self:AddMessage(str, r, g, b);
 	self.msgWaiting = true;
 	self.lastActivity = time();

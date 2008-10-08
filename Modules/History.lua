@@ -164,6 +164,19 @@ end
 --          History Viewer          --
 --------------------------------------
 
+local function searchResult(msg, search)
+    search = string.lower(string.trim(search));
+    msg = string.lower(msg);
+    local start, stop, match = string.find(search, "([^%s]+)",1);
+    while(match) do
+        if(not string.find(msg, match)) then
+            return false;
+        end
+        start, stop, match = string.find(search, "([^%s]+)",stop+1);
+    end
+    return true;
+end
+
 local HistoryViewer;
 local function createHistoryViewer()
     local win = CreateFrame("Frame", "WIM3_FilterFrame", _G.UIParent);
@@ -445,12 +458,65 @@ local function createHistoryViewer()
     win.search:SetPoint("TOPLEFT", win.nav, "TOPRIGHT");
     win.search:SetPoint("RIGHT", -18, 0);
     win.search:SetHeight(30);
-    win.search.bSearch = CreateFrame("Button", "WIM3_HistoryFrameSearchButton", win.search, "UIPanelButtonTemplate2");
-    win.search.bSearch.text = _G[win.search.bSearch:GetName().."Text"];
-    win.search.bSearch.text:SetText(L["Search"]);
-    win.search.bSearch:SetWidth(win.search.bSearch.text:GetStringWidth()+40);
-    win.search.bSearch:SetScript("OnClick", fun);
-    win.search.bSearch:SetPoint("RIGHT",-5, 0);
+    win.search.clear = CreateFrame("Button", nil, win.search);
+    win.search.clear:SetNormalTexture("Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\xNormal");
+    win.search.clear:SetPushedTexture("Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\xPressed");
+    win.search.clear:SetWidth(16);
+    win.search.clear:SetHeight(16);
+    win.search.clear:SetPoint("RIGHT", -5, 0)
+    win.search.clear:SetScript("OnClick", function(self)
+            win.search.text:ClearFocus();
+            win.search.text:SetText("");
+            for key, _ in pairs(win.SEARCHLIST) do
+                win.SEARCHLIST[key] = nil;
+            end
+            win.UpdateFilterList();
+            win.UpdateDisplay();
+        end);
+    win.search.text = CreateFrame("EditBox", nil, win.search);
+    win.search.text:SetFontObject(_G.ChatFontNormal);
+    win.search.text:SetWidth(200); win.search.text:SetHeight(15);
+    win.search.text:SetPoint("RIGHT", win.search.clear, "LEFT", -5, 0);
+    win.search.text:SetScript("OnEditFocusGained", function(self) self:HighlightText() end);
+    win.search.text:SetScript("OnEditFocusLost", function(self) self:HighlightText(0, 0) end);
+    win.search.text:SetScript("OnEnterPressed", function(self)
+            for key, _ in pairs(win.SEARCHLIST) do
+                win.SEARCHLIST[key] = nil;
+            end
+            local realm, character = string.match(win.USER, "^([%w%s]+)/?(.*)$");
+            if(realm and character and history[realm] and history[realm][character]) then
+                for convo, tbl in pairs(history[realm][character]) do
+                    for i=1, #tbl do
+                        if(searchResult(tbl[i].msg, self:GetText())) then
+                            table.insert(win.SEARCHLIST, tbl[i]);
+                        end
+                    end
+                end
+            elseif(realm and history[realm]) then
+                for character, convos in pairs(history[realm]) do
+                    for convo, tbl in pairs(convos) do
+                        for i=1, #tbl do
+                            if(searchResult(tbl[i].msg, self:GetText())) then
+                                table.insert(win.SEARCHLIST, tbl[i]);
+                            end
+                        end
+                    end
+                end
+            end
+            table.sort(win.SEARCHLIST, function(a, b)
+                return a.time < b.time;
+            end);
+            self:ClearFocus();
+            win.UpdateFilterList();
+            win.UpdateDisplay();
+        end);
+    options.AddFramedBackdrop(win.search.text);
+    win.search.text:SetAutoFocus(false);
+    win.search.text:SetScript("OnEscapePressed", function(self) self:ClearFocus() end);
+    win.search.label = win.search:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+    win.search.label:SetText(L["Search"]..":");
+    win.search.label:SetTextColor(_G.GameFontNormal:GetTextColor());
+    win.search.label:SetPoint("RIGHT", win.search.text, "LEFT", -5, 0);
     
     
     --content frame
@@ -688,8 +754,9 @@ local function createHistoryViewer()
         for i=1, #win.FILTERLIST do
             win.FILTERLIST[i] = nil;
         end
-        for i=1, #win.CONVOLIST do
-            local t = win.CONVOLIST[i].time;
+        local theList = #win.SEARCHLIST > 0 and win.SEARCHLIST or win.CONVOLIST;
+        for i=1, #theList do
+            local t = theList[i].time;
             local tbl = date("*t", t);
             t = time{year=tbl.year, month=tbl.month, day=tbl.day, hour=0};
             addToTableUnique(win.FILTERLIST, t);
