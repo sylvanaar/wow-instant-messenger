@@ -639,6 +639,7 @@ local function createHistoryViewer()
     win.CONVOLIST = {};
     win.FILTER = "";
     win.FILTERLIST = {};
+    win.SEARCHLIST = {};
 
     win.SelectConvo = function(self, convo)
         win.CONVO = convo;
@@ -649,6 +650,7 @@ local function createHistoryViewer()
     end
     
     win.UpdateDisplay = function(self)
+        local curList = #win.SEARCHLIST > 0 and win.SEARCHLIST or win.CONVOLIST;
         win.content.chatFrame:Clear();
         win.content.chatFrame.lastDate = nil;
         win.content.chatFrame:SetIndentedWordWrap(db.wordwrap_indent);
@@ -663,13 +665,13 @@ local function createHistoryViewer()
             t = time{year=tbl.year, month=tbl.month, day=tbl.day, hour=0};
             min, max = t, t+dDay;
         end
-        for i=1, #win.CONVOLIST do
+        for i=1, #curList do
             if(filter) then
-                if(min <= win.CONVOLIST[i].time and max > win.CONVOLIST[i].time) then
-                    ViewTypes[win.TAB].func(frame, win.CONVOLIST[i]);
+                if(min <= curList[i].time and max > curList[i].time) then
+                    ViewTypes[win.TAB].func(frame, curList[i]);
                 end
             else
-                ViewTypes[win.TAB].func(frame, win.CONVOLIST[i]);
+                ViewTypes[win.TAB].func(frame, curList[i]);
             end
         end
         win.content.chatFrame:update();
