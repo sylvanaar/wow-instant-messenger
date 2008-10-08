@@ -705,8 +705,6 @@ local function instantiateWindow(obj)
     widgets.chat_display:SetMovable(true);
     --widgets.chat_display:SetScript("OnDragStart", function(self) MessageWindow_MovementControler_OnDragStart(self); end);
     --widgets.chat_display:SetScript("OnDragStop", function(self) MessageWindow_MovementControler_OnDragStop(self); end);
-    widgets.chat_display:SetScript("OnHyperlinkClick", function(self, ...) _G.SetItemRef(...); end);
-    widgets.chat_display:SetScript("OnMessageScrollChanged", function(self) updateScrollBars(self:GetParent()); end);
     widgets.chat_display:SetJustifyH("LEFT");
     widgets.chat_display:EnableMouse(true);
     widgets.chat_display:EnableMouseWheel(1);
@@ -1457,7 +1455,11 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w,demo", "OnMouseUp", func
                         end
                 end
 	end);
-	
+
+
+RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkClick", function(self, ...) _G.SetItemRef(...); end);
+RegisterWidgetTrigger("chat_display", "whisper,chat,w2w","OnMessageScrollChanged", function(self) updateScrollBars(self:GetParent()); end);
+
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkEnter", function(self)
 			local obj = self.parentWindow;
 			obj.isOnHyperLink = true;
