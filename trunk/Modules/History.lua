@@ -46,7 +46,7 @@ local function clearTmpTable()
 end
 
 local function getPlayerHistoryTable(convoName)
-    if(history[env.realm] and history[env.realm][env.character][convoName]) then
+    if(history[env.realm] and history[env.realm][env.character] and history[env.realm][env.character][convoName]) then
         return history[env.realm][env.character][convoName];
     else
         -- this player hasn't been set up yet. Do it now.
@@ -147,7 +147,8 @@ function History:OnWindowCreated(win)
                     local color = db.displayColors[tmpTable[i].inbound and "historyIn" or "historyOut"];
                     win.nextStamp = tmpTable[i].time;
                     win.nextStampColor = db.displayColors.historyOut;
-                    win:AddMessage(applyMessageFormatting(win.widgets.chat_display, event, tmpTable[i].msg, tmpTable[i].from), color.r, color.g, color.b);
+                    win:AddMessage(applyMessageFormatting(win.widgets.chat_display, event, tmpTable[i].msg, tmpTable[i].from,
+                                    nil, nil, nil, nil, nil, nil, nil, nil, -i, color.r, color.g, color.b), color.r, color.g, color.b);
                 end
                 win.widgets.chat_display:AddMessage(" ");
             end
@@ -444,6 +445,12 @@ local function createHistoryViewer()
     win.search:SetPoint("TOPLEFT", win.nav, "TOPRIGHT");
     win.search:SetPoint("RIGHT", -18, 0);
     win.search:SetHeight(30);
+    win.search.bSearch = CreateFrame("Button", "WIM3_HistoryFrameSearchButton", win.search, "UIPanelButtonTemplate2");
+    win.search.bSearch.text = _G[win.search.bSearch:GetName().."Text"];
+    win.search.bSearch.text:SetText(L["Search"]);
+    win.search.bSearch:SetWidth(win.search.bSearch.text:GetStringWidth()+40);
+    win.search.bSearch:SetScript("OnClick", fun);
+    win.search.bSearch:SetPoint("RIGHT",-5, 0);
     
     
     --content frame
@@ -706,8 +713,10 @@ local function createHistoryViewer()
             end
         elseif(realm and history[realm]) then
             for character, tbl in pairs(history[realm]) do
-                for i=1, #tbl[win.CONVO] do
-                    table.insert(win.CONVOLIST, tbl[win.CONVO][i]);
+                if(tbl[win.CONVO]) then
+                    for i=1, #tbl[win.CONVO] do
+                        table.insert(win.CONVOLIST, tbl[win.CONVO][i]);
+                    end
                 end
             end
         end
