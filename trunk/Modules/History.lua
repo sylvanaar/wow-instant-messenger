@@ -11,7 +11,7 @@ local time = time;
 --set namespace
 setfenv(1, WIM);
 
-local History = WIM.CreateModule("History", true);
+local History = CreateModule("History", true);
 
 -- default history settings.
 db_defaults.history = {
@@ -57,10 +57,11 @@ local function getPlayerHistoryTable(convoName)
     end
 end
 
+
 local function createWidget()
     local button = _G.CreateFrame("Button");
     button.SetHistory = function(self, isHistory)
-        self.isHistory = isHistory;
+        self.parentWindow.isHistory = isHistory;
         if(isHistory and modules.History.enabled) then
             self:SetAlpha(1);
         else
@@ -71,13 +72,18 @@ local function createWidget()
         self:SetHistory(self.parentWindow.isHistory);
     end
     button:SetScript("OnEnter", function(self)
-        if(db.showToolTips == true) then
+        if(db.showToolTips == true and self.parentWindow.isHistory) then
             _G.GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
             _G.GameTooltip:SetText(L["Click to view message history."]);
         end
     end);
     button:SetScript("OnLeave", function(self)
         _G.GameTooltip:Hide();
+    end);
+    button:SetScript("OnClick", function(self, button)
+        if(self.parentWindow.isHistory) then
+            ShowHistoryViewer(self.parentWindow.theUser);
+        end
     end);
     return button;
 end
@@ -143,11 +149,10 @@ function History:OnWindowCreated(win)
                 win.isHistory = true;
                 win.widgets.history:SetHistory(true);
                 for i=1, #tmpTable do
-                    local event = tmpTable[i].inbound and "CHAT_MSG_WHISPER" or "CHAT_MSG_WHISPER_INFORM";
                     local color = db.displayColors[tmpTable[i].inbound and "historyIn" or "historyOut"];
                     win.nextStamp = tmpTable[i].time;
                     win.nextStampColor = db.displayColors.historyOut;
-                    win:AddMessage(applyMessageFormatting(win.widgets.chat_display, event, tmpTable[i].msg, tmpTable[i].from,
+                    win:AddMessage(applyMessageFormatting(win.widgets.chat_display, "CHAT_MSG_WHISPER", tmpTable[i].msg, tmpTable[i].from,
                                     nil, nil, nil, nil, nil, nil, nil, nil, -i, color.r, color.g, color.b), color.r, color.g, color.b);
                 end
                 win.widgets.chat_display:AddMessage(" ");
@@ -253,11 +258,18 @@ local function createHistoryViewer()
             for key, _ in pairs(self.list) do
                 self.list[key] = nil;
             end
+            local thisToon = env.realm.."/"..env.character;
             for realm, users in pairs(history) do
                 table.insert(self.list, realm);
                 for user, _ in pairs(users) do
+                    if(thisToon == realm.."/"..user) then
+                        thisToon = nil;
+                    end
                     table.insert(self.list, realm.."/"..user);
                 end
+            end
+            if(thisToon) then
+                table.insert(self.list, 1, thisToon);
             end
             table.sort(self.list);
             return self.list;
@@ -401,6 +413,9 @@ local function createHistoryViewer()
                 button.SetUser = function(self, user)
                         self.user = user;
                         self.text:SetText("     "..user);
+                        if(user == win.SELECT) then
+                            self:Click();
+                        end
                     end
                 button:SetScript("OnClick", function(self)
                         win:SelectConvo(self.user);
@@ -796,13 +811,14 @@ local function createHistoryViewer()
         for i=1, #win.USERLIST do
             win.USERLIST[i] = nil;
         end
-        local realm, character = string.match(win.USER, "^([%w%s]+)/?(.*)$");
+        local realm = string.match(win.USER, "^([%w%s]+)/?.*$");
+        local character = string.match(win.USER, "^[%w%s]+/(.*)$");
         if(realm and character and history[realm] and history[realm][character]) then
             local tbl = history[realm][character];
             for convo, _ in pairs(tbl) do
                 addToTableUnique(win.USERLIST, convo);
             end
-        elseif(realm and history[realm]) then
+        elseif(realm and not character and history[realm]) then
             for character, tbl in pairs(history[realm]) do
                 for convo, _ in pairs(tbl) do
                     addToTableUnique(win.USERLIST, convo);
@@ -813,7 +829,14 @@ local function createHistoryViewer()
         win.nav.userList.scroll:Hide();
         win.nav.userList.scroll:Show();
         if(#win.USERLIST>0) then
-            win.nav.userList.scroll.buttons[1]:Click();
+            if(not win.SELECT) then
+                win.nav.userList.scroll.buttons[1]:Click();
+            else
+                win.SELECT = nil;
+            end
+        else
+            win.SELECT = nil;
+            win:SelectConvo("");
         end
     end
     
@@ -822,16 +845,17 @@ local function createHistoryViewer()
     return win;
 end
 
-
+local chatFrameMsgId = -1;
 table.insert(ViewTypes, {
         text = L["Chat View"],
         frame = "chatFrame",
         func = function(frame, msg)
             if(msg.type == 1) then
-                local event = msg.inbound and "CHAT_MSG_WHISPER" or "CHAT_MSG_WHISPER_INFORM";
                 local color = db.displayColors[msg.inbound and "wispIn" or "wispOut"];
                 frame.nextStamp = msg.time;
-                frame:AddMessage(applyStringModifiers(applyMessageFormatting(frame, event, msg.msg, msg.from), frame), color.r, color.g, color.b)
+                frame:AddMessage(applyStringModifiers(applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from,
+                        nil, nil, nil, nil, nil, nil, nil, nil, chatFrameMsgId), frame), color.r, color.g, color.b);
+                chatFrameMsgId = chatFrameMsgId > -1000 and chatFrameMsgId - 1 or -1;
             end
         end
     });
@@ -851,9 +875,17 @@ table.insert(ViewTypes, {
 
 
 
-function ShowHistoryViewer()
+function ShowHistoryViewer(user)
     HistoryViewer = HistoryViewer or createHistoryViewer();
     HistoryViewer:Show();
+    if(user) then
+        HistoryViewer.USER = env.realm.."/"..env.character;
+        HistoryViewer.SELECT = user;
+        HistoryViewer.nav:Hide();
+        HistoryViewer.nav:Show();
+        HistoryViewer.UpdateUserList();
+        --HistoryViewer:SelectConvo(user);
+    end
 end
 
 RegisterSlashCommand("history", ShowHistoryViewer, L["Display history viewer."])
