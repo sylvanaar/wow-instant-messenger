@@ -23,6 +23,17 @@ setmetatable(L, {
     end
 });
 
+function getLocal()
+    local locale = _G.GetLocale();
+    local realmList = _G.GetCVar("realmList");
+    local isUS = realmList and _G.string.match(_G.string.lower(realmList), "us.logon.worldofwarcraft.com");
+    if(locale == "enUS" and not isUS) then
+        return "enGB";
+    else
+        return locale;
+    end
+end
+
 function AddLocale(Locale, lTable)
     if(_G.GetLocale() == Locale or Locale == "enUS") then
         for k, v in pairs(lTable) do
