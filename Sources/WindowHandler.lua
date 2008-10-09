@@ -1524,17 +1524,6 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
 		end
 	end);
 
-RegisterMessageFormatting(L["Test 1"], function(smf, event, ...)
-		local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
-		if(event == "CHAT_MSG_WHISPER") then
-			arg11 = arg11 or 0;
-			return "<|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h>: "..arg1;
-		elseif(event == "CHAT_MSG_WHISPER_INFORM") then
-			return "<|Hplayer:".._G.UnitName("player").."|h".._G.UnitName("player").."|h>: "..arg1;
-		else
-			return "Unknown event received...";
-		end
-	end);
 
 
 

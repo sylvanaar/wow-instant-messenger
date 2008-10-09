@@ -18,7 +18,7 @@ db_defaults.minimap = {
     rightClickNew = false
 };
 
- Notifications = {};	-- list of current notifications
+Notifications = {};	-- list of current notifications
 local NotificationIndex = 1;	-- index for update messages
 local Notification_Bowl = {};
 

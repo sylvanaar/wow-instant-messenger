@@ -13,5 +13,6 @@
     <Script file="Filters.lua"/>
     <Script file="TabManagement.lua"/>
     <Script file="History.lua"/>
+    <Script file="ldb.lua"/>
     
 </Ui>
