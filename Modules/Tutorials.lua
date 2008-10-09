@@ -74,6 +74,25 @@ function Tutorials:OnDisable()
 end
 
 
+local _TutorialFrame_NewTutorial = _G.TutorialFrame_NewTutorial;
+_G.TutorialFrame_NewTutorial = function(id)
+    _TutorialFrame_NewTutorial(id);
+    local button = _G.LAST_TUTORIAL_BUTTON_SHOWN;
+    if(button) then
+        -- set OnHide to restore button's image.
+        button:SetScript("OnHide", function(self)
+                self:SetNormalTexture("Interface\\TutorialFrame\\TutorialFrameAlert");
+                self:SetHighlightTexture("Interface\\TutorialFrame\\TutorialFrameAlert", "ADD");
+            end);
+        -- set buttons image to WIM tutorial.
+        if(button.id and string.match(button.id, "^WIM")) then
+            button:SetNormalTexture("Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\tutorial");
+            button:SetHighlightTexture("Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\tutorial", "ADD");
+        end
+    end
+end
+
+
 --Global to add tutorial
 function DisplayTutorial(title, tutorial)
     -- this function is defined when the module is enabled.

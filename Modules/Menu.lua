@@ -99,7 +99,7 @@ local function createButton(parent)
                     self.text:SetTextColor(.5, .5, .5);
                     self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipRed");
                     self.canFade = true;
-                elseif(self.win.unreadCount > 0) then
+                elseif(self.win.unreadCount and self.win.unreadCount > 0) then
                     self.text:SetTextColor(1, 1, 1);
                     self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipBlue");
                     self.canFade = false;
