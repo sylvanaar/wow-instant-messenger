@@ -25,13 +25,8 @@ setmetatable(L, {
 
 function getLocal()
     local locale = _G.GetLocale();
-    local realmList = _G.GetCVar("realmList");
-    local isUS = realmList and _G.string.match(_G.string.lower(realmList), "us.logon.worldofwarcraft.com");
-    if(locale == "enUS" and not isUS) then
-        return "enGB";
-    else
-        return locale;
-    end
+    local isGB = _G.GetCVar("locale") == "enGB";
+    return isGB and "enGB" or locale;
 end
 
 function AddLocale(Locale, lTable)
