@@ -182,7 +182,7 @@ local function searchResult(msg, search)
     return true;
 end
 
-local HistoryViewer;
+
 local function createHistoryViewer()
     local win = CreateFrame("Frame", "WIM3_FilterFrame", _G.UIParent);
     win:Hide();
@@ -566,13 +566,13 @@ local function createHistoryViewer()
                 for i=1, #win.content.tabs do
                     if(self.index == i) then
                         win.content.tabs[i]:SetAlpha(1);
-                        win.TAB = index;
+                        win.TAB = self.index;
                         if(self.frame == "chatFrame") then
                             win.content.chatFrame:Show();
                             win.content.textFrame:Hide();
                         else
-                            win.content.chatFrame:Hide();
                             win.content.textFrame:Show();
+                            win.content.chatFrame:Hide();
                         end
                     else
                         win.content.tabs[i]:SetAlpha(.5);
@@ -738,31 +738,9 @@ local function createHistoryViewer()
     end
     
     win.UpdateDisplay = function(self)
-        local curList = #win.SEARCHLIST > 0 and win.SEARCHLIST or win.CONVOLIST;
-        win.content.chatFrame:Clear();
-        win.content.chatFrame.lastDate = nil;
-        win.content.chatFrame:SetIndentedWordWrap(db.wordwrap_indent);
-        win.content.textFrame.text:SetText("");
-        win.content.textFrame.text.lastDate = nil;
-        local frame = ViewTypes[win.TAB].frame == "chatFrame" and win.content.chatFrame or win.content.textFrame.text;
-        local filter = _G.type(win.FILTER) == "number" or nil;
-        local min, max = 0, 0;
-        if(filter) then
-            local t = win.FILTER;
-            local tbl = date("*t", t);
-            t = time{year=tbl.year, month=tbl.month, day=tbl.day, hour=0};
-            min, max = t, t+dDay;
+        if(win.displayUpdate) then
+            win.displayUpdate:Show();
         end
-        for i=1, #curList do
-            if(filter) then
-                if(min <= curList[i].time and max > curList[i].time) then
-                    ViewTypes[win.TAB].func(frame, curList[i]);
-                end
-            else
-                ViewTypes[win.TAB].func(frame, curList[i]);
-            end
-        end
-        win.content.chatFrame:update();
     end
     
     win.UpdateFilterList = function(self)
@@ -840,9 +818,94 @@ local function createHistoryViewer()
         end
     end
     
+    
+    win.progressBar = CreateFrame("Frame", nil, win.content);
+    win.progressBar:SetFrameStrata("TOOLTIP");
+    win.progressBar:SetWidth(300); win.progressBar:SetHeight(65);
+    win.progressBar:SetPoint("CENTER", 0, 50);
+    options.AddFramedBackdrop(win.progressBar);
+    win.progressBar.backdrop.bg:SetTexture(0, 0, 0, 1);
+    win.progressBar.bar = CreateFrame("Frame", nil, win.progressBar);
+    options.AddFramedBackdrop(win.progressBar.bar);
+    win.progressBar.bar:SetWidth(win.progressBar:GetWidth()-40); win.progressBar.bar:SetHeight(15);
+    win.progressBar.bar:SetPoint("CENTER", 0, -5);
+    win.progressBar.bar.bg = win.progressBar.bar:CreateTexture(nil, "OVERLAY");
+    win.progressBar.bar.bg:SetTexture(1,1,1, .5);
+    win.progressBar.bar.bg:SetPoint("TOPLEFT");
+    win.progressBar.bar.bg:SetPoint("BOTTOMLEFT");
+    win.progressBar.text = win.progressBar:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+    win.progressBar.text:SetPoint("BOTTOMLEFT", win.progressBar.bar, "TOPLEFT", 0, 5);
+    win.progressBar.text:SetText(L["Loading History"].."...");
+    win.progressBar:SetScript("OnShow", function(self)
+            win.content.chatFrame:SetAlpha(.5);
+            win.content.textFrame:SetAlpha(.5);
+        end);
+    win.progressBar:SetScript("OnHide", function(self)
+            win.content.chatFrame:SetAlpha(1);
+            win.content.textFrame:SetAlpha(1);
+        end);
+    
     win.content.tabs[1]:Click();
     
     return win;
+end
+
+
+local HistoryViewer;
+local function createDisplayUpdate()
+    -- displayUpdate loads messages into the correct content frames avoiding lag from system ops.
+    local displayUpdate = CreateFrame("Frame");
+    displayUpdate:Hide();
+    displayUpdate.Process = function(self)
+            self.i = self.i or 1;
+            if(not self.curList or not self.curList[self.i]) then
+                self:Hide();
+                return;
+            end
+            HistoryViewer.progressBar.bar.bg:SetWidth(HistoryViewer.progressBar.bar:GetWidth()*self.i/#self.curList);
+            if(self.filter) then
+                if(self.min <= self.curList[self.i].time and self.max > self.curList[self.i].time) then
+                    ViewTypes[HistoryViewer.TAB].func(self.frame, self.curList[self.i]);
+                else
+                    self.i = self.i + 1;
+                    self:Process();
+                    return;
+                end
+            else
+                ViewTypes[HistoryViewer.TAB].func(self.frame, self.curList[self.i]);
+            end
+            self.i = self.i + 1;
+        end;
+    displayUpdate:SetScript("OnUpdate", function(self, elapsed)
+        self:Process()
+    end);
+    displayUpdate:SetScript("OnHide", function(self)
+        self.i = 1;
+        HistoryViewer.progressBar:Hide();
+        HistoryViewer.content.chatFrame:update();
+    end);
+    
+    displayUpdate:SetScript("OnShow", function(self)
+        HistoryViewer.progressBar:Show();
+        self.curList = #HistoryViewer.SEARCHLIST > 0 and HistoryViewer.SEARCHLIST or HistoryViewer.CONVOLIST;
+        self.frame = ViewTypes[HistoryViewer.TAB].frame == "chatFrame" and HistoryViewer.content.chatFrame or HistoryViewer.content.textFrame.text;
+        
+        HistoryViewer.content.chatFrame:Clear();
+        HistoryViewer.content.chatFrame.lastDate = nil;
+        HistoryViewer.content.chatFrame:SetIndentedWordWrap(db.wordwrap_indent);
+        HistoryViewer.content.textFrame.text:SetText("");
+        HistoryViewer.content.textFrame.text.lastDate = nil;
+        
+        self.filter = _G.type(HistoryViewer.FILTER) == "number" or nil;
+        self.min, self.max = 0, 0;
+        if(self.filter) then
+            local t = HistoryViewer.FILTER;
+            local tbl = date("*t", t);
+            t = time{year=tbl.year, month=tbl.month, day=tbl.day, hour=0};
+            self.min, self.max = t, t+dDay;
+        end
+    end);
+    return displayUpdate;
 end
 
 local chatFrameMsgId = -1;
@@ -873,10 +936,10 @@ table.insert(ViewTypes, {
     });
 
 
-
-
 function ShowHistoryViewer(user)
     HistoryViewer = HistoryViewer or createHistoryViewer();
+    HistoryViewer.displayUpdate = HistoryViewer.displayUpdate or createDisplayUpdate();
+    
     HistoryViewer:Show();
     if(user) then
         HistoryViewer.USER = env.realm.."/"..env.character;

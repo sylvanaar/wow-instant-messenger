@@ -44,6 +44,19 @@ local function getEmoteFilePath(theEmote)
     end
 end
 
+
+local function encodeColors(theMsg)
+    theMsg = string.gsub(theMsg, "|c", "\001\002");
+    theMsg = string.gsub(theMsg, "|r", "\001\003");
+    return theMsg;
+end
+
+local function decodeColors(theMsg)
+    theMsg = string.gsub(theMsg, "\001\002", "|c");
+    theMsg = string.gsub(theMsg, "\001\003", "|r");
+    return theMsg;
+end
+
 local function filterEmoticons(theMsg)
 
     --saftey check...
@@ -66,12 +79,16 @@ local function filterEmoticons(theMsg)
     -- first as to not disrupt any links, lets remove them and put them back later.
     local results, orig;
     orig = theMsg;
+    -- clean out colors and wait to put back.
+    local results;
+    theMsg = encodeColors(theMsg);
     repeat
         theMsg, results = string.gsub(theMsg, "(|H[^|]+|h[^|]+|h)", function(theLink)
             table.insert(LinkRepository, theLink);
-            return "#LINK"..#LinkRepository.."#";
+            return "\001\004"..#LinkRepository;
         end, 1);
     until results == 0;
+    --restore color
     
     -- lets exchange emotes...
     local emote, img;
@@ -84,7 +101,7 @@ local function filterEmoticons(theMsg)
         
     -- put all the links back into the string...
     for i=1, #LinkRepository do
-        theMsg = string.gsub(theMsg, "#LINK"..i.."#", LinkRepository[i]);
+        theMsg = string.gsub(theMsg, "\001\004"..i.."", LinkRepository[i]);
     end
     
     -- clear table to be recycled by next process
@@ -92,7 +109,7 @@ local function filterEmoticons(theMsg)
         LinkRepository[key] = nil;
     end
     
-    return theMsg;
+    return decodeColors(theMsg);
 end
 
 

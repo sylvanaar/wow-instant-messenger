@@ -6,6 +6,7 @@ local string = string;
 local format = format;
 local table = table;
 local type = type;
+local pairs = pairs;
 
 --set namespace
 setfenv(1, WIM);
@@ -52,6 +53,8 @@ local patterns = {
 };	
 
 
+local LinkRepository = {};
+
 local function formatRawURL(theURL)
     if(type(theURL) ~= "string" or theURL == "") then
         return "";
@@ -61,11 +64,46 @@ local function formatRawURL(theURL)
     end
 end
 
+local function encodeColors(theMsg)
+    theMsg = string.gsub(theMsg, "|c", "\001\002");
+    theMsg = string.gsub(theMsg, "|r", "\001\003");
+    return theMsg;
+end
+
+local function decodeColors(theMsg)
+    theMsg = string.gsub(theMsg, "\001\002", "|c");
+    theMsg = string.gsub(theMsg, "\001\003", "|r");
+    return theMsg;
+end
+
 local function convertURLtoLinks(text)
-	for i=1, table.getn(patterns) do
-		text = string.gsub(text, patterns[i], formatRawURL);
-	end
-	return text;
+        -- clean text first
+        local theMsg = text;
+        local results;
+        theMsg = encodeColors(theMsg);
+        repeat
+            theMsg, results = string.gsub(theMsg, "(|H[^|]+|h[^|]+|h)", function(theLink)
+                table.insert(LinkRepository, theLink);
+                return "\001\004"..#LinkRepository;
+            end, 1);
+        until results == 0;
+        
+        -- create urls
+        for i=1, table.getn(patterns) do
+            theMsg = string.gsub(theMsg, patterns[i], formatRawURL);
+        end
+        
+        --restore links
+        for i=1, #LinkRepository do
+            theMsg = string.gsub(theMsg, "\001\004"..i.."", LinkRepository[i]);
+        end
+        
+        -- clear table to be recycled by next process
+        for key, _ in pairs(LinkRepository) do
+            LinkRepository[key] = nil;
+        end
+        
+	return decodeColors(theMsg);
 end
 
 local function modifyURLs(str)
