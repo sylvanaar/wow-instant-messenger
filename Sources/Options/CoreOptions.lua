@@ -240,6 +240,9 @@ local function General_VisualSettings()
     frame.menu:CreateColorPicker(L["Color: Error Messages"], db.displayColors, "errorMsg");
     frame.menu:CreateColorPicker(L["Color: URL - Web Addresses"], db.displayColors, "webAddress");
     frame.menu.nextOffSetY = -10;
+    frame.menu:CreateColorPicker(L["Color: History Messages Sent"], db.displayColors, "historyOut");
+    frame.menu:CreateColorPicker(L["Color: History Messages Received"], db.displayColors, "historyIn");
+    frame.menu.nextOffSetY = -10;
     frame.menu:CreateCheckButton(L["Use colors suggested by skin."], db.displayColors, "useSkin");
     frame.menu.nextOffSetY = -40;
     frame.menu:CreateSlider(L["Chat Font Size"], "8", "50", 8, 50, 1, db, "fontSize", function(self) UpdateAllWindowProps(); end);
@@ -424,13 +427,71 @@ local function Whispers_Filters()
     return frame;
 end
 
+local function General_History()
+    local f = options.CreateOptionsFrame();
+    f.sub = f:CreateSection(L["History"], L["WIM can store conversations to be viewed at a later time."]);
+    f.sub.nextOffSetY = -10;
+    f.sub:CreateCheckButton(L["Enable History"], WIM.modules.History, "enabled", nil, function(self, button) EnableModule("History", self:GetChecked()); end);
+    f.sub.nextOffSetY = -15;
+    local tsList = {};
+    for i=1, 10 do
+        table.insert(tsList, {
+            text = (i*5).." "..L["Messages"],
+            value = (i*5),
+            justifyH = "LEFT",
+        });
+    end
+    f.sub:CreateCheckButtonMenu(L["Preview history inside message windows."], db.history, "preview", nil, nil, tsList, db.history, "previewCount");
+    f.sub.nextOffSetY = -10;
+    f.sub.whispers = f.sub:CreateCheckButton(L["Record Whispers"], db.history.whispers, "enabled");
+    f.sub.whispers:CreateCheckButton(L["Record Friends"], db.history.whispers, "friends");
+    f.sub.whispers:CreateCheckButton(L["Record Guild"], db.history.whispers, "guild");
+    f.sub.whispers:CreateCheckButton(L["Record Everyone"], db.history.whispers, "all");
+
+    f.sub.chat = f.sub:CreateCheckButton(L["Record Chat"], db.history.chat, "enabled");
+    f.sub.chat:ClearAllPoints();
+    f.sub.chat:SetPoint("TOPLEFT", f.sub.whispers, 200, 0);
+    f.sub.chat:CreateCheckButton(L["Record Friends"], db.history.chat, "friends");
+    f.sub.chat:CreateCheckButton(L["Record Guild"], db.history.chat, "guild");
+    f.sub.chat:CreateCheckButton(L["Record Everyone"], db.history.chat, "all");
+    f.sub.chat:Disable();
+    f.sub.lastObj = f.sub.whispers;
+    
+    f.maint = f:CreateSection(L["Maintenance"], L["Allowing your history logs to grow too large will affect the game's performance, therefore it is reccomended that you use the following options."]);
+    f.maint:ClearAllPoints();
+    f.maint:SetFullSize();
+    f.maint:SetPoint("BOTTOM", 0, 10);
+    local countList = {100, 200, 500, 1000};
+    tsList = {};
+    for i=1, #countList do
+        table.insert(tsList, {
+            text = countList[i].." "..L["Messages"],
+            value = countList[i],
+            justifyH = "LEFT",
+        });
+    end
+    f.maint.nextOffSetY = -10;
+    f.maint:CreateCheckButtonMenu(L["Save a maximum number of messages per person."], db.history, "maxPer", nil, nil, tsList, db.history, "maxCount");
+    --f.maint.nextOffSetY = -10;
+    local tsList2 = {};
+    for i=1, 5 do
+        table.insert(tsList2, {
+            text = _G.format(L["%d |4Week:Weeks;"], i),
+            value = 60*60*24*7*i,
+            justifyH = "LEFT",
+        });
+    end
+    f.maint:CreateCheckButtonMenu(L["Automatically delete old messages."], db.history, "ageLimit", nil, nil, tsList2, db.history, "maxAge");
+    return f;
+end
 
 
-RegisterOptionFrame(L["General"], L["Main"], "This is just a test Category", General_Main, "Display WIM's options.");
-RegisterOptionFrame(L["General"], L["Window Settings"], "This is just a test Category", General_WindowSettings, "Display WIM's options.");
-RegisterOptionFrame(L["General"], L["Display Settings"], "This is just a test Category", General_VisualSettings, "Display WIM's options.");
-RegisterOptionFrame(L["General"], L["Message Formatting"], "This is just a test Category", General_MessageFormatting, "Display WIM's options.");
+RegisterOptionFrame(L["General"], L["Main"], General_Main);
+RegisterOptionFrame(L["General"], L["Window Settings"], General_WindowSettings);
+RegisterOptionFrame(L["General"], L["Display Settings"], General_VisualSettings);
+RegisterOptionFrame(L["General"], L["Message Formatting"], General_MessageFormatting);
+RegisterOptionFrame(L["General"], L["History"], General_History);
 
-RegisterOptionFrame(L["Whispers"], L["Display Settings"], "This is just a test Category", Whispers_DisplaySettings, "Display WIM's options.");
-RegisterOptionFrame(L["Whispers"], L["Window Behavior"], "This is just a test Category", WhisperPopRules, "Display WIM's options.");
-RegisterOptionFrame(L["Whispers"], L["Filtering"], "This is just a test Category", Whispers_Filters, "Display WIM's options.");
+RegisterOptionFrame(L["Whispers"], L["Display Settings"], Whispers_DisplaySettings);
+RegisterOptionFrame(L["Whispers"], L["Window Behavior"], WhisperPopRules);
+RegisterOptionFrame(L["Whispers"], L["Filtering"], Whispers_Filters);
