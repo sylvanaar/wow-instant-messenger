@@ -7,6 +7,7 @@ local pairs = pairs;
 local CreateFrame = CreateFrame;
 local date = date;
 local time = time;
+local select = select;
 
 --set namespace
 setfenv(1, WIM);
@@ -15,9 +16,24 @@ local History = CreateModule("History", true);
 
 -- default history settings.
 db_defaults.history = {
-    whispers = true,
     preview = true,
     previewCount = 25,
+    maxPer = true,
+    maxCount = 500,
+    ageLimit = true,
+    maxAge = 60*60*24*7*2,
+    whispers = {
+        enabled = true,
+        friends = true,
+        guild = true,
+        all = false
+    },
+    chat = {
+        enabled = false,
+        friends = true,
+        guild = true,
+        all = true
+    }
 };
 db_defaults.displayColors.historyIn = {
     r=0.4705882352941176,
@@ -45,6 +61,13 @@ local function clearTmpTable()
     end
 end
 
+local function isEmptyTable(tbl)
+    for k, _ in pairs(tbl) do
+        return false;
+    end
+    return true;
+end
+
 local function getPlayerHistoryTable(convoName)
     if(history[env.realm] and history[env.realm][env.character] and history[env.realm][env.character][convoName]) then
         return history[env.realm][env.character][convoName];
@@ -64,6 +87,8 @@ local function createWidget()
         self.parentWindow.isHistory = isHistory;
         if(isHistory and modules.History.enabled) then
             self:SetAlpha(1);
+            DisplayTutorial(L["WIM History Button"], _G.format(L["Clicking the %s button on the message window will show that user's history in WIM's History Viewer."],
+                    "|T"..GetSelectedSkin().message_window.widgets.history.NormalTexture..":0:0:0:0|t"));
         else
             self:SetAlpha(0);
         end
@@ -90,10 +115,11 @@ end
 
 
 local function recordWhisper(inbound, ...)
-    if(db.history.whispers) then
+    if(db.history.whispers.enabled) then
         local msg, from = ...;
+        local db = db.history.whispers;
         local win = windows.active.whisper[from] or windows.active.chat[from] or windows.active.w2w[from];
-        if(win) then
+        if(win and (db.all or (db.friends and lists.friends[from]) or (db.guild and lists.guild[from]))) then
             win.widgets.history:SetHistory(true);
             local history = getPlayerHistoryTable(from);
             table.insert(history, {
@@ -104,6 +130,11 @@ local function recordWhisper(inbound, ...)
                 msg = msg,
                 time = _G.time();
             });
+            if(WIM.db.history.maxPer) then
+                while(WIM.db.history.maxCount < #history) do
+                    table.remove(history, 1);
+                end
+            end
         end
     end
 end
@@ -116,8 +147,34 @@ function History:PostEvent_WhisperInform(...)
     recordWhisper(false, ...);
 end
 
+local function deleteOldHistory()
+    local count = 0;
+    for realm, characters in pairs(history) do
+        for character, convos in pairs(characters) do
+            for convo, messages in pairs(convos) do
+                for i=#messages, 1, -1 do
+                    if((time() - messages[i].time) > db.history.maxAge) then
+                        dPrint("Deleting History."..realm.."."..character.."."..convo.."["..i.."]");
+                        table.remove(messages, i);
+                        count = count + 1;
+                    end
+                end
+                if(isEmptyTable(messages)) then convos[convo] = nil; end
+            end
+            if(isEmptyTable(convos)) then characters[character] = nil; end
+        end
+        if(isEmptyTable(characters)) then history[realm] = nil; end
+    end
+    if(count > 0) then
+        _G.DEFAULT_CHAT_FRAME:AddMessage(_G.format(L["WIM pruned %d |4message:messages; from your history."], count));
+    end
+end
+
 function History:OnEnableWIM()
     -- clean up history if asked to.
+    if(db.history.ageLimit) then
+        deleteOldHistory();
+    end
 end
 
 function History:OnEnable()
@@ -161,8 +218,6 @@ function History:OnWindowCreated(win)
         end
     end
 end
-
-
 
 
 --------------------------------------
@@ -407,7 +462,8 @@ local function createHistoryViewer()
                 button:GetHighlightTexture():SetVertexColor(.196, .388, .5);
                 
                 button.text = button:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
-                button.text:SetAllPoints();
+                button.text:SetPoint("TOPLEFT");
+                button.text:SetPoint("BOTTOMRIGHT", -18, 0);
                 button.text:SetJustifyH("LEFT");
                 
                 button.SetUser = function(self, user)
@@ -420,6 +476,52 @@ local function createHistoryViewer()
                 button:SetScript("OnClick", function(self)
                         win:SelectConvo(self.user);
                         win.nav.userList.scroll.update();
+                    end);
+                button.delete = CreateFrame("Button", nil, button);
+                button.delete:SetNormalTexture("Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\xNormal");
+                button.delete:SetPushedTexture("Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\xPressed");
+                button.delete:SetWidth(16);
+                button.delete:SetHeight(16);
+                button.delete:SetAlpha(.5);
+                button.delete:SetPoint("RIGHT");
+                button.delete:SetScript("OnClick", function(self)
+                        _G.StaticPopupDialogs["WIM_DELETE_HISTORY"] = {
+                            text = _G.format(L["Are you sure you want to delete all history saved for %s on %s?"],
+                                "|cff69ccf0"..self:GetParent().user.."|r",
+                                "|cff69ccf0"..win.USER.."|r"
+                                ),
+                            button1 = L["Yes"],
+                            button2 = L["No"],
+                            OnAccept = function()
+                                local realm, character = string.match(win.USER, "^([%w%s]+)/?(.*)$");
+                                if(realm and character and history[realm] and history[realm][character]) then
+                                    history[realm][character][self:GetParent().user] = nil;
+                                    if(isEmptyTable(history[realm][character])) then
+                                        history[realm][character] = nil;
+                                        if(isEmptyTable(history[realm])) then
+                                            history[realm] = nil;
+                                        end
+                                    end
+                                elseif(realm and history[realm]) then
+                                    for character, convos in pairs(history[realm]) do
+                                        convos[self:GetParent().user] = nil;
+                                        if(isEmptyTable(convos)) then
+                                            history[realm][character] = nil;
+                                        end
+                                    end
+                                    if(isEmptyTable(history[realm])) then
+                                        history[realm] = nil;
+                                    end
+                                end
+                                win.nav.user:Hide();
+                                win.nav.user:Show();
+                                win.UpdateUserList();
+                            end,
+                            timeout = 0,
+                            whileDead = 1,
+                            hideOnEscape = 1
+                        };
+                        _G.StaticPopup_Show("WIM_DELETE_HISTORY");
                     end);
                 
                 table.insert(win.nav.userList.scroll.buttons, button);
@@ -485,6 +587,7 @@ local function createHistoryViewer()
             for key, _ in pairs(win.SEARCHLIST) do
                 win.SEARCHLIST[key] = nil;
             end
+            win.search.result:Hide();
             win.UpdateFilterList();
             win.UpdateDisplay();
         end);
@@ -521,6 +624,12 @@ local function createHistoryViewer()
             table.sort(win.SEARCHLIST, function(a, b)
                 return a.time < b.time;
             end);
+            if(#win.SEARCHLIST > 0) then
+                win.search.result:SetText(_G.format(L["Search resulted in %d |4message:messages;."], #win.SEARCHLIST))
+            else
+                win.search.result:SetText("|cffff0000"..L["No results found!"].."|r");
+            end
+            win.search.result:Show();
             self:ClearFocus();
             win.UpdateFilterList();
             win.UpdateDisplay();
@@ -532,6 +641,10 @@ local function createHistoryViewer()
     win.search.label:SetText(L["Search"]..":");
     win.search.label:SetTextColor(_G.GameFontNormal:GetTextColor());
     win.search.label:SetPoint("RIGHT", win.search.text, "LEFT", -5, 0);
+    win.search.result = win.search:CreateFontString(nil, "OVERLAY", "ChatFontSmall");
+    win.search.result:SetPoint("LEFT");
+    win.search.result:SetPoint("RIGHT", win.search.label, "LEFT", -5, 0);
+    win.search.result:Hide();
     
     
     --content frame
@@ -592,6 +705,7 @@ local function createHistoryViewer()
     win.content.chatFrame:SetPoint("BOTTOMRIGHT", -30, 4);
     win.content.chatFrame:SetFontObject("ChatFontNormal");
     win.content.chatFrame:EnableMouse(true);
+    win.content.chatFrame:EnableMouseWheel(true);
     win.content.chatFrame:SetJustifyH("LEFT");
     win.content.chatFrame:SetFading(false);
     win.content.chatFrame:SetMaxLines(800);
@@ -634,6 +748,13 @@ local function createHistoryViewer()
 	    end
 	    self:update();
 	end);
+    win.content.chatFrame:SetScript("OnHyperlinkClick", function(self, ...)
+            if(isWOTLK) then
+                _G.ChatFrame_OnHyperlinkShow(self, ...);
+            else
+                _G.ChatFrame_OnHyperlinkShow(...);
+            end
+        end);
     win.content.chatFrame.up = CreateFrame("Button", nil, win.content.chatFrame);
     win.content.chatFrame.up:SetWidth(28); win.content.chatFrame.up:SetHeight(28);
     win.content.chatFrame.up:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollUp-Up");
@@ -730,6 +851,11 @@ local function createHistoryViewer()
     win.SEARCHLIST = {};
 
     win.SelectConvo = function(self, convo)
+        win.search.text:SetText("");
+        win.search.result:Hide();
+        for k, _ in pairs(win.SEARCHLIST) do
+            win.SEARCHLIST[k] = nil;
+        end
         win.CONVO = convo;
         win.FILTER = "";
         win.UpdateConvoList();
@@ -753,6 +879,7 @@ local function createHistoryViewer()
             local tbl = date("*t", t);
             t = time{year=tbl.year, month=tbl.month, day=tbl.day, hour=0};
             addToTableUnique(win.FILTERLIST, t);
+            win.FILTER = t;
         end
         if(#win.FILTERLIST > 0) then
             table.insert(win.FILTERLIST, 1, L["Show All"]);
@@ -827,8 +954,8 @@ local function createHistoryViewer()
     win.progressBar.backdrop.bg:SetTexture(0, 0, 0, 1);
     win.progressBar.bar = CreateFrame("Frame", nil, win.progressBar);
     options.AddFramedBackdrop(win.progressBar.bar);
-    win.progressBar.bar:SetWidth(win.progressBar:GetWidth()-40); win.progressBar.bar:SetHeight(15);
-    win.progressBar.bar:SetPoint("CENTER", 0, -5);
+    win.progressBar.bar:SetWidth(win.progressBar:GetWidth()-50); win.progressBar.bar:SetHeight(15);
+    win.progressBar.bar:SetPoint("CENTER", -10, -5);
     win.progressBar.bar.bg = win.progressBar.bar:CreateTexture(nil, "OVERLAY");
     win.progressBar.bar.bg:SetTexture(1,1,1, .5);
     win.progressBar.bar.bg:SetPoint("TOPLEFT");
@@ -843,6 +970,15 @@ local function createHistoryViewer()
     win.progressBar:SetScript("OnHide", function(self)
             win.content.chatFrame:SetAlpha(1);
             win.content.textFrame:SetAlpha(1);
+        end);
+    win.progressBar.delete = CreateFrame("Button", nil, win.progressBar);
+    win.progressBar.delete:SetNormalTexture("Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\xNormal");
+    win.progressBar.delete:SetPushedTexture("Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\xPressed");
+    win.progressBar.delete:SetWidth(16);
+    win.progressBar.delete:SetHeight(16);
+    win.progressBar.delete:SetPoint("LEFT", win.progressBar.bar, "RIGHT", 4, 0);
+    win.progressBar.delete:SetScript("OnClick", function(self)
+            win.displayUpdate:Hide();
         end);
     
     win.content.tabs[1]:Click();
@@ -883,9 +1019,27 @@ local function createDisplayUpdate()
         self.i = 1;
         HistoryViewer.progressBar:Hide();
         HistoryViewer.content.chatFrame:update();
+        local buttons = HistoryViewer.nav.userList.scroll.buttons;
+        for i=1, #buttons do
+            buttons[i]:Enable();
+            buttons[i].delete:Enable();
+        end
+        buttons = HistoryViewer.nav.filters.scroll.buttons;
+        for i=1, #buttons do
+            buttons[i]:Enable();
+        end
     end);
     
     displayUpdate:SetScript("OnShow", function(self)
+        local buttons = HistoryViewer.nav.userList.scroll.buttons;
+        for i=1, #buttons do
+            buttons[i]:Disable();
+            buttons[i].delete:Disable();
+        end
+        buttons = HistoryViewer.nav.filters.scroll.buttons;
+        for i=1, #buttons do
+            buttons[i]:Disable();
+        end
         HistoryViewer.progressBar:Show();
         self.curList = #HistoryViewer.SEARCHLIST > 0 and HistoryViewer.SEARCHLIST or HistoryViewer.CONVOLIST;
         self.frame = ViewTypes[HistoryViewer.TAB].frame == "chatFrame" and HistoryViewer.content.chatFrame or HistoryViewer.content.textFrame.text;
@@ -948,7 +1102,8 @@ function ShowHistoryViewer(user)
         HistoryViewer.nav:Show();
         HistoryViewer.UpdateUserList();
         --HistoryViewer:SelectConvo(user);
+        DisplayTutorial(L["WIM History Viewer"], L["WIM History Viewer can be accessed any time by typing:"].." \n|cff69ccf0/wim history|r");
     end
 end
 
-RegisterSlashCommand("history", ShowHistoryViewer, L["Display history viewer."])
+RegisterSlashCommand("history", function() ShowHistoryViewer(); end, L["Display history viewer."])

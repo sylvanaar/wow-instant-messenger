@@ -289,7 +289,7 @@ local function getCategoryIndexByName(cat)
 end
 
 
-function RegisterOptionFrame(Category, SubCategory, Description, OptionFrame)
+function RegisterOptionFrame(Category, SubCategory, OptionFrame)
     local catIndex = getCategoryIndexByName(Category);
     if(not catIndex) then
         catIndex = #Categories + 1;

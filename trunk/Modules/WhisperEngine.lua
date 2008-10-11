@@ -216,9 +216,7 @@ local function CHAT_MSG_WHISPER(...)
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER", ...);
     win:Pop("in");
-    if(db.pop_rules.whisper[WIM.curState].supress) then
-        _G.ChatEdit_SetLastTellTarget(arg2);
-    end
+    _G.ChatEdit_SetLastTellTarget(arg2);
     win.online = true;
     updateMinimapAlerts();
     CallModuleFunction("PostEvent_Whisper", ...);
@@ -230,9 +228,7 @@ local function CHAT_MSG_WHISPER_INFORM(...)
     local win = getWhisperWindowByUser(arg2);
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER_INFORM", ...);
     win:Pop("out");
-    if(db.pop_rules.whisper[curState].supress) then
-        _G.ChatEdit_SetLastToldTarget(arg2);
-    end
+    _G.ChatEdit_SetLastToldTarget(arg2);
     win.online = true;
     win.msgSent = false;
     CallModuleFunction("PostEvent_WhisperInform", ...);

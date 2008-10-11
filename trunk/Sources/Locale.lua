@@ -23,14 +23,14 @@ setmetatable(L, {
     end
 });
 
-function getLocal()
+function getLocale()
     local locale = _G.GetLocale();
     local isGB = _G.GetCVar("locale") == "enGB";
     return isGB and "enGB" or locale;
 end
 
 function AddLocale(Locale, lTable)
-    if(_G.GetLocale() == Locale or Locale == "enUS") then
+    if(getLocale() == Locale or Locale == "enUS") then
         for k, v in pairs(lTable) do
             v = (type(v) ~= "boolean") and v or k;
             L[k] = v;

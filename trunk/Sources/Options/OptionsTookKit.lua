@@ -286,11 +286,11 @@ local function CreateCheckButton(parent, title, dbTree, varName, tooltip, valCha
     if(parent.isCheckButton) then
         cb:SetScale(.90);
         if(#parent.children == 0) then
-            parent.nextOffSetX = cb:GetWidth();
-            parent.nextOffSetY = -cb:GetHeight();
+            parent.nextOffSetX = parent:GetWidth();
+            parent.nextOffSetY = -parent:GetHeight();
         else
             parent.nextOffSetX = nil;
-            parent.nextOffSetY = -cb:GetHeight()*(#parent.children)
+            parent.nextOffSetY = nil;
         end
         table.insert(parent.children, cb);
     end
