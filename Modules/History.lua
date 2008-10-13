@@ -63,7 +63,9 @@ end
 
 local function isEmptyTable(tbl)
     for k, _ in pairs(tbl) do
-        return false;
+        if(k ~= "info") then
+            return false;
+        end
     end
     return true;
 end
@@ -75,7 +77,7 @@ local function getPlayerHistoryTable(convoName)
         -- this player hasn't been set up yet. Do it now.
         history[env.realm] = history[env.realm] or {};
         history[env.realm][env.character] = history[env.realm][env.character] or {};
-        history[env.realm][env.character][convoName] = history[env.realm][env.character][convoName] or {};
+        history[env.realm][env.character][convoName] = history[env.realm][env.character][convoName] or {info = {}};
         return history[env.realm][env.character][convoName];
     end
 end
@@ -119,9 +121,10 @@ local function recordWhisper(inbound, ...)
         local msg, from = ...;
         local db = db.history.whispers;
         local win = windows.active.whisper[from] or windows.active.chat[from] or windows.active.w2w[from];
-        if(win and (db.all or (db.friends and lists.friends[from]) or (db.guild and lists.guild[from]))) then
+        if(win and (lists.gm[from] or db.all or (db.friends and lists.friends[from]) or (db.guild and lists.guild[from]))) then
             win.widgets.history:SetHistory(true);
             local history = getPlayerHistoryTable(from);
+            history.info.gm = lists.gm[from];
             table.insert(history, {
                 convo = from,
                 type = 1, -- whisper
@@ -433,7 +436,6 @@ local function createHistoryViewer()
     win.nav.filters.scroll:SetScript("OnVerticalScroll", function(self)
             _G.FauxScrollFrame_OnVerticalScroll(20, win.nav.filters.scroll.update);
         end);
-    
 
     win.nav.userList = CreateFrame("Frame", nil, win.nav);
     win.nav.userList:SetPoint("BOTTOMLEFT", win.nav.filters, "TOPLEFT", 0, 1);
@@ -467,8 +469,10 @@ local function createHistoryViewer()
                 button.text:SetJustifyH("LEFT");
                 
                 button.SetUser = function(self, user)
+                        local user, gmTag = string.match(user, "([^*]+)(*?)$");
+                        local color = gmTag == "*" and constants.classes[L["Game Master"]].color or "ffffff";
                         self.user = user;
-                        self.text:SetText("     "..user);
+                        self.text:SetText("     |cff"..color..user.."|r"..(gmTag == "*" and " |TInterface\\ChatFrame\\UI-ChatIcon-Blizz.blp:0:2:0:0|t" or ""));
                         if(user == win.SELECT) then
                             self:Click();
                         end
@@ -815,7 +819,8 @@ local function createHistoryViewer()
             if(r and g and b) then
                 color = RGBPercentToHex(r, g, b);
             end
-            self:SetText(self:GetText()..(color and "|cff"..color or "")..msg..(color and "|r" or "").."\n");
+            --self:SetText(self:GetText()..(color and "|cff"..color or "")..msg..(color and "|r" or "").."\n");
+            self:SetText(self:GetText()..msg.."\n");
         end;
     
     
@@ -920,13 +925,13 @@ local function createHistoryViewer()
         local character = string.match(win.USER, "^[%w%s]+/(.*)$");
         if(realm and character and history[realm] and history[realm][character]) then
             local tbl = history[realm][character];
-            for convo, _ in pairs(tbl) do
-                addToTableUnique(win.USERLIST, convo);
+            for convo, t in pairs(tbl) do
+                addToTableUnique(win.USERLIST, convo..(t.info and t.info.gm and "*" or ""));
             end
         elseif(realm and not character and history[realm]) then
             for character, tbl in pairs(history[realm]) do
-                for convo, _ in pairs(tbl) do
-                    addToTableUnique(win.USERLIST, convo);
+                for convo, t in pairs(tbl) do
+                    addToTableUnique(win.USERLIST, convo..(t.info and t.info.gm and "*" or ""));
                 end
             end
         end
@@ -992,6 +997,7 @@ local function createDisplayUpdate()
     -- displayUpdate loads messages into the correct content frames avoiding lag from system ops.
     local displayUpdate = CreateFrame("Frame");
     displayUpdate:Hide();
+    displayUpdate.firstPass = true;
     displayUpdate.Process = function(self)
             self.i = self.i or 1;
             if(not self.curList or not self.curList[self.i]) then
@@ -1013,9 +1019,18 @@ local function createDisplayUpdate()
             self.i = self.i + 1;
         end;
     displayUpdate:SetScript("OnUpdate", function(self, elapsed)
+        if(self.firstPass) then
+            HistoryViewer.content.chatFrame:Clear();
+            HistoryViewer.content.chatFrame.lastDate = nil;
+            HistoryViewer.content.chatFrame:SetIndentedWordWrap(db.wordwrap_indent);
+            HistoryViewer.content.textFrame.text:SetText("");
+            HistoryViewer.content.textFrame.text.lastDate = nil;
+            self.firstPass = nil;
+        end
         self:Process()
     end);
     displayUpdate:SetScript("OnHide", function(self)
+        self.firstPass = true;
         self.i = 1;
         HistoryViewer.progressBar:Hide();
         HistoryViewer.content.chatFrame:update();
@@ -1044,11 +1059,7 @@ local function createDisplayUpdate()
         self.curList = #HistoryViewer.SEARCHLIST > 0 and HistoryViewer.SEARCHLIST or HistoryViewer.CONVOLIST;
         self.frame = ViewTypes[HistoryViewer.TAB].frame == "chatFrame" and HistoryViewer.content.chatFrame or HistoryViewer.content.textFrame.text;
         
-        HistoryViewer.content.chatFrame:Clear();
-        HistoryViewer.content.chatFrame.lastDate = nil;
-        HistoryViewer.content.chatFrame:SetIndentedWordWrap(db.wordwrap_indent);
-        HistoryViewer.content.textFrame.text:SetText("");
-        HistoryViewer.content.textFrame.text.lastDate = nil;
+        
         
         self.filter = _G.type(HistoryViewer.FILTER) == "number" or nil;
         self.min, self.max = 0, 0;
@@ -1081,10 +1092,9 @@ table.insert(ViewTypes, {
         frame = "textFrame",
         func = function(frame, msg)
             if(msg.type == 1) then
-                local event = msg.inbound and "CHAT_MSG_WHISPER" or "CHAT_MSG_WHISPER_INFORM";
                 local color = db.displayColors[msg.inbound and "wispIn" or "wispOut"];
                 frame.nextStamp = msg.time;
-                frame:AddMessage(applyStringModifiers(applyMessageFormatting(frame, event, msg.msg, msg.from), frame), color.r, color.g, color.b)
+                frame:AddMessage(applyStringModifiers(applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from), frame), color.r, color.g, color.b)
             end
         end
     });

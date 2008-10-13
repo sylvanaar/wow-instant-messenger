@@ -1,7 +1,13 @@
+--imports
 local WIM = WIM;
+local _G = _G;
+local PlaySoundFile = PlaySoundFile;
+
+--set namespace
+setfenv(1, WIM);
 
 
-local Sounds = WIM.CreateModule("Sounds", true);
+local Sounds = CreateModule("Sounds", true);
 
 function Sounds:PostEvent_Whisper(...)
     PlaySoundFile("Interface\\AddOns\\"..WIM.addonTocName.."\\Sounds\\wisp.wav");

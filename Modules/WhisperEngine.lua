@@ -162,7 +162,7 @@ local function getWhisperWindowByUser(user)
     else
         -- otherwise, create a new one.
         Windows[user] = CreateWhisperWindow(user);
-        if(db.whoLookups) then
+        if(db.whoLookups or lists.gm[user]) then
             Windows[user]:SendWho(); -- send who request
         end
         Windows[user].online = true;
@@ -326,28 +326,24 @@ local function getNewEventTable(msgID)
     });
     local eventItem = WhisperQueue_Bowl[#WhisperQueue_Bowl];
     eventItem.Suspend = function(self)
-                            if(self.arg[6] ~= "GM" and not self.flags.ignore and not self.flags.block) then -- not allowed when talking to a GM
+                            if(not self.flags.ignore and not self.flags.block) then -- not allowed when talking to a GM
                                 self.flags.suspend = true;
                             end
                         end
     eventItem.Release = function(self)
-                            if(self.arg[6] ~= "GM") then -- not allowed when talking to a GM
-                                --if(self.flags.suspend) then
-                                    self.flags.suspend = false;
-                                    popEvents();
-                                --end
-                            end
+                            --if(self.flags.suspend) then
+                                self.flags.suspend = false;
+                                popEvents();
+                            --end
                         end
     eventItem.Block = function(self)
-                            if(self.arg[6] ~= "GM") then -- not allowed when talking to a GM
-                                self.flags.block = true;
-                                self.flags.ignore = false;
-                                self.flags.supress = true;
-                                self.flags.suspend = false;
-                            end
+                            self.flags.block = true;
+                            self.flags.ignore = false;
+                            self.flags.supress = true;
+                            self.flags.suspend = false;
                         end
     eventItem.Ignore = function(self)
-                            if(self.arg[6] ~= "GM" and not self.flags.block) then -- not allowed when talking to a GM
+                            if(not self.flags.block) then -- not allowed when talking to a GM
                                 self.flags.ignore = true;
                                 self.flags.supress = false;
                                 self.flags.suspend = false;
@@ -381,9 +377,9 @@ local function pushEvent(event, ...)
     addToTableUnique(WhisperQueue, eventItem);
     -- notify all modules.
     if(eventItem.argCount > 0) then
-        if(eventItem.event == "CHAT_MSG_WHISPER") then
+        if(eventItem.event == "CHAT_MSG_WHISPER" and not lists.gm[select(2,...)]) then
             CallModuleFunction("OnEvent_Whisper", eventItem);
-        elseif(eventItem.event == "CHAT_MSG_WHISPER_INFORM") then
+        elseif(eventItem.event == "CHAT_MSG_WHISPER_INFORM" and not lists.gm[select(2,...)]) then
             CallModuleFunction("OnEvent_WhisperInform", eventItem);
         end
     end

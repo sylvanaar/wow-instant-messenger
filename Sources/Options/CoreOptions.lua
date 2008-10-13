@@ -5,6 +5,7 @@ local table = table;
 local CreateFrame = CreateFrame;
 local unpack = unpack;
 local UnitName = UnitName;
+local pairs = pairs;
 
 --set namespace
 setfenv(1, WIM);
@@ -77,7 +78,12 @@ local function General_MessageFormatting()
     f.prev = CreateFrame("ScrollingMessageFrame", f:GetName().."PrevScrollingMessageFrame");
     f.prev:SetScript("OnShow", function(self)
             local color = db.displayColors.wispIn;
-            local font, height, flags = _G[db.skin.font]:GetFont();
+            local font, height, flags;
+            if(_G[db.skin.font]) then
+                font, height, flags = _G[db.skin.font]:GetFont();
+            else
+                font = libs.SML.MediaTable.font[db.skin.font] or _G["ChatFontNormal"]:GetFont();
+            end
             self:SetFont(font, 14, db.skin.font_outline);
             self:Clear();
             for i=1, #Preview do
@@ -244,13 +250,135 @@ local function General_VisualSettings()
     frame.menu:CreateColorPicker(L["Color: History Messages Received"], db.displayColors, "historyIn");
     frame.menu.nextOffSetY = -10;
     frame.menu:CreateCheckButton(L["Use colors suggested by skin."], db.displayColors, "useSkin");
-    frame.menu.nextOffSetY = -40;
-    frame.menu:CreateSlider(L["Chat Font Size"], "8", "50", 8, 50, 1, db, "fontSize", function(self) UpdateAllWindowProps(); end);
-    frame.menu.nextOffSetY = -50;
+    frame.menu.nextOffSetY = -35;
     frame.menu.sub = frame.menu:CreateSection();
     options.AddFramedBackdrop(frame.menu.sub);
     frame.menu.sub:CreateCheckButton(L["Enable window fading effects."], db, "winFade");
     frame.menu.sub:CreateCheckButton(L["Enable window animation effects."], db, "winAnimation");
+    frame.menu.sub:CreateCheckButton(L["Display item links when hovering over them."], db, "hoverLinks");
+    
+    return frame;
+end
+
+local function General_Fonts()
+    local frame = options.CreateOptionsFrame();
+    frame.menu = frame:CreateSection(L["Fonts"], L["Configure the fonts used in WIM's message windows."]);
+    frame.menu.nextOffSetY = -30;
+    
+    
+    frame.list = frame.menu:ImportCustomObject(CreateFrame("Frame"));
+    options.frame.filterList = frame.list;
+    options.AddFramedBackdrop(frame.list);
+    frame.list:SetFullSize();
+    frame.list:SetHeight(4 * 24);
+    frame.list.scroll = CreateFrame("ScrollFrame", frame.menu:GetName().."FilterScroll", frame.list, "FauxScrollFrameTemplate");
+    frame.list.scroll:SetPoint("TOPLEFT", 0, -1);
+    frame.list.scroll:SetPoint("BOTTOMRIGHT", -23, 0);
+    frame.list.scroll.update = function(self)
+            self = self or _G.this;
+            self.flist = self.flist or {};
+            for key, _ in pairs(self.flist) do self.flist[key] = nil; end
+            local sml = libs.SML.MediaTable.font;
+            for font, _ in pairs(sml) do
+                table.insert(self.flist, font);
+            end
+            table.sort(self.flist);
+            local offset = _G.FauxScrollFrame_GetOffset(self);
+            for i=1, #frame.list.buttons do
+                local index = i+offset;
+                if(index <= #self.flist) then
+                    frame.list.buttons[i]:SetFontItem(self.flist[index]);
+                    frame.list.buttons[i]:Show();
+                    if(db.skin.font == self.flist[index]) then
+                        frame.list.buttons[i]:LockHighlight();
+                    else
+                        frame.list.buttons[i]:UnlockHighlight();
+                    end
+                else
+                    frame.list.buttons[i]:Hide();
+                end
+            end
+            _G.FauxScrollFrame_Update(self, #self.flist, #frame.list.buttons, 24);
+        end
+    frame.list.scroll:SetScript("OnVerticalScroll", function(self)
+            _G.FauxScrollFrame_OnVerticalScroll(24, frame.list.scroll.update);
+        end);
+    frame.list:SetScript("OnShow", function(self)
+            self.scroll:update();
+        end);
+    frame.list.createButton = function(self)
+            self.buttons = self.buttons or {};
+            local button = CreateFrame("Button", nil, self);
+            button:SetHeight(24);
+            button:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD");
+            button.title = button:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+            button.title:SetAllPoints();
+            button.title:SetJustifyH("LEFT")
+            local font, height, flags = button.title:GetFont();
+            button.title:SetFont(font, 18, flags);
+            button.title:SetTextColor(_G.GameFontNormal:GetTextColor());
+            button.title:SetText("Test");
+            
+            button.SetFontItem = function(self, theFont)
+                self.font = theFont;
+                self.title:SetText("    "..theFont);
+                self.title:SetFont(libs.SML.MediaTable.font[theFont], 18, "");
+            end
+            
+            button:SetScript("OnClick", function(self)
+                    _G.PlaySound("igMainMenuOptionCheckBoxOn");
+                    db.skin.font = self.font;
+                    LoadSkin(db.skin.selected);
+                    frame.list:Hide(); frame.list:Show();
+                end);
+            
+            if(#self.buttons == 0) then
+                button:SetPoint("TOPLEFT");
+                button:SetPoint("TOPRIGHT", -25, 0);
+            else
+                button:SetPoint("TOPLEFT", self.buttons[#self.buttons], "BOTTOMLEFT");
+                button:SetPoint("TOPRIGHT", self.buttons[#self.buttons], "BOTTOMRIGHT");
+            end
+            
+            table.insert(self.buttons, button);
+        end
+    for i=1, 4 do
+        frame.list:createButton();
+    end
+    
+    frame.menu.nextOffSetY = -20;
+    frame.menu.outlineText = frame.menu:CreateText();
+    frame.menu.outlineText:SetText(L["Font Outline"]..":");
+    local outlineList = {
+            {text = L["None"],
+            value = "",
+            justifyH = "LEFT",
+            func = function(self)
+                LoadSkin(db.skin.selected);
+            end},
+            {text = L["Thin"],
+            value = "OUTLINE",
+            justifyH = "LEFT",
+            func = function(self)
+                LoadSkin(db.skin.selected);
+            end},
+            {text = L["Thick"],
+            value = "THICKOUTLINE",
+            justifyH = "LEFT",
+            func = function(self)
+                LoadSkin(db.skin.selected);
+            end},
+    };
+    frame.menu.outlineList = frame.menu:CreateDropDownMenu(db.skin, "font_outline", outlineList, 150);
+    frame.menu.outlineList:ClearAllPoints();
+    frame.menu.outlineList:SetPoint("LEFT", frame.menu.outlineText, "LEFT", frame.menu.outlineText:GetStringWidth(), 0);
+    frame.menu.lastObj = frame.menu.outlineText;
+    
+    frame.menu.nextOffSetY = -20;
+    frame.menu:CreateCheckButton(L["Use font suggested by skin."], db.skin, "suggest", nil, function(self) LoadSkin(db.skin.selected); end);
+    
+    frame.menu.nextOffSetY = -60;
+    frame.menu:CreateSlider(L["Chat Font Size"], "8", "50", 8, 50, 1, db, "fontSize", function(self) UpdateAllWindowProps(); end);
     
     return frame;
 end
@@ -489,6 +617,7 @@ end
 RegisterOptionFrame(L["General"], L["Main"], General_Main);
 RegisterOptionFrame(L["General"], L["Window Settings"], General_WindowSettings);
 RegisterOptionFrame(L["General"], L["Display Settings"], General_VisualSettings);
+RegisterOptionFrame(L["General"], L["Fonts"], General_Fonts);
 RegisterOptionFrame(L["General"], L["Message Formatting"], General_MessageFormatting);
 RegisterOptionFrame(L["General"], L["History"], General_History);
 
