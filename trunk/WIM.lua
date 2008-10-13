@@ -79,6 +79,7 @@ local function initialize()
     libs.Astrolabe = _G.DongleStub("Astrolabe-0.4");
     libs.LibCompress = _G.LibStub:GetLibrary("LibCompress");
     libs.Deformat = _G.AceLibrary and _G.AceLibrary("Deformat-2.0");
+    libs.SML = _G.LibStub:GetLibrary("LibSharedMedia-3.0");
     
     isInitialized = true;
     
@@ -273,6 +274,10 @@ function WIM:EventHandler(event, ...)
             return;
         end
         -- other filtering will take place in individual event handlers within modules.
+    end
+    
+    if(event == "CHAT_MSG_WHISPER" and arg6 == "GM") then
+        lists.gm[arg2] = true;
     end
 
     -- Core WIM Event Handlers.

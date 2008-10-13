@@ -69,6 +69,7 @@ db_defaults.escapeToHide = true;
 db_defaults.ignoreArrowKeys = true;
 db_defaults.pop_rules = {};
 db_defaults.whoLookups = true;
+db_defaults.hoverLinks = false;
 
 
 local WindowSoupBowl = {
@@ -740,7 +741,7 @@ local function instantiateWindow(obj)
     obj.UpdateIcon = function(self)
 	local icon = self.widgets.class_icon;
 	local classTag = obj.class;
-	if(self.class == "") then
+        if(self.class == "") then
 		classTag = "blank"
 	else
 		if(constants.classes[self.class]) then
@@ -776,18 +777,30 @@ local function instantiateWindow(obj)
         if(self.type ~= "whisper") then
                 return;
         end
-	local whoLib = libs.WhoLib;
-	if(whoLib) then
-		whoLib:UserInfo(self.theUser, 
-			{
-				queue = whoLib.WHOLIB_QUEUE_QUIET, 
-				timeout = 0,
-				flags = whoLib.WHOLIB_FLAG_ALLWAYS_CALLBACK,
-				callback = self.WhoCallback
-			});
-	else
-		dPrint("WhoLib-1.0 not loaded... Skipping who lookup!");
-	end
+        if(self.isGM) then
+                self.WhoCallback({
+                        Name = self.theUser,
+                        Online = true,
+                        Guild = "Blizzard",
+                        Class = L["Game Master"],
+                        Level = "",
+                        Race = "",
+                        Zone = L["Unknown"]
+                });
+        else
+        	local whoLib = libs.WhoLib;
+        	if(whoLib) then
+        		whoLib:UserInfo(self.theUser, 
+        			{
+        				queue = whoLib.WHOLIB_QUEUE_QUIET, 
+        				timeout = 0,
+        				flags = whoLib.WHOLIB_FLAG_ALLWAYS_CALLBACK,
+        				callback = self.WhoCallback
+        			});
+        	else
+        		dPrint("WhoLib-1.0 not loaded... Skipping who lookup!");
+        	end
+        end
     end
     
     obj.GetRuleSet = function(self)
@@ -1005,9 +1018,11 @@ local function loadWindowDefaults(obj)
 	obj.race = "";
 	obj.class = "blank";
 	obj.location = "";
-	obj:UpdateIcon();
         obj.demoSave = nil;
     
+        obj.isGM = lists.gm[obj.theUser];
+    
+        obj:UpdateIcon();
 	obj.isNew = true;
 
 	obj:SetScale(1);
@@ -1077,7 +1092,6 @@ local function createWindow(userName, wtype)
         WindowSoupBowl.windows[index].user = userName;
         obj.theUser = userName;
         obj.type = wtype;
-	obj.isGM = IsGM(userName);
         loadWindowDefaults(obj); -- clear contents of window and revert back to it's initial state.
         dPrint("Window recycled '"..obj:GetName().."'");
 	CallModuleFunction("OnWindowCreated", obj);
@@ -1100,7 +1114,6 @@ local function createWindow(userName, wtype)
         f.theUser = userName;
         f.type = wtype;
         f.isParent = true;
-	f.isGM = IsGM(userName);
         instantiateWindow(f);
         --f.icon.theUser = userName;
         loadWindowDefaults(f);
@@ -1460,14 +1473,29 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w,demo", "OnMouseUp", func
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkClick", function(self, ...) _G.SetItemRef(...); end);
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w","OnMessageScrollChanged", function(self) updateScrollBars(self:GetParent()); end);
 
-RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkEnter", function(self)
+RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkEnter", function(self, link)
 			local obj = self.parentWindow;
 			obj.isOnHyperLink = true;
+                        if(db.hoverLinks) then
+                                local t = string.match(link, "^(.-):")
+                                if(t == "item" or t == "enchant" or t == "spell" or t == "quest") then
+                                	_G.ShowUIPanel(_G.GameTooltip);
+                                	_G.GameTooltip:SetOwner(_G.UIParent, "ANCHOR_CURSOR");
+                                	_G.GameTooltip:SetHyperlink(link);
+                                	_G.GameTooltip:Show();
+                                end
+                        end
 		end)
 		
-RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkLeave", function(self)
+RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkLeave", function(self, link)
 			local obj = self.parentWindow;
 			obj.isOnHyperLink = false;
+                        if(db.hoverLinks) then
+                                local t = string.match(link, "^(.-):")
+                                if(t == "item" or t == "enchant" or t == "spell" or t == "quest") then
+                                        _G.HideUIPanel(_G.GameTooltip);
+                                end
+                        end
 		end)
 
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnEnterPressed", function(self)
