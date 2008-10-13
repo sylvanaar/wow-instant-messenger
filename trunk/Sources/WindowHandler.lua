@@ -97,7 +97,10 @@ local cascadeDirection = {
         {-50, -25},     -- Down & Left
         {50, -25},      -- Down & Right
 };
- windowsByAge = {};
+
+windowsByAge = {};
+
+nextColor = {}; 
 
 local FormattingCallsList = {}; -- used to get a list of available Formattings.
 local FormattingCalls = {}; -- functions which are passed events to be formatted. Only one may be used at once.
@@ -732,6 +735,7 @@ local function instantiateWindow(obj)
     end
     
     obj.AddEventMessage = function(self, r, g, b, event, ...)
+        nextColor.r, nextColor.g, nextColor.b = r, g, b;
 	local str = applyMessageFormatting(self.widgets.chat_display, event, ...);
 	self:AddMessage(str, r, g, b);
 	self.msgWaiting = true;
