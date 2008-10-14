@@ -258,7 +258,15 @@ RegisterShortcut("location", L["Player Location"], {
         end,
         OnEnter = function(self)
             local location = self.parentWindow.location ~= "" and self.parentWindow.location or L["Unknown"];
-            local txt = L["Player Location"]..": |cffffffff"..location.."|r\n|cff69ccf0"..L["Click to update..."].."|r";
+            local tbl = self.parentWindow.w2w;
+            local txt;
+            if(not tbl or not tbl.services) then
+                txt = L["Player Location"]..": |cffffffff"..location.."|r\n|cff69ccf0"..L["Click to update..."].."|r";
+            else
+                --w2w tooltip
+                txt = L["Player Location"]..": |cffffffff"..location.."|r\n"..
+                    L["Coordinates"]..": |cffffffff".._G.math.floor((tbl.x or 0)*100)..",".._G.math.floor((tbl.y or 0)*100).."|r";
+            end
             _G.GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
             _G.GameTooltip:SetText(txt);
         end

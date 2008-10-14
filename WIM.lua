@@ -20,6 +20,9 @@ debug = false; -- turn debugging on and off.
 -- WOTLK check by CKKnight
 isWOTLK = select(4, _G.GetBuildInfo()) >= 30000;
 
+-- is Private Server?
+isPrivateServer = not string.match(_G.GetCVar("realmList"), "worldofwarcraft.com$") and true or false;
+
 constants = {}; -- constants such as class colors will be stored here. (includes female class names).
 modules = {}; -- module table. consists of all registerd WIM modules/plugins/skins. (treated the same).
 windows = {active = {whisper = {}, chat = {}, w2w = {}}}; -- table of WIM windows.
@@ -397,4 +400,13 @@ function IsInRaid(user)
         end
     end
     return false;
+end
+
+function CompareVersion(v)
+    local M, m, r = string.match(v, "(%d+).(%d+).(%d+)");
+    local cM, cm, cr = string.match(version, "(%d+).(%d+).(%d+)");
+    M, m = M*100000, m*1000;
+    cM, cm = cM*100000, cm*1000;
+    local this, that = cM+cm+cr, M+m+r;
+    return that - this;
 end

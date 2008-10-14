@@ -431,6 +431,28 @@ function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
     popEvents();
 end
 
+function WhisperEngine:CHAT_MSG_AFK(...)
+    local color = db.displayColors.wispIn; -- color contains .r, .g & .b
+    local win = Windows[select(2, ...)];
+    if(win) then
+        win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_AFK", ...);
+        win:Pop("out");
+        _G.ChatEdit_SetLastToldTarget(select(2, ...));
+        win.online = true;
+    end
+end
+
+function WhisperEngine:CHAT_MSG_DND(...)
+    local color = db.displayColors.wispIn; -- color contains .r, .g & .b
+    local win = Windows[select(2, ...)];
+    if(win) then
+        win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_AFK", ...);
+        win:Pop("out");
+        _G.ChatEdit_SetLastToldTarget(select(2, ...));
+        win.online = true;
+    end
+end
+
 function WhisperEngine:CHAT_MSG_SYSTEM(msg)
     local user;
     -- detect player not online
@@ -580,6 +602,13 @@ local function CF_MessageEventHandler(self, event, ...)
             return;
         end
     end
+    
+    if(db and db.enabled and (event == "CHAT_MSG_AFK" or event == "CHAT_MSG_DND")) then
+        local curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+        if(Windows[select(2,...)] and db.pop_rules.whisper[curState].supress) then
+            return;
+        end
+    end
 
     -- process event whisper events
     if(db and db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
@@ -613,6 +642,13 @@ local function CF_MessageEventHandlerTBC(event)
         win = Windows[FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_ONLINE_SS)) or "NIL"];
         win = win or Windows[FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_OFFLINE_S)) or "NIL"];
         if(win and win:IsShown() and db.pop_rules.whisper[curState].supress) then
+            return;
+        end
+    end
+
+    if(db and db.enabled and (event == "CHAT_MSG_AFK" or event == "CHAT_MSG_DND")) then
+        local curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+        if(db.pop_rules.whisper[curState].supress) then
             return;
         end
     end

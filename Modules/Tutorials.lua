@@ -56,7 +56,7 @@ end
 
 local function displayTutorial(title, tutorial)
     local var = varFriendly(title);
-    if(not db.shownTutorials[var]) then
+    if(not db.shownTutorials[var] or L["WIM Update Available!"] == title) then
         db.shownTutorials[var] = true;
         _G["TUTORIAL_TITLEWIM"..var] = title;
         _G["TUTORIALWIM"..var] = tutorial;

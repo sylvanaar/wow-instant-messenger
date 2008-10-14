@@ -10,6 +10,7 @@
     <Script file="SlashHandler.lua" />
     <Script file="Stewmat.lua" />
     <Script file="Socket.lua" />
+    <Script file="Clear.lua" />
     
     <Script file="Options\Options.lua" />
     <Script file="Options\OptionsTookKit.lua" />

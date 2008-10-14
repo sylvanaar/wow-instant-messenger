@@ -134,35 +134,22 @@ local WIM_ClassicSkin = {
                 }
             },
             w2w = {
-                NormalTexture = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                PushedTexture = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
-                HighlightTexture = "Interface\\AddOns\\WIM_Rewrite\\Images\\w2w.tga",
+                NormalTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\w2w",
+                PushedTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\w2w",
+                HighlightTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\w2w",
                 HighlightAlphaMode = "ADD",
-                rect = {
-                    size = {
-                        x = 32,
-                        y = 32
-                    },
-                    anchor = "TOPLEFT",
-                    offset = {
-                        x = -16,
-                        y = 4
-                    }
+                points = {
+                    {"TOPLEFT", "class_icon", 14, -14},
+                    {"BOTTOMRIGHT", "class_icon", -14, 14}
                 }
             },
             chatting = {
                 NormalTexture = "Interface\\GossipFrame\\PetitionGossipIcon",
                 PushedTexture = "Interface\\GossipFrame\\PetitionGossipIcon",
-                rect = {
-                    size = {
-                        x = 16,
-                        y = 16
-                    },
-                    anchor = "TOPLEFT",
-                    offset = {
-                        x = 40,
-                        y = -28
-                    }
+                width = 16,
+                height = 16,
+                points = {
+                    {"TOPLEFT", "window", 45, -28}
                 }
             },
             scroll_up = {
