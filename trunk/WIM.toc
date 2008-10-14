@@ -1,7 +1,7 @@
-## Interface: 20400
-## Title: WIM Rewrite
+## Interface: 30000
+## Title: WIM
 ## Author: Pazza (Bronzebeard)
-## Version: 3.0.0
+## Version: 3.0.1
 ## Notes: Give whispers an instant messenger feel.
 ## eMail: johnlangone@gmail.com
 ## X-Email: johnlangone@gmail.com
