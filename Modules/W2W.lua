@@ -90,7 +90,7 @@ local function createWidget_W2W()
         end
     button:SetScript("OnEnter", function(self)
             if(self.active) then
-                ShowProfileTip(self, self.parentWindow.theUser, "TOPRIGHT", "TOPLEFT");
+                --ShowProfileTip(self, self.parentWindow.theUser, "TOPRIGHT", "TOPLEFT");
             end
         end);
     button:SetScript("OnLeave", function(self)
