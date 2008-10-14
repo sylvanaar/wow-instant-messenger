@@ -59,7 +59,7 @@ local function setPointsToObj(obj, pointsTable)
             if(string.lower(relativeTo) == "window") then
                 relativeTo = obj.parentWindow;
             else
-                relativeTo = obj.parentWindow.widgets[curPoint[2]];
+                relativeTo = obj.parentWindow.widgets[relativeTo];
             end
             relativeTo = relativeTo or UIPanel;
         end
@@ -371,6 +371,9 @@ function ApplySkinToWidget(obj)
         end
     else
         dPrint("Invalid widget trying to be skinned.");
+    end
+    if(obj.SkinSet) then
+        obj:SkinSet();
     end
 end
 

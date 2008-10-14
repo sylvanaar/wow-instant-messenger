@@ -614,6 +614,26 @@ local function General_History()
 end
 
 
+local function W2W_Main()
+    local f = options.CreateOptionsFrame();
+    f.sub = f:CreateSection("WIM-2-WIM (W2W)", L["WIM-2-WIM is a feature which allows users with WIM to interact in ways that normal whispering can not."]);
+    f.sub.nextOffSetY = -10;
+    f.sub:CreateCheckButton(L["Enable WIM-2-WIM"], WIM.modules.W2W, "enabled", nil, function(self, button) EnableModule("W2W", self:GetChecked()); end);
+    f.sub.nextOffSetY = -15;
+    return f;
+end
+
+local function W2W_Privacy()
+    local f = options.CreateOptionsFrame();
+    f.sub = f:CreateSection(L["Privacy"], L["Restrict the data that is shared."]);
+    f.sub.nextOffSetY = -10;
+    f.sub:CreateCheckButton(L["Allow others to see me typing."], db.w2w, "shareTyping", nil, function(self, button) UpdateAllServices(); end);
+    f.sub:CreateCheckButton(L["Allow others to see my location."], db.w2w, "shareCoordinates", nil, function(self, button) UpdateAllServices(); end);
+    f.sub.nextOffSetY = -15;
+    return f;
+end
+
+
 RegisterOptionFrame(L["General"], L["Main"], General_Main);
 RegisterOptionFrame(L["General"], L["Window Settings"], General_WindowSettings);
 RegisterOptionFrame(L["General"], L["Display Settings"], General_VisualSettings);
@@ -624,3 +644,6 @@ RegisterOptionFrame(L["General"], L["History"], General_History);
 RegisterOptionFrame(L["Whispers"], L["Display Settings"], Whispers_DisplaySettings);
 RegisterOptionFrame(L["Whispers"], L["Window Behavior"], WhisperPopRules);
 RegisterOptionFrame(L["Whispers"], L["Filtering"], Whispers_Filters);
+
+RegisterOptionFrame("WIM-2-WIM", L["General"], W2W_Main);
+RegisterOptionFrame("WIM-2-WIM", L["Privacy"], W2W_Privacy);

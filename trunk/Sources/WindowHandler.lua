@@ -50,9 +50,9 @@ db_defaults.keepFocus = true;
 db_defaults.keepFocusRested = true;
 db_defaults.autoFocus = false;
 db_defaults.winSize = {
-		width = 384,
-		height = 256,
-		scale = 85
+		width = 333,
+		height = 220,
+		scale = 100
 	};
 db_defaults.winLoc = {
 		left =217,
@@ -1551,6 +1551,10 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
 		elseif(event == "CHAT_MSG_WHISPER_INFORM") then
                         arg11 = arg11 or 0;
 			return "[|Hplayer:".._G.UnitName("player")..":"..arg11.."|h".._G.UnitName("player").."|h]: "..arg1;
+                elseif(event == "CHAT_MSG_AFK") then
+                        return _G.format(L["%s is Away From Keyboard: %s"], "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]", arg1);
+                elseif(event == "CHAT_MSG_DND") then
+                        return _G.format(L["%s does not wish to be disturbed: %s"], "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]", arg1);
 		else
 			return "Unknown event received...";
 		end
