@@ -13,8 +13,8 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM_Rewrite";
-version = "3.0.0";
-beta = true; -- flags current version as beta.
+version = "3.0.1";
+beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight
