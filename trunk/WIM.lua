@@ -12,7 +12,7 @@ local string = string;
 setfenv(1, WIM);
 
 -- Core information
-addonTocName = "WIM_Rewrite";
+addonTocName = "WIM";
 version = "3.0.1";
 beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
