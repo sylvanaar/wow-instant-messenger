@@ -21,18 +21,6 @@ socketFrame:RegisterEvent("CHAT_MSG_ADDON");
 
 local CommandHandlers = {};
 
--- thank you stewarta
-local function huff_encode(thestr)
-	thestr=thestr:gsub("\001","\001\002");
-	thestr=thestr:gsub("%z","\001\003");
-	return thestr;
-end
-
-local function huff_decode(thestr)
-	thestr=thestr:gsub("\001\003","\000");
-	thestr=thestr:gsub("\001\001","\001");
-	return thestr;
-end
 
 local function getNewTable()
     if(#recycled > 0) then
@@ -67,9 +55,8 @@ local function createNewSocket(user, socketIndex, dataLength)
 end
 
 local function ProcessData(channel, from, data)
-    local cmd, dat = string.match(huff_decode(data), "^(%w+):(.*)$")
-    local str, err = libs.LibCompress:DecompressHuffman(dat);
-    dat = str or dat;
+    local cmd, dat = string.match(data, "^(%w+):(.*)$")
+    local str = Decompress(dat);
     dPrint(cmd..":"..dat);
     if(CommandHandlers[cmd]) then
         for i = 1, #CommandHandlers[cmd] do
@@ -94,7 +81,7 @@ local function OnEvent(self, event, ...)
         if(cmd and args) then
             local socket = getSocket(from, tonumber(cmd));
             socket.data = socket.data..args;
-            dPrint(string.len(socket.data)/socket.len*100 .. "%")
+            --dPrint(string.len(socket.data)/socket.len*100 .. "%")
             if(CommandHandlers[cmd]) then
                 for i = 1,  #CommandHandlers[cmd] do
                     if(CommandHandlers[cmd][i].progress) then
@@ -138,10 +125,7 @@ function SendData(ttype, target, cmd, data)
         -- we do not want to send any messages to GM's
         return;
     end
-    local msg = libs.LibCompress:CompressHuffman(data);
-    msg = string.len(data) > string.len(msg) and msg or data;
-    msg = huff_encode(msg);
-    msg = string.upper(cmd)..":"..msg;
+    msg = string.upper(cmd)..":"..Compress(data);
     --local msg = string.upper(cmd)..":"..data
     local msgCount = math.ceil(string.len(msg)/200);
     if(msgCount == 1) then
