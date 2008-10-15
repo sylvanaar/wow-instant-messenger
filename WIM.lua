@@ -79,7 +79,6 @@ local function initialize()
         
     libs.WhoLib = _G.AceLibrary and _G.AceLibrary('WhoLib-1.0');
     libs.Astrolabe = _G.DongleStub("Astrolabe-0.4");
-    libs.LibCompress = _G.LibStub:GetLibrary("LibCompress");
     libs.Deformat = _G.AceLibrary and _G.AceLibrary("Deformat-2.0");
     libs.SML = _G.LibStub:GetLibrary("LibSharedMedia-3.0");
     

@@ -6,7 +6,6 @@
 
 <Include file="Astrolabe\Load.xml"/>
 <Include file="LibSharedMedia-3.0\lib.xml"/>
-<Include file="LibCompress\lib.xml"/>
 <Include file="ChatThrottleLib\ChatThrottleLib.xml"/>
 
 <Script file="AceLibrary\AceLibrary.lua"/>
