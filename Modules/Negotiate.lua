@@ -39,7 +39,7 @@ function Module:GUILD_ROSTER_UPDATE()
 end
 
 function Module:PARTY_MEMBERS_CHANGED()
-    if(GetNumRaidMembers() > 0) then
+    if(_G.GetNumRaidMembers() > 0) then
         Negotiate("RAID");
     else
         Negotiate("PARTY");

@@ -13,8 +13,8 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.0.1";
-beta = false; -- flags current version as beta.
+version = "3.0.2";
+beta = true; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight
@@ -77,7 +77,6 @@ local function initialize()
             _G.GuildRoster();
         end
         
-    
     libs.WhoLib = _G.AceLibrary and _G.AceLibrary('WhoLib-1.0');
     libs.Astrolabe = _G.DongleStub("Astrolabe-0.4");
     libs.LibCompress = _G.LibStub:GetLibrary("LibCompress");
