@@ -10,5 +10,5 @@ setfenv(1, WIM);
 local Sounds = CreateModule("Sounds", true);
 
 function Sounds:PostEvent_Whisper(...)
-    PlaySoundFile("Interface\\AddOns\\"..WIM.addonTocName.."\\Sounds\\wisp.wav");
+    PlaySoundFile("Interface\\AddOns\\"..addonTocName.."\\Sounds\\wisp.wav");
 end

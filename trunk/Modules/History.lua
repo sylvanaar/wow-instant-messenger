@@ -433,8 +433,8 @@ local function createHistoryViewer()
     win.nav.filters.scroll:SetScript("OnShow", function(self)
             self:update();
         end);
-    win.nav.filters.scroll:SetScript("OnVerticalScroll", function(self)
-            _G.FauxScrollFrame_OnVerticalScroll(20, win.nav.filters.scroll.update);
+    win.nav.filters.scroll:SetScript("OnVerticalScroll", function(self, offset)
+            _G.FauxScrollFrame_OnVerticalScroll(self, offset, 20, win.nav.filters.scroll.update);
         end);
 
     win.nav.userList = CreateFrame("Frame", nil, win.nav);
@@ -567,8 +567,8 @@ local function createHistoryViewer()
             end
             self:update();
         end);
-    win.nav.userList.scroll:SetScript("OnVerticalScroll", function(self)
-            _G.FauxScrollFrame_OnVerticalScroll(20, win.nav.userList.scroll.update);
+    win.nav.userList.scroll:SetScript("OnVerticalScroll", function(self, offset)
+            _G.FauxScrollFrame_OnVerticalScroll(self, offset, 20, win.nav.userList.scroll.update);
         end);
     
     --search bar

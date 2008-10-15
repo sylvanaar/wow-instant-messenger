@@ -300,8 +300,8 @@ local function General_Fonts()
             end
             _G.FauxScrollFrame_Update(self, #self.flist, #frame.list.buttons, 24);
         end
-    frame.list.scroll:SetScript("OnVerticalScroll", function(self)
-            _G.FauxScrollFrame_OnVerticalScroll(24, frame.list.scroll.update);
+    frame.list.scroll:SetScript("OnVerticalScroll", function(self, offset)
+            _G.FauxScrollFrame_OnVerticalScroll(self, offset, 24, frame.list.scroll.update);
         end);
     frame.list:SetScript("OnShow", function(self)
             self.scroll:update();
@@ -446,8 +446,8 @@ local function Whispers_Filters()
                 end
             end
         end
-    frame.list.scroll:SetScript("OnVerticalScroll", function(self)
-            _G.FauxScrollFrame_OnVerticalScroll(32, frame.list.scroll.update);
+    frame.list.scroll:SetScript("OnVerticalScroll", function(self, offset)
+            _G.FauxScrollFrame_OnVerticalScroll(self, offset, 32, frame.list.scroll.update);
         end);
     frame.list:SetScript("OnShow", function(self)
             self.scroll:update();
