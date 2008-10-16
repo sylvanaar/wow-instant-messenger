@@ -36,6 +36,11 @@ function AddLocale(Locale, lTable)
             L[k] = v;
             lTable[k] = nil; -- clean up the garbage now.
         end
+    else
+        -- other locale isn't used, clear tables out don't waste the memory.
+        for k, v in pairs(lTable) do
+            lTable[k] = nil;
+        end
     end
 end
 

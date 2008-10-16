@@ -279,7 +279,7 @@ local function createFilterFrame()
         
     -- create filter name
     win.nameText = win:CreateFontString(win:GetName().."NameText", "OVERLAY", "ChatFontNormal");
-    win.nameText:SetText(L["Filter Name:"]);
+    win.nameText:SetText(L["Filter Name"]..":");
     win.nameText:SetTextColor(_G.GameFontNormal:GetTextColor());
     win.nameText:SetPoint("TOPLEFT", 30, -60);
     win.name = CreateFrame("EditBox", win:GetName().."Name", win);
@@ -300,7 +300,7 @@ local function createFilterFrame()
     
     --create filter by
     win.byText = win:CreateFontString(win:GetName().."By_Text", "OVERLAY", "ChatFontNormal");
-    win.byText:SetText(L["Filter By:"]);
+    win.byText:SetText(L["Filter By"]..":");
     win.byText:SetTextColor(_G.GameFontNormal:GetTextColor());
     win.byText:SetPoint("TOPLEFT", win.nameText, "BOTTOMLEFT", 0, -20);
     win.by = CreateFrame("Frame", win:GetName().."By", win, "UIDropDownMenuTemplate");
