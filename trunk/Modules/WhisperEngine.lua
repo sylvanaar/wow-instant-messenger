@@ -271,21 +271,10 @@ local function popEvents()
                     end
                 end
                 if(not eventItem.flags.supress) then
-                    -- temproary hack for compatibility with TBC & WOTK -- REMOVE UPON RELEASE OF WOTK
-                    if(WIM.isWOTLK) then
-                            local j;
-                            for j=1, #eventItem.ChatFrames do
+                        local j;
+                        for j=1, #eventItem.ChatFrames do
                                 CF_MessageEventHandler_orig(eventItem.ChatFrames[j], eventItem.event, unpack(eventItem.arg, 1, eventItem.argCount));
-                            end
-                    else
-                            -- TBC
-                            local this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = _G.this, _G.arg1, _G.arg2, _G.arg3, _G.arg4, _G.arg5, _G.arg6, _G.arg7, _G.arg8, _G.arg9, _G.arg10, _G.arg11;
-                            for j=1, #eventItem.ChatFrames do
-                                _G.this, _G.arg1, _G.arg2, _G.arg3, _G.arg4, _G.arg5, _G.arg6, _G.arg7, _G.arg8, _G.arg9, _G.arg10, _G.arg11 = eventItem.ChatFrames[j], unpack(eventItem.arg, 1, eventItem.argCount);
-                                CF_MessageEventHandler_orig(eventItem.event);
-                            end
-                            _G.this, _G.arg1, _G.arg2, _G.arg3, _G.arg4, _G.arg5, _G.arg6, _G.arg7, _G.arg8, _G.arg9, _G.arg10, _G.arg11 = this, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11;
-                    end
+                        end
                 end
             end
             removeEventTable(i);
@@ -623,54 +612,7 @@ local function CF_MessageEventHandler(self, event, ...)
         CF_MessageEventHandler_orig(self, event, ...);
     end
 end
-local function CF_MessageEventHandlerTBC(event)
-    -- supress status messages
-    if(db and db.enabled and event == "CHAT_MSG_SYSTEM") then
-        local msg, win = _G.arg1;
-        local curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
-        -- handle no user online and chat ignored from being shown in default chat frame.
-        win = Windows[FormatUserName(libs.Deformat(msg, _G.ERR_CHAT_PLAYER_NOT_FOUND_S)) or "NIL"];
-        win = win or Windows[FormatUserName(libs.Deformat(msg, _G.CHAT_IGNORED)) or "NIL"];
-        if(win and win.type == "whisper") then
-            if(win:IsShown() and db.pop_rules.whisper[curState].supress) then
-                return;
-            elseif(not win.msgSent) then
-                return;
-            end
-        end
-        -- user comes/goes online/offline.
-        win = Windows[FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_ONLINE_SS)) or "NIL"];
-        win = win or Windows[FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_OFFLINE_S)) or "NIL"];
-        if(win and win:IsShown() and db.pop_rules.whisper[curState].supress) then
-            return;
-        end
-    end
-
-    if(db and db.enabled and (event == "CHAT_MSG_AFK" or event == "CHAT_MSG_DND")) then
-        local curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
-        if(db.pop_rules.whisper[curState].supress) then
-            return;
-        end
-    end
-
-    -- process event whisper events
-    if(db and db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
-        local eventItem = WhisperQueue_Index[_G.arg11];
-        if(eventItem) then
-            addToTableUnique(eventItem.ChatFrames, _G.this);
-        else
-            eventItem = pushEvent(event, _G.arg1, _G.arg2, _G.arg3, _G.arg4, _G.arg5, _G.arg6, _G.arg7, _G.arg8, _G.arg9, _G.arg10, _G.arg11);
-            addToTableUnique(eventItem.ChatFrames, _G.this);
-        end
-    else
-        CF_MessageEventHandler_orig(event);
-    end
-end
-if(isWOTLK) then
-    _G.ChatFrame_MessageEventHandler = CF_MessageEventHandler;
-else
-    _G.ChatFrame_MessageEventHandler = CF_MessageEventHandlerTBC;
-end
+_G.ChatFrame_MessageEventHandler = CF_MessageEventHandler;
 --------------------------------------------------------
 
 

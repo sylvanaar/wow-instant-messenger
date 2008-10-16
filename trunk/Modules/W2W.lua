@@ -5,6 +5,7 @@ local pairs = pairs;
 local string = string;
 local table = table;
 local time = time;
+local mod = mod;
 
 -- set namespace
 setfenv(1, WIM);
@@ -72,14 +73,14 @@ local function createWidget_W2W()
             self.active = active;
             if(active) then
                 self:Show();
-                self.isFlashing = true;
-                _G.UIFrameFlash(self.flash, .5, .5, 999999, nil, 0.5, 0.5);
+                --self.isFlashing = true;
+                --_G.UIFrameFlash(self.flash, .5, .5, 999999, nil, 0.5, 0.5);
             else
                 self:Hide();
-                if(self.isFlashing) then
-                    self.isFlashing = false;
-                    _G.UIFrameFlashStop(self.flash);
-                end
+                --if(self.isFlashing) then
+                    --self.isFlashing = false;
+                    --_G.UIFrameFlashStop(self.flash);
+                --end
             end
         end
     button.SetDefaults = function(self)
@@ -101,6 +102,27 @@ local function createWidget_W2W()
     
     return button;
 end
+RegisterWidgetTrigger("w2w", "whisper", "OnUpdate", function(self, elapsed)
+	    local alpha = 255;
+            local counter = (self.statusCounter or 0) + elapsed;
+	    local sign = self.sign or 1;
+
+	    if ( counter > 1 ) then
+		sign = -sign;
+		self.sign = sign;
+	    end
+	    counter = mod(counter, 1);
+	    self.statusCounter = counter;
+
+	    if ( sign == 1 ) then
+		alpha = (55  + (counter * 400)) / 255;
+	    else
+		alpha = (255 - (counter * 400)) / 255;
+	    end
+	    self.flash:SetAlpha(alpha);
+	    self.flash:SetAlpha(alpha);
+	end);
+
 
 local function createWidget_Chatting()
     local button = _G.CreateFrame("Button");

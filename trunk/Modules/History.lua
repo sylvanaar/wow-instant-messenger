@@ -306,11 +306,8 @@ local function createHistoryViewer()
     win.nav:SetWidth(200);
     win.nav.user = CreateFrame("Frame", "WIM3_HistoryUserMenu", win.nav, "UIDropDownMenuTemplate");
     win.nav.user:SetPoint("TOPLEFT", -15, 0);
-    if(isWOTLK) then
-        _G.UIDropDownMenu_SetWidth(win.nav.user, win.nav:GetWidth() - 25);
-    else
-        _G.UIDropDownMenu_SetWidth(win.nav:GetWidth() - 25, win.nav.user);
-    end
+    _G.UIDropDownMenu_SetWidth(win.nav.user, win.nav:GetWidth() - 25);
+
     win.nav.user.list = {};
     win.nav.user.getUserList = function(self)
             for key, _ in pairs(self.list) do
@@ -752,13 +749,8 @@ local function createHistoryViewer()
 	    end
 	    self:update();
 	end);
-    win.content.chatFrame:SetScript("OnHyperlinkClick", function(self, ...)
-            if(isWOTLK) then
-                _G.ChatFrame_OnHyperlinkShow(self, ...);
-            else
-                _G.ChatFrame_OnHyperlinkShow(...);
-            end
-        end);
+    win.content.chatFrame:SetScript("OnHyperlinkClick", _G.ChatFrame_OnHyperlinkShow);
+
     win.content.chatFrame.up = CreateFrame("Button", nil, win.content.chatFrame);
     win.content.chatFrame.up:SetWidth(28); win.content.chatFrame.up:SetHeight(28);
     win.content.chatFrame.up:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollUp-Up");
