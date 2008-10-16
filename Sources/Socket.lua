@@ -57,7 +57,7 @@ end
 local function ProcessData(channel, from, data)
     local cmd, dat = string.match(data, "^(%w+):(.*)$")
     local str = Decompress(dat);
-    dPrint(cmd..":"..dat);
+    dPrint(channel..":"..from.."->"..cmd..":"..dat);
     if(CommandHandlers[cmd]) then
         for i = 1, #CommandHandlers[cmd] do
             if(CommandHandlers[cmd][i].callBack) then
