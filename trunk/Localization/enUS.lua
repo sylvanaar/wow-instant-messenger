@@ -368,4 +368,12 @@ WIM.AddLocale("enUS", {
     ["User Level"] = true,
     ["Windows will also be hidden when frames such as the world map are shown."] = true,
     
+    -- TabManagement.lua --
+    ["Tab Management"] = true,
+    ["Automatically manage your open windows and place them into appropriate tab groups."] = true,
+    ["Automatically group whispers."] = true,
+    ["Place friends in their own group."] = true,
+    ["Place guild members in their own group."] = true,
+    ["Does not apply to windows already opened."] = true,
+    
 });

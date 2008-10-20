@@ -13,9 +13,8 @@ local math = math;
 setfenv(1, WIM);
 
 db_defaults.tabs = {
-    enabled = true,
+    sortBy = 2, -- 1: Window created, 2: Activity, 3: Alphabetical
 };
-
 
 local tabsPerStrip = 10;
 local minimumWidth = 75;
@@ -55,7 +54,7 @@ helperFrame:SetScript("OnDragStart", function(self)
                 self.isMoving = true;
                 if(self.obj) then
                     local win = self.obj.childObj;
-                    self.obj.tabStrip:Detach(self.obj.childName);
+                    self.obj.tabStrip:Detach(win);
                     self.parentWindow = win;
                     self.parentWindow.isMoving = true;
                     win:Show()
@@ -82,11 +81,11 @@ helperFrame:SetScript("OnDragStop", function(self)
                         -- win was already detached when drag started.
                         -- so no need to check for that again.
                         if(dropTo.tabStrip) then
-                            dropTo.tabStrip:Attach(win.theUser);
+                            dropTo.tabStrip:Attach(win);
                         else
-                            local tabStrip = WIM:GetAvailableTabGroup();
-                            tabStrip:Attach(dropTo.theUser);
-                            tabStrip:Attach(win.theUser);
+                            local tabStrip = GetAvailableTabGroup();
+                            tabStrip:Attach(dropTo);
+                            tabStrip:Attach(win);
                         end
                     end
                 end
@@ -148,6 +147,20 @@ local addToTableUnique = addToTableUnique;
 
 -- remove item from table. Return true if removed, false otherwise.
 local removeFromTable = removeFromTable;
+
+-- sorting functions
+local function sortTabs(a, b)
+    if(db.tabs.sortBy == 1) then
+        -- sort by window creation
+        return a.age > b.age;
+    elseif(db.tabs.sortBy == 2) then
+        -- sort by activity
+        return a.lastActivity > b.lastActivity;
+    else
+        -- sort alphabetical
+        return a.theUser > b.theUser;
+    end
+end
 
 
 -- get the table index of an item. return's 0 if not found
@@ -277,7 +290,7 @@ local function createTabGroup()
                 self.childObj.widgets.close.forceShift = true;
                 self.childObj.widgets.close:Click();
             else
-                tabStrip:JumpToTabName(self.childName);
+                tabStrip:JumpToTab(self.childObj);
             end
         end);
         tab.isWimTab = true;
@@ -303,6 +316,9 @@ local function createTabGroup()
             self:Hide();
             return;
         end
+    
+        -- sort tabs
+        table.sort(self.attached, sortTabs);
     
         -- relocate tabStrip to window
         local win = self.selected.obj;
@@ -360,9 +376,9 @@ local function createTabGroup()
         self.visibleCount = count;
         for i=1,tabsPerStrip do
             if(i <= count) then
-                local str = self.attached[i+self.curOffset];
+                local str = self.attached[i+self.curOffset].theUser;
                 self.tabs[i]:Show();
-                self.tabs[i].childObj = windows.active.whisper[str] or windows.active.chat[str] or windows.active.w2w[str];
+                self.tabs[i].childObj = self.attached[i+self.curOffset];
                 self.tabs[i].childName = str;
                 self.tabs[i].text:SetText(str);
                 applySkinToTab(self.tabs[i], skinTable);
@@ -385,43 +401,45 @@ local function createTabGroup()
         end
     end
     
-    tabStrip.SetSelectedName = function(self, winName)
-        local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
+    tabStrip.SetSelectedName = function(self, win)
+        --local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
-            self.selected.name = winName;
+            self.selected.name = win.theUser;
             self.selected.obj = win;
             --self:UpdateTabs();
             self.parentWindow = win;
         end
     end
     
-    tabStrip.JumpToTabName = function(self, winName)
-        local oldWin = self.selected.obj;
-
-        DisplayTutorial(L["Manipulating Tabs"], L["You can <Shift-Click> a tab and drag it out into it's own window."]);
-        self:SetSelectedName(winName);
-        local win = self.selected.obj;
-        if(oldWin and oldWin ~= win) then
-            win:SetWidth(oldWin:GetWidth());
-            win:SetHeight(oldWin:GetHeight());
-            win:ClearAllPoints();
-            win:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", oldWin:GetLeft(), oldWin:GetTop());
-            win:SetAlpha(oldWin:GetAlpha());
-        end
-        win:Show();
-        self:UpdateTabs();
-        for i=1,#self.attached do
-            local obj = windows.active.whisper[self.attached[i]] or windows.active.chat[self.attached[i]] or windows.active.w2w[self.attached[i]];
-            if(obj ~= win) then
-                obj:Hide();
+    tabStrip.JumpToTab = function(self, win)
+        if(win) then
+            local oldWin = self.selected.obj;
+    
+            DisplayTutorial(L["Manipulating Tabs"], L["You can <Shift-Click> a tab and drag it out into it's own window."]);
+            self:SetSelectedName(win);
+            local win = self.selected.obj;
+            if(oldWin and oldWin ~= win) then
+                win:SetWidth(oldWin:GetWidth());
+                win:SetHeight(oldWin:GetHeight());
+                win:ClearAllPoints();
+                win:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", oldWin:GetLeft(), oldWin:GetTop());
+                win:SetAlpha(oldWin:GetAlpha());
+            end
+            win:Show();
+            self:UpdateTabs();
+            for i=1,#self.attached do
+                local obj = self.attached[i];
+                if(obj ~= win) then
+                    obj:Hide();
+                end
             end
         end
     end
     
-    tabStrip.Detach = function(self, winName)
-        local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
+    tabStrip.Detach = function(self, win)
+        --local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
-            local curIndex = getIndexFromTable(tabStrip.attached, winName);
+            local curIndex = getIndexFromTable(tabStrip.attached, win);
             if(win == self.selected.obj) then
                 if(#self.attached <= 1) then
                     self.selected.name = "";
@@ -433,10 +451,10 @@ local function createTabGroup()
                     else
                         nextIndex = curIndex + 1;
                     end
-                    self:JumpToTabName(self.attached[nextIndex]);
+                    self:JumpToTab(self.attached[nextIndex]);
                 end
             end
-            removeFromTable(self.attached, winName);
+            removeFromTable(self.attached, win);
             win.tabStrip = nil;
             self:UpdateTabs();
             win:Show();
@@ -444,17 +462,17 @@ local function createTabGroup()
         end
     end
     
-    tabStrip.Attach = function(self, winName)
-        local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
+    tabStrip.Attach = function(self, win)
+        --local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
             --if already attached, detach then attach here.
             if(win.tabStrip and win.tabStrip ~= self) then
                 win.tabStrip:Detach(winName);
             end
-            addToTableUnique(self.attached, winName);
+            addToTableUnique(self.attached, win);
             win.tabStrip = self;
             if(#self.attached == 1 or win:IsVisible()) then
-                self:JumpToTabName(winName);
+                self:JumpToTab(win);
                 win:UpdateProps();
             else
                 win:Hide();
@@ -492,9 +510,15 @@ end
 --          Global Tab Functions    --
 --------------------------------------
 
+-- update All Tabs (used for options mainly)
+function UpdateAllTabs()
+    for i=1, table.getn(tabGroups) do
+        tabGroups[i]:UpdateTabs();
+    end
+end
+
 -- update skin to all tabStrips.
 function ApplySkinToTabs()
-    local i;
     for i=1, table.getn(tabGroups) do
         applySkin(tabGroups[i]);
     end
