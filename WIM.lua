@@ -236,11 +236,13 @@ end
 
 function CallModuleFunction(funName, ...)
     -- notify all enabled modules.
+    dPrint("Calling Module Function: "..funName);
     local module, tData, fun;
     for module, tData in pairs(WIM.modules) do
         fun = tData[funName];
         if(type(fun) == "function" and tData.enabled) then
-            fun(tData, ...);
+                dPrint(" +--"..module);
+                fun(tData, ...);
         end
     end
 end

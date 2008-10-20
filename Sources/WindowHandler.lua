@@ -418,14 +418,14 @@ local function MessageWindow_MovementControler_OnDragStop(self)
         window.hasMoved = true;
 	if(dropTo) then
 		if(window.tabStrip) then
-			window.tabStrip:Detach(window.theUser);
+			window.tabStrip:Detach(window);
 		end
 		if(dropTo.tabStrip) then
-			dropTo.tabStrip:Attach(window.theUser);
+			dropTo.tabStrip:Attach(window);
 		else
 			local tabStrip = GetAvailableTabGroup();
-			tabStrip:Attach(dropTo.theUser);
-			tabStrip:Attach(window.theUser);
+			tabStrip:Attach(dropTo);
+			tabStrip:Attach(window);
 		end
 	end
     end
@@ -439,7 +439,7 @@ local function MessageWindow_Frame_OnShow(self)
                 end
                 updateScrollBars(self);
                 if(self.tabStrip) then
-                        self.tabStrip:JumpToTabName(self.theUser);
+                        self.tabStrip:JumpToTab(self);
                 end
                 CallModuleFunction("OnWindowShow", self);
         	for widgetName, widgetObj in pairs(self.widgets) do
@@ -740,7 +740,10 @@ local function instantiateWindow(obj)
 	local str = applyMessageFormatting(self.widgets.chat_display, event, ...);
 	self:AddMessage(str, r, g, b);
 	self.msgWaiting = true;
-	self.lastActivity = time();
+	self.lastActivity = _G.GetTime();
+        if(self.tabStrip) then
+                self.tabStrip:UpdateTabs();
+        end
     end
     
     obj.UpdateIcon = function(self)
@@ -835,7 +838,7 @@ local function instantiateWindow(obj)
 		if(forceResult == true) then
 			setWindowAsFadedIn(self);
 			if(self.tabStrip) then
-				self.tabStrip:JumpToTabName(self.theUser);
+				self.tabStrip:JumpToTab(self);
                                 if(rules.autofocus or forceFocus) then
                                         self.widgets.msg_box:SetFocus();
                                 end
@@ -863,7 +866,7 @@ local function instantiateWindow(obj)
 			if(self.tabStrip) then
 				self:ResetAnimation();
                                 if(EditBoxInFocus ~= self.tabStrip.selected.obj.widgets.msg_box) then
-        				self.tabStrip:JumpToTabName(self.theUser);
+        				self.tabStrip:JumpToTab(self);
                                 end
 			else
 				self:ResetAnimation();
@@ -1011,10 +1014,10 @@ end
 local function loadWindowDefaults(obj)
 	obj:Hide();
 
-        obj.age = _G.time();
+        obj.age = _G.GetTime();
         obj.hasMoved = false;
 
-	obj.lastActivity = time();
+	obj.lastActivity = _G.GetTime();
 
         obj.customSize = false;
 
@@ -1161,7 +1164,7 @@ local function destroyWindow(userNameOrObj)
         --obj.icon:Hide();
         --obj.icon.track = false;
 	if(obj.tabStrip) then
-		obj.tabStrip:Detach(obj.theUser);
+		obj.tabStrip:Detach(obj);
 	end
         obj:Show();
         obj.widgets.chat_display:Clear();
@@ -1250,7 +1253,6 @@ end
 function Widgets(widgetName)
         local index = 1
         return function()
-                dPrint(index)
                 for i=index, #WindowSoupBowl.windows do
                         if(WindowSoupBowl.windows[i].obj.widgets[widgetName]) then
                                 index = i+1;

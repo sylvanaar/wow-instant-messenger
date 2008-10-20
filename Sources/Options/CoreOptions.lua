@@ -22,7 +22,7 @@ local credits = {
     "|cff69ccf0"..L["Special Thanks:"].."|r Stewarta, Zeke <Coilfang>,\n     Morphieus <Spinebreaker>, Nachonut <Bronzebeard>",
 };
 
-local states = {"resting", "combat", "pvp", "arena", "party", "raid", "other"};
+local states = {"arena", "combat", "pvp", "raid", "party", "resting", "other"};
 
 local filterListCount = 9;
 
@@ -633,6 +633,38 @@ local function W2W_Privacy()
     return f;
 end
 
+local function General_Tabs()
+    local f = options.CreateOptionsFrame();
+    f.sub = f:CreateSection(L["Tab Management"], L["Automatically manage your open windows and place them into appropriate tab groups."]);
+    f.sub.nextOffSetY = -20;
+    
+    f.sub.sortText = f.sub:CreateText();
+    f.sub.sortText:SetText(L["Sort tabs by:"]);
+    local sorts = {L["Window Created"], L["Last Activity"], L["Alphabetical"]};
+    local sortList = {};
+    for i=1, #sorts do
+        table.insert(sortList, {
+            text = sorts[i],
+            value = i,
+            justifyH = "LEFT",
+            func = function(self)
+                UpdateAllTabs();
+            end,
+        });
+    end
+    f.sub.sortList = f.sub:CreateDropDownMenu(db.tabs, "sortBy", sortList, 150);
+    f.sub.sortList:ClearAllPoints();
+    f.sub.sortList:SetPoint("LEFT", f.sub.sortText, "LEFT", f.sub.sortText:GetStringWidth(), 0);
+    f.sub.lastObj = f.sub.sortText;
+    
+    f.sub.nextOffSetY = -30;
+    f.sub.whispers = f.sub:CreateCheckButton(L["Automatically group whispers."], db.tabs.whispers, "enabled", L["Does not apply to windows already opened."]);
+    f.sub.whispers:CreateCheckButton(L["Place friends in their own group."], db.tabs.whispers, "friends", L["Does not apply to windows already opened."]);
+    f.sub.whispers:CreateCheckButton(L["Place guild members in their own group."], db.tabs.whispers, "guild", L["Does not apply to windows already opened."]);
+    f.sub.nextOffSetY = -15;
+    return f;
+end
+
 
 RegisterOptionFrame(L["General"], L["Main"], General_Main);
 RegisterOptionFrame(L["General"], L["Window Settings"], General_WindowSettings);
@@ -640,6 +672,7 @@ RegisterOptionFrame(L["General"], L["Display Settings"], General_VisualSettings)
 RegisterOptionFrame(L["General"], L["Fonts"], General_Fonts);
 RegisterOptionFrame(L["General"], L["Message Formatting"], General_MessageFormatting);
 RegisterOptionFrame(L["General"], L["History"], General_History);
+RegisterOptionFrame(L["General"], L["Tab Management"], General_Tabs);
 
 RegisterOptionFrame(L["Whispers"], L["Display Settings"], Whispers_DisplaySettings);
 RegisterOptionFrame(L["Whispers"], L["Window Behavior"], WhisperPopRules);
