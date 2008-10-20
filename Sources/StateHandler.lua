@@ -34,6 +34,8 @@ workerFrame:RegisterEvent("PLAYER_ENTERING_WORLD");
 local function evaluateState()
     if(select(2, IsInInstance()) == "arena") then
         WIM.curState = "arena";
+    elseif(flag_combat) then
+        WIM.curState = "combat";
     elseif(select(2, IsInInstance()) == "pvp") then
         -- inside battleground
         WIM.curState = "pvp";
@@ -43,8 +45,6 @@ local function evaluateState()
     elseif(select(2, IsInInstance()) == "party") then
         -- inside 5 man instance
         WIM.curState = "party";
-    elseif(flag_combat) then
-        WIM.curState = "combat";
     elseif(flag_resting) then
         WIM.curState = "resting";
     else
