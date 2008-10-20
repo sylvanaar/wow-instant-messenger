@@ -7,13 +7,15 @@ local PlaySoundFile = PlaySoundFile;
 setfenv(1, WIM);
 
 db_defaults.sounds = {
-    whisper_in = true
+    whispers = {
+        msgin = true,
+    }
 };
 
 local Sounds = CreateModule("Sounds", true);
 
 function Sounds:PostEvent_Whisper(...)
-    if(db and db.sounds.whisper_in) then
+    if(db and db.sounds.whispers.msgin) then
         PlaySoundFile("Interface\\AddOns\\"..addonTocName.."\\Sounds\\wisp.wav");
     end
 end

@@ -531,7 +531,7 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
 			else
 				local prct = animate.elapsed/animate.time;
                                 local scale = (db.winSize.scale/100)*(1-prct);
-                                scale = scale > 0 and scale or .001;
+                                scale = scale > 0 and scale or .01;
 				self:SetScale(scale);
 				if(animate.to) then
 					local x1, y1, x2, y2 = animate.initLeft*self:GetEffectiveScale(), animate.initTop*self:GetEffectiveScale(),
@@ -561,7 +561,8 @@ local function loadHandlers(obj)
 	local widgets = obj.widgets;
 	for widget, tbl in pairs(Widget_Triggers) do
 		for handler,_ in pairs(tbl) do
-			if(not widgets[widget]:GetScript(handler)) then
+                        -- This is, what i feel an over kill of checks.. but if it works... /shrug.
+			if(widgets[widget] and widgets[widget]and not widgets[widget]:GetScript(handler)) then
 				widgets[widget]:SetScript(handler, function(...) executeHandlers(widget, obj.type, handler, ...); end)
 			end
 		end

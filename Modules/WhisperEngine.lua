@@ -567,7 +567,6 @@ local function CF_HandleChatType(editBox, msg, command, send)
 	end
 end
 
----- THIS SECTION IS A HACK TO WORK WITH BOTH TBC AND WOTLK - UPDATE FOR RELEASE OF WOTK
 CF_MessageEventHandler_orig = _G.ChatFrame_MessageEventHandler;
 local function CF_MessageEventHandler(self, event, ...)
     -- supress status messages
