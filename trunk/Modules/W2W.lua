@@ -271,8 +271,9 @@ end
 
 
 -- typing
+-- enables typing notification for WIM window's message box.
 RegisterWidgetTrigger("msg_box", "whisper", "OnTextChanged", function(self)
-        if(W2W.enabled and db.w2w.shareTyping) then
+        if(W2W.enabled and db.w2w.shareTyping and string.sub(self:GetText(),1,1) ~= "/") then
             if(string.trim(self:GetText()) == "") then
                 getW2WTable(self.parentWindow).lastKeyPress = 0;
                 SendData("WHISPER", self.parentWindow.theUser, "TYPING", 0);
@@ -285,6 +286,24 @@ RegisterWidgetTrigger("msg_box", "whisper", "OnTextChanged", function(self)
         end
     end);
 RegisterWidgetTrigger("msg_box", "whisper", "OnShow", function(self) getW2WTable(self.parentWindow).lastKeyPress = 0; end);
+-- enables typing notification for default chat frame's message box.
+_G.hooksecurefunc("ChatEdit_OnTextChanged", function(self)
+    local chatType, tellTarget = self:GetAttribute("chatType"), self:GetAttribute("tellTarget");
+    if(chatType == "WHISPER" and W2W.enabled and db.w2w.shareTyping and string.sub(self:GetText(),1,1) ~= "/") then
+        self.lastKeyPress = self.lastKeyPress or 0;
+        if(string.trim(self:GetText()) == "") then
+            self.lastKeyPress = 0;
+            SendData("WHISPER", tellTarget, "TYPING", 0);
+        else
+            if(time() - self.lastKeyPress > 2) then
+                SendData("WHISPER", tellTarget, "TYPING", 1);
+                self.lastKeyPress = time();
+            end
+        end
+    else
+        self.lastKeyPress = 0;
+    end
+end);
 
 RegisterAddonMessageHandler("TYPING", function(from, data)
         if(Windows[from] and Windows[from].widgets.chatting) then

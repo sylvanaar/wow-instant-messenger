@@ -198,7 +198,7 @@ RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
         if(msgCount == 1) then
             Windows[obj.theUser].msgSent = true;
             _G.ChatThrottleLib:SendChatMessage("NORMAL", "WIM", msg, "WHISPER", nil, obj.theUser);
-        else
+        elseif(msgCount > 1) then
             Windows[obj.theUser].msgSent = true;
             for i=1, msgCount do
                 local chunk = string.sub(msg, ((i-1)*255+1), (((i-1)*255)+255));

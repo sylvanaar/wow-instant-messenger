@@ -534,11 +534,13 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                                 scale = scale > 0 and scale or .01;
 				self:SetScale(scale);
 				if(animate.to) then
-					local x1, y1, x2, y2 = animate.initLeft*self:GetEffectiveScale(), animate.initTop*self:GetEffectiveScale(),
+                                        local es = self:GetEffectiveScale();
+                                        es = es > 0 and es or .01;
+					local x1, y1, x2, y2 = animate.initLeft*es, animate.initTop*es,
 								animate.to:GetLeft()*animate.to:GetEffectiveScale(), animate.to:GetTop()*animate.to:GetEffectiveScale();
 					local rise, run = ((y2-y1)>=0) and (y2-y1) or 0, ((x2-x1)>=0) and (x2-x1) or 0;
 					self:ClearAllPoints();
-					self:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", (x1+run*prct)/self:GetEffectiveScale(), (y1+rise*prct)/self:GetEffectiveScale());
+					self:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", (x1+run*prct)/es, (y1+rise*prct)/es);
 				end
 				
 			end

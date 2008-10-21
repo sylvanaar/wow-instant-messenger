@@ -44,7 +44,7 @@ classes[L["Rogue"]]	= {
                                     tag = "ROGUE"
                                 };
 classes[L["Shaman"]]	= {
-                                    color = "00dbba",
+                                    color = "2459FF",
                                     tag = "SHAMAN"
                                 };
 classes[L["Warlock"]]	= {
