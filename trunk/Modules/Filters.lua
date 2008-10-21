@@ -40,7 +40,6 @@ local DefaultFilters = {
                     "^YOU ARE THE BOMB!\n"..
                     "VOLATILE INFECTION\n"..
                     "^GA[^A-Z]+\n"..
-                    "^/\n"..
                     "^<METAMAP\n"..
                     "^<CT",
         action = 2,
