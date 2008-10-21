@@ -152,13 +152,13 @@ local removeFromTable = removeFromTable;
 local function sortTabs(a, b)
     if(db.tabs.sortBy == 1) then
         -- sort by window creation
-        return a.age > b.age;
+        return a.age < b.age;
     elseif(db.tabs.sortBy == 2) then
         -- sort by activity
         return a.lastActivity > b.lastActivity;
     else
         -- sort alphabetical
-        return a.theUser > b.theUser;
+        return a.theUser < b.theUser;
     end
 end
 
@@ -368,6 +368,7 @@ local function createTabGroup()
 			self.prevButton:Enable();
 		end
 		if(self.curOffset >= #self.attached - count) then
+                        self.curOffset = 0;
 			self.nextButton:Disable();
 		else
 			self.nextButton:Enable();
@@ -414,7 +415,8 @@ local function createTabGroup()
     tabStrip.JumpToTab = function(self, win)
         if(win) then
             local oldWin = self.selected.obj;
-    
+            local oldCustomSize = win.customSize;
+            win.customSize = true;
             DisplayTutorial(L["Manipulating Tabs"], L["You can <Shift-Click> a tab and drag it out into it's own window."]);
             self:SetSelectedName(win);
             local win = self.selected.obj;
@@ -426,6 +428,7 @@ local function createTabGroup()
                 win:SetAlpha(oldWin:GetAlpha());
             end
             win:Show();
+            win.customSize = oldCustomSize;
             self:UpdateTabs();
             for i=1,#self.attached do
                 local obj = self.attached[i];

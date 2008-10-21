@@ -22,4 +22,6 @@ WIM.lua
 Sources\Includes.xml
 Modules\Includes.xml
 
+ChangeLog.lua
+
 Skins\Default\skin.lua
