@@ -17,10 +17,12 @@ addEntry("3.0.3", "10/??/2008", [[
     *Avoid any chances of dividing by 0 in window animation.
     *Changed window behavior priorities to: Arena, Combat, PvP, Raid, Party, Resting Other.
     *Fixed bug when running WIM on WOTLK.
-    -Removed "^/" from default filters. [/wim clear filters] to take effect.
     +W2W Typing notifiction is triggered from the default chat frame now too.
     -W2W will no longer notify user as typing if user is typing a slash command.
     *Fixed a resizing bug when using tabs. Entire tab group inherrits size until removed.
     +Added ChangeLog.lua (contains release information to be used later.)
     *Corrected shaman class color.
+    *Focus gain also respects Blizzard's ChatEditFrame.
+    *Filters are no longer trimmed.
+    +Added deDE localizations.
 ]]);
