@@ -825,7 +825,7 @@ local function instantiateWindow(obj)
     -- PopUp rules
     obj.Pop = function(self, msgDirection, forceResult, forceFocus) -- true to force show, false it ignore rules and force quiet.
 	-- account for variable arguments.
-	if(type(msgDirection) ~= "string" and type(msgDirection) == "boolean") then
+	if(type(msgDirection) == "boolean") then
 		forceResult, forceFocus = msgDirection, forceResult;
 		msgDirection = "in";
 	elseif(msgDirection == nil) then
@@ -847,7 +847,7 @@ local function instantiateWindow(obj)
 			else
 				self:ResetAnimation();
 				self:Show();
-                                if((not EditBoxInFocus and rules.autofocus) or forceFocus) then
+                                if((not _G.ChatFrameEditBox:wimIsVisible() and not EditBoxInFocus and rules.autofocus) or forceFocus) then
                                         self.widgets.msg_box:SetFocus();
                                 end
 				local count = 0;
@@ -873,7 +873,7 @@ local function instantiateWindow(obj)
 			else
 				self:ResetAnimation();
 				self:Show();
-                                if(not EditBoxInFocus and rules.autofocus and msgDirection == "in") then
+                                if(not _G.ChatFrameEditBox:wimIsVisible() and not EditBoxInFocus and rules.autofocus and msgDirection == "in") then
                                         self.widgets.msg_box:SetFocus();
                                 end
 			end

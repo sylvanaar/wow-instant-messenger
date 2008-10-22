@@ -39,6 +39,7 @@ local DefaultFilters = {
                     "^YOU ARE BURNING!\n"..
                     "^YOU ARE THE BOMB!\n"..
                     "VOLATILE INFECTION\n"..
+                    "^/"..
                     "^GA[^A-Z]+\n"..
                     "^<METAMAP\n"..
                     "^<CT",
@@ -95,7 +96,7 @@ local userCache = {};
 local function processFilter(eventItem, filter)
     local message, name = unpack(eventItem.arg)
     if(filter.type == 1) then
-        message = string.trim(message);
+        --message = string.trim(message);
         local patterns = filter.pattern.."\n";
         local start, stop, pattern = string.find(patterns, "([^\n]+)\n", 1);
         while(pattern) do
