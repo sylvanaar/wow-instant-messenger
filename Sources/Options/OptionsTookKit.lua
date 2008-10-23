@@ -212,7 +212,6 @@ local function CreateCheckButton(parent, title, dbTree, varName, tooltip, valCha
     cb.isCheckButton = true;
     cb.disabledByParent = nil; -- used to track enable and disables.
     cb.CreateCheckButton = CreateCheckButton;
-    cb.CreateCheckButtonMenu = CreateCheckButtonMenu;
     cb._Disable = cb.Disable;
     cb._Enable = cb.Enable;
     cb.text:SetText("  "..tostring(title));
@@ -296,6 +295,7 @@ end
 
 local function CreateCheckButtonMenu(parent, title, dbTree, varName, tooltip, valChanged, itemList, dbTree2, varName2, valChanged2)
     local cbm = CreateCheckButton(parent, title, dbTree, varName, tooltip, valChanged);
+    cbm.CreateCheckButtonMenu = CreateCheckButtonMenu;
     cbm.menu = CreateFrame("Button", cbm:GetName().."MenuButton", cbm);
     cbm.menu:SetWidth(26); cbm.menu:SetHeight(cbm.menu:GetWidth());
     cbm.menu:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIcon-ScrollDown-Up");

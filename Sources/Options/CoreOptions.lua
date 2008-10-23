@@ -666,6 +666,57 @@ local function General_Tabs()
 end
 
 
+local function General_Sounds()
+    local f = options.CreateOptionsFrame();
+    f.sub = f:CreateSection(L["Sounds"], L["Configure various sound events and how they are triggered."]);
+    f.sub.nextOffSetY = -20;
+    local soundList1 = {};
+    local soundList2 = {};
+    local soundList3 = {};
+    local soundList4 = {};
+    for sound, _ in pairs(libs.SML.MediaTable.sound) do
+        table.insert(soundList1, {
+            text = sound,
+            value = sound,
+            justifyH = "LEFT",
+            func = function(self)
+                _G.PlaySoundFile(libs.SML:Fetch(libs.SML.MediaType.SOUND, self.value));
+            end
+        });
+        table.insert(soundList2, {
+            text = sound,
+            value = sound,
+            justifyH = "LEFT",
+            func = function(self)
+                _G.PlaySoundFile(libs.SML:Fetch(libs.SML.MediaType.SOUND, self.value));
+            end
+        });
+        table.insert(soundList3, {
+            text = sound,
+            value = sound,
+            justifyH = "LEFT",
+            func = function(self)
+                _G.PlaySoundFile(libs.SML:Fetch(libs.SML.MediaType.SOUND, self.value));
+            end
+        });
+        table.insert(soundList4, {
+            text = sound,
+            value = sound,
+            justifyH = "LEFT",
+            func = function(self)
+                _G.PlaySoundFile(libs.SML:Fetch(libs.SML.MediaType.SOUND, self.value));
+            end
+        });
+    end
+    f.sub.whispers = f.sub:CreateCheckButtonMenu(L["Play sound when a whisper is received."], db.sounds.whispers, "msgin", nil, nil, soundList1, db.sounds.whispers, "msgin_sml");
+    f.sub.whispers:CreateCheckButtonMenu(L["Play special sound for friends."], db.sounds.whispers, "friend", nil, nil, soundList2, db.sounds.whispers, "friend_sml");
+    f.sub.whispers:CreateCheckButtonMenu(L["Play special sound for guild members."], db.sounds.whispers, "guild", nil, nil, soundList3, db.sounds.whispers, "guild_sml");
+    f.sub.nextOffSetY = -70;
+    f.sub:CreateCheckButtonMenu(L["Play sound when a whisper is sent."], db.sounds.whispers, "msgout", nil, nil, soundList4, db.sounds.whispers, "msgout_sml");
+    return f;
+end
+
+
 RegisterOptionFrame(L["General"], L["Main"], General_Main);
 RegisterOptionFrame(L["General"], L["Window Settings"], General_WindowSettings);
 RegisterOptionFrame(L["General"], L["Display Settings"], General_VisualSettings);
@@ -673,6 +724,7 @@ RegisterOptionFrame(L["General"], L["Fonts"], General_Fonts);
 RegisterOptionFrame(L["General"], L["Message Formatting"], General_MessageFormatting);
 RegisterOptionFrame(L["General"], L["History"], General_History);
 RegisterOptionFrame(L["General"], L["Tab Management"], General_Tabs);
+RegisterOptionFrame(L["General"], L["Sounds"], General_Sounds);
 
 RegisterOptionFrame(L["Whispers"], L["Display Settings"], Whispers_DisplaySettings);
 RegisterOptionFrame(L["Whispers"], L["Window Behavior"], WhisperPopRules);

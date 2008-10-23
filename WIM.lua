@@ -14,7 +14,7 @@ setfenv(1, WIM);
 -- Core information
 addonTocName = "WIM";
 version = "3.0.3";
-beta = true; -- flags current version as beta.
+beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight

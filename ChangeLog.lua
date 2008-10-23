@@ -12,7 +12,7 @@ end
 
 
 -- ChangeLog Entries.
-addEntry("3.0.3", "10/??/2008", [[
+addEntry("3.0.3", "10/23/2008", [[
     +Added Tab Management module. (Auto grouping of windows.)
     *Avoid any chances of dividing by 0 in window animation.
     *Changed window behavior priorities to: Arena, Combat, PvP, Raid, Party, Resting Other.
@@ -25,4 +25,6 @@ addEntry("3.0.3", "10/??/2008", [[
     *Focus gain also respects Blizzard's ChatEditFrame.
     *Filters are no longer trimmed.
     +Added deDE localizations.
+    +Added sound options.
+    +Added some stock sound files.
 ]]);
