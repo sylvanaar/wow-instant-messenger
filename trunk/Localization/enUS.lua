@@ -367,6 +367,13 @@ WIM.AddLocale("enUS", {
     ["General"] = true,
     ["User Level"] = true,
     ["Windows will also be hidden when frames such as the world map are shown."] = true,
+    ["Sounds"] = true,
+    ["Configure various sound events and how they are triggered."] = true,
+    ["Play sound when a whisper is received."] = true,
+    ["Play special sound for friends."] = true,
+    ["Play special sound for guild members."] = true,
+    ["Play sound when a whisper is sent."] = true,
+    
     
     -- TabManagement.lua --
     ["Tab Management"] = true,
