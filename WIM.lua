@@ -17,7 +17,7 @@ version = "3.0.3";
 beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
--- WOTLK check by CKKnight
+-- WOTLK check by CKKnight (we'll keep this around for now...)
 isWOTLK = select(4, _G.GetBuildInfo()) >= 30000;
 
 -- is Private Server?
