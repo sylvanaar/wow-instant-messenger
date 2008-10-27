@@ -12,6 +12,9 @@ end
 
 
 -- ChangeLog Entries.
+addEntry("3.0.4", "10/??/2008", [[
+    
+]]);
 addEntry("3.0.3", "10/23/2008", [[
     +Added Tab Management module. (Auto grouping of windows.)
     *Avoid any chances of dividing by 0 in window animation.
