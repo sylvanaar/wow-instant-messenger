@@ -174,6 +174,17 @@ local function getIndexFromTable(tbl, item)
     return 0;
 end
 
+local function applySkinToTab(tab, skinTable)
+    tab:SetHighlightTexture(skinTable.textures.tab.HighlightTexture, skinTable.textures.tab.HighlightAlphaMode);
+    tab:SetTexture(skinTable.textures.tab.NormalTexture);
+    tab:SetSelectedTexture(skinTable.textures.tab.PushedTexture);
+    local hlt = tab:GetHighlightTexture();
+    if(hlt) then
+        hlt:ClearAllPoints();
+        hlt:SetAllPoints();
+    end
+end
+
 -- update tabStip with propper skin layout.
 local function applySkin(tabStrip)
     local skinTable = GetSelectedSkin().tab_strip;
@@ -198,7 +209,23 @@ local function applySkin(tabStrip)
                 tab:SetPoint("BOTTOMLEFT", tabStrip.tabs[i-1], "BOTTOMRIGHT");
             end
         end
+        applySkinToTab(tab, skinTable);
     end
+    tabStrip.nextButton:SetNormalTexture(skinTable.textures.next.NormalTexture);
+    tabStrip.nextButton:SetPushedTexture(skinTable.textures.next.PushedTexture);
+    tabStrip.nextButton:SetHighlightTexture(skinTable.textures.next.HighlightTexture, skinTable.textures.next.HighlightAlphaMode);
+    tabStrip.nextButton:SetDisabledTexture(skinTable.textures.next.DisabledTexture);
+    tabStrip.prevButton:SetNormalTexture(skinTable.textures.prev.NormalTexture);
+    tabStrip.prevButton:SetPushedTexture(skinTable.textures.prev.PushedTexture);
+    tabStrip.prevButton:SetHighlightTexture(skinTable.textures.prev.HighlightTexture, skinTable.textures.prev.HighlightAlphaMode);
+    tabStrip.prevButton:SetDisabledTexture(skinTable.textures.prev.DisabledTexture);
+                
+    tabStrip.prevButton:ClearAllPoints();
+    tabStrip.prevButton:SetPoint("RIGHT", tabStrip, "LEFT", 0, 0);
+    tabStrip.prevButton:SetWidth(skinTable.textures.prev.width); tabStrip.prevButton:SetHeight(skinTable.textures.prev.height);
+    tabStrip.nextButton:ClearAllPoints();
+    tabStrip.nextButton:SetPoint("LEFT", tabStrip, "RIGHT", 0, 0);
+    tabStrip.nextButton:SetWidth(skinTable.textures.next.width); tabStrip.nextButton:SetHeight(skinTable.textures.next.height);
 end
 
 -- modify and manage tab offsets. pass 1 or -1. will always increment/decriment by 1.
@@ -220,15 +247,6 @@ local function setTabOffset(tabStrip, PlusOrMinus)
 	end
     end
     tabStrip:UpdateTabs();
-end
-
-local function applySkinToTab(tab, skinTable)
-    tab:SetHighlightTexture(skinTable.textures.tab.HighlightTexture, skinTable.textures.tab.HighlightAlphaMode);
-    local hlt = tab:GetHighlightTexture();
-    if(hlt) then
-        hlt:ClearAllPoints();
-        hlt:SetAllPoints();
-    end
 end
 
 
@@ -279,10 +297,50 @@ local function createTabGroup()
         tab.middle:SetTexCoord(0.25, 0.75, 0.0, 1.0);
         tab.middle:SetPoint("TOPLEFT", tab.left, "TOPRIGHT");
         tab.middle:SetPoint("BOTTOMRIGHT", tab.right, "BOTTOMLEFT");
+        tab.sleft = tab:CreateTexture(stripName.."_Tab"..i.."Backdrop_SL", "BORDER");
+        tab.sleft:SetTexCoord(0.0, 0.25, 0.0, 1.0);
+        tab.sleft:SetWidth(16);
+        tab.sleft:SetPoint("TOPLEFT", tab, "TOPLEFT");
+        tab.sleft:SetPoint("BOTTOMLEFT", tab, "BOTTOMLEFT");
+        tab.sright = tab:CreateTexture(stripName.."_Tab"..i.."Backdrop_SR", "BORDER");
+        tab.sright:SetTexCoord(0.75, 1.0, 0.0, 1.0);
+        tab.sright:SetWidth(16);
+        tab.sright:SetPoint("TOPRIGHT", tab, "TOPRIGHT");
+        tab.sright:SetPoint("BOTTOMRIGHT", tab, "BOTTOMRIGHT");
+        tab.smiddle = tab:CreateTexture(stripName.."_Tab"..i.."Backdrop_SM", "BORDER");
+        tab.smiddle:SetTexCoord(0.25, 0.75, 0.0, 1.0);
+        tab.smiddle:SetPoint("TOPLEFT", tab.left, "TOPRIGHT");
+        tab.smiddle:SetPoint("BOTTOMRIGHT", tab.right, "BOTTOMLEFT");
         tab.SetTexture = function(self, pathOrTexture)
             self.left:SetTexture(pathOrTexture);
             self.middle:SetTexture(pathOrTexture);
             self.right:SetTexture(pathOrTexture);
+        end
+        tab.SetSelectedTexture = function(self, pathOrTexture)
+            self.sleft:SetTexture(pathOrTexture);
+            self.smiddle:SetTexture(pathOrTexture);
+            self.sright:SetTexture(pathOrTexture);
+        end
+        tab.SetSelected = function(self, selected)
+            if(selected) then
+                self:SetAlpha(1);
+                self.sleft:Show();
+                self.smiddle:Show();
+                self.sright:Show();
+                self.left:Hide();
+                self.middle:Hide();
+                self.right:Hide();
+
+            else
+                self:SetAlpha(.7);
+                self.left:Show();
+                self.middle:Show();
+                self.right:Show();
+                self.sleft:Hide();
+                self.smiddle:Hide();
+                self.sright:Hide();
+
+            end
         end
         tab:RegisterForClicks("LeftButtonUp", "RightButtonUp");
         tab:SetScript("OnClick", function(self, button)
@@ -340,29 +398,14 @@ local function createTabGroup()
 		self.nextButton:Hide();
 		self.prevButton:Hide();
 	else
-                
 		self.nextButton:Show();
 		self.prevButton:Show();
-                self.nextButton:SetNormalTexture(skinTable.textures.next.NormalTexture);
-                self.nextButton:SetPushedTexture(skinTable.textures.next.PushedTexture);
-                self.nextButton:SetHighlightTexture(skinTable.textures.next.HighlightTexture, skinTable.textures.next.HighlightAlphaMode);
-                self.nextButton:SetDisabledTexture(skinTable.textures.next.DisabledTexture);
-                self.prevButton:SetNormalTexture(skinTable.textures.prev.NormalTexture);
-                self.prevButton:SetPushedTexture(skinTable.textures.prev.PushedTexture);
-                self.prevButton:SetHighlightTexture(skinTable.textures.prev.HighlightTexture, skinTable.textures.prev.HighlightAlphaMode);
-                self.prevButton:SetDisabledTexture(skinTable.textures.prev.DisabledTexture);
-                
-                self.prevButton:ClearAllPoints();
-                self.prevButton:SetPoint("RIGHT", self, "LEFT", 0, 0);
-                self.prevButton:SetWidth(skinTable.textures.prev.width); self.prevButton:SetHeight(skinTable.textures.prev.height);
-                self.nextButton:ClearAllPoints();
-                self.nextButton:SetPoint("LEFT", self, "RIGHT", 0, 0);
-                self.nextButton:SetWidth(skinTable.textures.next.width); self.nextButton:SetHeight(skinTable.textures.next.height);
                 
                 self.prevButton.parentWindow = self:GetParent();
                 self.nextButton.parentWindow = self:GetParent();
                 
 		if(self.curOffset <= 0) then
+                        self.curOffset = 0;
 			self.prevButton:Disable();
 		else
 			self.prevButton:Enable();
@@ -382,13 +425,11 @@ local function createTabGroup()
                 self.tabs[i].childObj = self.attached[i+self.curOffset];
                 self.tabs[i].childName = str;
                 self.tabs[i].text:SetText(str);
-                applySkinToTab(self.tabs[i], skinTable);
+                --applySkinToTab(self.tabs[i], skinTable);
                 if(self.tabs[i].childObj == self.selected.obj) then
-                    self.tabs[i]:SetAlpha(1);
-                    self.tabs[i]:SetTexture(skinTable.textures.tab.PushedTexture);
+                    self.tabs[i]:SetSelected(true);
                 else
-                    self.tabs[i]:SetAlpha(.7);
-                    self.tabs[i]:SetTexture(skinTable.textures.tab.NormalTexture);
+                    self.tabs[i]:SetSelected(false);
                 end
             else
                 self.tabs[i]:Hide();

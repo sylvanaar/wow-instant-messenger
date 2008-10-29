@@ -13,7 +13,10 @@ end
 
 -- ChangeLog Entries.
 addEntry("3.0.4", "10/??/2008", [[
-    
+    *History frame was named incorrectly. 'WIM3_HistoryFrame' is its new name.
+    *Socket only compresses large transmissions to minimize resource usage.
+    *Attempt at stopping minimize crashing.
+    *Attempt at fixing tab and lag issue.
 ]]);
 addEntry("3.0.3", "10/23/2008", [[
     +Added Tab Management module. (Auto grouping of windows.)

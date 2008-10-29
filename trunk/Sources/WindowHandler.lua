@@ -523,29 +523,25 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
 	
 	-- animation segment
 	if(self.animation.mode) then
-                self.animationThrottle = self.animationThrottle and self.animationThrottle + elapsed or 0;
                 local animate = self.animation;
                 if(animate.mode == "HIDE") then
                                 animate.elapsed = animate.elapsed + elapsed;
                                 if(animate.elapsed > animate.time) then
                                                 self:Hide_Normal();
                                 else
-                                                if(self.animationThrottle > .025) then
-                                                		local prct = animate.elapsed/animate.time;
-                                                                local scale = (db.winSize.scale/100)*(1-prct);
-                                                                scale = scale > 0 and scale or .01;
-                                                		self:SetScale(scale);
-                                                		if(animate.to) then
-                                                                        local es = self:GetEffectiveScale();
-                                                                        es = es > 0 and es or .01;
-                                                			local x1, y1, x2, y2 = animate.initLeft*es, animate.initTop*es,
-                                                						animate.to:GetLeft()*animate.to:GetEffectiveScale(), animate.to:GetTop()*animate.to:GetEffectiveScale();
-                                                			local rise, run = ((y2-y1)>=0) and (y2-y1) or 0, ((x2-x1)>=0) and (x2-x1) or 0;
-                                                			self:ClearAllPoints();
-                                                			self:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", (x1+run*prct)/es, (y1+rise*prct)/es);
-                                                		end
-                                                                self.animationThrottle = 0;
-                                		end
+                                                local prct = animate.elapsed/animate.time;
+                                                local scale = (db.winSize.scale/100)*(1-prct);
+                                                scale = scale > 0 and scale or .01;
+                                		self:SetScale(scale);
+                                		if(animate.to and animate.to.GetEffectiveScale) then
+                                                                local to = animate.to;
+                                                                local es, ts = self:GetEffectiveScale(), to:GetEffectiveScale();
+                                                                es, ts = es > 0 and es or .01, ts > 0 and ts or .01;
+                                                                local x1, y1, x2, y2 = animate.initLeft*es, animate.initTop*es, to:GetLeft()*ts, to:GetTop()*ts;
+                                                		local rise, run = ((y2-y1)>=0) and (y2-y1) or 0, ((x2-x1)>=0) and (x2-x1) or 0;
+                                                		self:ClearAllPoints();
+                                                		self:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", (x1+run*prct)/es, (y1+rise*prct)/es);
+                                                end
                                 	end
                                 end
 	end
