@@ -125,7 +125,11 @@ function SendData(ttype, target, cmd, data)
         -- we do not want to send any messages to GM's
         return;
     end
-    msg = string.upper(cmd)..":"..Compress(data);
+    if((string.len(cmd) + string.len(data) + 1) <= 200) then
+        msg = string.upper(cmd)..":"..data;
+    else
+        msg = string.upper(cmd)..":"..Compress(data);
+    end
     --local msg = string.upper(cmd)..":"..data
     local msgCount = math.ceil(string.len(msg)/200);
     if(msgCount == 1) then

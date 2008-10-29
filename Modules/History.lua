@@ -242,7 +242,7 @@ end
 
 
 local function createHistoryViewer()
-    local win = CreateFrame("Frame", "WIM3_FilterFrame", _G.UIParent);
+    local win = CreateFrame("Frame", "WIM3_HistoryFrame", _G.UIParent);
     win:Hide();
     win.filter = {};
     -- set size and position
