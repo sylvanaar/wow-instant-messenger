@@ -230,22 +230,17 @@ end
 
 -- modify and manage tab offsets. pass 1 or -1. will always increment/decriment by 1.
 local function setTabOffset(tabStrip, PlusOrMinus)
-    if(PlusOrMinus > 0) then
-	if(tabStrip.curOffset + tabStrip.visibleCount >= table.getn(tabStrip.attached)) then
-	    tabStrip.curOffset = table.getn(tabStrip.attached) - tabStrip.visibleCount;
-	    if(tabStrip.curOffset < 0) then
-                tabStrip.curOffset = 0;
-            end
-	else
-	    tabStrip.curOffset = tabStrip.curOffset + 1;
-	end
-    elseif(PlusOrMinus < 0) then
-	if(tabStrip.curOffset <= 0) then 
-	    tabStrip.curOffset = 0;
-	else
-	    tabStrip.curOffset = tabStrip.curOffset - 1;
-	end
+    local offset = tabStrip.curOffset + PlusOrMinus;
+    local count = tabStrip.visibleCount;
+    local attached = #tabStrip.attached;
+    if(offset + count > attached) then
+        offset = attached - count;
     end
+    if(offset < 0) then
+        offset = 0;
+    end
+    --dPrint("attached:"..attached..", visible:"..count..", range:"..offset+1 .."-"..offset+count);
+    tabStrip.curOffset = offset;
     tabStrip:UpdateTabs();
 end
 
@@ -351,6 +346,10 @@ local function createTabGroup()
                 tabStrip:JumpToTab(self.childObj);
             end
         end);
+        tab:EnableMouseWheel(true);
+        tab:SetScript("OnMouseWheel", function(self, direction)
+            setTabOffset(self:GetParent(), direction);
+        end);
         tab.isWimTab = true;
         
         table.insert(tabStrip.tabs, tab);
@@ -358,9 +357,9 @@ local function createTabGroup()
     
     -- create prev and next buttons
     tabStrip.prevButton = CreateFrame("Button", stripName.."_Prev", tabStrip);
-    tabStrip.prevButton:SetScript("OnClick", function() setTabOffset(tabStrip, -1); end);
+    tabStrip.prevButton:SetScript("OnClick", function(self) setTabOffset(self:GetParent(), -1); end);
     tabStrip.nextButton = CreateFrame("Button", stripName.."_Next", tabStrip);
-    tabStrip.nextButton:SetScript("OnClick", function() setTabOffset(tabStrip, 1); end);
+    tabStrip.nextButton:SetScript("OnClick", function(self) setTabOffset(self:GetParent(), 1); end);
     
     -- tabStip functions
     tabStrip.UpdateTabs = function(self)
@@ -393,6 +392,7 @@ local function createTabGroup()
             curSize = self:GetWidth();
         end
         local count = math.floor(curSize / minimumWidth);
+        self.visibleCount = count;
         if(count >= #self.attached) then
 		count = #self.attached;
 		self.nextButton:Hide();
@@ -411,35 +411,34 @@ local function createTabGroup()
 			self.prevButton:Enable();
 		end
 		if(self.curOffset >= #self.attached - count) then
-                        self.curOffset = 0;
+                        self.curOffset = #self.attached - count;
 			self.nextButton:Disable();
 		else
 			self.nextButton:Enable();
 		end
 	end
-        self.visibleCount = count;
         for i=1,tabsPerStrip do
+            local tab = self.tabs[i];
             if(i <= count) then
                 local str = self.attached[i+self.curOffset].theUser;
-                self.tabs[i]:Show();
-                self.tabs[i].childObj = self.attached[i+self.curOffset];
-                self.tabs[i].childName = str;
-                self.tabs[i].text:SetText(str);
-                --applySkinToTab(self.tabs[i], skinTable);
-                if(self.tabs[i].childObj == self.selected.obj) then
-                    self.tabs[i]:SetSelected(true);
+                tab:Show();
+                tab.childObj = self.attached[i+self.curOffset];
+                tab.childName = str;
+                tab.text:SetText(str);
+                if(tab.childObj == self.selected.obj) then
+                    tab:SetSelected(true);
                 else
-                    self.tabs[i]:SetSelected(false);
+                    tab:SetSelected(false);
                 end
             else
-                self.tabs[i]:Hide();
-                self.tabs[i].childName = "";
-                self.tabs[i].childObj = nil;
-                self.tabs[i]:SetText("");
+                tab:Hide();
+                tab.childName = "";
+                tab.childObj = nil;
+                tab:SetText("");
             end
             --include logic here to show selected tab or not.
-            self.tabs[i]:SetWidth(curSize/count);
-            self.tabs[i]:SetHeight(curSize/count);
+            tab:SetWidth(curSize/count);
+            tab:SetHeight(curSize/count);
         end
     end
     
