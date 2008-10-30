@@ -11,7 +11,6 @@ local table = table;
 setfenv(1, WIM);
 
 local UnlocalizedStrings = {};
-
 L = {};
 
 -- we never want nil, so if string is undecalred, return the requested key

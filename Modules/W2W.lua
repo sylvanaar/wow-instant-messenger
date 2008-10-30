@@ -269,6 +269,17 @@ function ShowProfileTip(frame, user, point, relativePoint)
     profileTip:Show();
 end
 
+function ShowW2WTip(win, anchor, point)
+    anchor = anchor or win;
+    point = point or "ANCHOR_RIGHT";
+    local location = win.location ~= "" and win.location or L["Unknown"];
+    local tbl = win.w2w;
+    _G.GameTooltip:SetOwner(anchor, point);
+    _G.GameTooltip:AddLine(win.theUser);
+    _G.GameTooltip:AddDoubleLine(L["Location"]..":",  "|cffffffff"..location.."|r");
+    _G.GameTooltip:AddDoubleLine(L["Coordinates"]..":", "|cffffffff".._G.math.floor((tbl.x or 0)*100)..",".._G.math.floor((tbl.y or 0)*100).."|r");
+    _G.GameTooltip:Show();
+end
 
 -- typing
 -- enables typing notification for WIM window's message box.
