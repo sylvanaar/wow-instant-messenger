@@ -261,7 +261,7 @@ RegisterShortcut("location", L["Player Location"], {
             local tbl = self.parentWindow.w2w;
             if(not tbl or not tbl.services) then
                 _G.GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-                _G.GameTooltip:AddLine(self.parentWindow.theUser);
+                _G.GameTooltip:AddLine("|cff"..self.parentWindow.classColor..self.parentWindow.theUser.."|r");
                 _G.GameTooltip:AddDoubleLine(L["Location"]..":", "|cffffffff"..location.."|r");
                 _G.GameTooltip:AddLine("|cff69ccf0"..L["Click to update..."].."|r");
                 _G.GameTooltip:Show(txt);
