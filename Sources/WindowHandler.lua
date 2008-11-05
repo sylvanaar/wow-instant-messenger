@@ -483,46 +483,8 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
 	-- window is visible, there aren't any messages waiting...
 	self.msgWaiting = false;
 	self.unreadCount = 0;
-	-- fading segment
-	if(db.winFade and self ~= DemoWindow) then
-		self.fadeElapsed = (self.fadeElapsed or 0) + elapsed;
-		while(self.fadeElapsed > .1) do
-			local window = GetMouseFocus();
-			if(window) then
-				if(((window == self or window.parentWindow == self  or self.isOnHyperLink or
-						self == helperFrame.attachedTo or
-						(EditBoxInFocus and EditBoxInFocus.parentWindow == self)) or
-						(window.tabStrip and window.tabStrip.selected.obj == self)) and
-						(not self.fadedIn or self.delayFade)) then
-					self.fadedIn = true;
-					self.delayFade = false;
-					self.delayFadeElapsed = 0;
-					UIFrameFadeIn(self, FadeProps.interval, self:GetAlpha(), FadeProps.max);
-				elseif(window ~= self and window.parentWindow ~= self and not self.isOnHyperLink and
-						(not (window.tabStrip and window.tabStrip.selected.obj == self)) and
-						helperFrame.attachedTo ~= self and
-						(not EditBoxInFocus or EditBoxInFocus.parentWindow ~= self) and self.fadedIn) then
-					if(self.delayFade) then
-						self.delayFadeElapsed = (self.delayFadeElapsed or 0) + elapsed;
-						while(self.delayFadeElapsed > FadeProps.delay) do
-							self.delayFade = false;
-							self.delayFadeElapsed = 0;
-						end
-					else
-						self.fadedIn = false;
-						self.delayFadeElapsed = 0;
-						UIFrameFadeOut(self, FadeProps.interval, self:GetAlpha(), FadeProps.min);
-					end
-				end
-			end
-			self.fadeElapsed = 0;
-		end
-	elseif(not self.fadedIn) then
-                setWindowAsFadedIn(self);
-        end
-	
-	-- animation segment
-	if(self.animation.mode) then
+        -- animation segment
+	if(self.animation and self.animation.mode) then
                 local animate = self.animation;
                 if(animate.mode == "HIDE") then
                                 animate.elapsed = animate.elapsed + elapsed;
@@ -544,6 +506,44 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                                                 end
                                 	end
                                 end
+	else
+                -- fading segment
+                if(db.winFade and self ~= DemoWindow) then
+                	self.fadeElapsed = (self.fadeElapsed or 0) + elapsed;
+                	while(self.fadeElapsed > .1) do
+                		local window = GetMouseFocus();
+                		if(window) then
+                			if(((window == self or window.parentWindow == self  or self.isOnHyperLink or
+                					self == helperFrame.attachedTo or
+                					(EditBoxInFocus and EditBoxInFocus.parentWindow == self)) or
+                					(window.tabStrip and window.tabStrip.selected.obj == self)) and
+                					(not self.fadedIn or self.delayFade)) then
+                				self.fadedIn = true;
+                				self.delayFade = false;
+                				self.delayFadeElapsed = 0;
+                				UIFrameFadeIn(self, FadeProps.interval, self:GetAlpha(), FadeProps.max);
+                			elseif(window ~= self and window.parentWindow ~= self and not self.isOnHyperLink and
+                					(not (window.tabStrip and window.tabStrip.selected.obj == self)) and
+                					helperFrame.attachedTo ~= self and
+                					(not EditBoxInFocus or EditBoxInFocus.parentWindow ~= self) and self.fadedIn) then
+                				if(self.delayFade) then
+                					self.delayFadeElapsed = (self.delayFadeElapsed or 0) + elapsed;
+                					while(self.delayFadeElapsed > FadeProps.delay) do
+                						self.delayFade = false;
+                						self.delayFadeElapsed = 0;
+                					end
+                				else
+                					self.fadedIn = false;
+                					self.delayFadeElapsed = 0;
+                					UIFrameFadeOut(self, FadeProps.interval, self:GetAlpha(), FadeProps.min);
+                				end
+                			end
+                		end
+                		self.fadeElapsed = 0;
+                	end
+                elseif(not self.fadedIn) then
+                        setWindowAsFadedIn(self);
+                end
 	end
 end
 
@@ -963,10 +963,10 @@ local function instantiateWindow(obj)
     end
     obj.ResetAnimation = function(self)
 	if(self.animation.mode) then
-		obj:SetClampedToScreen(true);
+		self:SetClampedToScreen(true);
 		self:SetScale(db.winSize.scale/100);
                 self:ClearAllPoints();
-		self:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", self.animation.initLeft, self.animation.initTop);
+		self:SetPoint("TOPLEFT", "UIParent", "BOTTOMLEFT", self.animation.initLeft, self.animation.initTop);
 		dPrint("Animation Reset: "..self:GetName());
 	end
 	for key, _ in pairs(self.animation) do

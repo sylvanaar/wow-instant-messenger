@@ -233,3 +233,13 @@ function WIM.dPrint(t)
         DEFAULT_CHAT_FRAME:AddMessage("|cffff0000[WIM Debug]:|r "..tostring(t));
     end
 end
+
+
+function dumpGlobals()
+    local tmp = {};
+    for var, _ in pairs(_G) do
+        table.insert(tmp, var);
+    end
+    table.sort(tmp);
+    return tmp;
+end
