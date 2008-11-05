@@ -18,6 +18,7 @@ addEntry("3.0.4", "10/??/2008", [[
     *Optimized tabs.
     *Tabs scroll correctly now.
     *Location button on shortcut uses special W2W tooltip if applicable.
+    *History viewer wasn't displaying realms which had punctuation characters in it.
 ]]);
 addEntry("3.0.3", "10/23/2008", [[
     +Added Tab Management module. (Auto grouping of windows.)

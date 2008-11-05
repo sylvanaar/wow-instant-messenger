@@ -889,7 +889,7 @@ local function createHistoryViewer()
         for i=1, #win.CONVOLIST do
             win.CONVOLIST[i] = nil;
         end
-        local realm, character = string.match(win.USER, "^([%w%s]+)/?(.*)$");
+        local realm, character = string.match(win.USER, "^([^/]+)/?(.*)$");
         if(realm and character and history[realm] and history[realm][character]) then
             local tbl = history[realm][character][win.CONVO];
             for i=1, #tbl do
