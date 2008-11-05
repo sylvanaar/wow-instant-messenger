@@ -665,7 +665,7 @@ local function instantiateWindow(obj)
     obj.animation = {};
     
     obj.SetScale_Orig = obj.SetScale;
-    --obj.SetScale = scaleWindow;
+    obj.SetScale = scaleWindow;
     
     obj.widgets = {};
     local widgets = obj.widgets;
@@ -959,8 +959,8 @@ local function instantiateWindow(obj)
 			obj:SetClampedToScreen(false);
 			a.initLeft = self:GetLeft();
 			a.initTop = self:GetTop();
-			a.to = MinimapIcon;
-			a.elapsed, a.time = 0, .5;
+			a.to = MinimapIcon or nil;
+			a.elapsed, a.time = 0, _G.wimAnimateSpeed or .5;
 			a.mode = "HIDE"; -- this starts the animation
 			dPrint("Animation Started: "..self:GetName());
 		end
@@ -969,7 +969,7 @@ local function instantiateWindow(obj)
     obj.ResetAnimation = function(self)
 	if(self.animation.mode) then
 		self:SetClampedToScreen(true);
-		self:SetScale(db.winSize.scale/100);
+		self:SetScale_Orig(db.winSize.scale/100);
                 self:ClearAllPoints();
 		self:SetPoint("TOPLEFT", "UIParent", "BOTTOMLEFT", self.animation.initLeft, self.animation.initTop);
 		dPrint("Animation Reset: "..self:GetName());
