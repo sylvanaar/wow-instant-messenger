@@ -665,7 +665,7 @@ local function instantiateWindow(obj)
     obj.animation = {};
     
     obj.SetScale_Orig = obj.SetScale;
-    obj.SetScale = scaleWindow;
+    --obj.SetScale = scaleWindow;
     
     obj.widgets = {};
     local widgets = obj.widgets;
