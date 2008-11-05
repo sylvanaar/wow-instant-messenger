@@ -634,9 +634,11 @@ function scaleWindow(self, scale)
 	-- scale down window and preserve location
 	local left, top = self:GetLeft()*self:GetEffectiveScale(), self:GetTop()*self:GetEffectiveScale();
 	local setScale = self.SetScale_Orig or self.SetScale;
-	setScale(self, (scale > 0) and scale or 0.00001)
+	setScale(self, (scale > 0) and scale or 0.01)
 	self:ClearAllPoints();
-	self:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", left/self:GetEffectiveScale(), top/self:GetEffectiveScale());
+        local curScale = self:GetEffectiveScale();
+        curScale = (curScale > 0) and curScale or 0.01;
+	self:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", left/curScale, top/curScale);
 end
 
 -- create all of MessageWindow's object children
@@ -761,8 +763,11 @@ local function instantiateWindow(obj)
 		end
 	end
 	icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.class_icon[classTag]));
-        if(constants.classes[self.class] and GetSelectedSkin().message_window.widgets.from.use_class_color) then
-		self.widgets.from:SetTextColor(RGBHexToPercent(constants.classes[self.class].color));
+        if(constants.classes[self.class]) then
+                self.classColor = constants.classes[self.class].color;
+                if(GetSelectedSkin().message_window.widgets.from.use_class_color) then
+                                self.widgets.from:SetTextColor(RGBHexToPercent(constants.classes[self.class].color));
+                end
 	end
     end
     
@@ -1028,6 +1033,7 @@ local function loadWindowDefaults(obj)
 	obj.class = "blank";
 	obj.location = "";
         obj.demoSave = nil;
+        obj.classColor = "ffffff";
     
         obj.isGM = lists.gm[obj.theUser];
     

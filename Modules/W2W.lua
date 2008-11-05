@@ -275,7 +275,7 @@ function ShowW2WTip(win, anchor, point)
     local location = win.location ~= "" and win.location or L["Unknown"];
     local tbl = win.w2w;
     _G.GameTooltip:SetOwner(anchor, point);
-    _G.GameTooltip:AddLine(win.theUser);
+    _G.GameTooltip:AddLine("|cff"..win.classColor..win.theUser.."|r");
     _G.GameTooltip:AddDoubleLine(L["Location"]..":",  "|cffffffff"..location.."|r");
     _G.GameTooltip:AddDoubleLine(L["Coordinates"]..":", "|cffffffff".._G.math.floor((tbl.x or 0)*100)..",".._G.math.floor((tbl.y or 0)*100).."|r");
     _G.GameTooltip:Show();
