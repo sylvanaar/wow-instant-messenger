@@ -59,7 +59,9 @@ local function pushNote(tag, color, num, desc)
                 note.index = #Notifications;
             end
         end
-        icon.flash:Show();
+        if(WIM.MinimapIcon) then
+            WIM.MinimapIcon.flash:Show();
+        end
     end
 end
 
