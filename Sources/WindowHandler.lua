@@ -489,6 +489,7 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                 if(animate.mode == "HIDE") then
                                 animate.elapsed = animate.elapsed + elapsed;
                                 if(animate.elapsed > animate.time) then
+                                                dPrint("Animation time Elapsed -- Hiding Window")
                                                 self:Hide_Normal();
                                 else
                                                 local prct = animate.elapsed/animate.time;
@@ -503,7 +504,7 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                                                                 local x1, y1, x2, y2 = animate.initLeft*es, animate.initTop*es, to:GetLeft()*ts, to:GetTop()*ts;
                                                 		local rise, run = ((y2-y1)>=0) and (y2-y1) or 0, ((x2-x1)>=0) and (x2-x1) or 0;
                                                 		self:ClearAllPoints();
-                                                		self:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", (x1+run*prct)/es, (y1+rise*prct)/es);
+                                                		self:SetPoint("TOPLEFT", "UIParent", "BOTTOMLEFT", (x1+run*prct)/es, (y1+rise*prct)/es);
                                                 end
                                 	end
                                 end
