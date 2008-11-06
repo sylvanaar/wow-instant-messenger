@@ -13,3 +13,4 @@ externals:
     Libs/WhoLib-1.0: svn://svn.wowace.com/wow/wholib/mainline/trunk/WhoLib-1.0
     Libs/Astrolabe: http://svn.esamynn.org/astrolabe/trunk
     Libs/ChatThrottleLib: svn://svn.wowace.com/wow/chatthrottlelib/mainline/trunk
+    Libs/LibBabble-TalentTree-3.0: svn://svn.wowace.com/wow/libbabble-talenttree-3-0/mainline/trunk
