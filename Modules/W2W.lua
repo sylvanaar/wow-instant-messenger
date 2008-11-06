@@ -15,6 +15,7 @@ local W2W = CreateModule("W2W", true);
 db_defaults.w2w = {
     shareTyping = true,
     shareCoordinates = true,
+    shareTalentSpec = true,
 };
 
 local myServices = {};
@@ -42,6 +43,9 @@ local function updateServices(user)
     end
     if(db.w2w.shareCoordinates) then
         table.insert(myServices, "Coordinates");
+    end
+    if(db.w2w.shareTalentSpec) then
+        table.insert(myServices, "Talent Spec");
     end
     
     table.sort(myServices);
@@ -278,6 +282,9 @@ function ShowW2WTip(win, anchor, point)
     _G.GameTooltip:AddLine("|cff"..win.classColor..win.theUser.."|r");
     _G.GameTooltip:AddDoubleLine(L["Location"]..":",  "|cffffffff"..location.."|r");
     _G.GameTooltip:AddDoubleLine(L["Coordinates"]..":", "|cffffffff".._G.math.floor((tbl.x or 0)*100)..",".._G.math.floor((tbl.y or 0)*100).."|r");
+    if(tbl.talentSpec) then
+        _G.GameTooltip:AddDoubleLine(L["Talent Spec"]..":", "|cffffffff"..TalentsToString(tbl.talentSpec, win.class).."|r");
+    end
     _G.GameTooltip:Show();
 end
 
@@ -352,6 +359,9 @@ RegisterAddonMessageHandler("SERVICES", function(from, data)
                 if(string.find(data, "Coordinates")) then
                     SendData("WHISPER", from, "GETLOC", "");
                 end
+                if(string.find(data, "Talent Spec")) then
+                    SendData("WHISPER", from, "GETTALENTSPEC", "");
+                end
                 Windows[from].widgets.w2w:SetActive(true);
             end
         end
@@ -369,6 +379,20 @@ RegisterAddonMessageHandler("GETLOC", function(from, data)
             SendData("WHISPER", from, "LOC", getPositionStr());
         end
     end);
+    
+-- Talent Spec
+RegisterAddonMessageHandler("TALENTSPEC", function(from, data)
+        if(Windows[from]) then
+            local tbl = getW2WTable(Windows[from]);
+            tbl.talentSpec = data;
+        end
+    end);
+RegisterAddonMessageHandler("GETTALENTSPEC", function(from, data)
+        if(W2W.enabled and db.w2w.shareCoordinates) then
+            SendData("WHISPER", from, "TALENTSPEC", GetTalentSpec());
+        end
+    end);
+    
     
 
 function UpdateAllServices()

@@ -77,10 +77,12 @@ local function initialize()
             _G.GuildRoster();
         end
         
+    -- import libraries.
     libs.WhoLib = _G.AceLibrary and _G.AceLibrary('WhoLib-1.0');
     libs.Astrolabe = _G.DongleStub("Astrolabe-0.4");
     libs.Deformat = _G.AceLibrary and _G.AceLibrary("Deformat-2.0");
     libs.SML = _G.LibStub:GetLibrary("LibSharedMedia-3.0");
+    libs.BabbleTalent = _G.LibStub:GetLibrary("LibBabble-TalentTree-3.0");
     
     isInitialized = true;
     
@@ -410,3 +412,56 @@ function CompareVersion(v)
     local this, that = cM+cm+cr, M+m+r;
     return that - this;
 end
+
+local talentOrder = {};
+function TalentsToString(talents, class)
+	--passed talents in format of "#/#/#";
+        -- first check that all required information is passed.
+	local t1, t2, t3 = string.match(talents or "", "(%d+)/(%d+)/(%d+)");
+	if(not t1 or not t2 or not t3 or not class) then
+                return talents;
+        end
+	
+        -- next check if we even have information to show.
+        if(talents == "0/0/0") then return L["None"]; end
+        
+        local classTbl = constants.classes[class];
+	if(not classTbl) then
+                return talents;
+        end
+        
+        -- clear talentOrder
+        for k, _ in pairs(talentOrder) do
+                talentOrder[k] = nil;
+        end
+        
+	--calculate which order the tabs should be in; in relation to spec.
+	table.insert(talentOrder, t1.."1");
+        table.insert(talentOrder, t2.."2");
+        table.insert(talentOrder, t3.."3");
+	table.sort(talentOrder);
+	
+	local fVal, f = string.match(_G.tostring(talentOrder[3]), "^(%d+)(%d)$");
+        local sVal, s = string.match(_G.tostring(talentOrder[2]), "^(%d+)(%d)$");
+        local tVal, t = string.match(_G.tostring(talentOrder[1]), "^(%d+)(%d)$");
+        
+	if(_G.tonumber(fVal)*.75 <= _G.tonumber(sVal)) then
+		if(_G.tonumber(fVal)*.75 <= _G.tonumber(tVal)) then
+			return L["Hybrid"]..": "..talents;
+		else
+			return classTbl.talent[_G.tonumber(f)].."/"..classTbl.talent[_G.tonumber(s)]..": "..talents;
+		end
+	else
+		return classTbl.talent[_G.tonumber(f)]..": "..talents;
+	end
+end
+
+function GetTalentSpec()
+        local talents, tabs = "", _G.GetNumTalentTabs();
+        for i=1, tabs do
+                local name, iconTexture, pointsSpent, background = _G.GetTalentTabInfo(i);
+                talents = i==tabs and talents..pointsSpent or talents..pointsSpent.."/";
+        end
+        return talents ~= "" and talents or "0/0/0";
+end
+

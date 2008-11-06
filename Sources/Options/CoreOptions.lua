@@ -629,6 +629,7 @@ local function W2W_Privacy()
     f.sub.nextOffSetY = -10;
     f.sub:CreateCheckButton(L["Allow others to see me typing."], db.w2w, "shareTyping", nil, function(self, button) UpdateAllServices(); end);
     f.sub:CreateCheckButton(L["Allow others to see my location."], db.w2w, "shareCoordinates", nil, function(self, button) UpdateAllServices(); end);
+    f.sub:CreateCheckButton(L["Allow others to see my talent spec."], db.w2w, "shareTalentSpec", nil, function(self, button) UpdateAllServices(); end);
     f.sub.nextOffSetY = -15;
     return f;
 end

@@ -220,6 +220,7 @@ WIM.AddLocale("enUS", {
     -- W2W.lua --
     ["%s is typing..."] = true,
     ["W2W Profile"] = true,
+    ["Talent Spec"] = true,
     
     -- WhisperEngine.lua --
     ["Whisper Received!"] = true,
@@ -373,6 +374,7 @@ WIM.AddLocale("enUS", {
     ["Play special sound for friends."] = true,
     ["Play special sound for guild members."] = true,
     ["Play sound when a whisper is sent."] = true,
+    ["Allow others to see my talent spec."] = true,
     
     
     -- TabManagement.lua --
