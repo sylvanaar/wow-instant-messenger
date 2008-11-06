@@ -499,7 +499,7 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                                 		self:SetScale_Orig(scale);
                                 		if(animate.to and animate.to.GetEffectiveScale) then
                                                                 local to = animate.to;
-                                                                local es, ts = self:GetEffectiveScale(), to:GetEffectiveScale();
+                                                                local es, ts = 1,1--self:GetEffectiveScale(), to:GetEffectiveScale();
                                                                 es, ts = es > 0 and es or .01, ts > 0 and ts or .01;
                                                                 local x1, y1, x2, y2 = animate.initLeft*es, animate.initTop*es, to:GetLeft()*ts, to:GetTop()*ts;
                                                 		local rise, run = ((y2-y1)>=0) and (y2-y1) or 0, ((x2-x1)>=0) and (x2-x1) or 0;
