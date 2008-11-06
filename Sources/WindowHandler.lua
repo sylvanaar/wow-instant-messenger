@@ -496,8 +496,8 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                                                 local scale = (db.winSize.scale/100)*(1-prct);
                                                 dPrint("Animation Prct:"..prct.."  Scale:"..scale);
                                                 scale = scale > 0 and scale or .01;
-                                		self:SetScale(scale);
-                                		if(1==2 and animate.to and animate.to.GetEffectiveScale) then
+                                		--self:SetScale(scale);
+                                		if(animate.to and animate.to.GetEffectiveScale) then
                                                                 local to = animate.to;
                                                                 local es, ts = self:GetEffectiveScale(), to:GetEffectiveScale();
                                                                 es, ts = es > 0 and es or .01, ts > 0 and ts or .01;
