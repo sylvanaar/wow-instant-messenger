@@ -20,6 +20,8 @@ addEntry("3.0.4", "10/??/2008", [[
     *Location button on shortcut uses special W2W tooltip if applicable.
     *History viewer wasn't displaying realms which had punctuation characters in it.
     *Fixed bug where alerts where referencing minimap icon even though it hasn't been loaded.
+    +WIM now comes packaged with LibBabble-TalentTree-3.0 and further defines class information.
+    +Added W2W Talent Spec sharing.
 ]]);
 addEntry("3.0.3", "10/23/2008", [[
     +Added Tab Management module. (Auto grouping of windows.)

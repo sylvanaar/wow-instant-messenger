@@ -10,6 +10,12 @@ local pairs = pairs;
 -- set namespace
 setfenv(1, WIM);
 
+local talent = L;
+if(libs.BabbleTalent) then -- need to do this check to prevent error if lib not loaded.
+     talent = libs.BabbleTalent:GetLookupTable();
+     L["Hybrid"] = talent["Hybrid"]; -- preserve hybrid localization.
+end
+
 constants.classes = {};
 local classes = constants.classes;
 
@@ -21,47 +27,58 @@ local classList = {
 --Male Classes - this doesn't apply to every locale
 classes[L["Druid"]]	= {
                                     color = "ff7d0a",
-                                    tag = "DRUID"
+                                    tag = "DRUID",
+                                    talent = {talent["Balance"], talent["Feral Combat"], talent["Restoration"]}
                                 };
 classes[L["Hunter"]]	= {
                                     color = "abd473",
-                                    tag = "HUNTER"
+                                    tag = "HUNTER",
+                                    talent = {talent["Beast Mastery"], talent["Marksmanship"], talent["Survival"]}
                                 };
 classes[L["Mage"]]	= {
                                     color = "69ccf0",
-                                    tag = "MAGE"
+                                    tag = "MAGE",
+                                    talent = {talent["Arcane"], talent["Fire"], talent["Frost"]}
                                 };
 classes[L["Paladin"]]	= {
                                     color = "f58cba",
-                                    tag = "PALADIN"
+                                    tag = "PALADIN",
+                                    talent = {talent["Holy"], talent["Protection"], talent["Retribution"]}
                                 };
 classes[L["Priest"]]	= {
                                     color = "ffffff",
-                                    tag = "PRIEST"
+                                    tag = "PRIEST",
+                                    talent = {talent["Discipline"], talent["Holy"], talent["Shadow"]}
                                 };
 classes[L["Rogue"]]	= {
                                     color = "fff569",
-                                    tag = "ROGUE"
+                                    tag = "ROGUE",
+                                    talent = {talent["Assassination"], talent["Combat"], talent["Subtlety"]}
                                 };
 classes[L["Shaman"]]	= {
                                     color = "2459FF",
-                                    tag = "SHAMAN"
+                                    tag = "SHAMAN",
+                                    talent = {talent["Elemental"], talent["Enhancement"], talent["Restoration"]}
                                 };
 classes[L["Warlock"]]	= {
                                     color = "9482ca",
-                                    tag = "WARLOCK"
+                                    tag = "WARLOCK",
+                                    talent = {talent["Affliction"], talent["Demonology"], talent["Destruction"]}
                                 };
 classes[L["Warrior"]]	= {
                                     color = "c79c6e",
-                                    tag = "WARRIOR"
+                                    tag = "WARRIOR",
+                                    talent = {talent["Arms"], talent["Fury"], talent["Protection"]}
                                 };
 classes[L["Death Knight"]]	= {
                                     color = "c41f3b",
-                                    tag = "DEATHKNIGHT"
+                                    tag = "DEATHKNIGHT",
+                                    talent = {talent["Blood"], talent["Frost"], talent["Unholy"]}
                                 };
 classes[L["Game Master"]]	= {
                                     color = "00c0ff",
-                                    tag = "GM"
+                                    tag = "GM",
+                                    talent = {"", "", ""} -- talent place holder
                                 };
 
 -- propigate female class types and update tags appropriately
