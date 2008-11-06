@@ -493,6 +493,7 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                                 else
                                                 local prct = animate.elapsed/animate.time;
                                                 local scale = (db.winSize.scale/100)*(1-prct);
+                                                dPrint("Animation Prct:"..prct.."  Scale:"..scale);
                                                 scale = scale > 0 and scale or .01;
                                 		self:SetScale(scale);
                                 		if(animate.to and animate.to.GetEffectiveScale) then
