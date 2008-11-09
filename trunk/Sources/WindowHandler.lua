@@ -495,7 +495,7 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                                                 local prct = animate.elapsed/animate.time;
                                                 local scale = (db.winSize.scale/100)*(1-prct);
                                                 dPrint("Animation Prct:"..prct.."  Scale:"..scale);
-                                                scale = scale > .25 and scale or .25;
+                                                scale = scale > animate.scaleLimit and scale or animate.scaleLimit;
                                 		self:SetScale(scale);
                                 		if(animate.to and animate.to.GetEffectiveScale) then
                                                                 local to = animate.to;
@@ -957,12 +957,16 @@ local function instantiateWindow(obj)
 			self:Hide_Normal();
 			self:ResetAnimation();
 		else
+                        self.widgets.chat_display:SetParent("UIParent");
+                        self.widgets.chat_display:Hide();
 			local a = self.animation;
 			obj:SetClampedToScreen(false);
 			a.initLeft = self:GetLeft();
 			a.initTop = self:GetTop();
 			a.to = MinimapIcon or nil;
 			a.elapsed, a.time = 0, _G.wimAnimateSpeed or .5;
+                        a.scaleLimit = .001 --_G.math.max(_G.math.ceil((100-_G.UIParent:GetScale()*100)/2)/100 + .04, .01);
+                        dPrint(a.scaleLimit)
 			a.mode = "HIDE"; -- this starts the animation
 			dPrint("Animation Started: "..self:GetName());
 		end
@@ -974,6 +978,8 @@ local function instantiateWindow(obj)
 		self:SetScale_Orig(db.winSize.scale/100);
                 self:ClearAllPoints();
 		self:SetPoint("TOPLEFT", "UIParent", "BOTTOMLEFT", self.animation.initLeft, self.animation.initTop);
+                self.widgets.chat_display:Show();
+                self.widgets.chat_display:SetParent(self);
 		dPrint("Animation Reset: "..self:GetName());
 	end
 	for key, _ in pairs(self.animation) do

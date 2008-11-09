@@ -45,7 +45,7 @@ local function createOptionsFrame()
 
     -- set basic frame properties
     win:SetClampedToScreen(true);
-    win:SetFrameStrata("DIALOG");
+    win:SetFrameStrata("MEDIUM");
     win:SetMovable(true);
     win:SetToplevel(true);
     win:EnableMouse(true);
@@ -119,7 +119,7 @@ local function createOptionsFrame()
     win.disableFrame:SetAllPoints();
     win.disableFrame:EnableMouse(true);
     win.disableFrame:Hide();
-    win.disableFrame:SetFrameStrata("DIALOG");
+    win.disableFrame:SetFrameStrata("MEDIUM");
 
     -- allow this window to close when escape is pressed.
     table.insert(_G.UISpecialFrames,win:GetName());
