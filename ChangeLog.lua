@@ -22,6 +22,7 @@ addEntry("3.0.4", "10/??/2008", [[
     *Fixed bug where alerts where referencing minimap icon even though it hasn't been loaded.
     +WIM now comes packaged with LibBabble-TalentTree-3.0 and further defines class information.
     +Added W2W Talent Spec sharing.
+    *Lowered options frame strata from DIALOG to MEDIUM.
 ]]);
 addEntry("3.0.3", "10/23/2008", [[
     +Added Tab Management module. (Auto grouping of windows.)
