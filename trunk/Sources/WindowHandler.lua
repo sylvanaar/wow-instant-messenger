@@ -489,12 +489,10 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                 if(animate.mode == "HIDE") then
                                 animate.elapsed = animate.elapsed + elapsed;
                                 if(animate.elapsed > animate.time) then
-                                                dPrint("Animation time Elapsed -- Hiding Window")
                                                 self:Hide_Normal();
                                 else
                                                 local prct = animate.elapsed/animate.time;
                                                 local scale = (db.winSize.scale/100)*(1-prct);
-                                                dPrint("Animation Prct:"..prct.."  Scale:"..scale);
                                                 scale = scale > animate.scaleLimit and scale or animate.scaleLimit;
                                 		self:SetScale(scale);
                                 		if(animate.to and animate.to.GetEffectiveScale) then
@@ -964,7 +962,7 @@ local function instantiateWindow(obj)
 			a.initLeft = self:GetLeft();
 			a.initTop = self:GetTop();
 			a.to = MinimapIcon or nil;
-			a.elapsed, a.time = 0, _G.wimAnimateSpeed or .5;
+			a.elapsed, a.time = 0, .5;
                         a.scaleLimit = .001 --_G.math.max(_G.math.ceil((100-_G.UIParent:GetScale()*100)/2)/100 + .04, .01);
                         dPrint(a.scaleLimit)
 			a.mode = "HIDE"; -- this starts the animation

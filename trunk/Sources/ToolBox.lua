@@ -225,6 +225,51 @@ function WIM.getGradientFromColor(...)
     return r1, g1, b1, r2, g2, b2;
 end
 
+
+--------------------------------------
+--         String Functions         --
+--------------------------------------
+function WIM.paddString(str, paddingChar, minLength, paddRight)
+    str = tostring(str or "");
+    paddingChar = tostring(paddingChar or " ");
+    minLength = tonumber(minLength or 0);
+    while(string.len(str) < minLength) do
+        if(paddRight) then
+            str = str..paddingChar;
+        else
+            str = paddingChar..str;
+        end
+    end
+    return str;
+end
+
+function WIM.gSplit(splitBy, str)
+    local index, splitBy, str = 0, splitBy, str;
+    return function()
+        index = index + 1;
+        return select(index, string.split(splitBy, str));
+    end
+end
+
+function WIM.SplitToTable(str, inSplitPattern, outResults )
+  if not outResults then
+    return;
+  end
+  local theStart = 1
+  local theSplitStart, theSplitEnd = string.find( str, inSplitPattern, theStart )
+  while theSplitStart do
+    table.insert( outResults, string.sub( str, theStart, theSplitStart-1 ) )
+    theStart = theSplitEnd + 1
+    theSplitStart, theSplitEnd = string.find( str, inSplitPattern, theStart )
+  end
+  table.insert( outResults, string.sub( str, theStart ) )
+  --if(#outResults > 0) then
+  --  table.remove(outResults, 1);
+  --end
+end
+
+
+
 --------------------------------------
 --      Debugging Functions         --
 --------------------------------------
