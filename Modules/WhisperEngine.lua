@@ -191,6 +191,43 @@ function WhisperEngine:OnWindowShow(win)
     updateMinimapAlerts();
 end
 
+local splitMessage, splitMessageLinks = {}, {};
+local function SendSplitMessage(theMsg, to)
+        -- parse out links as to not split them incorrectly.
+        theMsg, results = string.gsub(theMsg, "(|H[^|]+|h[^|]+|h)", function(theLink)
+                table.insert(splitMessageLinks, theLink);
+                return "\001\002"..paddString(#splitMessageLinks, "0", string.len(theLink)-4).."\003\004";
+        end);
+        
+        -- split up each word.
+        SplitToTable(theMsg, "%s", splitMessage);
+        
+        --reconstruct message into chunks of no more than 255 characters.
+        local chunk = "";
+        for i=1, #splitMessage + 1 do
+                if(splitMessage[i] and string.len(chunk) + string.len(splitMessage[i]) <= 254) then
+                        chunk = chunk..splitMessage[i].." ";
+                else
+                        -- reinsert links of necessary
+                        chunk = string.gsub(chunk, "\001\002%d+\003\004", function(link)
+                                local index = _G.tonumber(string.match(link, "(%d+)"));
+                                return splitMessageLinks[index] or link;
+                        end);
+                        _G.ChatThrottleLib:SendChatMessage("NORMAL", "WIM", chunk, "WHISPER", nil, to);
+                        chunk = splitMessage[i];
+                end
+        end
+        
+        -- clean up
+        for k, _ in pairs(splitMessage) do
+                splitMessage[k] = nil;
+        end
+        for k, _ in pairs(splitMessageLinks) do
+                splitMessageLinks[k] = nil;
+        end
+end
+
+
 RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
         local obj = self:GetParent();
         local msg = self:GetText();
@@ -200,10 +237,7 @@ RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
             _G.ChatThrottleLib:SendChatMessage("NORMAL", "WIM", msg, "WHISPER", nil, obj.theUser);
         elseif(msgCount > 1) then
             Windows[obj.theUser].msgSent = true;
-            for i=1, msgCount do
-                local chunk = string.sub(msg, ((i-1)*255+1), (((i-1)*255)+255));
-                _G.ChatThrottleLib:SendChatMessage("NORMAL", "WIM", chunk, "WHISPER", nil, obj.theUser);
-            end
+            SendSplitMessage(msg, obj.theUser);
         end
         self:SetText("");
     end);
@@ -426,7 +460,7 @@ function WhisperEngine:CHAT_MSG_AFK(...)
     if(win) then
         win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_AFK", ...);
         win:Pop("out");
-        _G.ChatEdit_SetLastToldTarget(select(2, ...));
+        _G.ChatEdit_SetLastTellTarget(select(2, ...));
         win.online = true;
     end
 end
@@ -437,7 +471,7 @@ function WhisperEngine:CHAT_MSG_DND(...)
     if(win) then
         win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_AFK", ...);
         win:Pop("out");
-        _G.ChatEdit_SetLastToldTarget(select(2, ...));
+        _G.ChatEdit_SetLastTellTarget(select(2, ...));
         win.online = true;
     end
 end

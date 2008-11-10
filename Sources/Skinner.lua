@@ -372,8 +372,8 @@ function ApplySkinToWidget(obj)
     else
         dPrint("Invalid widget trying to be skinned.");
     end
-    if(obj.SkinSet) then
-        obj:SkinSet();
+    if(obj.UpdateSkin) then
+        obj:UpdateSkin();
     end
 end
 
