@@ -124,9 +124,9 @@ local function processFilter(eventItem, filter)
     	    {
     		queue = libs.WhoLib.WHOLIB_QUEUE_QUIET, 
     		timeout = 0,
-    		flags = libs.WhoLib.WHOLIB_FLAG_ALLWAYS_CALLBACK,
+    		flags = libs.WhoLib.WHOLIB_FLAG_ALWAYS_CALLBACK,
     		callback = function(result)
-                        if(result.Online and result.Name == name) then
+                        if(result and result.Online and result.Name == name) then
                             userCache[name] = result.Level;
                             if(result.Level < filter.level) then
                                 if(filter.action == 1) then

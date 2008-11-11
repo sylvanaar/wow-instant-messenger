@@ -476,10 +476,14 @@ function WhisperEngine:CHAT_MSG_DND(...)
     end
 end
 
+local ERR_CHAT_PLAYER_NOT_FOUND_S = string.gsub(_G.ERR_CHAT_PLAYER_NOT_FOUND_S, "%%s", "(.+)");
+local CHAT_IGNORED = string.gsub(_G.CHAT_IGNORED, "%%s", "(.+)");
+local ERR_FRIEND_ONLINE_SS = string.gsub(_G.ERR_FRIEND_ONLINE_SS, "%%s", "(.+)");
+local ERR_FRIEND_OFFLINE_S = string.gsub(_G.ERR_FRIEND_OFFLINE_S, "%%s", "(.+)");
 function WhisperEngine:CHAT_MSG_SYSTEM(msg)
     local user;
     -- detect player not online
-    user = FormatUserName(libs.Deformat(msg, _G.ERR_CHAT_PLAYER_NOT_FOUND_S));
+    user = FormatUserName(string.match(msg, ERR_CHAT_PLAYER_NOT_FOUND_S));
     if(Windows[user]) then
         if(Windows[user].online or Windows[user].msgSent) then
             Windows[user]:AddMessage(msg, db.displayColors.errorMsg.r, db.displayColors.errorMsg.g, db.displayColors.errorMsg.b);
@@ -490,7 +494,7 @@ function WhisperEngine:CHAT_MSG_SYSTEM(msg)
     end
     
     -- detect player has you ignored
-    user = FormatUserName(libs.Deformat(msg, _G.CHAT_IGNORED));
+    user = FormatUserName(string.match(msg, CHAT_IGNORED));
     if(Windows[user]) then
         if(Windows[user].online) then
             Windows[user]:AddMessage(msg, db.displayColors.errorMsg.r, db.displayColors.errorMsg.g, db.displayColors.errorMsg.b);
@@ -500,7 +504,7 @@ function WhisperEngine:CHAT_MSG_SYSTEM(msg)
     end
     
     -- detect player has come online
-    user = FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_ONLINE_SS));
+    user = FormatUserName(string.match(msg, ERR_FRIEND_ONLINE_SS));
     if(Windows[user]) then
         Windows[user]:AddMessage(msg, db.displayColors.sysMsg.r, db.displayColors.sysMsg.g, db.displayColors.sysMsg.b);
         Windows[user].online = true;
@@ -508,7 +512,7 @@ function WhisperEngine:CHAT_MSG_SYSTEM(msg)
     end
     
         -- detect player has gone offline
-    user = FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_OFFLINE_S));
+    user = FormatUserName(string.match(msg, ERR_FRIEND_OFFLINE_S));
     if(Windows[user]) then
         Windows[user]:AddMessage(msg, db.displayColors.sysMsg.r, db.displayColors.sysMsg.g, db.displayColors.sysMsg.b);
         Windows[user].online = false;
@@ -608,8 +612,8 @@ local function CF_MessageEventHandler(self, event, ...)
         local msg, win = select(1, ...);
         local curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
         -- handle no user online and chat ignored from being shown in default chat frame.
-        win = Windows[FormatUserName(libs.Deformat(msg, _G.ERR_CHAT_PLAYER_NOT_FOUND_S)) or "NIL"];
-        win = win or Windows[FormatUserName(libs.Deformat(msg, _G.CHAT_IGNORED)) or "NIL"];
+        win = Windows[FormatUserName(string.match(msg, ERR_CHAT_PLAYER_NOT_FOUND_S)) or "NIL"];
+        win = win or Windows[FormatUserName(string.match(msg, CHAT_IGNORED)) or "NIL"];
         if(win and win.type == "whisper") then
             if(win:IsShown() and db.pop_rules.whisper[curState].supress) then
                 return;
@@ -618,8 +622,8 @@ local function CF_MessageEventHandler(self, event, ...)
             end
         end
         -- user comes/goes online/offline.
-        win = Windows[FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_ONLINE_SS)) or "NIL"];
-        win = win or Windows[FormatUserName(libs.Deformat(msg, _G.ERR_FRIEND_OFFLINE_S)) or "NIL"];
+        win = Windows[FormatUserName(string.match(msg, ERR_FRIEND_ONLINE_SS)) or "NIL"];
+        win = win or Windows[FormatUserName(string.match(msg, ERR_FRIEND_OFFLINE_S)) or "NIL"];
         if(win and win:IsShown() and db.pop_rules.whisper[curState].supress) then
             return;
         end
