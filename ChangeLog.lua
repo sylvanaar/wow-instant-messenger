@@ -12,7 +12,7 @@ end
 
 
 -- ChangeLog Entries.
-addEntry("3.0.4", "10/??/2008", [[
+addEntry("3.0.4", "11/??/2008", [[
     *History frame was named incorrectly. 'WIM3_HistoryFrame' is its new name.
     *Socket only compresses large transmissions to minimize resource usage.
     *Optimized tabs.
@@ -27,6 +27,8 @@ addEntry("3.0.4", "10/??/2008", [[
     +WIM's widget API now calls UpdateSkin method of widget if available upon skin loading.
     *Long messages are now split correclty without breaking links.
     *LastTellTarget is not set correctly when receiving AFK & DND responses.
+    +WIM now uses LibWho-2.0. WhoLib-1.0 is not considered depricated.
+    -Removed dependencies(libs) of all Ace2 addons including Deformat.
 ]]);
 addEntry("3.0.3", "10/23/2008", [[
     +Added Tab Management module. (Auto grouping of windows.)

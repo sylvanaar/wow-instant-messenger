@@ -90,7 +90,7 @@ local function createWidget_W2W()
     button.SetDefaults = function(self)
             self:SetActive(false);
         end
-    button.SkinSet = function(self)
+    button.UpdateSkin = function(self)
             self.flash.bg:SetTexture(GetSelectedSkin().message_window.widgets.w2w.HighlightTexture);
         end
     button:SetScript("OnEnter", function(self)
@@ -292,10 +292,10 @@ end
 -- enables typing notification for WIM window's message box.
 RegisterWidgetTrigger("msg_box", "whisper", "OnTextChanged", function(self)
         if(W2W.enabled and db.w2w.shareTyping and string.sub(self:GetText(),1,1) ~= "/") then
-            if(string.trim(self:GetText()) == "") then
+            if(string.trim(self:GetText()) == "" and getW2WTable(self.parentWindow).lastKeyPress ~= 0) then
                 getW2WTable(self.parentWindow).lastKeyPress = 0;
                 SendData("WHISPER", self.parentWindow.theUser, "TYPING", 0);
-            else
+            elseif(string.trim(self:GetText()) ~= "") then
                 if(time() - getW2WTable(self.parentWindow).lastKeyPress > 2) then
                     SendData("WHISPER", self.parentWindow.theUser, "TYPING", 1);
                     getW2WTable(self.parentWindow).lastKeyPress = time();

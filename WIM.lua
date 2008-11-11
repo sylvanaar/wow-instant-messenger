@@ -78,9 +78,8 @@ local function initialize()
         end
         
     -- import libraries.
-    libs.WhoLib = _G.AceLibrary and _G.AceLibrary('WhoLib-1.0');
+    libs.WhoLib = _G.LibStub:GetLibrary("LibWho-2.0");
     libs.Astrolabe = _G.DongleStub("Astrolabe-0.4");
-    libs.Deformat = _G.AceLibrary and _G.AceLibrary("Deformat-2.0");
     libs.SML = _G.LibStub:GetLibrary("LibSharedMedia-3.0");
     libs.BabbleTalent = _G.LibStub:GetLibrary("LibBabble-TalentTree-3.0");
     

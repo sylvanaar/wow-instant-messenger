@@ -776,7 +776,7 @@ local function instantiateWindow(obj)
     end
     
     obj.WhoCallback = function(result)
-	if( result.Online and result.Name == obj.theUser) then
+	if(result and result.Online and result.Name == obj.theUser) then
 		obj.class = result.Class;
 		obj.level = result.Level;
 		obj.race = result.Race;
@@ -807,8 +807,8 @@ local function instantiateWindow(obj)
         		whoLib:UserInfo(self.theUser, 
         			{
         				queue = whoLib.WHOLIB_QUEUE_QUIET, 
-        				timeout = 0,
-        				flags = whoLib.WHOLIB_FLAG_ALLWAYS_CALLBACK,
+        				timeout = 5,
+        				flags = whoLib.WHOLIB_FLAG_ALWAYS_CALLBACK,
         				callback = self.WhoCallback
         			});
         	else
