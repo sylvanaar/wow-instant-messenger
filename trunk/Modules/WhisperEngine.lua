@@ -295,19 +295,19 @@ local function popEvents()
     while(#WhisperQueue > 0 and i <= #WhisperQueue) do
         --WIM:dPrint("Processing "..i.." of "..table.getn(WhisperQueue));
         local eventItem = WhisperQueue[i];
+        local args = eventItem.arg;
         if(not eventItem.flags.suspend) then
             if(not eventItem.flags.block) then
                 if(not eventItem.flags.ignore) then
                     if(eventItem.event == "CHAT_MSG_WHISPER") then
-                        CHAT_MSG_WHISPER(unpack(eventItem.arg, 1, eventItem.argCount));
+                        CHAT_MSG_WHISPER(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15]);
                     else
-                        CHAT_MSG_WHISPER_INFORM(unpack(eventItem.arg, 1, eventItem.argCount));
+                        CHAT_MSG_WHISPER_INFORM(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15]);
                     end
                 end
                 if(not eventItem.flags.supress) then
-                        local j;
                         for j=1, #eventItem.ChatFrames do
-                                CF_MessageEventHandler_orig(eventItem.ChatFrames[j], eventItem.event, unpack(eventItem.arg, 1, eventItem.argCount));
+                                CF_MessageEventHandler_orig(eventItem.ChatFrames[j], eventItem.event, args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15]);
                         end
                 end
             end
@@ -395,7 +395,8 @@ local function pushEvent(event, ...)
     local argCount = select("#", ...);
     eventItem.argCount = argCount;
     for i=1, argCount do
-        table.insert(eventItem.arg, select(i, ...) or nil);
+        --table.insert(eventItem.arg, select(i, ...) or nil);
+        eventItem.arg[i] = select(i, ...);
     end
     addToTableUnique(WhisperQueue, eventItem);
     -- notify all modules.
