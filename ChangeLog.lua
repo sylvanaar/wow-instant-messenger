@@ -12,7 +12,7 @@ end
 
 
 -- ChangeLog Entries.
-addEntry("3.0.4", "11/??/2008", [[
+addEntry("3.0.4", "11/12/2008", [[
     *History frame was named incorrectly. 'WIM3_HistoryFrame' is its new name.
     *Socket only compresses large transmissions to minimize resource usage.
     *Optimized tabs.

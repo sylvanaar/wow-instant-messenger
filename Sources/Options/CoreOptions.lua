@@ -19,7 +19,7 @@ db_defaults.stats = {
 
 local credits = {
     "|cff69ccf0"..L["Created by:"].."|r Pazza <Bronzebeard>",
-    "|cff69ccf0"..L["Special Thanks:"].."|r Stewarta, Zeke <Coilfang>,\n     Morphieus <Spinebreaker>, Nachonut <Bronzebeard>",
+    "|cff69ccf0"..L["Special Thanks:"].."|r Stewarta <Emerald Dream - EU>, Zeke <Coilfang>,\n     Morphieus <Spinebreaker>, Nachonut <Bronzebeard>,\n     Chiaki <Frostwolf - EU>",
 };
 
 local states = {"arena", "combat", "pvp", "raid", "party", "resting", "other"};
