@@ -804,13 +804,16 @@ local function instantiateWindow(obj)
         else
         	local whoLib = libs.WhoLib;
         	if(whoLib) then
-        		whoLib:UserInfo(self.theUser, 
+        		local result = whoLib:UserInfo(self.theUser, 
         			{
         				queue = whoLib.WHOLIB_QUEUE_QUIET, 
-        				timeout = 5,
-        				flags = whoLib.WHOLIB_FLAG_ALWAYS_CALLBACK,
+        				timeout = 0,
+        				--flags = whoLib.WHOLIB_FLAG_ALWAYS_CALLBACK,
         				callback = self.WhoCallback
         			});
+                         if(result) then
+                                self.WhoCallback(result);
+                         end
         	else
         		dPrint("WhoLib-1.0 not loaded... Skipping who lookup!");
         	end
@@ -844,9 +847,11 @@ local function instantiateWindow(obj)
 		if(forceResult == true) then
 			setWindowAsFadedIn(self);
 			if(self.tabStrip) then
-				self.tabStrip:JumpToTab(self);
-                                if(rules.autofocus or forceFocus) then
-                                        self.widgets.msg_box:SetFocus();
+                                if(not EditBoxInFocus) then
+                                                self.tabStrip:JumpToTab(self);
+                                                if(not _G.ChatFrameEditBox:wimIsVisible() and (rules.autofocus or forceFocus)) then
+                                                        self.widgets.msg_box:SetFocus();
+                                                end
                                 end
 			else
 				self:ResetAnimation();
