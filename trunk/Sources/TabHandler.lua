@@ -515,7 +515,7 @@ local function createTabGroup()
             addToTableUnique(self.attached, win);
             win.tabStrip = self;
             if(#self.attached == 1 or win:IsVisible()) then
-                self:JumpToTab(win);
+                --self:JumpToTab(win);
                 win:UpdateProps();
             else
                 win:Hide();

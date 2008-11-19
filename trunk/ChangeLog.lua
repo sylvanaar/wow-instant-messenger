@@ -12,6 +12,11 @@ end
 
 
 -- ChangeLog Entries.
+addEntry("3.0.5", "11/??/2008", [[
+    *Fixed: Who lookups wouldn't update if already cached.
+    *Fixed: Default Spamfilter wasn't working as intended.
+    *Loading of skins also updates character info as well.
+]]);
 addEntry("3.0.4", "11/12/2008", [[
     *History frame was named incorrectly. 'WIM3_HistoryFrame' is its new name.
     *Socket only compresses large transmissions to minimize resource usage.
@@ -27,7 +32,7 @@ addEntry("3.0.4", "11/12/2008", [[
     +WIM's widget API now calls UpdateSkin method of widget if available upon skin loading.
     *Long messages are now split correclty without breaking links.
     *LastTellTarget is not set correctly when receiving AFK & DND responses.
-    +WIM now uses LibWho-2.0. WhoLib-1.0 is not considered depricated.
+    +WIM now uses LibWho-2.0. WhoLib-1.0 is now considered depricated.
     -Removed dependencies(libs) of all Ace2 addons including Deformat.
 ]]);
 addEntry("3.0.3", "10/23/2008", [[

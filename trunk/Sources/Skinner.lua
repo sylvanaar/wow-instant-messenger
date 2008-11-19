@@ -204,6 +204,7 @@ function ApplySkinToWindow(obj)
 
     obj:UpdateProps();
     obj:UpdateIcon();
+    obj:UpdateCharDetails();
 end
 
 local function deleteStyleFileEntries(theTable)

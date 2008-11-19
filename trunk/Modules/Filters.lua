@@ -93,6 +93,32 @@ local Filters = CreateModule("Filters", true);
 
 local userCache = {};
 
+local function whoCallback(result, eventItem, filter)
+    if(result and result.Online and result.Name == name) then
+        userCache[name] = result.Level;
+        if(result.Level < filter.level) then
+            if(filter.action == 1) then
+                eventItem.suspendedByFilter = false;
+                eventItem:Release();
+            elseif(filter.action == 2) then
+                eventItem.suspendedByFilter = false;
+                eventItem:Ignore();
+                eventItem:Release();
+            elseif(filter.action == 3) then
+                eventItem.suspendedByFilter = false;
+                eventItem:Block();
+                eventItem:Release();
+            else
+                Filters:OnEvent_Whisper(eventItem, eventItem.continueFrom);
+            end
+        else
+            Filters:OnEvent_Whisper(eventItem, eventItem.continueFrom);
+        end
+    else
+        Filters:OnEvent_Whisper(eventItem, eventItem.continueFrom);
+    end
+end
+
 local function processFilter(eventItem, filter)
     local message, name = unpack(eventItem.arg)
     if(filter.type == 1) then
@@ -120,37 +146,18 @@ local function processFilter(eventItem, filter)
         if(not windows.active.whisper[name] and not userCache[user]) then
             eventItem.suspendedByFilter = true;
             eventItem:Suspend();
-            libs.WhoLib:UserInfo(name, 
+            local result = libs.WhoLib:UserInfo(name, 
     	    {
     		queue = libs.WhoLib.WHOLIB_QUEUE_QUIET, 
     		timeout = 0,
-    		flags = libs.WhoLib.WHOLIB_FLAG_ALWAYS_CALLBACK,
+    		--flags = libs.WhoLib.WHOLIB_FLAG_ALWAYS_CALLBACK,
     		callback = function(result)
-                        if(result and result.Online and result.Name == name) then
-                            userCache[name] = result.Level;
-                            if(result.Level < filter.level) then
-                                if(filter.action == 1) then
-                                    eventItem.suspendedByFilter = false;
-                                    eventItem:Release();
-                                elseif(filter.action == 2) then
-                                    eventItem.suspendedByFilter = false;
-                                    eventItem:Ignore();
-                                    eventItem:Release();
-                                elseif(filter.action == 3) then
-                                    eventItem.suspendedByFilter = false;
-                                    eventItem:Block();
-                                    eventItem:Release();
-                                else
-                                    Filters:OnEvent_Whisper(eventItem, eventItem.continueFrom);
-                                end
-                            else
-                                Filters:OnEvent_Whisper(eventItem, eventItem.continueFrom);
-                            end
-                        else
-                            Filters:OnEvent_Whisper(eventItem, eventItem.continueFrom);
-                        end
-                    end
+                    whoCallback(result, eventItem, filter);
+                end
     	    });
+            if(result) then
+                whoCallback(result, eventItem, filter);
+            end
             return 0;
         elseif(windows.active.whisper[name]) then
             return;
