@@ -57,11 +57,16 @@ local function decodeColors(theMsg)
     return theMsg;
 end
 
-local function filterEmoticons(theMsg)
+local function filterEmoticons(theMsg, smf)
 
     --saftey check...
     if(not theMsg or theMsg == "") then
         return "";
+    end
+    
+    --check if special formatting is not wanted
+    if(smf.noEscapedStrings) then
+        return theMsg;
     end
 
     --accomodate WoW's built in symbols and inherrit WoW's options whether to display them or not.
