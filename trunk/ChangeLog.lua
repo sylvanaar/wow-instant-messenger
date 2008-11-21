@@ -16,6 +16,9 @@ addEntry("3.0.5", "11/??/2008", [[
     *Fixed: Who lookups wouldn't update if already cached.
     *Fixed: Default Spamfilter wasn't working as intended.
     *Loading of skins also updates character info as well.
+    *Fixed the history viewer. For real this time? (Thanks Stewart)
+    *History text view loads correctly now on first click. (Thanks Stewart)
+    *History text views are stripped of all colors and emoticons.
 ]]);
 addEntry("3.0.4", "11/12/2008", [[
     *History frame was named incorrectly. 'WIM3_HistoryFrame' is its new name.

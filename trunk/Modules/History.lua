@@ -678,6 +678,9 @@ local function createHistoryViewer()
             end
             tab:SetScript("OnClick", function(self)
                 for i=1, #win.content.tabs do
+                    if(win.progressBar:IsVisible()) then
+                        win.progressBar.delete:Click();
+                    end
                     if(self.index == i) then
                         win.content.tabs[i]:SetAlpha(1);
                         win.TAB = self.index;
@@ -691,8 +694,8 @@ local function createHistoryViewer()
                     else
                         win.content.tabs[i]:SetAlpha(.5);
                     end
-                    win:UpdateDisplay();
                 end
+                win:UpdateDisplay();
             end);
             table.insert(self.tabs, tab);
         end
@@ -808,9 +811,11 @@ local function createHistoryViewer()
         end);
     win.content.textFrame.text.AddMessage = function(self, msg, r, g, b)
             local color;
-            if(r and g and b) then
-                color = RGBPercentToHex(r, g, b);
-            end
+            --if(r and g and b) then
+            --    color = RGBPercentToHex(r, g, b);
+            --end
+            msg = msg:gsub("|c[0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f]", "");
+            msg = msg:gsub("|r", "");
             --self:SetText(self:GetText()..(color and "|cff"..color or "")..msg..(color and "|r" or "").."\n");
             self:SetText(self:GetText()..msg.."\n");
         end;
@@ -913,8 +918,7 @@ local function createHistoryViewer()
         for i=1, #win.USERLIST do
             win.USERLIST[i] = nil;
         end
-        local realm = string.match(win.USER, "^([%w%s]+)/?.*$");
-        local character = string.match(win.USER, "^[%w%s]+/(.*)$");
+        local realm, character = string.match(win.USER, "^([^/]+)/?(.*)$");
         if(realm and character and history[realm] and history[realm][character]) then
             local tbl = history[realm][character];
             for convo, t in pairs(tbl) do
@@ -1083,6 +1087,7 @@ table.insert(ViewTypes, {
         text = L["Text View"],
         frame = "textFrame",
         func = function(frame, msg)
+            frame.noEscapedStrings = true;
             if(msg.type == 1) then
                 local color = db.displayColors[msg.inbound and "wispIn" or "wispOut"];
                 frame.nextStamp = msg.time;

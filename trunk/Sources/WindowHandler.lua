@@ -135,6 +135,7 @@ function applyStringModifiers(str, chatDisplay)
 	for i=1, #StringModifiers do
 		str = StringModifiers[i](str, chatDisplay);
 	end
+        chatDisplay.noEscapedStrings = nil;
 	return str;
 end
 
