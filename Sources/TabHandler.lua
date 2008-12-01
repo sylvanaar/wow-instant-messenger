@@ -452,13 +452,14 @@ local function createTabGroup()
         end
     end
     
-    tabStrip.JumpToTab = function(self, win)
+    tabStrip.JumpToTab = function(self, win, honorFocus)
         if(win) then
             local oldWin = self.selected.obj;
             local oldCustomSize = win.customSize;
+            honorFocus = honorFocus and oldWin and oldWin.widgets.msg_box == EditBoxInFocus;
             win.customSize = true;
             DisplayTutorial(L["Manipulating Tabs"], L["You can <Shift-Click> a tab and drag it out into it's own window."]);
-            self:SetSelectedName(win);
+            self:SetSelectedName(honorFocus and oldWin or win);
             local win = self.selected.obj;
             if(oldWin and oldWin ~= win) then
                 win:SetWidth(oldWin:GetWidth());
@@ -515,7 +516,7 @@ local function createTabGroup()
             addToTableUnique(self.attached, win);
             win.tabStrip = self;
             if(#self.attached == 1 or win:IsVisible()) then
-                --self:JumpToTab(win);
+                self:JumpToTab(win, true);
                 win:UpdateProps();
             else
                 win:Hide();

@@ -877,16 +877,14 @@ local function instantiateWindow(obj)
 			setWindowAsFadedIn(self);
 			if(self.tabStrip) then
 				self:ResetAnimation();
-                                if(EditBoxInFocus ~= self.tabStrip.selected.obj.widgets.msg_box) then
-        				self.tabStrip:JumpToTab(self);
-                                end
+        			self.tabStrip:JumpToTab(self, true);
 			else
 				self:ResetAnimation();
 				self:Show();
-                                if(not _G.ChatFrameEditBox:wimIsVisible() and not EditBoxInFocus and rules.autofocus and msgDirection == "in") then
-                                        self.widgets.msg_box:SetFocus();
-                                end
 			end
+                        if(self:IsVisible() and not _G.ChatFrameEditBox:wimIsVisible() and not EditBoxInFocus and rules.autofocus and msgDirection == "in") then
+                                --self.widgets.msg_box:SetFocus();
+                        end
 		end
 	end
 	
