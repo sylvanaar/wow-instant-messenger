@@ -52,7 +52,8 @@ db_defaults.autoFocus = false;
 db_defaults.winSize = {
 		width = 333,
 		height = 220,
-		scale = 100
+		scale = 100,
+                strata = "DIALOG"
 	};
 db_defaults.winLoc = {
 		left =217,
@@ -894,6 +895,7 @@ local function instantiateWindow(obj)
     end
     
     obj.UpdateProps = function(self)
+        self:SetFrameStrata(db.winSize.strata);
 	self:SetScale(db.winSize.scale/100);
 	self.widgets.Backdrop:SetAlpha(db.windowAlpha/100);
 	local Path,_,Flags = self.widgets.chat_display:GetFont();
