@@ -20,6 +20,11 @@ addEntry("3.0.5", "12/02/2008", [[
     *History text view loads correctly now on first click. (Thanks Stewart)
     *History text views are stripped of all colors and emoticons.
     +Added Russian translations. (Thanks Stingersoft)
+    *Fixed: System message of user coming online wasn't being handled correctly.
+    +Added libraries to optional dependencies to allow for disembedded addons.
+    *Moved Window Alpha option from Window Settings to Display Settings.
+    +Added Window Strata option to Window Settings.
+    *Fixed: History viewer wasn't loading for entire realm.
 ]]);
 addEntry("3.0.4", "11/12/2008", [[
     *History frame was named incorrectly. 'WIM3_HistoryFrame' is its new name.

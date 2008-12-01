@@ -924,7 +924,7 @@ local function createHistoryViewer()
             for convo, t in pairs(tbl) do
                 addToTableUnique(win.USERLIST, convo..(t.info and t.info.gm and "*" or ""));
             end
-        elseif(realm and not character and history[realm]) then
+        elseif(realm and (not character or character == "") and history[realm]) then
             for character, tbl in pairs(history[realm]) do
                 for convo, t in pairs(tbl) do
                     addToTableUnique(win.USERLIST, convo..(t.info and t.info.gm and "*" or ""));

@@ -87,7 +87,7 @@ local function General_MessageFormatting()
             self:SetFont(font, 14, db.skin.font_outline);
             self:Clear();
             for i=1, #Preview do
-                self:AddMessage(applyStringModifiers(applyMessageFormatting(self, unpack(Preview[i]))), color.r, color.g, color.b);
+                self:AddMessage(applyStringModifiers(applyMessageFormatting(self, unpack(Preview[i])), self), color.r, color.g, color.b);
             end
             self:SetIndentedWordWrap(db.wordwrap_indent);
         end);
@@ -188,7 +188,26 @@ local function General_WindowSettings()
     frame.menu.nextOffSetY = -45;
     frame.menu.scale = frame.menu:CreateSlider(L["Window Scale"], "10", "400", 10, 400, 1, db.winSize, "scale", function(self) UpdateAllWindowProps(); end);
     frame.menu.nextOffSetY = -45;
-    frame.menu.alpha = frame.menu:CreateSlider(L["Window Alpha"], "1", "100", 1, 100, 1, db, "windowAlpha", function(self) UpdateAllWindowProps(); end);
+    -- window strata
+    local stratas = {"BACKGROUND", "LOW", "MEDIUM", "HIGH", "DIALOG", "TOOLTIP"};
+    local strataList = {};
+    frame.menu.strataText = frame.menu:CreateText();
+    frame.menu.strataText:SetText(L["Window Strata:"]);
+    for i=1, #stratas do
+        table.insert(strataList, {
+            text = stratas[i],
+            value = stratas[i],
+            justifyH = "LEFT",
+            func = function(self)
+                UpdateAllWindowProps();
+            end,
+        });
+    end
+    frame.menu.strataList = frame.menu:CreateDropDownMenu(db.winSize, "strata", strataList, 150);
+    frame.menu.strataList:ClearAllPoints();
+    frame.menu.strataList:SetPoint("LEFT", frame.menu.strataText, "LEFT", frame.menu.strataText:GetStringWidth(), 0);
+    frame.menu.lastObj = frame.menu.strataText;
+    
     frame.menu.nextOffSetY = -25;
     frame.menu:CreateButton(L["Set Window Spawn Location"], ShowDemoWindow);
     frame.menu.nextOffSetY = -10;
@@ -250,6 +269,8 @@ local function General_VisualSettings()
     frame.menu:CreateColorPicker(L["Color: History Messages Received"], db.displayColors, "historyIn");
     frame.menu.nextOffSetY = -10;
     frame.menu:CreateCheckButton(L["Use colors suggested by skin."], db.displayColors, "useSkin");
+    frame.menu.nextOffSetY = -30;
+    frame.menu.alpha = frame.menu:CreateSlider(L["Window Alpha"], "1", "100", 1, 100, 1, db, "windowAlpha", function(self) UpdateAllWindowProps(); end);
     frame.menu.nextOffSetY = -35;
     frame.menu.sub = frame.menu:CreateSection();
     options.AddFramedBackdrop(frame.menu.sub);

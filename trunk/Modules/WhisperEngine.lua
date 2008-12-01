@@ -479,7 +479,9 @@ end
 
 local ERR_CHAT_PLAYER_NOT_FOUND_S = string.gsub(_G.ERR_CHAT_PLAYER_NOT_FOUND_S, "%%s", "(.+)");
 local CHAT_IGNORED = string.gsub(_G.CHAT_IGNORED, "%%s", "(.+)");
-local ERR_FRIEND_ONLINE_SS = string.gsub(_G.ERR_FRIEND_ONLINE_SS, "%%s", "(.+)");
+local ERR_FRIEND_ONLINE_SS = string.gsub(_G.ERR_FRIEND_ONLINE_SS, "%[", "%%[");
+ERR_FRIEND_ONLINE_SS = string.gsub(ERR_FRIEND_ONLINE_SS, "%]", "%%]");
+ERR_FRIEND_ONLINE_SS = string.gsub(ERR_FRIEND_ONLINE_SS, "%%s", "(.+)");
 local ERR_FRIEND_OFFLINE_S = string.gsub(_G.ERR_FRIEND_OFFLINE_S, "%%s", "(.+)");
 function WhisperEngine:CHAT_MSG_SYSTEM(msg)
     local user;
