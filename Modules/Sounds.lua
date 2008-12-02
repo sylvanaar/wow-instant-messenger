@@ -60,6 +60,11 @@ SML:Register(SOUND, "IM", "Interface\\AddOns\\"..addonTocName.."\\Sounds\\wisp.w
 SML:Register(SOUND, "iChat In", "Interface\\AddOns\\"..addonTocName.."\\Sounds\\ichatIn.mp3");
 SML:Register(SOUND, "iChat Out", "Interface\\AddOns\\"..addonTocName.."\\Sounds\\ichatOut.mp3");
 
+--[[ Test Scrolling Dropdown menu.
+for i=1,20 do
+    SML:Register(SOUND, "Test "..i, "Interface\\AddOns\\"..addonTocName.."\\Sounds\\ichatOut.mp3");
+end
+]]
 
 -- This is a core module and must always be loaded...
 Sounds.canDisable = false;

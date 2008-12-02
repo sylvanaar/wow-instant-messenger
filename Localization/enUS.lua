@@ -375,6 +375,7 @@ WIM.AddLocale("enUS", {
     ["Play special sound for guild members."] = true,
     ["Play sound when a whisper is sent."] = true,
     ["Allow others to see my talent spec."] = true,
+    ["Window Strata:"] = true,
     
     
     -- TabManagement.lua --

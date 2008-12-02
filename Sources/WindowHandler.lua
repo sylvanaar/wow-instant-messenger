@@ -441,7 +441,7 @@ local function MessageWindow_Frame_OnShow(self)
                 end
                 updateScrollBars(self);
                 if(self.tabStrip) then
-                        self.tabStrip:JumpToTab(self);
+                        self.tabStrip:JumpToTab(self, true);
                 end
                 CallModuleFunction("OnWindowShow", self);
         	for widgetName, widgetObj in pairs(self.widgets) do
