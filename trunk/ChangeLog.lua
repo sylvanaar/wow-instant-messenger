@@ -25,6 +25,7 @@ addEntry("3.0.5", "12/02/2008", [[
     *Moved Window Alpha option from Window Settings to Display Settings.
     +Added Window Strata option to Window Settings.
     *Fixed: History viewer wasn't loading for entire realm.
+    *Fixed: Tabs now honor focus as intended. (Thanks Stewart)
 ]]);
 addEntry("3.0.4", "11/12/2008", [[
     *History frame was named incorrectly. 'WIM3_HistoryFrame' is its new name.

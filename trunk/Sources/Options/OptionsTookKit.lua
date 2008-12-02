@@ -458,3 +458,4 @@ function options.AddFramedBackdrop(obj)
     obj.backdrop.bg:SetTexture(0, 0, 0, .25);
     obj.backdrop.bg:SetAllPoints();
 end
+
