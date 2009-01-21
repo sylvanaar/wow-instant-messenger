@@ -13,8 +13,8 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.0.5";
-beta = false; -- flags current version as beta.
+version = "3.0.6";
+beta = true; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight (we'll keep this around for now...)
@@ -368,9 +368,15 @@ function WIM:GUILD_ROSTER_UPDATE()
 end
 
 function IsGM(name)
-    if(name == nil or name == "") then
+        if(name == nil or name == "") then
 		return false;
 	end
+        
+        -- Blizz gave us a new tool. Lets use it.
+        if(_G.GMChatFrame_IsGM and _G.GMChatFrame_IsGM(name)) then
+                lists.gm[user] = 1;
+        end
+        
 	if(string.len(name) < 4) then return false; end
 	if(string.sub(name, 1, 4) == "<GM>") then
 		local tmp = string.gsub(name, "<GM> ", "");

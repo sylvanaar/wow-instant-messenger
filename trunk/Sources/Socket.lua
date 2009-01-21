@@ -121,7 +121,7 @@ end
 function SendData(ttype, target, cmd, data)
     data = tostring(data);
     ttype = string.upper(ttype);
-    if(ttype == "WHISPER" and lists.gm[target]) then
+    if(ttype == "WHISPER" and IsGM(target)) then
         -- we do not want to send any messages to GM's
         return;
     end

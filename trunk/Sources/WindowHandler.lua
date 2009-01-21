@@ -388,16 +388,18 @@ end
 --------------------------------------
 
 function updateScrollBars(parentWindow)
-	if(parentWindow.widgets.chat_display:AtTop()) then
-		parentWindow.widgets.scroll_up:Disable();
-	else
-		parentWindow.widgets.scroll_up:Enable();
-	end
-	if(parentWindow.widgets.chat_display:AtBottom()) then
-		parentWindow.widgets.scroll_down:Disable();
-	else
-		parentWindow.widgets.scroll_down:Enable();
-	end
+        if(parentWindow and parentWindow.widgets and parentWindow.widgets.chat_display) then
+                if(parentWindow.widgets.chat_display:AtTop()) then
+                	parentWindow.widgets.scroll_up:Disable();
+                else
+                	parentWindow.widgets.scroll_up:Enable();
+                end
+                if(parentWindow.widgets.chat_display:AtBottom()) then
+                	parentWindow.widgets.scroll_down:Disable();
+                else
+                	parentWindow.widgets.scroll_down:Enable();
+                end
+        end
 end
 
 local function MessageWindow_MovementControler_OnDragStart(self)
@@ -441,7 +443,7 @@ local function MessageWindow_Frame_OnShow(self)
                 end
                 updateScrollBars(self);
                 if(self.tabStrip) then
-                        self.tabStrip:JumpToTab(self, true);
+                        --self.tabStrip:JumpToTab(self), true);
                 end
                 CallModuleFunction("OnWindowShow", self);
         	for widgetName, widgetObj in pairs(self.widgets) do
