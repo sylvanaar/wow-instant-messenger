@@ -213,7 +213,7 @@ local function SendSplitMessage(theMsg, to)
                                 local index = _G.tonumber(string.match(link, "(%d+)"));
                                 return splitMessageLinks[index] or link;
                         end);
-                        _G.ChatThrottleLib:SendChatMessage("NORMAL", "WIM", chunk, "WHISPER", nil, to);
+                        _G.ChatThrottleLib:SendChatMessage("ALERT", "WIM", chunk, "WHISPER", nil, to);
                         chunk = splitMessage[i];
                 end
         end
