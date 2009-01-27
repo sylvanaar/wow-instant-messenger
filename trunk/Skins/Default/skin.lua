@@ -227,7 +227,8 @@ local WIM_ClassicSkin = {
             tab = {
                 NormalTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\tab_normal",
                 PushedTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\tab_selected",
-                HighlightTexture = "Interface\\PaperDollInfoFrame\\UI-Character-Tab-Highlight",
+                HighlightTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\tab_flash",
+                --HighlightTexture = "Interface\\PaperDollInfoFrame\\UI-Character-Tab-Highlight",
                 HighlightAlphaMode = "ADD"
             },
             prev = {

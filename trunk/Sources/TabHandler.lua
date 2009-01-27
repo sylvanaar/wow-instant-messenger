@@ -306,6 +306,7 @@ local function createTabGroup()
         tab.smiddle:SetTexCoord(0.25, 0.75, 0.0, 1.0);
         tab.smiddle:SetPoint("TOPLEFT", tab.left, "TOPRIGHT");
         tab.smiddle:SetPoint("BOTTOMRIGHT", tab.right, "BOTTOMLEFT");
+        
         tab.SetTexture = function(self, pathOrTexture)
             self.left:SetTexture(pathOrTexture);
             self.middle:SetTexture(pathOrTexture);
@@ -345,6 +346,7 @@ local function createTabGroup()
             else
                 tabStrip:JumpToTab(self.childObj);
             end
+            self:UnlockHighlight();
         end);
         tab:EnableMouseWheel(true);
         tab:SetScript("OnMouseWheel", function(self, direction)
@@ -525,6 +527,33 @@ local function createTabGroup()
             dPrint(win:GetName().." is attached to "..self:GetName());
         end
     end
+    
+    tabStrip.flashTrack_elapsed = 0;
+    tabStrip:SetScript("OnUpdate", function(self, elapsed)
+            -- manage flashing tabs.
+            self.flashTrack_elapsed = self.flashTrack_elapsed + elapsed;
+            while(self.flashTrack_elapsed >= 1) do
+                for i=1, #self.tabs do
+                    local tab = self.tabs[i];
+                    if(tab:IsVisible()) then
+                        if(tab.childObj and (tab.childObj.unreadCount or 0) > 0) then
+                            if(tab.flashOn) then
+                                tab.flashOn = nil;
+                                tab:UnlockHighlight();
+                            else
+                                tab.flashOn = true;
+                                tab:LockHighlight();
+                            end
+                        else
+                            tab:UnlockHighlight();
+                        end
+                    else
+                        tab:UnlockHighlight();
+                    end
+                end
+                self.flashTrack_elapsed = 0;
+            end
+        end);
     
     applySkin(tabStrip);
     
