@@ -27,6 +27,7 @@ local IsShiftKeyDown = IsShiftKeyDown;
 local select = select;
 local unpack = unpack;
 local math = math;
+local time = time;
 
 -- set name space
 setfenv(1, WIM);
@@ -281,6 +282,7 @@ local function removeEventTable(index)
     eventItem.flags.ignore = false;
     eventItem.flags.supress = false;
     eventItem.flags.passedToModules = nil;
+    eventItem.stamp = nil;
     eventItem.msgID = 0;
     eventItem.argCount = 0;
     -- remove registered chat frame objects.
@@ -345,6 +347,7 @@ local function getNewEventTable(msgID)
             supress = false
         },
         msgID = msgID or 0,
+        stamp = time(),
         ChatFrames = {}
     });
     local eventItem = WhisperQueue_Bowl[#WhisperQueue_Bowl];
@@ -683,6 +686,7 @@ function _G.SendChatMessage(...)
     end
     hookedSendChatMessage(...);
 end
+
 
 -- This is a core module and must always be loaded...
 WhisperEngine.canDisable = false;
