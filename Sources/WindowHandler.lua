@@ -959,6 +959,7 @@ local function instantiateWindow(obj)
 		self:Hide_Normal();
 		self:ResetAnimation();
 	else
+                
 		if(not db.winAnimation) then
 			self:Hide_Normal();
 			self:ResetAnimation();
@@ -972,7 +973,6 @@ local function instantiateWindow(obj)
 			a.to = MinimapIcon or nil;
 			a.elapsed, a.time = 0, .5;
                         a.scaleLimit = .001 --_G.math.max(_G.math.ceil((100-_G.UIParent:GetScale()*100)/2)/100 + .04, .01);
-                        dPrint(a.scaleLimit)
 			a.mode = "HIDE"; -- this starts the animation
 			dPrint("Animation Started: "..self:GetName());
 		end
@@ -1044,7 +1044,7 @@ local function loadWindowDefaults(obj)
 	obj.guild = "";
 	obj.level = "";
 	obj.race = "";
-	obj.class = "blank";
+	obj.class = "";
 	obj.location = "";
         obj.demoSave = nil;
         obj.classColor = "ffffff";
@@ -1177,6 +1177,9 @@ local function destroyWindow(userNameOrObj)
     end
     
     if(obj) then
+	if(obj.tabStrip) then
+		obj.tabStrip:Detach(obj);
+	end
         WindowSoupBowl.windows[index].inUse = false;
         WindowSoupBowl.windows[index].user = "";
         WindowSoupBowl.available = WindowSoupBowl.available + 1;
@@ -1184,9 +1187,6 @@ local function destroyWindow(userNameOrObj)
         --WIM_Astrolabe:RemoveIconFromMinimap(obj.icon);
         --obj.icon:Hide();
         --obj.icon.track = false;
-	if(obj.tabStrip) then
-		obj.tabStrip:Detach(obj);
-	end
         obj:Show();
         obj.widgets.chat_display:Clear();
         obj:Hide();

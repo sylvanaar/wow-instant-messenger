@@ -12,12 +12,13 @@ end
 
 
 -- ChangeLog Entries.
-addEntry("3.0.6", "01/??/2008", [[
+addEntry("3.0.6", "02/??/2008", [[
     *Fixed: Error when receiving whisper while minimizing.
     *Fixed: Negotiating with guild members would cause addon msg spam.
     *Changed outbound whispers priority from NORMAL to ALERT.
     *Fix for 3.0.8 patch. GM's should no longer receive addon messages.
     +Tabs now flash when it contains an unread message.
+    *Fixed error when closing tabs.
 ]]);
 addEntry("3.0.5", "12/02/2008", [[
     *Fixed: Who lookups wouldn't update if already cached.

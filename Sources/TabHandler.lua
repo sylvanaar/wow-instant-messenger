@@ -395,6 +395,9 @@ local function createTabGroup()
         end
         local count = math.floor(curSize / minimumWidth);
         self.visibleCount = count;
+        if((self.curOffset + count) > #self.attached) then
+            self.curOffset = math.max(#self.attached - count , 0);
+        end
         if(count >= #self.attached) then
 		count = #self.attached;
 		self.nextButton:Hide();
