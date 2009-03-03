@@ -89,38 +89,46 @@ local maxLevel = isWOTLK and 80 or 70;
 
 local Filters = CreateModule("Filters", true);
 
+-- This module requires LibChatHandler-1.0
+_G.LibStub:GetLibrary("LibChatHandler-1.0"):embedLibrary(Filters);
+
 -- filtering
 
 local userCache = {};
 
 local function whoCallback(result, eventItem, filter)
+    local arg1, name = eventItem:getArgs();
     if(result and result.Online and result.Name == name) then
         userCache[name] = result.Level;
         if(result.Level < filter.level) then
             if(filter.action == 1) then
-                eventItem.suspendedByFilter = false;
-                eventItem:Release();
+                dPrint("Filter->WhoCallBack: Allow()");
+                eventItem:Allow();
+                Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, eventItem.continueFrom);
             elseif(filter.action == 2) then
-                eventItem.suspendedByFilter = false;
-                eventItem:Ignore();
-                eventItem:Release();
+                dPrint("Filter->WhoCallBack: Ignored()");
+                eventItem:BlockFromChatFrame();
+                Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, eventItem.continueFrom);
             elseif(filter.action == 3) then
-                eventItem.suspendedByFilter = false;
+                dPrint("Filter->WhoCallBack: Block()");
                 eventItem:Block();
                 eventItem:Release();
             else
-                Filters:OnEvent_Whisper(eventItem, eventItem.continueFrom);
+                dPrint("Filter->WhoCallBack: Unknown Action...");
+                Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, eventItem.continueFrom);
             end
         else
-            Filters:OnEvent_Whisper(eventItem, eventItem.continueFrom);
+            dPrint("Filter->WhoCallBack: Level above threshhold");
+            Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, eventItem.continueFrom);
         end
     else
-        Filters:OnEvent_Whisper(eventItem, eventItem.continueFrom);
+        dPrint("Filter->WhoCallBack: Result failure");
+        Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, eventItem.continueFrom);
     end
 end
 
 local function processFilter(eventItem, filter)
-    local message, name = unpack(eventItem.arg)
+    local message, name = eventItem:getArgs();
     if(filter.type == 1) then
         --message = string.trim(message);
         local patterns = filter.pattern.."\n";
@@ -143,13 +151,13 @@ local function processFilter(eventItem, filter)
         end
     elseif(filter.type == 3) then
         -- do not do look up if user has window opened already. Defeats the purpose.
-        if(not windows.active.whisper[name] and not userCache[user]) then
-            eventItem.suspendedByFilter = true;
+        if(not windows.active.whisper[name] and not userCache[name]) then
             eventItem:Suspend();
+            dPrint("Running WhoLookUp on: "..name);
             local result = libs.WhoLib:UserInfo(name, 
     	    {
     		queue = libs.WhoLib.WHOLIB_QUEUE_QUIET, 
-    		timeout = 0,
+    		timeout = 60,
     		--flags = libs.WhoLib.WHOLIB_FLAG_ALWAYS_CALLBACK,
     		callback = function(result)
                     whoCallback(result, eventItem, filter);
@@ -175,19 +183,27 @@ local function processFilter(eventItem, filter)
     end
 end
 
-function Filters:OnEvent_Whisper(eventItem, startFrom)
-    startFrom = startFrom or 1;
+function Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, startFrom)
+    if(not db or not db.enabled) then
+        return;
+    end
+    startFrom = type(startFrom) == "number" and startFrom or 1;
     for i=startFrom, #filters do
+        if(not filters[i] and eventItem.suspendedByWIM_Filter) then
+            eventItem:Release();
+            return;
+        end
         if(filters[i].received and filters[i].enabled) then
             eventItem.continueFrom = startFrom + 1;
             local result = processFilter(eventItem, filters[i]);
             if(result == 0) then
                 -- event suspended... will resume later.
+                eventItem.suspendedByWIM_Filter = true;
                 return;
             elseif(result == 1) then
                 break;
             elseif(result == 2) then
-                eventItem:Ignore();
+                eventItem:BlockFromChatFrame();
                 break;
             elseif(result == 3) then
                 eventItem:Block();
@@ -195,8 +211,8 @@ function Filters:OnEvent_Whisper(eventItem, startFrom)
             end
         end
     end
-    if(eventItem.suspendedByFilter) then
-        eventItem.suspendedByFilter = false;
+    if(eventItem.suspendedByWIM_Filter) then
+        eventItem.suspendedByWIM_Filter = false;
         eventItem:Release();
     end
     if(options.frame and options.frame.filterList) then
@@ -205,8 +221,11 @@ function Filters:OnEvent_Whisper(eventItem, startFrom)
     end
 end
 
-function Filters:OnEvent_WhisperInform(eventItem, startFrom)
-    startFrom = startFrom or 1;
+function Filters:CHAT_MSG_WHISPER_INFORM_CONTROLLER(eventItem, startFrom)
+    if(not db or not db.enabled) then
+        return;
+    end
+    startFrom = type(startFrom) == "number" and startFrom or 1;
     for i=startFrom, #filters do
         if(filters[i].sent and filters[i].type == 1 and filters[i].enabled) then
             local result = processFilter(eventItem, filters[i]);
@@ -216,7 +235,7 @@ function Filters:OnEvent_WhisperInform(eventItem, startFrom)
             elseif(result == 1) then
                 break;
             elseif(result == 2) then
-                eventItem:Ignore();
+                eventItem:BlockFromChatFrame();
                 break;
             elseif(result == 3) then
                 eventItem:Block();
@@ -230,6 +249,16 @@ function Filters:OnEvent_WhisperInform(eventItem, startFrom)
     end
 end
 
+
+function Filters:OnEnable()
+    Filters:RegisterChatEvent("CHAT_MSG_WHISPER");
+    Filters:RegisterChatEvent("CHAT_MSG_WHISPER_INFORM");
+end
+
+function Filters:OnDisable()
+    Filters:UnregisterChatEvent("CHAT_MSG_WHISPER");
+    Filters:UnregisterChatEvent("CHAT_MSG_WHISPER_INFORM");
+end
 
 
 -- Globals

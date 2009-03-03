@@ -81,7 +81,8 @@ local function initialize()
     libs.WhoLib = _G.LibStub:GetLibrary("LibWho-2.0");
     libs.Astrolabe = _G.DongleStub("Astrolabe-0.4");
     libs.SML = _G.LibStub:GetLibrary("LibSharedMedia-3.0");
-    libs.BabbleTalent = _G.LibStub:GetLibrary("LibBabble-TalentTree-3.0");
+    libs.ChatHandler = _G.LibStub:GetLibrary("LibChatHandler-1.0");
+    libs.BabbleTalent = _G.LibStub:GetLibrary("LibBabble-3.0");
     
     isInitialized = true;
     
@@ -422,6 +423,7 @@ local talentOrder = {};
 function TalentsToString(talents, class)
 	--passed talents in format of "#/#/#";
         -- first check that all required information is passed.
+        if(1) then return "N/A"; end
 	local t1, t2, t3 = string.match(talents or "", "(%d+)/(%d+)/(%d+)");
 	if(not t1 or not t2 or not t3 or not class) then
                 return talents;
