@@ -35,6 +35,9 @@ setfenv(1, WIM);
 -- create WIM Module
 local WhisperEngine = CreateModule("WhisperEngine");
 
+-- This Module requires LibChatHandler-1.0
+_G.LibStub:GetLibrary("LibChatHandler-1.0"):embedLibrary(WhisperEngine);
+
 -- declare default settings for whispers.
 -- if new global env wasn't set to WIM's namespace, then your module would call as follows:
 --      WhisperEngine.db_defaults... or WIM.db_defaults...
@@ -104,12 +107,6 @@ db_defaults.displayColors.wispOut = {
 	b=0.9882352941176471
     }
 
--- register events needed for Whisper handling. (Note WIM handles these events for modules declared within.)
-WhisperEngine:RegisterEvent("CHAT_MSG_WHISPER");
-WhisperEngine:RegisterEvent("CHAT_MSG_WHISPER_INFORM");
-WhisperEngine:RegisterEvent("CHAT_MSG_AFK");
-WhisperEngine:RegisterEvent("CHAT_MSG_DND");
-WhisperEngine:RegisterEvent("CHAT_MSG_SYSTEM");
 
 local Windows = windows.active.whisper;
 
@@ -143,11 +140,19 @@ local function updateMinimapAlerts()
 end
 
 function WhisperEngine:OnEnableWIM()
-    -- this exists for documenation purposes and is not used in this module.
+        WhisperEngine:RegisterChatEvent("CHAT_MSG_WHISPER");
+        WhisperEngine:RegisterChatEvent("CHAT_MSG_WHISPER_INFORM");
+        WhisperEngine:RegisterChatEvent("CHAT_MSG_AFK");
+        WhisperEngine:RegisterChatEvent("CHAT_MSG_DND");
+        WhisperEngine:RegisterChatEvent("CHAT_MSG_SYSTEM");
 end
 
 function WhisperEngine:OnDisableWIM()
-    -- this exists for documenation purposes and is not used in this module.
+        WhisperEngine:UnregisterChatEvent("CHAT_MSG_WHISPER");
+        WhisperEngine:UnregisterChatEvent("CHAT_MSG_WHISPER_INFORM");
+        WhisperEngine:UnregisterChatEvent("CHAT_MSG_AFK");
+        WhisperEngine:UnregisterChatEvent("CHAT_MSG_DND");
+        WhisperEngine:UnregisterChatEvent("CHAT_MSG_SYSTEM");
 end
 
 local function getWhisperWindowByUser(user)
@@ -244,7 +249,21 @@ RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
     end);
 
 
-local function CHAT_MSG_WHISPER(...)
+--------------------------------------
+--          Event Handlers          --
+--------------------------------------
+
+-- CHAT_MSG_WHISPER  CONTROLLER (For Supression from Chat Frame)
+function WhisperEngine:CHAT_MSG_WHISPER_CONTROLLER(eventItem, ...)
+    -- execute appropriate supression rules
+    local curState = curState;
+    curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+    if(WIM.db.pop_rules.whisper[curState].supress) then
+        eventItem:BlockFromChatFrame();
+    end
+end
+
+function WhisperEngine:CHAT_MSG_WHISPER(...)
     local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
     local color = WIM.db.displayColors.wispIn; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
@@ -257,7 +276,17 @@ local function CHAT_MSG_WHISPER(...)
     CallModuleFunction("PostEvent_Whisper", ...);
 end
 
-local function CHAT_MSG_WHISPER_INFORM(...)
+-- CHAT_MSG_WHISPER_INFORM  CONTROLLER (For Supression from Chat Frame)
+function WhisperEngine:CHAT_MSG_WHISPER_INFORM_CONTROLLER(eventItem, ...)
+    -- execute appropriate supression rules
+    local curState = curState;
+    curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+    if(WIM.db.pop_rules.whisper[curState].supress) then
+        eventItem:BlockFromChatFrame();
+    end
+end
+
+function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
     local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
     local color = db.displayColors.wispOut; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
@@ -269,193 +298,14 @@ local function CHAT_MSG_WHISPER_INFORM(...)
     CallModuleFunction("PostEvent_WhisperInform", ...);
 end
 
-
-local function removeEventTable(index)
-    local eventItem = WhisperQueue[index];
-    WhisperQueue_Index[eventItem.msgID] = nil;
-    for i, _ in pairs(eventItem.arg) do
-        eventItem.arg[i] = nil;
-    end
-    eventItem.event = nil;
-    eventItem.flags.suspend = false;
-    eventItem.flags.block = false;
-    eventItem.flags.ignore = false;
-    eventItem.flags.supress = false;
-    eventItem.flags.passedToModules = nil;
-    eventItem.stamp = nil;
-    eventItem.msgID = 0;
-    eventItem.argCount = 0;
-    -- remove registered chat frame objects.
-    for i=1, #eventItem.ChatFrames do
-        table.remove(eventItem.ChatFrames, 1);
-    end
-    table.remove(WhisperQueue, index);
-end
-
-local function popEvents()
-    local i = 1;
-    while(#WhisperQueue > 0 and i <= #WhisperQueue) do
-        --WIM:dPrint("Processing "..i.." of "..table.getn(WhisperQueue));
-        local eventItem = WhisperQueue[i];
-        local args = eventItem.arg;
-        if(not eventItem.flags.suspend) then
-            if(not eventItem.flags.block) then
-                if(not eventItem.flags.ignore) then
-                    if(eventItem.event == "CHAT_MSG_WHISPER") then
-                        CHAT_MSG_WHISPER(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15]);
-                    else
-                        CHAT_MSG_WHISPER_INFORM(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15]);
-                    end
-                end
-                if(not eventItem.flags.supress) then
-                        for j=1, #eventItem.ChatFrames do
-                                CF_MessageEventHandler_orig(eventItem.ChatFrames[j], eventItem.event, args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10], args[11], args[12], args[13], args[14], args[15]);
-                        end
-                end
-            end
-            removeEventTable(i);
-            i = 1;
-        else
-            i = i+1;
-        end
-    end
-end
-
-
-local function getNewEventTable(msgID)
-    if(msgID) then
-        if(WhisperQueue_Index[msgID]) then
-            return WhisperQueue_Index[msgID];
-        end
-    end
-    local i;
-    for i=1, #WhisperQueue_Bowl do
-        if(WhisperQueue_Bowl[i].event == nil) then
-            if(msgID) then
-                WhisperQueue_Index[msgID] = WhisperQueue_Bowl[i];
-            end
-            return WhisperQueue_Bowl[i];
-        end
-    end
-    table.insert(WhisperQueue_Bowl, {
-        arg = {},
-        argCount = 0,
-        flags = {
-            suspend = false,
-            block = false,
-            ignore = false,
-            supress = false
-        },
-        msgID = msgID or 0,
-        stamp = time(),
-        ChatFrames = {}
-    });
-    local eventItem = WhisperQueue_Bowl[#WhisperQueue_Bowl];
-    eventItem.Suspend = function(self)
-                            if(not self.flags.ignore and not self.flags.block) then -- not allowed when talking to a GM
-                                self.flags.suspend = true;
-                            end
-                        end
-    eventItem.Release = function(self)
-                            --if(self.flags.suspend) then
-                                self.flags.suspend = false;
-                                popEvents();
-                            --end
-                        end
-    eventItem.Block = function(self)
-                            self.flags.block = true;
-                            self.flags.ignore = false;
-                            self.flags.supress = true;
-                            self.flags.suspend = false;
-                        end
-    eventItem.Ignore = function(self)
-                            if(not self.flags.block) then -- not allowed when talking to a GM
-                                self.flags.ignore = true;
-                                self.flags.supress = false;
-                                self.flags.suspend = false;
-                            end
-                        end
-    eventItem.SetSupress = function(self, supress)
-                                if(not self.flags.ignore and not self.flags.block) then
-                                    self.flags.supress = supress or false;
-                                end
-                            end
-
-    WhisperQueue_Index[msgID] = eventItem;
-    return eventItem;
-end
-
-
-
--- this function returns the EventItem so it can have be additionally modified.
-local function pushEvent(event, ...)
-    local eventItem = getNewEventTable(select(11, ...));
-    if(eventItem.flags.passedToModules) then
-        --event already loaded, return to creator.
-        return eventItem;
-    end
-    eventItem.event = event;
-    local argCount = select("#", ...);
-    eventItem.argCount = argCount;
-    for i=1, argCount do
-        --table.insert(eventItem.arg, select(i, ...) or nil);
-        eventItem.arg[i] = select(i, ...);
-    end
-    addToTableUnique(WhisperQueue, eventItem);
-    -- notify all modules.
-    if(eventItem.argCount > 0) then
-        if(eventItem.event == "CHAT_MSG_WHISPER" and not lists.gm[select(2,...)]) then
-            CallModuleFunction("OnEvent_Whisper", eventItem);
-        elseif(eventItem.event == "CHAT_MSG_WHISPER_INFORM" and not lists.gm[select(2,...)]) then
-            CallModuleFunction("OnEvent_WhisperInform", eventItem);
-        end
-    end
-    eventItem.flags.passedToModules = true;
-    return eventItem;
-end
-
-
-local function bumpWhisperEventToEnd()
-    --WIM:dPrint("WhisperEngine: Moving WIM to the end of the event chain.");
-    _G.WIM_workerFrame:UnregisterEvent("CHAT_MSG_WHISPER_INFORM");
-    _G.WIM_workerFrame:RegisterEvent("CHAT_MSG_WHISPER_INFORM");
-    _G.WIM_workerFrame:UnregisterEvent("CHAT_MSG_WHISPER");
-    _G.WIM_workerFrame:RegisterEvent("CHAT_MSG_WHISPER");
-    _G.WIM_workerFrame:UnregisterEvent("CHAT_MSG_SYSTEM");
-    _G.WIM_workerFrame:RegisterEvent("CHAT_MSG_SYSTEM");
-end
-
---------------------------------------
---          Event Handlers          --
---------------------------------------
-
-function WhisperEngine:OnEvent_Whisper(eventItem)
+-- CHAT_MSG_AFK  CONTROLLER (For Supression from Chat Frame)
+function WhisperEngine:CHAT_MSG_AFK_CONTROLLER(eventItem, ...)
     -- execute appropriate supression rules
     local curState = curState;
     curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
-    eventItem:SetSupress(WIM.db.pop_rules.whisper[curState].supress);
-end
-
-function WhisperEngine:OnEvent_WhisperInform(eventItem)
-    -- execute appropriate supression rules
-    local curState = curState;
-    curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
-    eventItem:SetSupress(WIM.db.pop_rules.whisper[curState].supress);
-end
-
-function WhisperEngine:CHAT_MSG_WHISPER(...)
-    -- incoming messages will be put into a FIFO queue and have an event triggered to each
-    -- module requesting to see whispers before they are received. Modules may then decide
-    -- if the message should be disabled, blocked or ignored...
-    local eventItem = pushEvent("CHAT_MSG_WHISPER", ...);
-    popEvents();
-end
-
-function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
-    -- these incoming messages do not need to be queued in order to be filtered.
-    -- All messages can be filtered immidiately from Unit(Player) information.
-    local eventItem = pushEvent("CHAT_MSG_WHISPER_INFORM", ...);
-    popEvents();
+    if(WIM.db.pop_rules.whisper[curState].supress) then
+        eventItem:BlockFromChatFrame();
+    end
 end
 
 function WhisperEngine:CHAT_MSG_AFK(...)
@@ -469,6 +319,11 @@ function WhisperEngine:CHAT_MSG_AFK(...)
     end
 end
 
+-- CHAT_MSG_DND  CONTROLLER (For Supression from Chat Frame) Handle same as AFK
+function WhisperEngine:CHAT_MSG_DND_CONTROLLER(eventItem, ...)
+        WhisperEngine:CHAT_MSG_AFK_CONTROLLER(eventItem, ...);
+end
+
 function WhisperEngine:CHAT_MSG_DND(...)
     local color = db.displayColors.wispIn; -- color contains .r, .g & .b
     local win = Windows[select(2, ...)];
@@ -480,56 +335,79 @@ function WhisperEngine:CHAT_MSG_DND(...)
     end
 end
 
-local ERR_CHAT_PLAYER_NOT_FOUND_S = string.gsub(_G.ERR_CHAT_PLAYER_NOT_FOUND_S, "%%s", "(.+)");
-local CHAT_IGNORED = string.gsub(_G.CHAT_IGNORED, "%%s", "(.+)");
-local ERR_FRIEND_ONLINE_SS = string.gsub(_G.ERR_FRIEND_ONLINE_SS, "%[", "%%[");
-ERR_FRIEND_ONLINE_SS = string.gsub(ERR_FRIEND_ONLINE_SS, "%]", "%%]");
-ERR_FRIEND_ONLINE_SS = string.gsub(ERR_FRIEND_ONLINE_SS, "%%s", "(.+)");
-local ERR_FRIEND_OFFLINE_S = string.gsub(_G.ERR_FRIEND_OFFLINE_S, "%%s", "(.+)");
-function WhisperEngine:CHAT_MSG_SYSTEM(msg)
+
+-- CHAT_MSG_SYSTEM   CONTROLLER (for collection and supression of data)
+function WhisperEngine:CHAT_MSG_SYSTEM_CONTROLLER(eventItem, msg)
+    -- set patterns
+    local ERR_CHAT_PLAYER_NOT_FOUND_S = string.gsub(_G.ERR_CHAT_PLAYER_NOT_FOUND_S, "%%s", "(.+)");
+    local CHAT_IGNORED = string.gsub(_G.CHAT_IGNORED, "%%s", "(.+)");
+    local ERR_FRIEND_ONLINE_SS = string.gsub(_G.ERR_FRIEND_ONLINE_SS, "%[", "%%[");
+        ERR_FRIEND_ONLINE_SS = string.gsub(ERR_FRIEND_ONLINE_SS, "%]", "%%]");
+        ERR_FRIEND_ONLINE_SS = string.gsub(ERR_FRIEND_ONLINE_SS, "%%s", "(.+)");
+    local ERR_FRIEND_OFFLINE_S = string.gsub(_G.ERR_FRIEND_OFFLINE_S, "%%s", "(.+)");
+
     local user;
+    local curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+    
     -- detect player not online
     user = FormatUserName(string.match(msg, ERR_CHAT_PLAYER_NOT_FOUND_S));
-    if(Windows[user]) then
-        if(Windows[user].online or Windows[user].msgSent) then
-            Windows[user]:AddMessage(msg, db.displayColors.errorMsg.r, db.displayColors.errorMsg.g, db.displayColors.errorMsg.b);
+    local win = Windows[user];
+    if(win) then
+        if(win.online or win.msgSent) then
+            win:AddMessage(msg, db.displayColors.errorMsg.r, db.displayColors.errorMsg.g, db.displayColors.errorMsg.b);
         end
-        Windows[user].online = false;
-        Windows[user].msgSent = nil;
+        win.online = false;
+        win.msgSent = nil;
+        if(win:IsShown() and db.pop_rules.whisper[curState].supress) then
+                eventItem:BlockFromChatFrame();
+        elseif(not win.msgSent) then
+                eventItem:BlockFromChatFrame();
+        end
         return;
     end
     
     -- detect player has you ignored
     user = FormatUserName(string.match(msg, CHAT_IGNORED));
-    if(Windows[user]) then
-        if(Windows[user].online) then
-            Windows[user]:AddMessage(msg, db.displayColors.errorMsg.r, db.displayColors.errorMsg.g, db.displayColors.errorMsg.b);
+    win = Windows[user];
+    if(win) then
+        if(win.online) then
+            win:AddMessage(msg, db.displayColors.errorMsg.r, db.displayColors.errorMsg.g, db.displayColors.errorMsg.b);
         end
-        Windows[user].online = false;
+        win.online = false;
+        if(win:IsShown() and db.pop_rules.whisper[curState].supress) then
+                eventItem:Block();
+        elseif(not win.msgSent) then
+                eventItem:Block();
+        end
         return;
     end
     
     -- detect player has come online
     user = FormatUserName(string.match(msg, ERR_FRIEND_ONLINE_SS));
-    if(Windows[user]) then
-        Windows[user]:AddMessage(msg, db.displayColors.sysMsg.r, db.displayColors.sysMsg.g, db.displayColors.sysMsg.b);
-        Windows[user].online = true;
+    win = Windows[user];
+    if(win) then
+        win:AddMessage(msg, db.displayColors.sysMsg.r, db.displayColors.sysMsg.g, db.displayColors.sysMsg.b);
+        win.online = true;
+        if(win and win:IsShown() and db.pop_rules.whisper[curState].supress) then
+            eventItem:Block();
+        end
         return;
     end
     
         -- detect player has gone offline
     user = FormatUserName(string.match(msg, ERR_FRIEND_OFFLINE_S));
-    if(Windows[user]) then
-        Windows[user]:AddMessage(msg, db.displayColors.sysMsg.r, db.displayColors.sysMsg.g, db.displayColors.sysMsg.b);
-        Windows[user].online = false;
+    win = Windows[user];
+    if(win) then
+        win:AddMessage(msg, db.displayColors.sysMsg.r, db.displayColors.sysMsg.g, db.displayColors.sysMsg.b);
+        win.online = false;
+        if(win and win:IsShown() and db.pop_rules.whisper[curState].supress) then
+            eventItem:Block();
+        end
         return;
     end
     
 end
 
-function WhisperEngine:ADDON_LOADED(...)
-    bumpWhisperEventToEnd();
-end
 
 --------------------------------------
 --          Whisper Related Hooks   --
@@ -611,53 +489,6 @@ local function CF_HandleChatType(editBox, msg, command, send)
 	end
 end
 
-CF_MessageEventHandler_orig = _G.ChatFrame_MessageEventHandler;
-local function CF_MessageEventHandler(self, event, ...)
-    -- supress status messages
-    if(db and db.enabled and event == "CHAT_MSG_SYSTEM") then
-        local msg, win = select(1, ...);
-        local curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
-        -- handle no user online and chat ignored from being shown in default chat frame.
-        win = Windows[FormatUserName(string.match(msg, ERR_CHAT_PLAYER_NOT_FOUND_S)) or "NIL"];
-        win = win or Windows[FormatUserName(string.match(msg, CHAT_IGNORED)) or "NIL"];
-        if(win and win.type == "whisper") then
-            if(win:IsShown() and db.pop_rules.whisper[curState].supress) then
-                return;
-            elseif(not win.msgSent) then
-                return;
-            end
-        end
-        -- user comes/goes online/offline.
-        win = Windows[FormatUserName(string.match(msg, ERR_FRIEND_ONLINE_SS)) or "NIL"];
-        win = win or Windows[FormatUserName(string.match(msg, ERR_FRIEND_OFFLINE_S)) or "NIL"];
-        if(win and win:IsShown() and db.pop_rules.whisper[curState].supress) then
-            return;
-        end
-    end
-    
-    if(db and db.enabled and (event == "CHAT_MSG_AFK" or event == "CHAT_MSG_DND")) then
-        local curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
-        if(Windows[select(2,...)] and db.pop_rules.whisper[curState].supress) then
-            return;
-        end
-    end
-
-    -- process event whisper events
-    if(db and db.enabled and (event == "CHAT_MSG_WHISPER" or event == "CHAT_MSG_WHISPER_INFORM")) then
-        local eventItem = WhisperQueue_Index[select(11, ...)];
-        if(eventItem) then
-            addToTableUnique(eventItem.ChatFrames, self);
-        else
-            eventItem = pushEvent(event, ...);
-            addToTableUnique(eventItem.ChatFrames, self);
-        end
-    else
-        CF_MessageEventHandler_orig(self, event, ...);
-    end
-end
-_G.ChatFrame_MessageEventHandler = CF_MessageEventHandler;
---------------------------------------------------------
-
 
 -- the following hook is needed in order to intercept Send Whisper from UnitPopup Menus
 hooksecurefunc("ChatFrame_SendTell", CF_sendTell);
@@ -671,10 +502,6 @@ hooksecurefunc("ChatEdit_HandleChatType", CF_HandleChatType);
 --Hook ChatFrame_ReplyTell & ChatFrame_ReplyTell2
 hooksecurefunc("ChatFrame_ReplyTell", function() replyTellTarget(true) end);
 hooksecurefunc("ChatFrame_ReplyTell2", function() replyTellTarget(false) end);
-
---Hook in order to make sure that WIM receives it's events after the default chat frames.
-hooksecurefunc("ChatFrame_AddMessageGroup", function() bumpWhisperEventToEnd(); end);
-hooksecurefunc("ChatFrame_RemoveMessageGroup", function() bumpWhisperEventToEnd(); end);
 
 local hookedSendChatMessage = _G.SendChatMessage;
 function _G.SendChatMessage(...)

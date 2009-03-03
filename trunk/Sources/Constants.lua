@@ -12,7 +12,7 @@ setfenv(1, WIM);
 
 local talent = L;
 if(libs.BabbleTalent) then -- need to do this check to prevent error if lib not loaded.
-     talent = libs.BabbleTalent:GetLookupTable();
+     talent = libs.BabbleTalent:GetBaseLookupTable();
      L["Hybrid"] = talent["Hybrid"]; -- preserve hybrid localization.
 end
 
