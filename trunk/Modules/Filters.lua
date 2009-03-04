@@ -90,14 +90,14 @@ local maxLevel = isWOTLK and 80 or 70;
 local Filters = CreateModule("Filters", true);
 
 -- This module requires LibChatHandler-1.0
-_G.LibStub:GetLibrary("LibChatHandler-1.0"):embedLibrary(Filters);
+_G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(Filters);
 
 -- filtering
 
 local userCache = {};
 
 local function whoCallback(result, eventItem, filter)
-    local arg1, name = eventItem:getArgs();
+    local arg1, name = eventItem:GetArgs();
     if(result and result.Online and result.Name == name) then
         userCache[name] = result.Level;
         if(result.Level < filter.level) then
@@ -107,12 +107,13 @@ local function whoCallback(result, eventItem, filter)
                 Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, eventItem.continueFrom);
             elseif(filter.action == 2) then
                 dPrint("Filter->WhoCallBack: Ignored()");
-                eventItem:BlockFromChatFrame();
+                eventItem.ignoredByWIM = true;
+                eventItem:BlockFromDelegate(modules.WhisperEngine);
                 Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, eventItem.continueFrom);
             elseif(filter.action == 3) then
                 dPrint("Filter->WhoCallBack: Block()");
                 eventItem:Block();
-                eventItem:Release();
+                eventItem:Release(Filters);
             else
                 dPrint("Filter->WhoCallBack: Unknown Action...");
                 Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, eventItem.continueFrom);
@@ -128,7 +129,7 @@ local function whoCallback(result, eventItem, filter)
 end
 
 local function processFilter(eventItem, filter)
-    local message, name = eventItem:getArgs();
+    local message, name = eventItem:GetArgs();
     if(filter.type == 1) then
         --message = string.trim(message);
         local patterns = filter.pattern.."\n";
@@ -152,7 +153,6 @@ local function processFilter(eventItem, filter)
     elseif(filter.type == 3) then
         -- do not do look up if user has window opened already. Defeats the purpose.
         if(not windows.active.whisper[name] and not userCache[name]) then
-            eventItem:Suspend();
             dPrint("Running WhoLookUp on: "..name);
             local result = libs.WhoLib:UserInfo(name, 
     	    {
@@ -165,6 +165,8 @@ local function processFilter(eventItem, filter)
     	    });
             if(result) then
                 whoCallback(result, eventItem, filter);
+            else
+                eventItem:Suspend(Filters);
             end
             return 0;
         elseif(windows.active.whisper[name]) then
@@ -189,10 +191,6 @@ function Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, startFrom)
     end
     startFrom = type(startFrom) == "number" and startFrom or 1;
     for i=startFrom, #filters do
-        if(not filters[i] and eventItem.suspendedByWIM_Filter) then
-            eventItem:Release();
-            return;
-        end
         if(filters[i].received and filters[i].enabled) then
             eventItem.continueFrom = startFrom + 1;
             local result = processFilter(eventItem, filters[i]);
@@ -203,7 +201,8 @@ function Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, startFrom)
             elseif(result == 1) then
                 break;
             elseif(result == 2) then
-                eventItem:BlockFromChatFrame();
+                eventItem.ignoredByWIM = true;
+                eventItem:BlockFromDelegate(modules.WhisperEngine);
                 break;
             elseif(result == 3) then
                 eventItem:Block();
@@ -213,7 +212,7 @@ function Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, startFrom)
     end
     if(eventItem.suspendedByWIM_Filter) then
         eventItem.suspendedByWIM_Filter = false;
-        eventItem:Release();
+        eventItem:Release(Filters);
     end
     if(options.frame and options.frame.filterList) then
         options.frame.filterList:Hide();
@@ -235,13 +234,18 @@ function Filters:CHAT_MSG_WHISPER_INFORM_CONTROLLER(eventItem, startFrom)
             elseif(result == 1) then
                 break;
             elseif(result == 2) then
-                eventItem:BlockFromChatFrame();
+                eventItem.ignoredByWIM = true;
+                eventItem:BlockFromDelegate(modules.WhisperEngine);
                 break;
             elseif(result == 3) then
                 eventItem:Block();
                 break;
             end
         end
+    end
+    if(eventItem.suspendedByWIM_Filter) then
+        eventItem.suspendedByWIM_Filter = false;
+        eventItem:Release(Filters);
     end
     if(options.frame and options.frame.filterList) then
         options.frame.filterList:Hide();
@@ -251,8 +255,8 @@ end
 
 
 function Filters:OnEnable()
-    Filters:RegisterChatEvent("CHAT_MSG_WHISPER");
-    Filters:RegisterChatEvent("CHAT_MSG_WHISPER_INFORM");
+    Filters:RegisterChatEvent("CHAT_MSG_WHISPER", 1);
+    Filters:RegisterChatEvent("CHAT_MSG_WHISPER_INFORM", 1);
 end
 
 function Filters:OnDisable()

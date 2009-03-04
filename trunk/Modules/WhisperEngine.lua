@@ -36,7 +36,7 @@ setfenv(1, WIM);
 local WhisperEngine = CreateModule("WhisperEngine");
 
 -- This Module requires LibChatHandler-1.0
-_G.LibStub:GetLibrary("LibChatHandler-1.0"):embedLibrary(WhisperEngine);
+_G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(WhisperEngine);
 
 -- declare default settings for whispers.
 -- if new global env wasn't set to WIM's namespace, then your module would call as follows:
@@ -255,6 +255,9 @@ RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
 
 -- CHAT_MSG_WHISPER  CONTROLLER (For Supression from Chat Frame)
 function WhisperEngine:CHAT_MSG_WHISPER_CONTROLLER(eventItem, ...)
+    if(eventItem.ignoredByWIM) then
+        return;
+    end
     -- execute appropriate supression rules
     local curState = curState;
     curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
@@ -278,6 +281,9 @@ end
 
 -- CHAT_MSG_WHISPER_INFORM  CONTROLLER (For Supression from Chat Frame)
 function WhisperEngine:CHAT_MSG_WHISPER_INFORM_CONTROLLER(eventItem, ...)
+    if(eventItem.ignoredByWIM) then
+        return;
+    end
     -- execute appropriate supression rules
     local curState = curState;
     curState = db.pop_rules.whisper.alwaysOther and "other" or curState;

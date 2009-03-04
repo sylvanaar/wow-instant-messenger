@@ -22,7 +22,8 @@ local str_find = string.find;
 
 local eventHandler = CreateFrame("Frame", "LibChatHander_EventHandler");
 
-local DelegatedEvents = {}; -- objects which handle events
+ DelegatedEvents = {}; -- objects which handle events
+ ChatEvents = {};
 
 --------------------------------------
 --          table recycling         --
@@ -63,7 +64,7 @@ end
 local function destroyTable(tbl)
     if(tbl) then
         for k, v in pairs(tbl) do
-            if(type(v) == "table" and not v.GetParent) then
+            if(type(v) == "table" and not v.GetParent and not v.LibChatHandler_Delegate) then
                 destroyTable(v);
             end
             tbl[k] = nil;
@@ -93,15 +94,44 @@ end
 --          Event Object Object       --
 --------------------------------------
 
--- The following functions provide actions for the chat events.
-local function Suspend(self)
-    self.suspended = self.suspended + 1;
+--is delegate in suspended list
+local function isSuspendedBy(eventItem, delegate)
+    local tbl = eventItem.suspendedBy;
+    return tbl_indexOf(tbl, delegate) and true or false;
 end
 
-local function Release(self, releasedBy)
-    self.suspended = self.suspended > 0 and self.suspended - 1 or 0;
-    if(self.suspended == 0) then
-        lib:popEvents();
+--is delegate valid for eventItem
+local function isValidDelegate(eventItem, delegate)
+    local tbl = DelegatedEvents[eventItem:GetEvent()];
+    if(tbl) then
+        return tbl_indexOf(tbl, delegate) and true or false;
+    else
+        return false;
+    end
+end
+
+-- The following functions provide actions for the chat events.
+local function Suspend(self, delegate)
+    if(isValidDelegate(self, delegate)) then
+        if(isSuspendedBy(self, delegate)) then
+            return false, "Event already suspended by delegate";
+        else
+            return true;
+        end
+    else
+        return false, "Invalid delegate - Not registered for event.";
+    end
+end
+
+local function Release(self, delegate)
+    if(isSuspendedBy(self, delegate)) then
+        tbl_rm(self.suspendedBy, tbl_indexOf(self.suspendedBy, delegate));
+        if(#self.suspendedBy == 0) then
+            lib:popEvents();
+        end
+        return true;
+    else
+        return false, "Delegate hasn't claimed responsibility for suspending this event.";
     end
 end
 
@@ -113,19 +143,30 @@ local function BlockFromChatFrame(self)
     self.flag_blocked_from_chatFrame = true;
 end
 
+local function BlockFromDelegate(self, delegate)
+    if(isValidDelegate(self, delegate)) then
+        tbl_ins(self.blockFrom, delegate);
+        _G.DEFAULT_CHAT_FRAME:AddMessage("Delegate Blocked");
+        return true;
+    else
+        _G.DEFAULT_CHAT_FRAME:AddMessage("Delegate Not Blocked");
+        return false, "Invalid delegate - Not registered for event.";
+    end
+end
+
 local function Allow(self)
     -- do nothing to event
 end
 
 -- provide some get methods for args & events
-local function getArgs(self)
+local function GetArgs(self)
     -- function returns 15 args incase blizzard ever decides to add more.
     return self.arg[1], self.arg[2], self.arg[3], self.arg[4], self.arg[5],
         self.arg[6], self.arg[7], self.arg[8], self.arg[9], self.arg[10],
         self.arg[11], self.arg[12], self.arg[13], self.arg[14]; 
 end
 
-local function getEvent(self)
+local function GetEvent(self)
     return self.event;
 end
 
@@ -137,16 +178,18 @@ local function newChatEvent(event, ...)
     c.frames = newTable(regd4Event(event));
     c.flag_block = false;
     c.flag_blocked_from_chatFrame = false;
-    c.suspended = 0;
+    c.suspendedBy = newTable();
+    c.blockFrom = newTable();
     --event actions
     c.Suspend = Suspend;
     c.Release = Release;
     c.Block = Block;
     c.BlockFromChatFrame = BlockFromChatFrame;
+    c.BlockFromDelegate = BlockFromDelegate;
     c.Allow = Allow;
     --event data
-    c.getArgs = getArgs;
-    c.getEvent = getEvent;
+    c.GetArgs = GetArgs;
+    c.GetEvent = GetEvent;
     return c;
 end
 
@@ -155,7 +198,6 @@ end
 --------------------------------------
 --          Event Handling          --
 --------------------------------------
-local ChatEvents = {};
 
 local ChatFrame_MessageEventHandler_orig = ChatFrame_MessageEventHandler;
 
@@ -170,17 +212,19 @@ end
 local function popEvents()
     for i=#ChatEvents, 1, -1 do
         local e = ChatEvents[i];
-        if(e.suspended == 0) then
+        if(#e.suspendedBy == 0) then
             if(not e.flag_block) then
                 tbl_rm(ChatEvents, i);
                 -- first return to registered objects
-                local delegates = DelegatedEvents[e:getEvent()];
+                local delegates = DelegatedEvents[e:GetEvent()];
                 if(delegates) then
                     -- for each delegate handling the event
                     for j=1, #delegates do
-                        local handler = delegates[j][e:getEvent()];
-                        if(handler) then
-                            handler(delegates[j], e:getArgs());
+                        if(not tbl_indexOf(e.blockFrom, delegates[j])) then
+                            local handler = delegates[j][e:GetEvent()];
+                            if(handler) then
+                                handler(delegates[j], e:GetArgs());
+                            end
                         end
                     end
                 end
@@ -191,7 +235,7 @@ local function popEvents()
                         local f = e.frames[j];
                         local fName = f and f.GetName and f:GetName();
                         if(fName and str_find(fName, "^ChatFrame%d+")) then
-                            ChatFrame_MessageEventHandler_orig(e.frames[j], e:getEvent(), e:getArgs());
+                            ChatFrame_MessageEventHandler_orig(e.frames[j], e:GetEvent(), e:GetArgs());
                         end
                     end
                 end
@@ -274,6 +318,7 @@ end
 local function prepDelegate(delegate)
     delegate.RegisterChatEvent = RegisterChatEvent;
     delegate.UnregisterChatEvent = UnregisterChatEvent;
+    delegate.LibChatHandler_Delegate = true;
 end
 
 
@@ -295,14 +340,14 @@ end
 
 
 -- available lib API
-function lib:newDelegate()
+function lib:NewDelegate()
     local delegate = newTable();
     prepDelegate(delegate);
     
     return delegate;
 end
 
-function lib:embedLibrary(tbl)
+function lib:Embed(tbl)
     -- tbl must be a table, if not, do nothing
     if(type(tbl) ~= "table") then
         return;
