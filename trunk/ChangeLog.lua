@@ -21,7 +21,8 @@ addEntry("3.0.6", "03/??/2008", [[
     *Fixed error when closing tabs.
     +Added LibChatHandler-1.0 for chat management. I will post documentation for this.
     *Fixed Level lookup.
-    *LibBabbel-TalentTree is disabled for now till i figure out why i can't get it to work.
+    *LibBabbel-TalentTree is no longer packaged with WIM.
+    +Added compatibility for PTR ChatEventFilters.
 ]]);
 addEntry("3.0.5", "12/02/2008", [[
     *Fixed: Who lookups wouldn't update if already cached.
