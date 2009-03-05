@@ -18,7 +18,7 @@ beta = true; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight (we'll keep this around for now...)
-isWOTLK = select(4, _G.GetBuildInfo()) >= 30000;
+isPTR = select(4, _G.GetBuildInfo()) >= 30100;
 
 -- is Private Server?
 isPrivateServer = not string.match(_G.GetCVar("realmList"), "worldofwarcraft.com$") and true or false;
@@ -82,7 +82,6 @@ local function initialize()
     libs.Astrolabe = _G.DongleStub("Astrolabe-0.4");
     libs.SML = _G.LibStub:GetLibrary("LibSharedMedia-3.0");
     libs.ChatHandler = _G.LibStub:GetLibrary("LibChatHandler-1.0");
-    libs.BabbleTalent = _G.LibStub:GetLibrary("LibBabble-3.0");
     
     isInitialized = true;
     
@@ -252,38 +251,39 @@ end
 --          Event Handlers          --
 --------------------------------------
 
-local function honorChatFrameEventFilter(event, msg)
-    local chatFilters = _G.ChatFrame_GetMessageEventFilters(event);
-    if chatFilters then 
-	local filter, newmsg = false;
-        for _, filterFunc in pairs(chatFilters) do
-            filter, newmsg = filterFunc(msg);
-            if filter then 
-		return true; 
-	    end 
-	end 
-    end 
-    return false;
+function WIM.honorChatFrameEventFilter(event, ...)
+        local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
+        local chatFilters = _G.ChatFrame_GetMessageEventFilters(event);
+        if(isPTR) then
+                local chatFilters = _G.ChatFrame_GetMessageEventFilters(event);
+                if chatFilters then 
+                        local filter = false;
+                        for _, filterFunc in pairs(chatFilters) do
+                                filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = filterFunc(event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
+                                if filter then 
+                                        return true, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11; 
+                                end 
+                        end 
+                end 
+                return false, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11;
+        else
+            local msg = arg1;
+            if chatFilters then 
+        	local filter, newmsg = false;
+                for _, filterFunc in pairs(chatFilters) do
+                    filter, newmsg = filterFunc(msg);
+                    if filter then 
+        		return true, ...; 
+        	    end 
+        	end 
+            end 
+            return false, ...;
+        end
 end
 
 
 -- This is WIM's core event controler.
 function WIM:EventHandler(event, ...)
-    local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
-    -- before we do any filtering, make sure that we are not speaking to a GM.
-    -- no matter what, we want to see these.
-    if(not (event == "CHAT_MSG_WHISPER" and agr6 ~= "GM")) then
-        -- first we will filter out
-        if(honorChatFrameEventFilter(event, arg1 or "")) then
-            -- ChatFrame's event filters said to block this message.
-            return;
-        end
-        -- other filtering will take place in individual event handlers within modules.
-    end
-    
-    if(event == "CHAT_MSG_WHISPER" and arg6 == "GM") then
-        lists.gm[arg2] = true;
-    end
 
     -- Core WIM Event Handlers.
     dPrint("Event '"..event.."' received.");
@@ -423,7 +423,6 @@ local talentOrder = {};
 function TalentsToString(talents, class)
 	--passed talents in format of "#/#/#";
         -- first check that all required information is passed.
-        if(1) then return "N/A"; end
 	local t1, t2, t3 = string.match(talents or "", "(%d+)/(%d+)/(%d+)");
 	if(not t1 or not t2 or not t3 or not class) then
                 return talents;

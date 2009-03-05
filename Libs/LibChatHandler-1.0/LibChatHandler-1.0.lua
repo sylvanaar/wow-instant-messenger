@@ -12,6 +12,7 @@ local lib = LibStub:NewLibrary(MAJOR, MINOR);
 
 if not lib then return; end -- newer version is already loaded
 
+
 -- locals are always faster than globals
 local tbl_rm = table.remove;
 local tbl_ins = table.insert;
@@ -20,10 +21,12 @@ local pairs = pairs;
 local regd4Event = GetFramesRegisteredForEvent;
 local str_find = string.find;
 
+
+local DelegatedEvents = {}; -- objects which handle events
+local ChatEvents = {}; -- queued events
+
 local eventHandler = CreateFrame("Frame", "LibChatHander_EventHandler");
 
- DelegatedEvents = {}; -- objects which handle events
- ChatEvents = {};
 
 --------------------------------------
 --          table recycling         --
@@ -91,7 +94,7 @@ local function tbl_indexOf(tbl, obj)
 end
 
 --------------------------------------
---          Event Object Object       --
+--        Event Object Object       --
 --------------------------------------
 
 --is delegate in suspended list
@@ -169,6 +172,15 @@ end
 local function GetEvent(self)
     return self.event;
 end
+
+local function GetDelegateCount(self)
+    return #DelegatedEvents[self:GetEvent()];
+end
+
+local function GetDelegate(self, index)
+    return DelegatedEvents[self:GetEvent()][index];
+end
+
 
 -- instantiate new chat event object
 local function newChatEvent(event, ...)

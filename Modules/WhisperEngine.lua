@@ -255,6 +255,9 @@ RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
 
 -- CHAT_MSG_WHISPER  CONTROLLER (For Supression from Chat Frame)
 function WhisperEngine:CHAT_MSG_WHISPER_CONTROLLER(eventItem, ...)
+    if(select(6, ...) == "GM") then
+        lists.gm[select(2, ...)] = true;
+    end
     if(eventItem.ignoredByWIM) then
         return;
     end
@@ -267,7 +270,7 @@ function WhisperEngine:CHAT_MSG_WHISPER_CONTROLLER(eventItem, ...)
 end
 
 function WhisperEngine:CHAT_MSG_WHISPER(...)
-    local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = honorChatFrameEventFilter("CHAT_MSG_WHISPER", ...);
     local color = WIM.db.displayColors.wispIn; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
@@ -293,7 +296,7 @@ function WhisperEngine:CHAT_MSG_WHISPER_INFORM_CONTROLLER(eventItem, ...)
 end
 
 function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
-    local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = honorChatFrameEventFilter("CHAT_MSG_WHISPER_INFORM", ...);
     local color = db.displayColors.wispOut; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER_INFORM", ...);
