@@ -8,6 +8,15 @@ License: LGPL v2.1
 ]]
 
 local MAJOR, MINOR = "LibChatHandler-1.0", tonumber(("$Revision: 1 $"):match("(%d+)"));
+-- check if lib is already loaded and check versioning -- update as needed.
+local prevLib = LibStub:GetLibrary("LibChatHandler-1.0", 1); -- load library silently.
+local prevDelegatedEvents;
+if(prevLib and prevLib:GetMinor() < MINOR) then
+    --upgrade needed perform cleanup operations.
+    prevDelegatedEvents = prevLib:GetDelegatedEventsTable();
+    prevLib:ReadyUpgrade();
+end
+
 local lib = LibStub:NewLibrary(MAJOR, MINOR);
 
 if not lib then return; end -- newer version is already loaded
@@ -22,10 +31,10 @@ local regd4Event = GetFramesRegisteredForEvent;
 local str_find = string.find;
 
 
-local DelegatedEvents = {}; -- objects which handle events
+local DelegatedEvents = prevDelegatedEvents or {}; -- objects which handle events
 local ChatEvents = {}; -- queued events
 
-local eventHandler = CreateFrame("Frame", "LibChatHander_EventHandler");
+local eventHandler = LibChatHander_EventHandler or CreateFrame("Frame", "LibChatHander_EventHandler");
 
 
 --------------------------------------
@@ -173,7 +182,7 @@ local function GetEvent(self)
     return self.event;
 end
 
-local function GetDelegateCount(self)
+local function GetNumDelegate(self)
     return #DelegatedEvents[self:GetEvent()];
 end
 
@@ -202,6 +211,8 @@ local function newChatEvent(event, ...)
     --event data
     c.GetArgs = GetArgs;
     c.GetEvent = GetEvent;
+    c.GetNumDelegate = GetNumDelegate;
+    c.GetDelegate = GetDelegate;
     return c;
 end
 
@@ -275,6 +286,10 @@ local function eventHandler_OnEvent(self, event, ...)
     end
 end
 eventHandler:SetScript("OnEvent", eventHandler_OnEvent);
+-- if we are upgrading, we want to make sure all events are accounted for.
+for event, _ in pairs(DelegatedEvents) do
+    eventHandler:RegisterEvent(event);
+end
 
 -- Hook ChatFrame_MessageHandler. We want our delegates to see the event first.
 _G.ChatFrame_MessageEventHandler = function(self, event, ...)
@@ -370,8 +385,32 @@ end
 
 -- public wrapper needed because of order of declarations.
 -- (To keep code cleaner)
-function lib:popEvents()
+local function popEvents()
     popEvents();
 end
 
+-- get MINOR - for upgrade checks.
+local function GetMinor()
+    return MINOR;
+end
 
+-- get DelegatedEvents table for upgrade. (really only needed if Loaded on demand)
+local function GetDelegatedEventsTable()
+    return DelegatedEvents;
+end
+
+-- ready the lib to be upgraded.
+local function ReadyUpgrade()
+    -- restore hook
+    ChatFrame_MessageEventHandler = ChatFrame_MessageEventHandler_orig;
+end
+
+-- load hidden API
+setmetatable(lib, {
+    __index = function(t, k)
+        if(k == "popEvents") then return popEvents; end
+        if(k == "GetMinor") then return GetMinor; end
+        if(k == "GetDelegatedEventsTable") then return GetDelegatedEventsTable; end
+        if(k == "ReadyUpgrade") then return ReadyUpgrade; end
+    end
+});
