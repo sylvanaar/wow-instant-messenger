@@ -8,7 +8,7 @@
 ## X-Website: http://www.wimaddon.com/
 ## X-Category: MYADDONS_CATEGORY_CHAT
 ## DefaultState: Enabled
-## OptionalDeps: Prat-3.0, SpamMeNot, SpamSentry, LibStub, Astrolabe, CallbackHandler-1.0, ChatThrottleLib, LibBabble-TalentTree-3.0, LibSharedMedia-3.0, LibWho-2.0
+## OptionalDeps: Prat-3.0, SpamMeNot, SpamSentry, LibStub, Astrolabe, CallbackHandler-1.0, ChatThrottleLib, LibSharedMedia-3.0, LibWho-2.0, LibChatHandler-1.0
 ## SavedVariables: WIM3_Data, WIM3_Cache, WIM3_Filters, WIM3_History
 
 Sources\Namespace.lua
