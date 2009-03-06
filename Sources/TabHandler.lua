@@ -473,7 +473,10 @@ local function createTabGroup()
                 win:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", oldWin:GetLeft(), oldWin:GetTop());
                 win:SetAlpha(oldWin:GetAlpha());
             end
-            win:Show();
+            if( not win.popNoShow ) then
+                win:Show();
+            end
+            win.popNoShow = nil;
             win.customSize = oldCustomSize;
             self:UpdateTabs();
             for i=1,#self.attached do
@@ -520,7 +523,8 @@ local function createTabGroup()
             end
             addToTableUnique(self.attached, win);
             win.tabStrip = self;
-            if(#self.attached == 1 or win:IsVisible()) then
+            --if(#self.attached == 1 or win:IsVisible()) then
+            if(self:IsVisible()) then
                 self:JumpToTab(win, true);
                 win:UpdateProps();
             else
