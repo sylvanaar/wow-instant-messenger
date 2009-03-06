@@ -428,8 +428,7 @@ local WIM_ClassicSkin_Yellow = {
 };
 
 -- preprocessing - :-)
-local wd, month, day, year = CalendarGetDate();
-if(month == 4 and day == 1) then
+if(WIM.aprilFools) then
     WIM_ClassicSkin.message_window.widgets.class_icon.texture = WIM_ClassicSkin.message_window.widgets.class_icon.texture .. "2";
 end
 

@@ -51,6 +51,13 @@ function Sounds:PostEvent_WhisperInform(...)
     end
 end
 
+--temp of course...
+if(aprilFools) then
+    Sounds.OnWindowShow = function()
+        PlaySoundFile("Interface\\AddOns\\"..addonTocName.."\\Sounds\\aping1.wav");
+    end
+    PlaySoundFile("Interface\\AddOns\\"..addonTocName.."\\Sounds\\aping2.mp3");
+end
 
 
 
