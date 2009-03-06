@@ -416,4 +416,8 @@ WIM.AddLocale("enUS", {
     ["Survival"] = true,
     ["Unholy"] = true,
     
+    -- ChangeLog.lua --
+    ["Change Log"] = true,
+    ["View WIM's change log."] = true,
+    
 });

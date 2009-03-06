@@ -2,7 +2,7 @@
     This change log was meant to be viewed in game.
     You may do so by typing: /wim changelog
 ]]
-
+local currentRevision = tonumber(("$Revision$"):match("(%d+)"));
 local log = {};
 local t_insert = table.insert;
 
@@ -90,8 +90,8 @@ end
 local function getEntryText(index)
     local entry = log[index];
     if(not entry) then return ""; end
-    
-    local txt = "|rVersion "..entry.v.."  ("..entry.r..")\n";
+    local revision = index == 1 and " - Revision "..WIM.GetRevision() or "";
+    local txt = "|rVersion "..entry.v.."  ("..entry.r..")"..revision.."\n";
     txt = txt..formatEntry(entry.d);
     
     return txt.."\n\n";
@@ -135,7 +135,7 @@ local function createChangeLogWindow()
     win.title:SetPoint("TOPLEFT", 50 , -20);
     local font = win.title:GetFont();
     win.title:SetFont(font, 16, "");
-    win.title:SetText(WIM.L["WIM (WoW Instant Messenger)"].." v"..WIM.version.."  -  "..WIM.L["Change Log"]);
+    win.title:SetText(WIM.L["WIM (WoW Instant Messenger)"].." v"..WIM.version.."   -  "..WIM.L["Change Log"]);
     
     -- create close button
     win.close = CreateFrame("Button", win:GetName().."Close", win);
@@ -172,4 +172,10 @@ function WIM.ShowChangeLog()
     changeLogWindow = changeLogWindow or createChangeLogWindow();
     changeLogWindow:Show();
 end
-WIM.RegisterSlashCommand("changelog", WIM.ShowChangeLog, WIM.L["View WIM's change log"]);
+
+function WIM.GetRevision()
+    return currentRevision;
+end
+
+WIM.RegisterSlashCommand("changelog", WIM.ShowChangeLog, WIM.L["View WIM's change log."]);
+
