@@ -1327,7 +1327,7 @@ function ShowAllUnreadWindows(type)
 	for i=1, #WindowSoupBowl.windows do
 		if(WindowSoupBowl.windows[i].inUse and WindowSoupBowl.windows[i].obj.type == (type or WindowSoupBowl.windows[i].obj.type)) then
                         local obj = WindowSoupBowl.windows[i].obj;
-                        if(obj.unreadCount > 0) then
+                        if(obj and obj.unreadCount > 0) then
                                 if(obj.tabStrip) then
                                         if(addToTableUnique(showAllUnreadTbl, obj.tabStrip)) then
                         			WindowSoupBowl.windows[i].obj:Pop(true);
