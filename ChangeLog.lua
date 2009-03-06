@@ -23,6 +23,8 @@ addEntry("3.0.6", "03/??/2008", [[
     *Fixed Level lookup.
     *LibBabbel-TalentTree is no longer packaged with WIM.
     +Added compatibility for PTR ChatEventFilters.
+    +Added Change Log Viewer (/wim changelog).
+    *Set cache timeout of 60 for filter level lookups.
 ]]);
 addEntry("3.0.5", "12/02/2008", [[
     *Fixed: Who lookups wouldn't update if already cached.
@@ -73,3 +75,99 @@ addEntry("3.0.3", "10/23/2008", [[
     +Added sound options.
     +Added some stock sound files.
 ]]);
+
+
+local function formatEntry(txt)
+    txt = txt:gsub("[ ]+(%+)", " |r|cff69ccf0+ ");
+    txt = txt:gsub("[ ]+(%*)", " |r|cffc79c6e* ");
+    txt = txt:gsub("[ ]+(%-)", " |r|cffc41f3b- ");
+    return txt;
+end
+
+
+local function getEntryText(index)
+    local entry = log[index];
+    if(not entry) then return ""; end
+    
+    local txt = "|rVersion "..entry.v.."  ("..entry.r..")\n";
+    txt = txt..formatEntry(entry.d);
+    
+    return txt.."\n\n";
+end
+
+
+
+local changeLogWindow;
+local function createChangeLogWindow()
+    -- create frame object
+    local win = CreateFrame("Frame", "WIM3_ChangeLog", _G.UIParent);
+    win:Hide(); -- hide initially, scripts aren't loaded yet.
+    
+    -- set size and position
+    win:SetWidth(700);
+    win:SetHeight(500);
+    win:SetPoint("CENTER");
+    
+    -- set backdrop
+    win:SetBackdrop({bgFile = "Interface\\AddOns\\"..WIM.addonTocName.."\\Sources\\Options\\Textures\\Frame_Background", 
+        edgeFile = "Interface\\AddOns\\"..WIM.addonTocName.."\\Sources\\Options\\Textures\\Frame", 
+        tile = true, tileSize = 64, edgeSize = 64, 
+        insets = { left = 64, right = 64, top = 64, bottom = 64 }});
+
+    -- set basic frame properties
+    win:SetClampedToScreen(true);
+    win:SetFrameStrata("DIALOG");
+    win:SetMovable(true);
+    win:SetToplevel(true);
+    win:EnableMouse(true);
+    win:RegisterForDrag("LeftButton");
+
+    -- set script events
+    win:SetScript("OnShow", function(self) _G.PlaySound("igMainMenuOpen");  end);
+    win:SetScript("OnHide", function(self) _G.PlaySound("igMainMenuClose");  end);
+    win:SetScript("OnDragStart", function(self) self:StartMoving(); end);
+    win:SetScript("OnDragStop", function(self) self:StopMovingOrSizing(); end);
+    
+    -- create and set title bar text
+    win.title = win:CreateFontString(win:GetName().."Title", "OVERLAY", "ChatFontNormal");
+    win.title:SetPoint("TOPLEFT", 50 , -20);
+    local font = win.title:GetFont();
+    win.title:SetFont(font, 16, "");
+    win.title:SetText(WIM.L["WIM (WoW Instant Messenger)"].." v"..WIM.version.."  -  "..WIM.L["Change Log"]);
+    
+    -- create close button
+    win.close = CreateFrame("Button", win:GetName().."Close", win);
+    win.close:SetWidth(18); win.close:SetHeight(18);
+    win.close:SetPoint("TOPRIGHT", -24, -20);
+    win.close:SetNormalTexture("Interface\\AddOns\\"..WIM.addonTocName.."\\Sources\\Options\\Textures\\blipRed");
+    win.close:SetHighlightTexture("Interface\\AddOns\\"..WIM.addonTocName.."\\Sources\\Options\\Textures\\close", "BLEND");
+    win.close:SetScript("OnClick", function(self)
+            self:GetParent():Hide();
+        end);
+    
+    win.textFrame = CreateFrame("ScrollFrame", "WIM3_ChangeLogTextFrame", win, "UIPanelScrollFrameTemplate");
+    win.textFrame:SetPoint("TOPLEFT", 25, -50);
+    win.textFrame:SetPoint("BOTTOMRIGHT", -42, 20);
+    
+    win.textFrame.text = CreateFrame("SimpleHTML", "WIM3_ChangeLogTextFrameText", win.textFrame);
+    win.textFrame.text:SetWidth(win.textFrame:GetWidth());
+    win.textFrame.text:SetHeight(200);
+    win.textFrame:SetScrollChild(win.textFrame.text);
+    
+    local tmp = "";
+    for i=1, #log do
+        tmp = tmp..getEntryText(i);
+    end
+    win.textFrame.text:SetFontObject(ChatFontNormal);
+    win.textFrame.text:SetFontObject("h1",QuestFont_Shadow_Huge);
+    win.textFrame.text:SetText(tmp);
+    win.textFrame:UpdateScrollChildRect();
+    
+    return win;
+end
+
+function WIM.ShowChangeLog()
+    changeLogWindow = changeLogWindow or createChangeLogWindow();
+    changeLogWindow:Show();
+end
+WIM.RegisterSlashCommand("changelog", WIM.ShowChangeLog, WIM.L["View WIM's change log"]);
