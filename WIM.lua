@@ -471,3 +471,8 @@ function GetTalentSpec()
         return talents ~= "" and talents or "0/0/0";
 end
 
+
+local wd, month, day, year = _G.CalendarGetDate();
+if(month == 4 and day == 1) then
+        aprilFools = true;
+end
