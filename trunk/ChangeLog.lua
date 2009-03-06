@@ -25,6 +25,8 @@ addEntry("3.0.6", "03/??/2008", [[
     +Added compatibility for PTR ChatEventFilters.
     +Added Change Log Viewer (/wim changelog).
     *Set cache timeout of 60 for filter level lookups.
+    *Fixed error that would sometimes occur when right mouse clicking the minimap icon.
+    *Fixed bug which caused tabbed windows to pop regardless of selected rules.
 ]]);
 addEntry("3.0.5", "12/02/2008", [[
     *Fixed: Who lookups wouldn't update if already cached.

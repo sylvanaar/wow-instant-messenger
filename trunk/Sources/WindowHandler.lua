@@ -437,6 +437,7 @@ end
 
 -- this needs to be looked at. it isn't doing anything atm...
 local function MessageWindow_Frame_OnShow(self)
+                --_G.DEFAULT_CHAT_FRAME:AddMessage(_G.debugstack(1))
         if(self ~= DemoWindow) then
                 if(db.autoFocus == true) then
         		--_G[self:GetName().."MsgBox"]:SetFocus();
