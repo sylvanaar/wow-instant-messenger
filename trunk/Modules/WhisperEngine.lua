@@ -523,6 +523,9 @@ function _G.SendChatMessage(...)
     hookedSendChatMessage(...);
 end
 
+-- global reference
+GetWhisperWindowByUser = getWhisperWindowByUser;
+
 
 -- This is a core module and must always be loaded...
 WhisperEngine.canDisable = false;

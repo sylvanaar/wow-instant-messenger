@@ -375,7 +375,7 @@ function IsGM(name)
         
         -- Blizz gave us a new tool. Lets use it.
         if(_G.GMChatFrame_IsGM and _G.GMChatFrame_IsGM(name)) then
-                lists.gm[user] = 1;
+                lists.gm[name] = 1;
         end
         
 	if(string.len(name) < 4) then return false; end
@@ -384,7 +384,7 @@ function IsGM(name)
 		lists.gm[tmp] = 1;
 		return true;
 	else
-		if(lists.gm[user]) then
+		if(lists.gm[name]) then
 			return true;
 		else
 			return false;

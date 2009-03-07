@@ -420,4 +420,10 @@ WIM.AddLocale("enUS", {
     ["Change Log"] = true,
     ["View WIM's change log."] = true,
     
+    -- Filters.lua --
+    ["Show Alert"] = true,
+    ["WIM has blocked a message from %s."] = true,
+    ["View Blocked Message"] = true,
+    ["Blocked Message"] = true,
+    
 });

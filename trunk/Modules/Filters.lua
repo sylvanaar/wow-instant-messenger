@@ -69,6 +69,7 @@ local DefaultFilters = {
         action = 3,
         level = 2,
         received = true,
+        notify = true,
         stats = 0
     },
     {
@@ -85,7 +86,7 @@ local DefaultFilters = {
 
 local filterFrame;
 
-local maxLevel = isWOTLK and 80 or 70;
+local maxLevel = 80;
 
 local Filters = CreateModule("Filters", true);
 
@@ -95,6 +96,24 @@ _G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(Filters);
 -- filtering
 
 local userCache = {};
+local blockedEvents = {};
+
+local function logBlockedEvent(eventItem)
+    -- only blocked events whishing a notification will be logged.
+    local event = eventItem:GetEvent();
+    local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = eventItem:GetArgs();
+    if(event == "CHAT_MSG_WHISPER_INFORM") then
+        arg2 = _G.UnitName("player");
+    end
+    if(arg11 and blockedEvents[arg11] == nil) then
+        blockedEvents[arg11] = {event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11};
+        local msg = "|cffff7d0a"..L["WIM has blocked a message from %s."].." |r|cffff0000[|HWIMBLOCKED:"..arg11.."|h"..L["View Blocked Message"].."|h]|r"
+        _G.DEFAULT_CHAT_FRAME:AddMessage(msg:gsub("%%s", "|r[|Hplayer:"..arg2.."|h"..arg2.."|h]|cffff7d0a"));
+        _G.PlaySound("TellMessage");
+    end
+end
+
+
 
 local function whoCallback(result, eventItem, filter)
     local arg1, name = eventItem:GetArgs();
@@ -103,15 +122,21 @@ local function whoCallback(result, eventItem, filter)
         if(result.Level < filter.level) then
             if(filter.action == 1) then
                 dPrint("Filter->WhoCallBack: Allow()");
+                filter.stats = filter.stats + 1;
                 eventItem:Allow();
                 Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, eventItem.continueFrom);
             elseif(filter.action == 2) then
                 dPrint("Filter->WhoCallBack: Ignored()");
+                filter.stats = filter.stats + 1;
                 eventItem.ignoredByWIM = true;
                 eventItem:BlockFromDelegate(modules.WhisperEngine);
                 Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, eventItem.continueFrom);
             elseif(filter.action == 3) then
                 dPrint("Filter->WhoCallBack: Block()");
+                filter.stats = filter.stats + 1;
+                if(filter.notify) then
+                    logBlockedEvent(eventItem);
+                end
                 eventItem:Block();
                 eventItem:Release(Filters);
             else
@@ -205,13 +230,16 @@ function Filters:CHAT_MSG_WHISPER_CONTROLLER(eventItem, startFrom)
                 eventItem:BlockFromDelegate(modules.WhisperEngine);
                 break;
             elseif(result == 3) then
+                if(filters[i].notify) then
+                    logBlockedEvent(eventItem);
+                end
                 eventItem:Block();
                 break;
             end
         end
     end
     if(eventItem.suspendedByWIM_Filter) then
-        eventItem.suspendedByWIM_Filter = false;
+        eventItem.suspendedByWIM_Filter = nil;
         eventItem:Release(Filters);
     end
     if(options.frame and options.frame.filterList) then
@@ -238,6 +266,9 @@ function Filters:CHAT_MSG_WHISPER_INFORM_CONTROLLER(eventItem, startFrom)
                 eventItem:BlockFromDelegate(modules.WhisperEngine);
                 break;
             elseif(result == 3) then
+                if(filters[i].notify) then
+                    logBlockedEvent(eventItem);
+                end
                 eventItem:Block();
                 break;
             end
@@ -565,10 +596,27 @@ local function createFilterFrame()
             info.func = win.action.click;
             _G.UIDropDownMenu_AddButton(info, _G.UIDROPDOWNMENU_MENU_LEVEL);
         end
+    win.actionNotify = CreateFrame("CheckButton", win:GetName().."Notify", win, "UICheckButtonTemplate");
+    win.actionNotify:SetPoint("LEFT", win.action, "RIGHT", 130, 2);
+    win.actionNotify.text = _G.getglobal(win.actionNotify:GetName().."Text");
+    win.actionNotify.text:SetText(L["Show Alert"]);
+    win.actionNotify:SetScript("OnShow", function(self)
+            win.filter.notify = win.filter.notify;
+            self:SetChecked(win.filter.notify);
+        end);
+    win.actionNotify:SetScript("OnClick", function(self)
+            win.filter.notify = self:GetChecked() and true or nil;
+        end);
+        
     win.action:SetScript("OnShow", function(self)
             win.filter.action = win.filter.action or 2;
             _G.UIDropDownMenu_Initialize(self, self.init);
             _G.UIDropDownMenu_SetSelectedValue(self, win.filter.action);
+            if(win.filter.action ~= 3) then
+                win.actionNotify:Hide();
+            else
+                win.actionNotify:Show();
+            end
         end);
     
     
@@ -648,3 +696,28 @@ function ShowFilterFrame(filter, index)
     filterFrame.title:SetText(filterFrame.saveIndex and L["Edit Filter"] or L["Add Filter"]);
     filterFrame:Show();
 end
+
+
+--Hook SetItemRef
+local SetItemRef_orig = _G.SetItemRef;
+local function setItemRef (link, text, button)
+	if (_G.strsub(link, 1, 10) == "WIMBLOCKED") then
+            local msgId = _G.tonumber(link:match("(%d+)"));
+            _G.test = blockedEvents[msgId];
+	    if(msgId and blockedEvents[msgId]) then
+                local win = GetWhisperWindowByUser(blockedEvents[msgId][3]);
+                win:Pop(true);
+                win.widgets.chat_display:AddMessage("   ");
+                win.widgets.chat_display:AddMessage("|cffff0000"..L["Blocked Message"]..":|r");
+                local color = WIM.db.displayColors.wispIn;
+                win:AddEventMessage(color.r, color.g, color.b, blockedEvents[msgId][1], blockedEvents[msgId][2],
+                    blockedEvents[msgId][3], blockedEvents[msgId][4], blockedEvents[msgId][5], blockedEvents[msgId][6],
+                    blockedEvents[msgId][7], blockedEvents[msgId][8], blockedEvents[msgId][9], blockedEvents[msgId][10],
+                    blockedEvents[msgId][11], blockedEvents[msgId][12]);
+                win.widgets.chat_display:AddMessage("   ");
+            end
+	    return;
+	end
+	SetItemRef_orig(link, text, button);
+end
+_G.SetItemRef = setItemRef;
