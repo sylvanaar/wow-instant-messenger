@@ -27,6 +27,8 @@ addEntry("3.0.6", "03/??/2008", [[
     *Set cache timeout of 60 for filter level lookups.
     *Fixed error that would sometimes occur when right mouse clicking the minimap icon.
     *Fixed bug which caused tabbed windows to pop regardless of selected rules.
+    *Level filtering wasn't recording stats.
+    +Added option to filters to send alert chat frame when a message is blocked.
 ]]);
 addEntry("3.0.5", "12/02/2008", [[
     *Fixed: Who lookups wouldn't update if already cached.
