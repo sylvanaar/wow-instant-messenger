@@ -119,6 +119,9 @@ end
 
 -- outbound Traffic:
 function SendData(ttype, target, cmd, data)
+    if(isPrivateServer) then
+        return; -- we don't want to send addon messages if on a private server.
+    end
     data = tostring(data);
     ttype = string.upper(ttype);
     if(ttype == "WHISPER" and IsGM(target)) then

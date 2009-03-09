@@ -656,8 +656,8 @@ local function createHistoryViewer()
     win.content.border:SetPoint("BOTTOMRIGHT");
     win.content.border:SetHeight(1);
     win.content:SetPoint("TOPLEFT", win.search, "BOTTOMLEFT");
-    win.content:SetPoint("TOPRIGHT", win.search, "BOTTOMRIGHT");
-    win.content:SetPoint("BOTTOM", 0, 40);
+    win.content:SetPoint("BOTTOMRIGHT", win, "BOTTOMRIGHT", -18, 40);
+    
     win.content.tabs = {};
     win.content.createTab = function(self, index)
             local tab = CreateFrame("Button", nil, self);
@@ -704,7 +704,7 @@ local function createHistoryViewer()
     end
     
     
-    win.content.chatFrame = CreateFrame("ScrollingMessageFrame", nil, win.content);
+    win.content.chatFrame = CreateFrame("ScrollingMessageFrame", "WIM3_HistoryChatFrame", win.content);
     win.content.chatFrame:SetPoint("TOPLEFT", 4, -4);
     win.content.chatFrame:SetPoint("BOTTOMRIGHT", -30, 4);
     win.content.chatFrame:SetFontObject("ChatFontNormal");
@@ -1076,6 +1076,7 @@ table.insert(ViewTypes, {
         func = function(frame, msg)
             if(msg.type == 1) then
                 local color = db.displayColors[msg.inbound and "wispIn" or "wispOut"];
+                nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b;
                 frame.nextStamp = msg.time;
                 frame:AddMessage(applyStringModifiers(applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from,
                         nil, nil, nil, nil, nil, nil, nil, nil, chatFrameMsgId), frame), color.r, color.g, color.b);
@@ -1090,6 +1091,7 @@ table.insert(ViewTypes, {
             frame.noEscapedStrings = true;
             if(msg.type == 1) then
                 local color = db.displayColors[msg.inbound and "wispIn" or "wispOut"];
+                nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b;
                 frame.nextStamp = msg.time;
                 frame:AddMessage(applyStringModifiers(applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from), frame), color.r, color.g, color.b)
             end

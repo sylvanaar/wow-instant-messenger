@@ -139,7 +139,7 @@ local function updateMinimapAlerts()
     end
 end
 
-function WhisperEngine:OnEnableWIM()
+function WhisperEngine:OnEnable()
         WhisperEngine:RegisterChatEvent("CHAT_MSG_WHISPER");
         WhisperEngine:RegisterChatEvent("CHAT_MSG_WHISPER_INFORM");
         WhisperEngine:RegisterChatEvent("CHAT_MSG_AFK");
@@ -147,7 +147,7 @@ function WhisperEngine:OnEnableWIM()
         WhisperEngine:RegisterChatEvent("CHAT_MSG_SYSTEM");
 end
 
-function WhisperEngine:OnDisableWIM()
+function WhisperEngine:OnDisable()
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_WHISPER");
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_WHISPER_INFORM");
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_AFK");
@@ -271,6 +271,9 @@ end
 
 function WhisperEngine:CHAT_MSG_WHISPER(...)
     local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = honorChatFrameEventFilter("CHAT_MSG_WHISPER", ...);
+    if(filter) then
+        return; -- ChatFrameEventFilter says don't process
+    end
     local color = WIM.db.displayColors.wispIn; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
@@ -297,6 +300,9 @@ end
 
 function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
     local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = honorChatFrameEventFilter("CHAT_MSG_WHISPER_INFORM", ...);
+    if(filter) then
+        return; -- ChatFrameEventFilter says don't process
+    end
     local color = db.displayColors.wispOut; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER_INFORM", ...);

@@ -457,14 +457,14 @@ local function createTabGroup()
         end
     end
     
-    tabStrip.JumpToTab = function(self, win, honorFocus)
+    tabStrip.JumpToTab = function(self, win)
         if(win) then
             local oldWin = self.selected.obj;
             local oldCustomSize = win.customSize;
-            honorFocus = honorFocus and oldWin and oldWin.widgets.msg_box == EditBoxInFocus;
+            local inFocus = EditBoxInFocus and EditBoxInFocus:GetParent().tabStrip == self and true or false;
             win.customSize = true;
             DisplayTutorial(L["Manipulating Tabs"], L["You can <Shift-Click> a tab and drag it out into it's own window."]);
-            self:SetSelectedName(honorFocus and oldWin or win);
+            self:SetSelectedName(win);
             local win = self.selected.obj;
             if(oldWin and oldWin ~= win) then
                 win:SetWidth(oldWin:GetWidth());
@@ -475,6 +475,9 @@ local function createTabGroup()
             end
             if( not win.popNoShow ) then
                 win:Show();
+                if(inFocus) then
+                    win.widgets.msg_box:SetFocus()
+                end
             end
             win.popNoShow = nil;
             win.customSize = oldCustomSize;
@@ -514,7 +517,7 @@ local function createTabGroup()
         end
     end
     
-    tabStrip.Attach = function(self, win)
+    tabStrip.Attach = function(self, win, jumpToTab)
         --local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
             --if already attached, detach then attach here.
@@ -524,7 +527,8 @@ local function createTabGroup()
             addToTableUnique(self.attached, win);
             win.tabStrip = self;
             --if(#self.attached == 1 or win:IsVisible()) then
-            if(self:IsVisible()) then
+            --if(self:IsVisible()) then
+            if(jumpToTab) then
                 self:JumpToTab(win, true);
                 win:UpdateProps();
             else
@@ -585,6 +589,42 @@ local function getAvailableTabGroup()
         return createTabGroup();
     end
 end
+
+
+
+--------------------------------------
+--          Widget Handling         --
+--------------------------------------
+
+
+RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnTabPressed", function(self)
+    local win = self.parentWindow;
+    if(win.tabStrip and #win.tabStrip.attached > 1 and self:GetCursorPosition() == 0) then
+        local index;
+        -- get window index
+        for i=1, #win.tabStrip.attached do
+            if(win.tabStrip.attached[i] == win) then
+                index = i;
+                break;
+            end
+        end
+        -- shouldn't be needed but just in case.
+        if(index) then
+            -- cycle forward or backword?
+            if(_G.IsShiftKeyDown()) then
+                -- backwards
+                index = win.tabStrip.attached[index - 1] and (index - 1) or #win.tabStrip.attached;
+            else
+                -- forwards
+                index = win.tabStrip.attached[index + 1] and (index + 1) or 1;
+            end
+            win.tabStrip:JumpToTab(win.tabStrip.attached[index]);
+        end
+    end
+end);
+
+
+
 
 --------------------------------------
 --          Global Tab Functions    --

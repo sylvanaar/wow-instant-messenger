@@ -12,11 +12,11 @@ end
 
 
 -- ChangeLog Entries.
-addEntry("3.0.6", "03/??/2008", [[
+addEntry("3.0.6", "03/10/2008", [[
     *Fixed: Error when receiving whisper while minimizing.
     *Fixed: Negotiating with guild members would cause addon msg spam.
     *Changed outbound whispers priority from NORMAL to ALERT.
-    *Fix for 3.0.8 patch. GM's should no longer receive addon messages.
+    *Fix for 3.0.8/9 patch. GM's should no longer receive addon messages.
     +Tabs now flash when it contains an unread message.
     *Fixed error when closing tabs.
     +Added LibChatHandler-1.0 for chat management. I will post documentation for this.
@@ -29,6 +29,12 @@ addEntry("3.0.6", "03/??/2008", [[
     *Fixed bug which caused tabbed windows to pop regardless of selected rules.
     *Level filtering wasn't recording stats.
     +Added option to filters to send alert chat frame when a message is blocked.
+    -Depricated WIM:EventHandler() to avoid conflict with old WIM event hooks.
+    *Revised the module calls made when WIM is enabled/disabled.
+    *Fixed bug in history viewer when using Prat formatting.
+    +Addon messages are never sent if on a private server.
+    *Fixed inconsistant pop rules.
+    +<TAB> and <SHIFT><TAB> can be used to navigate through a tab group
 ]]);
 addEntry("3.0.5", "12/02/2008", [[
     *Fixed: Who lookups wouldn't update if already cached.

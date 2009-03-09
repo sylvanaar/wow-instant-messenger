@@ -51,7 +51,7 @@ local Events = {};
 
 -- create a frame to moderate events and frame updates.
     local workerFrame = CreateFrame("Frame", "WIM_workerFrame");
-    workerFrame:SetScript("OnEvent", function(self, event, ...) WIM:EventHandler(event, ...); end);
+    workerFrame:SetScript("OnEvent", function(self, event, ...) WIM:CoreEventHandler(event, ...); end);
     
     -- some events we always want to listen to so data is ready upon WIM being enabled.
     workerFrame:RegisterEvent("VARIABLES_LOADED");
@@ -128,6 +128,9 @@ local function onEnable()
         if(type(module.OnEnableWIM) == "function") then
             module:OnEnableWIM();
         end
+        if(type(module.OnEnable) == "function") then
+            module:OnEnable();
+        end
     end
     DisplayTutorial(L["WIM (WoW Instant Messenger)"], L["WIM is currently running. To access WIM's wide array of options type:"].." |cff69ccf0/wim|r");
     dPrint("WIM is now enabled.");
@@ -145,6 +148,9 @@ local function onDisable()
     for _, module in pairs(modules) do
         if(type(module.OnDisableWIM) == "function") then
             module:OnDisableWIM();
+        end
+        if(type(module.OnDisable) == "function") then
+            module:OnDisable();
         end
     end
     
@@ -282,8 +288,12 @@ function WIM.honorChatFrameEventFilter(event, ...)
 end
 
 
+function WIM:EventHandler(event,...) 
+        -- depricated - here for compatibility only
+end
+
 -- This is WIM's core event controler.
-function WIM:EventHandler(event, ...)
+function WIM:CoreEventHandler(event, ...)
 
     -- Core WIM Event Handlers.
     dPrint("Event '"..event.."' received.");
