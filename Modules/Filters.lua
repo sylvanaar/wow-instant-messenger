@@ -284,7 +284,6 @@ function Filters:CHAT_MSG_WHISPER_INFORM_CONTROLLER(eventItem, startFrom)
     end
 end
 
-
 function Filters:OnEnable()
     Filters:RegisterChatEvent("CHAT_MSG_WHISPER", 1);
     Filters:RegisterChatEvent("CHAT_MSG_WHISPER_INFORM", 1);

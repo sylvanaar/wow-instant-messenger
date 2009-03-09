@@ -438,14 +438,9 @@ end
 -- this needs to be looked at. it isn't doing anything atm...
 local function MessageWindow_Frame_OnShow(self)
                 --_G.DEFAULT_CHAT_FRAME:AddMessage(_G.debugstack(1))
+        setWindowAsFadedIn(self);
         if(self ~= DemoWindow) then
-                if(db.autoFocus == true) then
-        		--_G[self:GetName().."MsgBox"]:SetFocus();
-                end
                 updateScrollBars(self);
-                if(self.tabStrip) then
-                        self.tabStrip:JumpToTab(self, true);
-                end
                 CallModuleFunction("OnWindowShow", self);
         	for widgetName, widgetObj in pairs(self.widgets) do
         		if(type(widgetObj.OnWindowShow) == "function") then
@@ -847,18 +842,16 @@ local function instantiateWindow(obj)
 	local rules = self:GetRuleSet(); -- defaults incase unknown
     
 	-- pass isNew to pop ruleset.
-	if(forceResult ~= nil) then
+	if(forceResult == true) then
 		-- go by forceResult and ignore rules
-		if(forceResult == true) then
-			setWindowAsFadedIn(self);
-			if(self.tabStrip) then
-                                if(not EditBoxInFocus) then
+		if(self.tabStrip) then
+                                --if(not EditBoxInFocus) then
                                                 self.tabStrip:JumpToTab(self);
                                                 if(not _G.ChatFrameEditBox:wimIsVisible() and (rules.autofocus or forceFocus)) then
                                                         self.widgets.msg_box:SetFocus();
                                                 end
-                                end
-			else
+                                --end
+		else
 				self:ResetAnimation();
 				self:Show();
                                 if((not _G.ChatFrameEditBox:wimIsVisible() and not EditBoxInFocus and rules.autofocus) or forceFocus) then
@@ -873,28 +866,31 @@ local function instantiateWindow(obj)
 				else
 					DisplayTutorial(L["Resizing Windows"], L["You can resize a window by holding <Shift> and dragging the bottom right corner of the window."]);
 				end
-			end
 		end
 	else
 		-- execute pop rules.
 		if((rules.onSend and msgDirection == "out") or (rules.onReceive and msgDirection == "in")) then 
-			setWindowAsFadedIn(self);
 			if(self.tabStrip) then
 				self:ResetAnimation();
-        			self.tabStrip:JumpToTab(self, true);
+                                local infocus = EditBoxInFocus and EditBoxInFocus:GetParent().tabStrip;
+                                if(infocus ~= self.tabStrip) then
+                                                self.tabStrip:JumpToTab(self);
+                                                setWindowAsFadedIn(self);
+                                end
 			else
 				self:ResetAnimation();
 				self:Show();
+                                setWindowAsFadedIn(self);
 			end
                         if(self:IsVisible() and not _G.ChatFrameEditBox:wimIsVisible() and not EditBoxInFocus and rules.autofocus and msgDirection == "in") then
-                                --self.widgets.msg_box:SetFocus();
+                                self.widgets.msg_box:SetFocus();
                         end
 		end
 	end
 	
 	-- at this state the message is no longer classified as a new window, reset flag.
 	obj.isNew = false;
-	CallModuleFunction("OnWindowPopped", self);
+        CallModuleFunction("OnWindowPopped", self);
     end
     
     obj.UpdateProps = function(self)
