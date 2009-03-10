@@ -33,8 +33,9 @@ local function General_Main()
     frame.welcome.cb1 = frame.welcome:CreateCheckButton(L["Enable WIM"], WIM.db, "enabled", nil, function(self, button) SetEnabled(self:GetChecked()); end);
     frame.welcome.nextOffSetY = -30;
     frame.welcome.cb2 = frame.welcome:CreateCheckButton(L["Display Minimap Icon"], WIM.modules.MinimapIcon, "enabled", nil, function(self, button) EnableModule("MinimapIcon", self:GetChecked()); end);
+    frame.welcome.cb2:CreateCheckButton(L["Unlock from Minimap"], db.minimap, "free", nil, function(self, button) modules.MinimapIcon:OnEnable() end);
     frame.welcome.cb2:CreateCheckButton(L["<Right-Click> to show unread messages."], db.minimap, "rightClickNew");
-    frame.welcome.nextOffSetY = -45;
+    frame.welcome.nextOffSetY = -75;
     frame.welcome.cb3 = frame.welcome:CreateCheckButton(L["Display Tutorials"], WIM.modules.Tutorials, "enabled", nil, function(self, button) EnableModule("Tutorials", self:GetChecked()); end);
     frame.welcome.reset = frame.welcome:CreateButton(L["Reset Tutorials"], function() db.shownTutorials = {}; end);
     frame.welcome.reset:ClearAllPoints();

@@ -7,6 +7,8 @@ local math = math;
 local table = table;
 local pairs = pairs;
 local string = string;
+local GetMouseFocus = GetMouseFocus;
+local IsShiftKeyDown = IsShiftKeyDown;
 
 -- set namespace
 setfenv(1, WIM);
@@ -15,7 +17,13 @@ local MinimapIcon = CreateModule("MinimapIcon", true);
 
 db_defaults.minimap = {
     position = 200,
-    rightClickNew = false
+    rightClickNew = false,
+    free = false,
+    free_position = {
+        point = "CENTER",
+        x = 0,
+        y = 0
+    }
 };
 
 Notifications = {};	-- list of current notifications
@@ -93,14 +101,45 @@ local function toggleMenu(parent)
     end
 end
 
+
+local function getFreePoints(x, y)
+    local scale = _G.UIParent:GetEffectiveScale();
+    local width = _G.UIParent:GetWidth()*scale;
+    local height = _G.UIParent:GetHeight()*scale;
+    local point;
+    
+    -- set limits to cursor position. We want to stay on the screen.
+    x = math.min(width, math.max(x, 0));
+    y = math.min(height, math.max(y, 0));
+    
+    --determine TOP or BOTTOM
+    if(y > height/2) then
+        point = "TOP";
+        y = y - height;
+    else
+        point = "BOTTOM";
+    end
+    
+    --determine LEFT or RIGHT
+    if(x < width/2) then
+        point = point.."LEFT";
+    else
+        point = point.."RIGHT";
+        x = x - width;
+    end
+    
+    return point, x, y;
+end
+
+
 local function createMinimapIcon()
-    local icon = CreateFrame('Button', 'WIM3MinimapButton', _G.Minimap);
+    local icon = CreateFrame('Button', 'WIM3MinimapButton');
     icon.Load = function(self)
         self:SetFrameStrata('MEDIUM');
 	self:SetWidth(31); self:SetHeight(31);
 	self:SetFrameLevel(8);
+        self:SetMovable(true);
 	self:RegisterForClicks('LeftButtonUp', "RightButtonUp");
-	self:RegisterForDrag('LeftButton');
 	self:SetHighlightTexture('Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight');
 
 	local overlay = self:CreateTexture(nil, 'OVERLAY');
@@ -214,7 +253,7 @@ local function createMinimapIcon()
         self.dragging = true;
 	self:LockHighlight();
 	self.icon:SetTexCoord(0, 1, 0, 1);
-	self:SetScript('OnUpdate', self.OnUpdate);
+        self:SetScript('OnUpdate', self.OnUpdate);
 	_G.GameTooltip:Hide();
     end
     icon.OnDragStop = function(self)
@@ -222,66 +261,98 @@ local function createMinimapIcon()
 	self:SetScript('OnUpdate', nil);
 	self.icon:SetTexCoord(0.05, 0.95, 0.05, 0.95);
 	self:UnlockHighlight();
+        self.registeredForDrag = nil;
+        self:RegisterForDrag();
     end
     icon.OnUpdate = function(self)
         local mx, my = _G.Minimap:GetCenter();
 	local px, py = _G.GetCursorPosition();
 	local scale = _G.Minimap:GetEffectiveScale();
 
-	px, py = px / scale, py / scale;
-
-        db.minimap.position = math.deg(math.atan2(py - my, px - mx)) % 360;
+        if(db.minimap.free) then
+            local free = db.minimap.free_position;
+            free.point, free.x, free.y = getFreePoints(px, py);
+        else
+            px, py = px / scale, py / scale;
+            db.minimap.position = math.deg(math.atan2(py - my, px - mx)) % 360;
+        end
 	self:UpdatePosition();
     end
     icon.UpdatePosition = function(self)
-        local angle = math.rad(db.minimap.position or random(0, 360));
-	local cos = math.cos(angle);
-	local sin = math.sin(angle);
-	local minimapShape = _G.GetMinimapShape and _G.GetMinimapShape() or 'ROUND';
+        if(db.minimap.free) then
+            local free = db.minimap.free_position;
+            self:SetFrameStrata("DIALOG");
+            self:SetParent(_G.UIParent);
+            self:ClearAllPoints();
+            local scale = _G.UIParent:GetEffectiveScale();
+            self:SetPoint("CENTER", _G.UIParent, free.point, free.x/scale, free.y/scale)
+        else
+            self:SetFrameStrata("BACKGROUND");
+            self:SetParent(_G.Minimap);
+            self:SetFrameLevel(8);
+            local angle = math.rad(db.minimap.position or random(0, 360));
+            local cos = math.cos(angle);
+            local sin = math.sin(angle);
+            local minimapShape = _G.GetMinimapShape and _G.GetMinimapShape() or 'ROUND';
 
-	local round = false;
-	if minimapShape == 'ROUND' then
+            local round = false;
+            if minimapShape == 'ROUND' then
 		round = true;
-	elseif minimapShape == 'SQUARE' then
-		round = false;
-	elseif minimapShape == 'CORNER-TOPRIGHT' then
+            elseif minimapShape == 'SQUARE' then
+            	round = false;
+            elseif minimapShape == 'CORNER-TOPRIGHT' then
 		round = not(cos < 0 or sin < 0);
-	elseif minimapShape == 'CORNER-TOPLEFT' then
+            elseif minimapShape == 'CORNER-TOPLEFT' then
 		round = not(cos > 0 or sin < 0);
-	elseif minimapShape == 'CORNER-BOTTOMRIGHT' then
+            elseif minimapShape == 'CORNER-BOTTOMRIGHT' then
 		round = not(cos < 0 or sin > 0);
-	elseif minimapShape == 'CORNER-BOTTOMLEFT' then
+            elseif minimapShape == 'CORNER-BOTTOMLEFT' then
 		round = not(cos > 0 or sin > 0);
-	elseif minimapShape == 'SIDE-LEFT' then
+            elseif minimapShape == 'SIDE-LEFT' then
 		round = cos <= 0;
-	elseif minimapShape == 'SIDE-RIGHT' then
+            elseif minimapShape == 'SIDE-RIGHT' then
 		round = cos >= 0;
-	elseif minimapShape == 'SIDE-TOP' then
+            elseif minimapShape == 'SIDE-TOP' then
 		round = sin <= 0;
-	elseif minimapShape == 'SIDE-BOTTOM' then
+            elseif minimapShape == 'SIDE-BOTTOM' then
 		round = sin >= 0;
-	elseif minimapShape == 'TRICORNER-TOPRIGHT' then
+            elseif minimapShape == 'TRICORNER-TOPRIGHT' then
 		round = not(cos < 0 and sin > 0);
-	elseif minimapShape == 'TRICORNER-TOPLEFT' then
+            elseif minimapShape == 'TRICORNER-TOPLEFT' then
 		round = not(cos > 0 and sin > 0);
-	elseif minimapShape == 'TRICORNER-BOTTOMRIGHT' then
+            elseif minimapShape == 'TRICORNER-BOTTOMRIGHT' then
 		round = not(cos < 0 and sin < 0);
-	elseif minimapShape == 'TRICORNER-BOTTOMLEFT' then
+            elseif minimapShape == 'TRICORNER-BOTTOMLEFT' then
 		round = not(cos > 0 and sin < 0);
-	end
+            end
 
-	local x, y;
-	if round then
-		x = cos*80;
-		y = sin*80;
-	else
-		x = math.max(-82, math.min(110*cos, 84));
-		y = math.max(-86, math.min(110*sin, 82));
-	end
+            local x, y;
+            if round then
+            	x = cos*80;
+            	y = sin*80;
+            else
+            	x = math.max(-82, math.min(110*cos, 84));
+            	y = math.max(-86, math.min(110*sin, 82));
+            end
 
-	self:SetPoint('CENTER', x, y);
+            self:ClearAllPoints();
+            self:SetPoint('CENTER', x, y);
+            local free = db.minimap.free_position;
+            local scale = self:GetEffectiveScale();
+            free.point, free.x, free.y = getFreePoints((self:GetLeft() + self:GetWidth()/2)*scale, (self:GetTop() - self:GetHeight()/2)*scale);
+        end
     end
     icon:Load();
+    
+    local helperFrame = _G.CreateFrame("Frame");
+    helperFrame:SetScript("OnUpdate", function(self)
+            if(not icon.dragging and not icon.registeredForDrag and IsShiftKeyDown() and GetMouseFocus() == icon) then
+                icon.registeredForDrag = true;
+                icon:RegisterForDrag('LeftButton');
+            end
+        end);
+    
+    
     dPrint("MinimapIcon Created...");
     return icon;
 end

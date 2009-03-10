@@ -177,7 +177,7 @@ local function processFilter(eventItem, filter)
         end
     elseif(filter.type == 3) then
         -- do not do look up if user has window opened already. Defeats the purpose.
-        if(not windows.active.whisper[name] and not userCache[name]) then
+        if(not windows.active.whisper[name] and not userCache[name] and _G.UnitName("player") ~= name) then
             dPrint("Running WhoLookUp on: "..name);
             local result = libs.WhoLib:UserInfo(name, 
     	    {
@@ -702,7 +702,6 @@ local SetItemRef_orig = _G.SetItemRef;
 local function setItemRef (link, text, button)
 	if (_G.strsub(link, 1, 10) == "WIMBLOCKED") then
             local msgId = _G.tonumber(link:match("(%d+)"));
-            _G.test = blockedEvents[msgId];
 	    if(msgId and blockedEvents[msgId]) then
                 local win = GetWhisperWindowByUser(blockedEvents[msgId][3]);
                 win:Pop(true);
