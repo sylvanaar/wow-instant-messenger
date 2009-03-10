@@ -258,6 +258,7 @@ local function createMenu()
         end);
     menu:SetScript("OnShow", function(self)
             self.mouseStamp = _G.time();
+            _G.CloseDropDownMenus();
         end);
         
     return menu;

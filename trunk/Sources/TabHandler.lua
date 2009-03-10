@@ -367,17 +367,6 @@ local function createTabGroup()
     
     -- tabStip functions
     tabStrip.UpdateTabs = function(self, ignoreOffset)
-        -- first check to see if we have more than one tab to show...
-        if(#self.attached > 1) then
-            self:Show();
-        else
-            if(#self.attached == 1) then
-                self:Detach(self.attached[i])
-            end
-            self:Hide();
-            return;
-        end
-    
         -- sort tabs
         table.sort(self.attached, sortTabs);
     
@@ -387,6 +376,17 @@ local function createTabGroup()
         self:SetParent(win);
         self.parentWindow = win;
         SetWidgetRect(self, skinTable);
+        
+        -- check to see if we have more than one tab to show...
+        if(#self.attached > 1) then
+            self:Show();
+        else
+            if(#self.attached == 1) then
+                self:Detach(self.attached[i])
+            end
+            self:Hide();
+            return;
+        end
     
         -- re-order tabs & sizing
         local curSize;
@@ -486,8 +486,7 @@ local function createTabGroup()
             local inFocus = EditBoxInFocus and EditBoxInFocus:GetParent().tabStrip == self and true or false;
             win.customSize = true;
             DisplayTutorial(L["Manipulating Tabs"], L["You can <Shift-Click> a tab and drag it out into it's own window."]);
-            self:SetSelectedName(win);
-            local win = self.selected.obj;
+            
             if(oldWin and oldWin ~= win) then
                 win:SetWidth(oldWin:GetWidth());
                 win:SetHeight(oldWin:GetHeight());
@@ -496,20 +495,24 @@ local function createTabGroup()
                 win:SetAlpha(oldWin:GetAlpha());
             end
             if( not win.popNoShow ) then
+                self:SetSelectedName(win);
                 win:Show();
                 if(inFocus) then
                     win.widgets.msg_box:SetFocus()
                 end
             end
-            win.popNoShow = nil;
+            
             win.customSize = oldCustomSize;
             self:UpdateTabs();
-            for i=1,#self.attached do
-                local obj = self.attached[i];
-                if(obj ~= win) then
-                    obj:Hide();
+            if( not win.popNoShow ) then
+                for i=1,#self.attached do
+                    local obj = self.attached[i];
+                    if(obj ~= win) then
+                        obj:Hide();
+                    end
                 end
             end
+            win.popNoShow = nil;
         end
     end
     
