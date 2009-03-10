@@ -13,8 +13,8 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.0.6";
-beta = false; -- flags current version as beta.
+version = "3.0.7";
+beta = true; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight (we'll keep this around for now...)
@@ -127,9 +127,6 @@ local function onEnable()
     for _, module in pairs(modules) do
         if(type(module.OnEnableWIM) == "function") then
             module:OnEnableWIM();
-        end
-        if(type(module.OnEnable) == "function") then
-            module:OnEnable();
         end
     end
     DisplayTutorial(L["WIM (WoW Instant Messenger)"], L["WIM is currently running. To access WIM's wide array of options type:"].." |cff69ccf0/wim|r");
