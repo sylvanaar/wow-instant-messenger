@@ -425,10 +425,12 @@ local function MessageWindow_MovementControler_OnDragStop(self)
 			window.tabStrip:Detach(window);
 		end
 		if(dropTo.tabStrip) then
+                        window:Hide();
 			dropTo.tabStrip:Attach(window);
 		else
 			local tabStrip = GetAvailableTabGroup();
 			tabStrip:Attach(dropTo);
+                        window:Hide();
 			tabStrip:Attach(window);
 		end
 	end

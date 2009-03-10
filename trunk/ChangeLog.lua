@@ -35,6 +35,7 @@ addEntry("3.0.6", "03/10/2008", [[
     +Addon messages are never sent if on a private server.
     *Fixed inconsistant pop rules.
     +<TAB> and <SHIFT><TAB> can be used to navigate through a tab group
+    *Tabstrip updates to show selected tab when window is popped/shown.
 ]]);
 addEntry("3.0.5", "12/02/2008", [[
     *Fixed: Who lookups wouldn't update if already cached.

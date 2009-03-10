@@ -241,7 +241,7 @@ local function setTabOffset(tabStrip, PlusOrMinus)
     end
     --dPrint("attached:"..attached..", visible:"..count..", range:"..offset+1 .."-"..offset+count);
     tabStrip.curOffset = offset;
-    tabStrip:UpdateTabs();
+    tabStrip:UpdateTabs(true);
 end
 
 
@@ -350,7 +350,7 @@ local function createTabGroup()
         end);
         tab:EnableMouseWheel(true);
         tab:SetScript("OnMouseWheel", function(self, direction)
-            setTabOffset(self:GetParent(), direction);
+            setTabOffset(self:GetParent(), -direction);
         end);
         tab.isWimTab = true;
         
@@ -364,7 +364,7 @@ local function createTabGroup()
     tabStrip.nextButton:SetScript("OnClick", function(self) setTabOffset(self:GetParent(), 1); end);
     
     -- tabStip functions
-    tabStrip.UpdateTabs = function(self)
+    tabStrip.UpdateTabs = function(self, ignoreOffset)
         -- first check to see if we have more than one tab to show...
         if(#self.attached > 1) then
             self:Show();
@@ -395,6 +395,26 @@ local function createTabGroup()
         end
         local count = math.floor(curSize / minimumWidth);
         self.visibleCount = count;
+        
+        if(not ignoreOffset) then
+            local index;
+            -- get index of selected object
+            for i=1, #self.attached do
+                if(self.selected.obj == self.attached[i]) then
+                    index = i;
+                    break;
+                end
+            end
+            if(index) then -- just incase.
+                    -- we need to adjust the offset to make sure the selected tab is shown.
+                    if((self.curOffset + count) < index) then
+                        self.curOffset = index - count;
+                    elseif(index - 1 < self.curOffset) then
+                        self.curOffset = index - 1;
+                    end
+            end
+        end
+        
         if((self.curOffset + count) > #self.attached) then
             self.curOffset = math.max(#self.attached - count , 0);
         end
@@ -526,14 +546,7 @@ local function createTabGroup()
             end
             addToTableUnique(self.attached, win);
             win.tabStrip = self;
-            --if(#self.attached == 1 or win:IsVisible()) then
-            --if(self:IsVisible()) then
-            if(jumpToTab) then
-                self:JumpToTab(win, true);
-                win:UpdateProps();
-            else
-                win:Hide();
-            end
+            self:SetSelectedName(self.selected.obj or win);
             self:UpdateTabs();
             dPrint(win:GetName().." is attached to "..self:GetName());
         end
