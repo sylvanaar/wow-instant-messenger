@@ -82,10 +82,12 @@ helperFrame:SetScript("OnDragStop", function(self)
                         -- so no need to check for that again.
                         if(dropTo.tabStrip) then
                             dropTo.tabStrip:Attach(win);
+                            dropTo.tabStrip:JumpToTab(dropTo);
                         else
                             local tabStrip = GetAvailableTabGroup();
                             tabStrip:Attach(dropTo);
                             tabStrip:Attach(win);
+                            tabStrip:JumpToTab(dropTo);
                         end
                     end
                 end
@@ -514,9 +516,11 @@ local function createTabGroup()
     tabStrip.Detach = function(self, win)
         --local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
+            removeFromTable(self.attached, win);
+            win.tabStrip = nil;
             local curIndex = getIndexFromTable(tabStrip.attached, win);
             if(win == self.selected.obj) then
-                if(#self.attached <= 1) then
+                if(#self.attached < 1) then
                     self.selected.name = "";
                     self.selected.obj = nil;
                 else
@@ -529,10 +533,8 @@ local function createTabGroup()
                     self:JumpToTab(self.attached[nextIndex]);
                 end
             end
-            removeFromTable(self.attached, win);
-            win.tabStrip = nil;
             self:UpdateTabs();
-            win:Show();
+            --win:Show();
             dPrint(win:GetName().." is detached from "..self:GetName());
         end
     end

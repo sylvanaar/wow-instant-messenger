@@ -376,7 +376,7 @@ WIM.AddLocale("enUS", {
     ["Play sound when a whisper is sent."] = true,
     ["Allow others to see my talent spec."] = true,
     ["Window Strata:"] = true,
-    
+    ["Unlock from Minimap"] = true,
     
     -- TabManagement.lua --
     ["Tab Management"] = true,

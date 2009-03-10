@@ -24,7 +24,7 @@ addEntry("3.0.6", "03/10/2008", [[
     *LibBabbel-TalentTree is no longer packaged with WIM.
     +Added compatibility for PTR ChatEventFilters.
     +Added Change Log Viewer (/wim changelog).
-    *Set cache timeout of 60 for filter level lookups.
+    *Set cache timeout of 60 seconds for filter level lookups.
     *Fixed error that would sometimes occur when right mouse clicking the minimap icon.
     *Fixed bug which caused tabbed windows to pop regardless of selected rules.
     *Level filtering wasn't recording stats.
@@ -34,8 +34,10 @@ addEntry("3.0.6", "03/10/2008", [[
     *Fixed bug in history viewer when using Prat formatting.
     +Addon messages are never sent if on a private server.
     *Fixed inconsistant pop rules.
-    +<TAB> and <SHIFT><TAB> can be used to navigate through a tab group
+    +<TAB> and <Shift>+<Tab> can be used to navigate through a tab group
     *Tabstrip updates to show selected tab when window is popped/shown.
+    +Moving the minimap icon now requires you to hold <Shift> while dragging.
+    +Added option to unlock Minimap Icon from the Minimap (Free Moving).
 ]]);
 addEntry("3.0.5", "12/02/2008", [[
     *Fixed: Who lookups wouldn't update if already cached.

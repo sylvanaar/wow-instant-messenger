@@ -421,17 +421,16 @@ local function MessageWindow_MovementControler_OnDragStop(self)
         window.widgets.chat_display:Show();
         window.hasMoved = true;
 	if(dropTo) then
-		if(window.tabStrip) then
-			window.tabStrip:Detach(window);
-		end
 		if(dropTo.tabStrip) then
-                        window:Hide();
 			dropTo.tabStrip:Attach(window);
+                        window:Hide();
+                        dropTo.tabStrip:JumpToTab(dropTo);
 		else
+                        window:Hide();
 			local tabStrip = GetAvailableTabGroup();
 			tabStrip:Attach(dropTo);
-                        window:Hide();
 			tabStrip:Attach(window);
+                        tabStrip:JumpToTab(dropTo);
 		end
 	end
     end
