@@ -167,13 +167,12 @@ end
 
 -- get the table index of an item. return's 0 if not found
 local function getIndexFromTable(tbl, item)
-    local i;
-    for i=1,table.getn(tbl) do
+    for i=1, #tbl do
         if(tbl[i] == item) then
             return i;
         end
     end
-    return 0;
+    return;
 end
 
 local function applySkinToTab(tab, skinTable)
@@ -367,6 +366,7 @@ local function createTabGroup()
     
     -- tabStip functions
     tabStrip.UpdateTabs = function(self, ignoreOffset)
+        
         -- sort tabs
         table.sort(self.attached, sortTabs);
     
@@ -480,6 +480,7 @@ local function createTabGroup()
     end
     
     tabStrip.JumpToTab = function(self, win)
+        local start, a, b = _G.GetTime(), 0, 0;
         if(win) then
             local oldWin = self.selected.obj;
             local oldCustomSize = win.customSize;
@@ -496,47 +497,61 @@ local function createTabGroup()
             end
             if( not win.popNoShow ) then
                 self:SetSelectedName(win);
+                a = _G.GetTime()
                 win:Show();
+                b = _G.GetTime() - a;
                 if(inFocus) then
                     win.widgets.msg_box:SetFocus()
                 end
             end
             
             win.customSize = oldCustomSize;
+            
             self:UpdateTabs();
             if( not win.popNoShow ) then
                 for i=1,#self.attached do
                     local obj = self.attached[i];
-                    if(obj ~= win) then
+                    if(obj ~= win and obj:IsVisible()) then
                         obj:Hide();
                     end
                 end
             end
             win.popNoShow = nil;
         end
+        local stop = _G.GetTime();
+        --_G.DEFAULT_CHAT_FRAME:AddMessage((stop - start)..":"..b);
     end
     
     tabStrip.Detach = function(self, win)
         --local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
-            removeFromTable(self.attached, win);
-            win.tabStrip = nil;
-            local curIndex = getIndexFromTable(tabStrip.attached, win);
+            local curIndex = getIndexFromTable(self.attached, win);
+            if(curIndex and self.attached[curIndex]) then
+                win.tabStrip = nil;
+                table.remove(self.attached, curIndex);
+            else
+                return; -- window isn't attached.
+            end
             if(win == self.selected.obj) then
                 if(#self.attached < 1) then
                     self.selected.name = "";
                     self.selected.obj = nil;
+                    self.parentWindow = nil;
+                    self:UpdateTabs();
                 else
-                    local nextIndex;
-                    if(curIndex > 1) then
-                        nextIndex = curIndex - 1;
+                    local nextIndex = 0;
+                    if(curIndex > #self.attached) then
+                        nextIndex = #self.attached;
                     else
-                        nextIndex = curIndex + 1;
+                        nextIndex = curIndex;
                     end
+                    self:UpdateTabs();
                     self:JumpToTab(self.attached[nextIndex]);
+                    win:SetFrameLevel(self:GetFrameLevel()+10);
                 end
+            else
+                self:UpdateTabs();
             end
-            self:UpdateTabs();
             --win:Show();
             dPrint(win:GetName().." is detached from "..self:GetName());
         end
@@ -546,10 +561,10 @@ local function createTabGroup()
         --local win = windows.active.whisper[winName] or windows.active.chat[winName] or windows.active.w2w[winName];
         if(win) then
             --if already attached, detach then attach here.
-            if(win.tabStrip and win.tabStrip ~= self) then
-                win.tabStrip:Detach(winName);
+            if(win.tabStrip) then
+                win.tabStrip:Detach(win);
             end
-            addToTableUnique(self.attached, win);
+            table.insert(self.attached, win);
             win.tabStrip = self;
             self:SetSelectedName(self.selected.obj or win);
             self:UpdateTabs();
