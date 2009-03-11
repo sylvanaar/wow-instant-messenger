@@ -21,124 +21,6 @@ local minimumWidth = 75;
 
 local tabGroups = {};
 
--- helperFrame's purpose is to assist with dragging and dropping of Windows out of tab strips.
--- The frame will monitor which tab objects are being hovered over and attach itself to them when
--- it's key trigger is pressed.
-local helperFrame = CreateFrame("Frame", "WIM_TabHelperFrame", UIParent);
-helperFrame.flash = helperFrame:CreateTexture(helperFrame:GetName().."Flash", "OVERLAY");
-helperFrame.flash:SetPoint("BOTTOMLEFT");
-helperFrame.flash:SetPoint("BOTTOMRIGHT");
-helperFrame.flash:SetHeight(2);
-helperFrame.flash:SetBlendMode("ADD");
-helperFrame.flash:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
-helperFrame:SetClampedToScreen(true);
-helperFrame:SetFrameStrata("TOOLTIP");
-helperFrame:SetMovable(true);
-helperFrame:SetToplevel(true);
-helperFrame:SetWidth(1);
-helperFrame:SetHeight(1);
-helperFrame:EnableMouse(true);
-helperFrame.ResetState = function(self)
-        helperFrame:RegisterForDrag();
-        helperFrame:ClearAllPoints();
-        helperFrame:SetWidth(1);
-        helperFrame:SetHeight(1);
-        helperFrame:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", 0, 0);
-        helperFrame.attachedTo = nil;
-        helperFrame.isAttached = false;
-        helperFrame.obj = nil;
-    end
-helperFrame:SetPoint("TOPLEFT", "UIParent", "TOPLEFT", 0, 0);
-helperFrame:SetScript("OnDragStart", function(self)
-                self:StartMoving();
-                self.isMoving = true;
-                if(self.obj) then
-                    local win = self.obj.childObj;
-                    self.obj.tabStrip:Detach(win);
-                    self.parentWindow = win;
-                    self.parentWindow.isMoving = true;
-                    win:Show()
-                    win:ClearAllPoints();
-                    win:SetPoint("TOPLEFT", self, "TOPLEFT");
-                else
-                    dPrint("TabHelperFrame couldn't find 'obj'. Reseting State.");
-                    self:StopMovingOrSizing();
-                    self.isMoving = false;
-                    helperFrame:ResetState();
-                end
-            end);
-helperFrame:SetScript("OnDragStop", function(self)
-                local win = self.parentWindow;
-                local x,y = win:GetLeft(), win:GetTop();
-                win:ClearAllPoints();
-                win:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", x, y);
-                
-                -- account for win's helper frame.
-                if(win.helperFrame.isAttached) then
-                    local dropTo = win.helperFrame.attachedTo;
-                    win.helperFrame:ResetState();
-                    if(dropTo) then
-                        -- win was already detached when drag started.
-                        -- so no need to check for that again.
-                        if(dropTo.tabStrip) then
-                            dropTo.tabStrip:Attach(win);
-                            dropTo.tabStrip:JumpToTab(dropTo);
-                        else
-                            local tabStrip = GetAvailableTabGroup();
-                            tabStrip:Attach(dropTo);
-                            tabStrip:Attach(win);
-                            tabStrip:JumpToTab(dropTo);
-                        end
-                    end
-                end
-                self:StopMovingOrSizing();
-                self.isMoving = false;
-                win.isMoving = false;
-                helperFrame:ResetState();
-            end);
-helperFrame:SetScript("OnUpdate", function(self)
-                if(self.isMoving and self.isAttached) then
-                    helperFrame.flash:Hide();
-                    return;
-                end
-                
-                if(IsShiftKeyDown()) then
-                    local obj = GetMouseFocus();
-                    if(obj and obj.isWimTab and not self.isAttached) then
-                        -- attach to tab + position window
-                        self.attachedTo = obj;
-                        self:RegisterForDrag("LeftButton");
-                        self.tabStrip = obj.tabStrip;
-                        self.isTabHelper = true;
-                        self:ClearAllPoints();
-                        self:SetPoint("TOPLEFT", obj, "TOPLEFT", 0, 0);
-                        self:SetPoint("BOTTOMRIGHT", obj, "BOTTOMRIGHT", 0, 0);
-                        self.isAttached = true;
-                        self.obj = obj;
-                    elseif(obj and self.isAttached) then
-                        if(obj ~= helperFrame) then
-                            self:ResetState();
-                        end
-                    else
-                        if(self.isAttached) then
-                            self:ResetState();
-                        end
-                    end
-                else
-                    if(self.isAttached) then
-                        self:ResetState();
-                    end
-                end
-                if(self.isAttached) then
-                    self.flash:Show();
-                else
-                    self.flash:Hide();
-                end
-            end);
-helperFrame:Show();
-
-
-
 ----------------------------------
 --      Core Tab Management     --
 ----------------------------------
@@ -246,6 +128,20 @@ local function setTabOffset(tabStrip, PlusOrMinus)
 end
 
 
+local function tabOnUpdate(self, elapsed)
+    if(not self.dragFrame and self.dragging) then
+        return;
+    end
+    local dragFrame = self.dragFrame or self
+    if(IsShiftKeyDown()) then
+        -- shift is being held down over tab.
+        dragFrame:Show();
+    else
+        dragFrame:Hide();
+    end
+end
+
+
 -- create a tabStrip object and register it to table TabGroups.
 -- returns the tabStrip just created.
 local function createTabGroup()
@@ -308,6 +204,93 @@ local function createTabGroup()
         tab.smiddle:SetPoint("TOPLEFT", tab.left, "TOPRIGHT");
         tab.smiddle:SetPoint("BOTTOMRIGHT", tab.right, "BOTTOMLEFT");
         
+        tab.dragFrame = _G.CreateFrame("Frame");
+        tab.dragFrame.parentTab = tab;
+        tab.dragFrame.tabStrip = tabStrip;
+        tab.dragFrame:SetPoint("TOPLEFT", tab.dragFrame.parentTab, 0, 0);
+        tab.dragFrame:SetPoint("BOTTOMRIGHT", tab.dragFrame.parentTab, 0, 0);
+        tab.dragFrame.marker = tab.dragFrame:CreateTexture(nil, "OVERLAY");
+        tab.dragFrame.marker:SetPoint("BOTTOMLEFT");
+        tab.dragFrame.marker:SetPoint("BOTTOMRIGHT");
+        tab.dragFrame.marker:SetHeight(2);
+        tab.dragFrame.marker:SetBlendMode("ADD");
+        tab.dragFrame.marker:SetTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight");
+        --tab.dragFrame:SetClampedToScreen(true);
+        tab.dragFrame:SetFrameStrata("TOOLTIP");
+        tab.dragFrame:SetMovable(true);
+        tab.dragFrame:SetToplevel(true);
+        tab.dragFrame:EnableMouse(true);
+        tab.dragFrame:RegisterForDrag("LeftButton");
+        tab.dragFrame:SetScript("OnEnter", function(self)
+            self:SetScript("OnUpdate", tabOnUpdate);
+        end);
+        tab.dragFrame:SetScript("OnLeave", function(self)
+            self:SetScript("OnUpdate", nil);
+            self:Hide();
+        end);
+        tab.dragFrame:SetScript("OnShow", function(self)
+            self.marker:Show();
+        end);
+        tab.dragFrame:SetScript("OnDragStart", function(self)
+            self.marker:Hide();
+            self.dragging = true;
+            self:StartMoving();
+            local win = self.parentTab.childObj;
+            win.isMoving = true;
+            self.draggedObject = win;
+            self.parentWindow = win;
+            self.tabStrip = nil;
+            --detach window from tab group
+            win.tabStrip:Detach(win);
+            win:Show();
+            win:ClearAllPoints();
+            win:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0);
+        end);
+        tab.dragFrame:SetScript("OnDragStop", function(self)
+            self:StopMovingOrSizing();
+            self.dragging = nil;
+            
+            local win = self.draggedObject;
+            win.isMoving = nil;
+            win:ClearAllPoints();
+            self.draggedObj = nil;
+            self.parentWindow = nil;
+            self.tabStrip = self.parentTab.tabStrip;
+            
+            -- account for win's helper frame.
+            if(win.helperFrame.isAttached) then
+                local dropTo = win.helperFrame.attachedTo;
+                win.helperFrame:ResetState();
+                if(dropTo) then
+                    -- win was already detached when drag started.
+                    -- so no need to check for that again.
+                    if(dropTo.tabStrip) then
+                        dropTo.tabStrip:Attach(win);
+                        dropTo.tabStrip:JumpToTab(dropTo);
+                    else
+                        local tabStrip = GetAvailableTabGroup();
+                        tabStrip:Attach(dropTo);
+                        tabStrip:Attach(win);
+                        tabStrip:JumpToTab(dropTo);
+                    end
+                end
+            end
+            
+            self:ClearAllPoints();
+            self:SetPoint("TOPLEFT", self.parentTab, 0, 0);
+            self:SetPoint("BOTTOMRIGHT", self.parentTab, 0, 0);
+            self:Hide();
+        end);
+        tab.dragFrame:SetScript("OnHide", function(self)
+            if(self.dragging) then
+                local fun = self:GetScript("OnDragStop");
+                fun(self);
+            end
+        end);
+        
+        tab.dragFrame:Hide();
+        
+        
         tab.SetTexture = function(self, pathOrTexture)
             self.left:SetTexture(pathOrTexture);
             self.middle:SetTexture(pathOrTexture);
@@ -345,7 +328,7 @@ local function createTabGroup()
                 self.childObj.widgets.close.forceShift = true;
                 self.childObj.widgets.close:Click();
             else
-                tabStrip:JumpToTab(self.childObj);
+                self.tabStrip:JumpToTab(self.childObj);
             end
             self:UnlockHighlight();
         end);
@@ -354,6 +337,12 @@ local function createTabGroup()
             setTabOffset(self:GetParent(), -direction);
         end);
         tab.isWimTab = true;
+        tab:SetScript("OnEnter", function(self)
+            self:SetScript("OnUpdate", tabOnUpdate);
+        end);
+        tab:SetScript("OnLeave", function(self)
+            self:SetScript("OnUpdate", nil);
+        end);
         
         table.insert(tabStrip.tabs, tab);
     end
@@ -480,7 +469,7 @@ local function createTabGroup()
     end
     
     tabStrip.JumpToTab = function(self, win)
-        local start, a, b = _G.GetTime(), 0, 0;
+        local lastWin = "NONE";
         if(win) then
             local oldWin = self.selected.obj;
             local oldCustomSize = win.customSize;
@@ -489,17 +478,17 @@ local function createTabGroup()
             DisplayTutorial(L["Manipulating Tabs"], L["You can <Shift-Click> a tab and drag it out into it's own window."]);
             
             if(oldWin and oldWin ~= win) then
-                win:SetWidth(oldWin:GetWidth());
-                win:SetHeight(oldWin:GetHeight());
-                win:ClearAllPoints();
-                win:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", oldWin:GetLeft(), oldWin:GetTop());
-                win:SetAlpha(oldWin:GetAlpha());
+                local oW, oH, oL, oT, oA = oldWin:GetWidth(), oldWin:GetHeight(), oldWin:GetLeft(), oldWin:GetTop(), oldWin:GetAlpha();
+                local cW, cH, cL, cT, cA = win:GetWidth(), win:GetHeight(), win:GetLeft(), win:GetTop(), win:GetAlpha();
+                if(oW ~= cW) then win:SetWidth(oW); end
+                if(oH ~= cH) then win:SetHeight(oH); end
+                if(oL ~= cL or oT ~= oT) then win:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", oL, oT); end
+                if(oA ~= cA) then win:SetAlpha(oA); end
+                lastWin = oldWin:GetName();
             end
             if( not win.popNoShow ) then
                 self:SetSelectedName(win);
-                a = _G.GetTime()
                 win:Show();
-                b = _G.GetTime() - a;
                 if(inFocus) then
                     win.widgets.msg_box:SetFocus()
                 end
@@ -518,8 +507,6 @@ local function createTabGroup()
             end
             win.popNoShow = nil;
         end
-        local stop = _G.GetTime();
-        --_G.DEFAULT_CHAT_FRAME:AddMessage((stop - start)..":"..b);
     end
     
     tabStrip.Detach = function(self, win)

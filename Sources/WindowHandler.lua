@@ -199,14 +199,16 @@ end
 local resizeFrame = CreateFrame("Button", "WIM_WindowResizeFrame", _G.UIParent);
 resizeFrame:Hide();
 resizeFrame.widgetName = "resize";
+resizeFrame:SetFrameStrata("TOOLTIP");
 resizeFrame.Attach = function(self, win)
 		if(win.widgets.close ~= GetMouseFocus() and win.type ~= "demo") then
 			self:SetParent(win);
 			self.parentWindow = win;
 			ApplySkinToWidget(self);
 			self:Show();
-			resizeFrame:SetFrameLevel(999);
+			--resizeFrame:SetFrameLevel(999);
 		else
+                        self:Reset();
 			resizeFrame:Hide();
 		end
 	end
@@ -288,24 +290,34 @@ helperFrame:SetScript("OnUpdate", function(self)
                                 if(win == WIM.DemoWindow) then
                                         return;
                                 end
-				resizeFrame:Attach(win);
+				if(not win.isMoving) then
+                                                resizeFrame:Attach(win);
+                                end
 				if(win.isMoving and not (win.tabStrip and win.tabStrip:IsVisible())) then
-				local mWin = getWindowAtCursorPosition(win);
-					if(not self.isAttached and mWin ~= DemoWindow) then
-						if(mWin) then
-							-- attach to window
-							local skinTable = GetSelectedSkin().tab_strip;
-							self.parentWindow = mWin;
-							self.attachedTo = mWin;
-							mWin.helperFrame = helperFrame;
-							self:SetParent(mWin);
-							SetWidgetRect(self, skinTable);
-							self:SetHeight(self.flash:GetHeight());
-							self.isAttached = true;
-						end
-					elseif(self.isAttached and mWin ~= self.attachedTo) then
-						self:ResetState();
-					end
+				        local mWin = getWindowAtCursorPosition(win);
+                                        if(mWin) then
+                                                if(self.isAttached) then
+                                                                if(mWin ~= self.attachedTo) then
+                                                                                self:ResetState();
+                                                                end
+                                                else
+                                                                if(mWin ~= WIM.DemoWindow) then
+                                                                                -- attach to window
+                                                                                local skinTable = GetSelectedSkin().tab_strip;
+                                                                                self.parentWindow = mWin;
+                                                                                self.attachedTo = mWin;
+                                                                                mWin.helperFrame = self;
+                                                                                self:SetParent(mWin);
+                                                                                SetWidgetRect(self, skinTable);
+                                                                                self:SetHeight(self.flash:GetHeight());
+                                                                                self.isAttached = true;
+                                                                end
+                                                end
+                                        else
+                                                if(self.isAttached) then
+                                                                self:ResetState();
+                                                end
+                                        end
 				else
 					if(self.isAttached) then
 						self:ResetState();
