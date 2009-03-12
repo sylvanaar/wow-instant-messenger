@@ -1578,8 +1578,13 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusLost", function
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseUp", function(self, button)
                                 _G.CloseDropDownMenus();
                                 if(button == "RightButton") then
-                                                PopContextMenu("MsgBoxMenu", self);
+                                                PopContextMenu("MENU_MSGBOX", self);
+                                else
+                                                DisplayTutorial(L["Right-Mouse Click!"], L["There might be useful tools hidden under the message box. Right-Click to see them!"]);
                                 end
+                end);
+RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseDown", function(self, button)
+                                MSG_CONTEXT_MENU_EDITBOX = self;
                 end);
 
 
@@ -1601,7 +1606,7 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
 	end);
 
 
-
+--[[
 -- msg_box context menu
 local info = _G.UIDropDownMenu_CreateInfo();
 info.text = "MsgBoxMenu";
@@ -1610,4 +1615,13 @@ local msgBoxMenu = AddContextMenu(info);
     info.text = _G.CANCEL;
     info.func = function() _G.CloseDropDownMenus(); end;
     msgBoxMenu:AddSubItem(info);
-
+]]
+-- define context menu
+local info = _G.UIDropDownMenu_CreateInfo();
+info.text = "MENU_MSGBOX";
+local msgBoxMenu = AddContextMenu(info.text, info);
+                local info = _G.UIDropDownMenu_CreateInfo();
+                info.text = _G.CANCEL;
+                info.notCheckable = true;
+                info.func = function() _G.CloseDropDownMenus(); end
+                msgBoxMenu:AddSubItem(AddContextMenu("MENU_CANCEL", info));

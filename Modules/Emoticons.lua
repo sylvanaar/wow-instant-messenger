@@ -5,6 +5,7 @@ local table = table;
 local unpack = unpack;
 local string = string;
 local pairs = pairs;
+local select = select;
 
 --set namespace
 setfenv(1, WIM);
@@ -136,6 +137,15 @@ local function clearTempTable()
 end
 
 
+local function loadTable(tbl, ...)
+    clearTempTable();
+    for i=1, select("#", ...) do
+        local item = select(i, ...);
+        table.insert(tbl, item);
+    end
+end
+
+
 -- Extended Global
 function GetEmotes()
     clearTempTable();
@@ -163,3 +173,78 @@ function GetEmoteTexture(emote)
     return getEmoteFilePath(emote);
 end
 
+
+
+-- define context menu
+local emotesPerMenu = 14;
+
+local info = _G.UIDropDownMenu_CreateInfo();
+info.text = "MENU_MSGBOX";
+local msgBoxMenu = AddContextMenu(info.text, info);
+    info = _G.UIDropDownMenu_CreateInfo();
+    info.text = WIM.L["Emoticons"];
+    info.notCheckable = true;
+    local emoticonsMenu = msgBoxMenu:AddSubItem(AddContextMenu("EMOTICON_LIST", info), 2);
+
+local function emoteMenuClicked(self)
+    _G.CloseDropDownMenus();
+    if(MSG_CONTEXT_MENU_EDITBOX) then
+        MSG_CONTEXT_MENU_EDITBOX:Insert(self.value);
+    end
+end
+
+local emoteTmpList = {};
+local function generateEmoticonList(self, button)
+    if(button ~= "RightButton") then
+        return;
+    end
+    local emoticonsMenu = GetContextMenu("EMOTICON_LIST");
+    local tbl = emoticonsMenu.menuTable;
+    --clear initial table
+    if(tbl) then
+        for k, _ in pairs(tbl) do
+            tbl[k] = nil;
+        end
+    end
+    
+    loadTable(emoteTmpList, GetEmotes());
+    local EMOTICON_MORE = 1;
+    local info;
+    for i=1, #emoteTmpList do
+        if(i % emotesPerMenu == 0) then
+            local more = GetContextMenu("EMOTICON_MORE"..EMOTICON_MORE) or _G.UIDropDownMenu_CreateInfo();
+            more.text = "|cff69ccf0"..WIM.L["More"].."|r";
+            more.notCheckable = true;
+            if(more.menuTable) then
+                for k, _ in pairs(more.menuTable) do
+                    more.menuTable[k] = nil;
+                end
+            end
+            emoticonsMenu:AddSubItem(GetContextMenu("MENU_SPACE"), 1);
+            emoticonsMenu:AddSubItem(AddContextMenu("EMOTICON_MORE"..EMOTICON_MORE, more), 1);
+            emoticonsMenu = GetContextMenu("EMOTICON_MORE"..EMOTICON_MORE);
+            EMOTICON_MORE = EMOTICON_MORE + 1;
+        end
+
+        info = GetContextMenu("EMOTICON_"..emoteTmpList[i]) or _G.UIDropDownMenu_CreateInfo();
+        info.text = "|T"..getEmoteFilePath(emoteTmpList[i])..":16:16:0:0|t   "..emoteTmpList[i];
+        info.tooltipTitle = info.text
+        loadTable(tmpList, GetEmoteAlias(emoteTmpList[i]))
+        info.tooltipText = table.concat(tmpList, "\n");
+        if(info.tooltipText and info.tooltipText ~= "") then
+            info.tooltipText = "|cff69ccf0"..L["Also"]..":|r\n"..info.tooltipText
+        end
+        info.notCheckable = true;
+        info.value = emoteTmpList[i];
+        info.func = emoteMenuClicked;
+        emoticonsMenu:AddSubItem(AddContextMenu("EMOTICON_"..emoteTmpList[i], info));
+    end
+    for key, _ in pairs(emoteTmpList) do
+        emoteTmpList[key] = nil;
+    end
+    clearTempTable();
+end
+
+RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseDown", generateEmoticonList);
+    
+    

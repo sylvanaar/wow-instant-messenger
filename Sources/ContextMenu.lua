@@ -15,10 +15,12 @@ local ToggleDropDownMenu = ToggleDropDownMenu;
 setfenv(1, WIM);
 
 local menuFrame = _G.CreateFrame("Frame", "WIM3_ContextMenu", _G.UIParent, "UIDropDownMenuTemplate");
+menuFrame:SetPoint("TOP", -80, -200);
+menuFrame:Hide();
 
-local ctxMenu = {};
+ ctxMenu = {};
 
-local MENU_ID = 1;
+local MENU_ID = 0;
 
 local CurMenu;
 
@@ -31,32 +33,61 @@ local function getMenuByTitle(text)
     return;
 end
 
-local function addMenuItem(info)
+local function addMenuItem(tag, info)
     -- required checks
-    if(type(info) ~= "table" and not info.txt) then return; end
+    if(type(info) ~= "table" and not info.text) then
+        if(type(tag) == "table" and tag.text) then
+            MENU_ID = MENU_ID + 1;
+            return addMenuItem("MENU_ITEM"..MENU_ID, tag);
+        else
+            return;
+        end
+    end
+    if(type(tag) ~= "string") then
+        return;
+    end
+    if(tag == "") then
+        MENU_ID = MENU_ID + 1;
+        return addMenuItem("MENU_ITEM"..MENU_ID, info);
+    end
+    if(ctxMenu[string.upper(tag)]) then
+        return ctxMenu[string.upper(tag)];
+    end
     
+    -- propper formatting
+    tag = string.upper(tag);
+    
+    -- load data into its own table. we will send this back to the user later.
     local item = {};
     for key, val in pairs(info) do
         item[key] = val;
     end
     
-    ctxMenu[MENU_ID] = item;
-    item.MENU_ID = MENU_ID;
-    MENU_ID = MENU_ID + 1;
+    ctxMenu[tag] = item;
+    item.MENU_ID = tag;
     
-    item.AddSubItem = function(self, info, insertAt)
-        local sub = addMenuItem(info);
+    item.AddSubItem = function(self, menuItem, insertAt)
+        if(type(menuItem) == "string") then
+            menuItem = ctxMenu[string.upper(menuItem)];
+            if(not menuItem) then
+                return;
+            end
+        end
+        if(not (type(menuItem) == "table" and menuItem.MENU_ID)) then
+            return;
+        end
+        
         if(not self.menuTable) then
             self.menuTable = {};
         end
         if(insertAt) then
-            table.insert(self.menuTable, insertAt, sub);
+            table.insert(self.menuTable, insertAt, menuItem.MENU_ID);
         else
-            table.insert(self.menuTable, sub);
+            table.insert(self.menuTable, menuItem.MENU_ID);
         end
         self.hasArrow = true;
         self.value = self.MENU_ID;
-        return sub;
+        return true;
     end
     return item;
 end
@@ -64,7 +95,7 @@ end
 local function initializeMenu(frame, level, menuTable)
     level = level or _G.UIDROPDOWNMENU_MENU_LEVEL;
     if(level > 1 and _G.UIDROPDOWNMENU_MENU_VALUE) then
-        CurMenu = ctxMenu[_G.tonumber(_G.UIDROPDOWNMENU_MENU_VALUE)];
+        CurMenu = ctxMenu[_G.UIDROPDOWNMENU_MENU_VALUE];
     end
     if(not CurMenu) then
         dPrint("ContextMenu Error - Menu not set.");
@@ -77,10 +108,10 @@ local function initializeMenu(frame, level, menuTable)
     end
     for i=1, #items do
         local info = UIDropDownMenu_CreateInfo();
-        for key, val in pairs(items[i]) do
+        for key, val in pairs(ctxMenu[items[i]]) do
             info[key] = val;
         end
-        if(not info.hidden) then
+        if(not ctxMenu[items[i]].hidden) then
             UIDropDownMenu_AddButton(info, level);
         end
     end
@@ -89,39 +120,42 @@ end
 
 -- global API
 
-function PopContextMenu(menu, parent)
-    local id = getMenuByTitle(menu);
+function PopContextMenu(tag, parent)
+    if(type(tag) ~= "string") then
+        return;
+    end
+    tag = string.upper(tag);
+    
+    local id = ctxMenu[tag];
     if(id) then
         _G.CloseDropDownMenus();
-        dPrint("Popping menu ["..menu.."]:"..id..".");
-        CurMenu = ctxMenu[id];
+        dPrint("Popping menu ["..tag.."]");
+        CurMenu = id;
         _G.UIDROPDOWNMENU_MENU_VALUE = nil;
         if(WIM.Menu) then
             WIM.Menu:Hide();
         end
         UIDropDownMenu_Initialize(menuFrame, initializeMenu, "MENU");
         ToggleDropDownMenu(1, 1, menuFrame, parent, 0, 0);
+        _G.UIDropDownMenu_SetButtonWidth(menuFrame, 25);
+	_G.UIDropDownMenu_SetWidth(menuFrame, 25, 5);
+        _G.PlaySound("UChatScrollButton");
     else
-        dPrint("Menu ["..menu.."] not found!")
+        dPrint("Menu ["..tag.."] not found!")
     end
 end
 
-function AddContextMenu(info)
-    local item = addMenuItem(info)
+function AddContextMenu(tag, info)
+    local item = addMenuItem(tag, info)
     if(item) then
-        dPrint("Menu ["..item.text.."] registered with ContextMenu.");
+        dPrint("Menu ["..item.MENU_ID.."] registered with ContextMenu.");
     else
         dPrint("Menu failed to register with ContextMenu.")
     end
     return item;
 end
 
-function GetContextMenuByName(title)
-    local id = getMenuByTitle(title)
-    if(id) then
-        return ctxMenu[id];
-    else
-        return nil;
-    end
+function GetContextMenu(tag)
+    return ctxMenu[tag or "<NIL>"];
 end
 
