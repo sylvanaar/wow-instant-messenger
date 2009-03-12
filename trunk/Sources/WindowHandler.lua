@@ -1322,13 +1322,25 @@ function HideAllWindows(type)
 	end
 end
 
+local showAllTbl = {};
 function ShowAllWindows(type)
 	type = type and string.lower(type) or nil;
 	for i=1, #WindowSoupBowl.windows do
 		if(WindowSoupBowl.windows[i].inUse and WindowSoupBowl.windows[i].obj.type == (type or WindowSoupBowl.windows[i].obj.type)) then
-			WindowSoupBowl.windows[i].obj:Pop(true);
-		end
+                                local obj = WindowSoupBowl.windows[i] and WindowSoupBowl.windows[i].obj;
+                                if(obj.tabStrip and #obj.tabStrip.attached > 1) then
+                                                if(addToTableUnique(showAllTbl, obj.tabStrip)) then
+                                                                obj.tabStrip.selected.obj:Pop(true);
+                                                end
+                                else
+                                                WindowSoupBowl.windows[i].obj:Pop(true);
+                                end
+                end
 	end
+        -- clean table
+        for key, _ in pairs(showAllTbl) do
+                showAllTbl[key] = nil;
+        end
 end
 
 local showAllUnreadTbl = {};
@@ -1336,8 +1348,8 @@ function ShowAllUnreadWindows(type)
         type = type and string.lower(type) or nil;
 	for i=1, #WindowSoupBowl.windows do
 		if(WindowSoupBowl.windows[i].inUse and WindowSoupBowl.windows[i].obj.type == (type or WindowSoupBowl.windows[i].obj.type)) then
-                        local obj = WindowSoupBowl.windows[i].obj;
-                        if(obj and obj.unreadCount > 0) then
+                        local obj = WindowSoupBowl.windows[i] and WindowSoupBowl.windows[i].obj;
+                        if(obj and obj.unreadCount and obj.unreadCount > 0) then
                                 if(obj.tabStrip) then
                                         if(addToTableUnique(showAllUnreadTbl, obj.tabStrip)) then
                         			WindowSoupBowl.windows[i].obj:Pop(true);
@@ -1349,8 +1361,8 @@ function ShowAllUnreadWindows(type)
 		end
 	end
         -- clean table
-        for i=1, #showAllUnreadTbl do
-                table.remove(showAllUnreadTbl, 1);
+        for key, _ in pairs(showAllUnreadTbl) do
+                showAllUndreadTbl[key] = nil;
         end
 end
 
