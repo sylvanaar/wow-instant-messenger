@@ -12,15 +12,16 @@ end
 
 
 -- ChangeLog Entries.
-addEntry("3.0.7", "03/??/2008", [[
+addEntry("3.0.7", "03/12/2008", [[
     +Added context menu management system.
-    +Added minimap icon right mouse click menu. (not completed).
+    +Added minimap icon right mouse click menu.
     *Modules were getting loaded on startup regardless of their settings.
     *Fixed a bug where tabs would be updated incorrectly.
     *Fixed freeze/lockup bug when switching tabs.
     +Added <Right-Click> drop down menu to window's text box.
     +Added emoticons to the drop down menu.
     +Added recently sent messages to drop down menu.
+    +Added koKR translation. (thank you BlueNyx).
 ]]);
 
 addEntry("3.0.6", "03/10/2008", [[

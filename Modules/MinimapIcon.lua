@@ -230,10 +230,19 @@ local function createMinimapIcon()
             toggleMenu(self);
         else
             if(db.minimap.rightClickNew) then
-                ShowAllUnreadWindows();
+                if(_G.IsShiftKeyDown()) then
+                    -- display tools menu
+                    PopContextMenu("MENU_MINIMAP", "WIM3MinimapButton");
+                else
+                    ShowAllUnreadWindows();
+                end
             else
-                -- display tools menu
-                PopContextMenu("MENU_MINIMAP", "WIM3MinimapButton");
+                if(_G.IsShiftKeyDown()) then
+                    ShowAllUnreadWindows();
+                else
+                    -- display tools menu
+                    PopContextMenu("MENU_MINIMAP", "WIM3MinimapButton");
+                end
             end
         end
     end
@@ -405,8 +414,20 @@ info.text = "MENU_MINIMAP";
 local minimapMenu = AddContextMenu(info.text, info);
     --show unread messages
     info = _G.UIDropDownMenu_CreateInfo();
+    info.text = L["Show All Windows"];
+    info.func = function() ShowAllWindows(); end;
+    info.notCheckable = true;
+    minimapMenu:AddSubItem(AddContextMenu("SHOW_ALL_WINDOWS", info));
+    --show unread messages
+    info = _G.UIDropDownMenu_CreateInfo();
+    info.text = L["Hide All Windows"];
+    info.func = function() HideAllWindows(); end;
+    info.notCheckable = true;
+    minimapMenu:AddSubItem(AddContextMenu("HIDE_ALL_WINDOWS", info));
+    --show unread messages
+    info = _G.UIDropDownMenu_CreateInfo();
     info.text = L["Show Unread Messages"];
-    info.func = function() ShowAllUnreadWindows("whisper"); end;
+    info.func = function() ShowAllUnreadWindows(); end;
     info.notCheckable = true;
     minimapMenu:AddSubItem(AddContextMenu("SHOW_UNREAD_MESSAGES", info));
     -- add space

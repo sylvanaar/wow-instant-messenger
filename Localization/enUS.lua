@@ -225,6 +225,7 @@ WIM.AddLocale("enUS", {
     -- WhisperEngine.lua --
     ["Whisper Received!"] = true,
     ["You received a whisper which was hidden due to your current activity. You can change how whispers behave in WIM's options by typing"] = true,
+    ["Recently Sent Messages"] = true,
     
     -- Clear.lua --
     ["You are about to clear all of WIM's history!"] = true,
@@ -258,6 +259,9 @@ WIM.AddLocale("enUS", {
     ["Default"] = true,
     ["%s is Away From Keyboard: %s"] = true,
     ["%s does not wish to be disturbed: %s"] = true,
+    ["Right-Mouse Click!"] = true,
+    ["There might be useful tools hidden under the message box. Right-Click to see them!"] = true,
+    
     
     -- Options.lua --
     ["Display WIM's options."] = true,
@@ -425,5 +429,15 @@ WIM.AddLocale("enUS", {
     ["WIM has blocked a message from %s."] = true,
     ["View Blocked Message"] = true,
     ["Blocked Message"] = true,
+    
+    -- MinimapIcon.lua
+    ["Show Unread Messages"] = true,
+    ["Show All Windows"] = true,
+    ["Hide All Windows"] = true,
+    
+    --Emoticons.lua
+    ["Also"] = true,
+    ["More"] = true,
+    ["Emoticons"] = true,
     
 });
