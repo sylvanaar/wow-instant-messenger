@@ -1575,6 +1575,12 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnUpdate", function(s
 	
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusGained", function(self) EditBoxInFocus = self; end);
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusLost", function(self) EditBoxInFocus = nil; end);
+RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseUp", function(self, button)
+                                _G.CloseDropDownMenus();
+                                if(button == "RightButton") then
+                                                PopContextMenu("MsgBoxMenu", self);
+                                end
+                end);
 
 
 RegisterMessageFormatting(L["Default"], function(smf, event, ...)
@@ -1596,4 +1602,12 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
 
 
 
+-- msg_box context menu
+local info = _G.UIDropDownMenu_CreateInfo();
+info.text = "MsgBoxMenu";
+local msgBoxMenu = AddContextMenu(info);
+    info = _G.UIDropDownMenu_CreateInfo();
+    info.text = _G.CANCEL;
+    info.func = function() _G.CloseDropDownMenus(); end;
+    msgBoxMenu:AddSubItem(info);
 
