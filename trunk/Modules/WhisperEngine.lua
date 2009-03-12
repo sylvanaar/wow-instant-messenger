@@ -119,6 +119,9 @@ local CF_MessageEventHandler_orig; -- used for a hook of the chat frame. Messaag
 local addToTableUnique = addToTableUnique;
 local removeFromTable = removeFromTable;
 
+local recentSent = {};
+local maxRecent = 10;
+
 local alertPushed = false;
 
 local function updateMinimapAlerts()
@@ -311,6 +314,10 @@ function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
     win.online = true;
     win.msgSent = false;
     CallModuleFunction("PostEvent_WhisperInform", ...);
+    addToTableUnique(recentSent, arg1);
+        if(#recentSent > maxRecent) then
+                table.remove(recentSent, 1);
+        end
 end
 
 -- CHAT_MSG_AFK  CONTROLLER (For Supression from Chat Frame)
@@ -531,6 +538,67 @@ end
 
 -- global reference
 GetWhisperWindowByUser = getWhisperWindowByUser;
+
+
+
+
+
+-- define context menu
+local info = _G.UIDropDownMenu_CreateInfo();
+info.text = "MENU_MSGBOX";
+local msgBoxMenu = AddContextMenu(info.text, info);
+        info = _G.UIDropDownMenu_CreateInfo();
+        info.text = WIM.L["Recently Sent Messages"];
+        info.notCheckable = true;
+        msgBoxMenu:AddSubItem(AddContextMenu("RECENT_LIST", info), 1);
+        local recentMenu = GetContextMenu("RECENT_LIST");
+        if(recentMenu.menuTable) then
+                for k, _ in pairs(recentMenu.menuTable) do
+                        recentMenu.menuTable[k] = nil;
+                end
+        end
+        for i=1, maxRecent do
+            info = GetContextMenu("RECENT_LIST"..i) or _G.UIDropDownMenu_CreateInfo();
+            info.txt = " ";
+            info.hidden = true;
+            info.notCheckable = true;
+            recentMenu:AddSubItem(AddContextMenu("RECENT_LIST"..i, info));
+        end
+
+local function recentMenuClick(self)
+        _G.CloseDropDownMenus();
+        if(MSG_CONTEXT_MENU_EDITBOX) then
+                if(_G.IsShiftKeyDown()) then
+                        MSG_CONTEXT_MENU_EDITBOX:Insert(self.value);
+                else
+                        MSG_CONTEXT_MENU_EDITBOX:SetText(self.value);
+                end
+        end
+end
+
+RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseDown", function(self)
+                if(#recentSent == 0) then
+                        local item = GetContextMenu("RECENT_LIST1");
+                        item.text = "|cff808080 - "..L["None"].." - |r";
+                        item.notClickable = true;
+                        item.hidden = nil;
+                        return;
+                end
+                for i=maxRecent, 1, -1 do
+                        local item = GetContextMenu("RECENT_LIST"..(10-i+1));
+                        item.notClickable = nil;
+                        if(recentSent[i]) then
+                                item.text = recentSent[i];
+                                item.value = recentSent[i];
+                                item.func = recentMenuClick;
+                                item.hidden = nil;
+                        else
+                                item.hidden = true;
+                        end
+                end
+        end);
+
+
 
 
 -- This is a core module and must always be loaded...

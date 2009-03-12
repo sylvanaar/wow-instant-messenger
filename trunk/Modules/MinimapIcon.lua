@@ -233,7 +233,7 @@ local function createMinimapIcon()
                 ShowAllUnreadWindows();
             else
                 -- display tools menu
-                PopContextMenu("MinimapMenu", "WIM3MinimapButton");
+                PopContextMenu("MENU_MINIMAP", "WIM3MinimapButton");
             end
         end
     end
@@ -401,28 +401,32 @@ end
 --      Right Click Menu            --
 --------------------------------------
 local info = _G.UIDropDownMenu_CreateInfo();
-info.text = "MinimapMenu";
-local minimapMenu = AddContextMenu(info);
-    -- add space
+info.text = "MENU_MINIMAP";
+local minimapMenu = AddContextMenu(info.text, info);
+    --show unread messages
     info = _G.UIDropDownMenu_CreateInfo();
     info.text = L["Show Unread Messages"];
     info.func = function() ShowAllUnreadWindows("whisper"); end;
-    minimapMenu:AddSubItem(info);
+    info.notCheckable = true;
+    minimapMenu:AddSubItem(AddContextMenu("SHOW_UNREAD_MESSAGES", info));
     -- add space
     info = _G.UIDropDownMenu_CreateInfo();
     info.text = "";
     info.isTitle = true;
-    minimapMenu:AddSubItem(info);
+    info.notCheckable = true;
+    minimapMenu:AddSubItem(AddContextMenu("MENU_SPACE", info));
     -- history viewer
     info = _G.UIDropDownMenu_CreateInfo();
     info.text = L["History Viewer"];
     info.func = function() ShowHistoryViewer() end;
-    minimapMenu:AddSubItem(info);
+    info.notCheckable = true;
+    minimapMenu:AddSubItem(AddContextMenu("HISTORY_VIEWER", info));
     -- options
     info = _G.UIDropDownMenu_CreateInfo();
     info.text = L["Options"];
     info.func = ShowOptions;
-    minimapMenu:AddSubItem(info);
+    info.notCheckable = true;
+    minimapMenu:AddSubItem(AddContextMenu("OPTIONS", info));
 
 
 --------------------------------------
