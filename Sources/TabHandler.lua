@@ -256,6 +256,9 @@ local function createTabGroup()
             self.draggedObj = nil;
             self.parentWindow = nil;
             self.tabStrip = self.parentTab.tabStrip;
+
+            win:ClearAllPoints();
+            win:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", win:GetLeft(), win:GetTop());
             
             -- account for win's helper frame.
             if(win.helperFrame.isAttached) then

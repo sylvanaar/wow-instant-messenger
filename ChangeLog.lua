@@ -17,7 +17,7 @@ addEntry("3.0.7", "03/??/2008", [[
     +Added minimap icon right mouse click menu. (not completed).
     *Modules were getting loaded on startup regardless of their settings.
     *Fixed a bug where tabs would be updated incorrectly.
-    *Fixed freeze/lockup bug when switching tabs.
+    *Fixed freeze/lockup bug when switching tabs. 
 ]]);
 
 addEntry("3.0.6", "03/10/2008", [[
