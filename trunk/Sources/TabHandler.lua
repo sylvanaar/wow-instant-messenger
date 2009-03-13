@@ -146,7 +146,7 @@ end
 -- returns the tabStrip just created.
 local function createTabGroup()
     local stripName = "WIM_TabStrip"..(table.getn(tabGroups) + 1);
-    local tabStrip = CreateFrame("Frame", stripName, UIParent);
+    local tabStrip = CreateFrame("Frame", stripName, WindowParent);
     tabStrip:SetFrameStrata("DIALOG");
     tabStrip:SetToplevel(true);
     --tabStrip:SetWidth(384);
@@ -243,7 +243,7 @@ local function createTabGroup()
             --detach window from tab group
             win.tabStrip:Detach(win);
             win:Show();
-            win:ClearAllPoints();
+            --win:ClearAllPoints();
             win:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0);
         end);
         tab.dragFrame:SetScript("OnDragStop", function(self)
@@ -252,13 +252,13 @@ local function createTabGroup()
             
             local win = self.draggedObject;
             win.isMoving = nil;
-            win:ClearAllPoints();
+            --win:ClearAllPoints();
             self.draggedObj = nil;
             self.parentWindow = nil;
             self.tabStrip = self.parentTab.tabStrip;
 
-            win:ClearAllPoints();
-            win:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", win:GetLeft(), win:GetTop());
+            --win:ClearAllPoints();
+            win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", win:GetLeft(), win:GetTop());
             
             -- account for win's helper frame.
             if(win.helperFrame.isAttached) then
@@ -481,11 +481,11 @@ local function createTabGroup()
             DisplayTutorial(L["Manipulating Tabs"], L["You can <Shift-Click> a tab and drag it out into it's own window."]);
             
             if(oldWin and oldWin ~= win) then
-                local oW, oH, oL, oT, oA = oldWin:GetWidth(), oldWin:GetHeight(), oldWin:GetLeft(), oldWin:GetTop(), oldWin:GetAlpha();
-                local cW, cH, cL, cT, cA = win:GetWidth(), win:GetHeight(), win:GetLeft(), win:GetTop(), win:GetAlpha();
+                local oW, oH, oL, oT, oA = oldWin:GetWidth(), oldWin:GetHeight(), oldWin:GetLeft(), oldWin:SafeGetTop(), oldWin:GetAlpha();
+                local cW, cH, cL, cT, cA = win:GetWidth(), win:GetHeight(), win:GetLeft(), win:SafeGetTop(), win:GetAlpha();
                 if(oW ~= cW) then win:SetWidth(oW); end
                 if(oH ~= cH) then win:SetHeight(oH); end
-                if(oL ~= cL or oT ~= oT) then win:SetPoint("TOPLEFT", _G.UIParent, "BOTTOMLEFT", oL, oT); end
+                if(oL ~= cL or oT ~= oT) then win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", oL, oT); end
                 if(oA ~= cA) then win:SetAlpha(oA); end
                 lastWin = oldWin:GetName();
             end

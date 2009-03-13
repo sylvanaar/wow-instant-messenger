@@ -6,6 +6,7 @@ local pairs = pairs;
 local type = type;
 local tostring = tostring;
 local table = table;
+local setglobal = setglobal;
 
 -- set WIM Namespace
 setfenv(1, WIM);
@@ -22,6 +23,16 @@ setmetatable(L, {
     end
 });
 
+local function initKeyBindingStrings()
+    setglobal("BINDING_HEADER_WIM",       L["WIM (WoW Instant Messenger)"]);
+    setglobal("BINDING_NAME_WIMSHOWALL",  L["Show All Windows"]);
+    setglobal("BINDING_NAME_WIMHIDEALL",  L["Hide All Windows"]);
+    setglobal("BINDING_NAME_WIMUNREAD",   L["Show Unread Messages"]);
+    setglobal("BINDING_NAME_WIMVISIBLE",   L["Toggle Visibility"]);
+    setglobal("BINDING_NAME_WIMHISTORY",  L["History Viewer"]);
+    setglobal("BINDING_NAME_WIMOPTIONS",  L["Options"]);
+end
+
 function getLocale()
     local locale = _G.GetLocale();
     local isGB = _G.GetCVar("locale") == "enGB";
@@ -35,6 +46,7 @@ function AddLocale(Locale, lTable)
             L[k] = v;
             lTable[k] = nil; -- clean up the garbage now.
         end
+        initKeyBindingStrings();
     else
         -- other locale isn't used, clear tables out don't waste the memory.
         for k, v in pairs(lTable) do
