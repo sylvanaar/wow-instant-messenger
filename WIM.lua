@@ -13,8 +13,8 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.0.7";
-beta = false; -- flags current version as beta.
+version = "3.0.8";
+beta = true; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight (we'll keep this around for now...)
@@ -112,6 +112,7 @@ local function initialize()
     FRIENDLIST_UPDATE(); -- pretend event has been fired in order to get cache loaded.
     CallModuleFunction("OnInitialized");
     dPrint("WIM initialized...");
+    WindowParent:Show();
 end
 
 -- called when WIM is enabled.

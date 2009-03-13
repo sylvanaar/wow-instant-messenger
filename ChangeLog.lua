@@ -12,6 +12,11 @@ end
 
 
 -- ChangeLog Entries.
+addEntry("3.0.8", "03/??/2008", [[
+    +Added section for WIM in Blizzard's keybinding interface.
+    +Added 'Toggle Visibility' feature.
+]]);
+
 addEntry("3.0.7", "03/12/2008", [[
     +Added context menu management system.
     +Added minimap icon right mouse click menu.
