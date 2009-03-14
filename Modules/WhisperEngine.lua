@@ -33,7 +33,7 @@ local time = time;
 setfenv(1, WIM);
 
 -- create WIM Module
-local WhisperEngine = CreateModule("WhisperEngine");
+local WhisperEngine = CreateModule("WhisperEngine", true);
 
 -- This Module requires LibChatHandler-1.0
 _G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(WhisperEngine);
@@ -142,7 +142,7 @@ local function updateMinimapAlerts()
     end
 end
 
-function WhisperEngine:OnEnable()
+function WhisperEngine:OnEnableWIM()
         WhisperEngine:RegisterChatEvent("CHAT_MSG_WHISPER");
         WhisperEngine:RegisterChatEvent("CHAT_MSG_WHISPER_INFORM");
         WhisperEngine:RegisterChatEvent("CHAT_MSG_AFK");
@@ -150,7 +150,7 @@ function WhisperEngine:OnEnable()
         WhisperEngine:RegisterChatEvent("CHAT_MSG_SYSTEM");
 end
 
-function WhisperEngine:OnDisable()
+function WhisperEngine:OnDisableWIM()
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_WHISPER");
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_WHISPER_INFORM");
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_AFK");
@@ -223,7 +223,7 @@ local function SendSplitMessage(theMsg, to)
                                 return splitMessageLinks[index] or link;
                         end);
                         _G.ChatThrottleLib:SendChatMessage("ALERT", "WIM", chunk, "WHISPER", nil, to);
-                        chunk = splitMessage[i];
+                        chunk = (splitMessage[i] or "").." ";
                 end
         end
         

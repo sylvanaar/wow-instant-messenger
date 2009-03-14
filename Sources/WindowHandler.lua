@@ -1383,7 +1383,7 @@ function ShowAllUnreadWindows(type)
 	end
         -- clean table
         for key, _ in pairs(showAllUnreadTbl) do
-                showAllUndreadTbl[key] = nil;
+                showAllUnreadTbl[key] = nil;
         end
 end
 

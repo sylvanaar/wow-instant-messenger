@@ -103,16 +103,31 @@ local function initialize()
                     EnableModule(moduleName, true);
                 end
             end
+        else
+                EnableModule(moduleName, true);
         end
     end
+    
+        for mName, module in pairs(modules) do
+                if(db.enabled) then
+                        if(type(module.OnEnableWIM) == "function") then
+                            module:OnEnableWIM();
+                        end
+                else
+                        if(type(module.OnDisableWIM) == "function") then
+                            module:OnDisableWIM();
+                        end
+                end
+        end
+    
     -- notify all modules of current state.
     CallModuleFunction("OnStateChange", WIM.curState);
     RegisterSlashCommand("enable", function() SetEnabled(not db.enabled) end, L["Toggle WIM 'On' and 'Off'."]);
     RegisterSlashCommand("debug", function() debug = not debug; end, L["Toggle Debugging Mode 'On' and 'Off'."]);
     FRIENDLIST_UPDATE(); -- pretend event has been fired in order to get cache loaded.
     CallModuleFunction("OnInitialized");
-    dPrint("WIM initialized...");
     WindowParent:Show();
+    dPrint("WIM initialized...");
 end
 
 -- called when WIM is enabled.
@@ -125,11 +140,16 @@ local function onEnable()
         workerFrame:RegisterEvent(tEvent);
     end
     
-    for _, module in pairs(modules) do
-        if(type(module.OnEnableWIM) == "function") then
-            module:OnEnableWIM();
+        if(isInitialized) then
+            for mName, module in pairs(modules) do
+                if(type(module.OnEnableWIM) == "function") then
+                    module:OnEnableWIM();
+                end
+                if(db.modules[mName] and db.modules[mName].enabled and type(module.OnEnable) == "function") then
+                    module:OnEnable();
+                end
+            end
         end
-    end
     DisplayTutorial(L["WIM (WoW Instant Messenger)"], L["WIM is currently running. To access WIM's wide array of options type:"].." |cff69ccf0/wim|r");
     dPrint("WIM is now enabled.");
 end
@@ -143,12 +163,14 @@ local function onDisable()
         workerFrame:UnregisterEvent(tEvent);
     end
     
-    for _, module in pairs(modules) do
-        if(type(module.OnDisableWIM) == "function") then
-            module:OnDisableWIM();
-        end
-        if(type(module.OnDisable) == "function") then
-            module:OnDisable();
+    if(isInitialized) then
+        for _, module in pairs(modules) do
+            if(type(module.OnDisableWIM) == "function") then
+                module:OnDisableWIM();
+            end
+            if(type(module.OnDisable) == "function") then
+                module:OnDisable();
+            end
         end
     end
     
@@ -211,6 +233,10 @@ function EnableModule(moduleName, enabled)
             dPrint("Module '"..moduleName.."' can not be disabled!");
             return;
         end
+        if(db) then
+            db.modules[moduleName] = WIM.db.modules[moduleName] or {};
+            db.modules[moduleName].enabled = enabled;
+        end
         if(enabled) then
             module.enabled = enabled;
             if(enabled and type(module.OnEnable) == "function") then
@@ -231,10 +257,6 @@ function EnableModule(moduleName, enabled)
                 end
                 dPrint("Module '"..moduleName.."' Disabled");
             end
-        end
-        if(db) then
-            db.modules[moduleName] = WIM.db.modules[moduleName] or {};
-            db.modules[moduleName].enabled = enabled;
         end
     end
 end
@@ -340,8 +362,8 @@ function WIM:VARIABLES_LOADED()
     -- load previous state into memory
     curState = db.lastState;
     
-    initialize();
     SetEnabled(db.enabled);
+    initialize();
 end
 
 function WIM:FRIENDLIST_UPDATE()
@@ -384,19 +406,13 @@ function IsGM(name)
         -- Blizz gave us a new tool. Lets use it.
         if(_G.GMChatFrame_IsGM and _G.GMChatFrame_IsGM(name)) then
                 lists.gm[name] = 1;
+                return true;
         end
         
-	if(string.len(name) < 4) then return false; end
-	if(string.sub(name, 1, 4) == "<GM>") then
-		local tmp = string.gsub(name, "<GM> ", "");
-		lists.gm[tmp] = 1;
+	if(lists.gm[name]) then
 		return true;
 	else
-		if(lists.gm[name]) then
-			return true;
-		else
-			return false;
-		end
+		return false;
 	end
 end
 

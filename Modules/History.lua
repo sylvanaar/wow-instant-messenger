@@ -182,9 +182,21 @@ end
 
 function History:OnEnable()
     RegisterWidget("history", createWidget);
+    for widget in Widgets("history") do
+        local win = widget.parentWindow;
+        if(win) then
+            local history = history[env.realm] and history[env.realm][env.character] and history[env.realm][env.character][win.theUser];
+            if(history) then
+                widget:SetHistory(true);
+            end
+        end
+    end
 end
 
 function History:OnDisable()
+    if(db.modules.History.enabled) then
+        return;
+    end
     for widget in Widgets("history") do
         widget:SetHistory(false); -- module is disabled, hide Icons.
     end

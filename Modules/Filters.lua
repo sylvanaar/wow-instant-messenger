@@ -285,8 +285,10 @@ function Filters:CHAT_MSG_WHISPER_INFORM_CONTROLLER(eventItem, startFrom)
 end
 
 function Filters:OnEnable()
-    Filters:RegisterChatEvent("CHAT_MSG_WHISPER", 1);
-    Filters:RegisterChatEvent("CHAT_MSG_WHISPER_INFORM", 1);
+    if(db.enabled) then
+        Filters:RegisterChatEvent("CHAT_MSG_WHISPER", 1);
+        Filters:RegisterChatEvent("CHAT_MSG_WHISPER_INFORM", 1);
+    end
 end
 
 function Filters:OnDisable()
