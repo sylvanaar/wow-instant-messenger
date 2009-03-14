@@ -15,6 +15,10 @@ end
 addEntry("3.0.8", "03/??/2008", [[
     +Added section for WIM in Blizzard's keybinding interface.
     +Added 'Toggle Visibility' feature.
+    *Fixed they way modules were being handled when WIM enabled is toggled.
+    +Added Enable/Disable WIM to Minimap right-click menu.
+    -Removed <GM> tag from GM's names & fixed error when whispering a GM.
+    *Fixed bug when splitting long messages. Thanks blazeflack.
 ]]);
 
 addEntry("3.0.7", "03/12/2008", [[

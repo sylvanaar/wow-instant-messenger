@@ -373,6 +373,8 @@ function MinimapIcon:OnEnableWIM()
         WIM.MinimapIcon.icon:SetAlpha(1);
         WIM.MinimapIcon.flash:Show();
     end
+    local menu = GetContextMenu("ENABLE_DISABLE_WIM");
+    menu.text = L["Disable"].." WIM";
     dPrint("enable event received");
 end
 
@@ -382,6 +384,8 @@ function MinimapIcon:OnDisableWIM()
         WIM.MinimapIcon.icon:SetAlpha(.75);
         WIM.MinimapIcon.flash:Show();
     end
+    local menu = GetContextMenu("ENABLE_DISABLE_WIM");
+    menu.text = L["Enable"].." WIM";
     dPrint("disable event received");
 end
 
@@ -396,9 +400,17 @@ function MinimapIcon:OnEnable()
         MinimapIcon:OnEnable();
     end
     WIM.MinimapIcon = icon;
+    if(WIM.db.enabled) then
+        MinimapIcon:OnEnableWIM();
+    else
+        MinimapIcon:OnDisableWIM();
+    end
 end
 
 function MinimapIcon:OnDisable()
+    if(db.modules.MinimapIcon.enabled) then
+        return;
+    end
     if(icon) then
         icon:Hide();
     end
@@ -412,6 +424,18 @@ end
 local info = _G.UIDropDownMenu_CreateInfo();
 info.text = "MENU_MINIMAP";
 local minimapMenu = AddContextMenu(info.text, info);
+    --show unread messages
+    info = _G.UIDropDownMenu_CreateInfo();
+    info.text = L["Enable"].." WIM";
+    info.func = function() SetEnabled(not db.enabled); end;
+    info.notCheckable = true;
+    minimapMenu:AddSubItem(AddContextMenu("ENABLE_DISABLE_WIM", info));
+    -- add space
+    info = GetContextMenu("MENU_SPACE") or _G.UIDropDownMenu_CreateInfo();
+    info.text = "";
+    info.isTitle = true;
+    info.notCheckable = true;
+    minimapMenu:AddSubItem(AddContextMenu("MENU_SPACE", info));
     --show unread messages
     info = _G.UIDropDownMenu_CreateInfo();
     info.text = L["Show All Windows"];
@@ -431,7 +455,7 @@ local minimapMenu = AddContextMenu(info.text, info);
     info.notCheckable = true;
     minimapMenu:AddSubItem(AddContextMenu("SHOW_UNREAD_MESSAGES", info));
     -- add space
-    info = _G.UIDropDownMenu_CreateInfo();
+    info = GetContextMenu("MENU_SPACE") or _G.UIDropDownMenu_CreateInfo();
     info.text = "";
     info.isTitle = true;
     info.notCheckable = true;

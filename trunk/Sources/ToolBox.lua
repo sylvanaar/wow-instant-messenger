@@ -96,20 +96,9 @@ end
 
 function WIM.FormatUserName(user)
 	if(user ~= nil) then
-		if(WIM.IsGM(user)) then
-			if(WIM.lists.gm[user]) then
-				return "<GM> "..user;
-			else
-				return user;
-			end
-		else
-			user = string.gsub(user, "[A-Z]", string.lower);
-			user = string.gsub(user, "^[a-z]", string.upper);
-			user = string.gsub(user, "-[a-z]", string.upper); -- accomodate for cross server...
-			if(WIM.windows.active["<GM> "..user]) then
-				return "<GM> "..user;
-			end
-		end
+	    user = string.gsub(user, "[A-Z]", string.lower);
+	    user = string.gsub(user, "^[a-z]", string.upper);
+	    user = string.gsub(user, "-[a-z]", string.upper); -- accomodate for cross server...
 	end
 	return user;
 end

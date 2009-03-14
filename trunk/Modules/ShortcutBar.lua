@@ -207,6 +207,9 @@ function ShortcutBar:OnEnable()
 end
 
 function ShortcutBar:OnDisable()
+    if(db.modules.ShortcutBar.enabled) then
+        return;
+    end
     -- WIM.Widgets(widgetName) is an iterator of all loaded widgets.
     -- Since this widget can be disabled, we will hide the widgets already loaded.
     for widget in Widgets("shortcuts") do
