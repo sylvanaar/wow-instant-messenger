@@ -739,6 +739,18 @@ local function General_Sounds()
     return f;
 end
 
+local function General_Expose()
+    local frame = options.CreateOptionsFrame();
+    frame.menu = frame:CreateSection(L["Expose"], L["Expose is a Mac OS X inspired feature which enables you to quickly clear your screen of windows and then restore them back to their original position."]);
+    frame.menu.nextOffSetY = -20;
+    
+    frame.menu:CreateCheckButton(L["Auto hide/restore windows during combat."], db.expose, "combat");
+    frame.menu.nextOffSetY = -40;
+    frame.menu.size = frame.menu:CreateSlider(L["Border Size"], "1", "200", 1, 200, 1, db.expose, "borderSize");
+    return frame;
+end
+
+
 
 RegisterOptionFrame(L["General"], L["Main"], General_Main);
 RegisterOptionFrame(L["General"], L["Window Settings"], General_WindowSettings);
@@ -748,6 +760,7 @@ RegisterOptionFrame(L["General"], L["Message Formatting"], General_MessageFormat
 RegisterOptionFrame(L["General"], L["History"], General_History);
 RegisterOptionFrame(L["General"], L["Tab Management"], General_Tabs);
 RegisterOptionFrame(L["General"], L["Sounds"], General_Sounds);
+RegisterOptionFrame(L["General"], L["Expose"], General_Expose);
 
 RegisterOptionFrame(L["Whispers"], L["Display Settings"], Whispers_DisplaySettings);
 RegisterOptionFrame(L["Whispers"], L["Window Behavior"], WhisperPopRules);

@@ -127,7 +127,7 @@ local alertPushed = false;
 local function updateMinimapAlerts()
     local count = 0;
     for _, win in pairs(Windows) do
-        if(not win:IsShown()) then
+        if(not win:IsVisible()) then
             count = count + (win.unreadCount or 0);
         end
     end
@@ -157,6 +157,8 @@ function WhisperEngine:OnDisableWIM()
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_DND");
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_SYSTEM");
 end
+
+
 
 local function getWhisperWindowByUser(user)
     user = FormatUserName(user);

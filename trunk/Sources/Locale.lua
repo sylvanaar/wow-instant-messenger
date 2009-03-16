@@ -28,7 +28,7 @@ local function initKeyBindingStrings()
     setglobal("BINDING_NAME_WIMSHOWALL",  L["Show All Windows"]);
     setglobal("BINDING_NAME_WIMHIDEALL",  L["Hide All Windows"]);
     setglobal("BINDING_NAME_WIMUNREAD",   L["Show Unread Messages"]);
-    setglobal("BINDING_NAME_WIMVISIBLE",   L["Toggle Visibility"]);
+    setglobal("BINDING_NAME_WIMVISIBLE",  L["Expose"]);
     setglobal("BINDING_NAME_WIMHISTORY",  L["History Viewer"]);
     setglobal("BINDING_NAME_WIMOPTIONS",  L["Options"]);
 end
