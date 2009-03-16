@@ -6,6 +6,8 @@
 	Module:OnWindowMessageAdded(winObj, msg, r, g, b)
         Module:OnWindowShow(winObj)
         Module:OnWindowHide(winObj)
+        Module:OnContainerShow()
+        Module:OnContainerHide()
 ]]
 
 local WIM = WIM;
@@ -462,6 +464,9 @@ end
 
 -- this needs to be looked at. it isn't doing anything atm...
 local function MessageWindow_Frame_OnShow(self)
+        if(WindowParent.animUp) then
+                return;
+        end
                 --_G.DEFAULT_CHAT_FRAME:AddMessage(_G.debugstack(1))
         setWindowAsFadedIn(self);
         if(self ~= DemoWindow) then
@@ -677,7 +682,7 @@ local function instantiateWindow(obj)
     obj:SetWidth(384);
     obj:SetHeight(256);
     obj:EnableMouse(true);
-    obj:SetPoint("TOPLEFT", WindowParent, "TOPLEFT", 25, -125);
+    obj:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", 25, WindowParent:GetTop()-125);
     obj:RegisterForDrag("LeftButton");
     obj:SetScript("OnDragStart", MessageWindow_MovementControler_OnDragStart);
     obj:SetScript("OnDragStop", MessageWindow_MovementControler_OnDragStop);
@@ -871,12 +876,14 @@ local function instantiateWindow(obj)
 		-- go by forceResult and ignore rules
 		if(self.tabStrip) then
                                 --if(not EditBoxInFocus) then
+                                                ShowContainer();
                                                 self.tabStrip:JumpToTab(self);
                                                 if(not _G.ChatFrameEditBox:wimIsVisible() and (rules.autofocus or forceFocus)) then
                                                         self.widgets.msg_box:SetFocus();
                                                 end
                                 --end
 		else
+                                ShowContainer();
 				self:ResetAnimation();
 				self:Show();
                                 if((not _G.ChatFrameEditBox:wimIsVisible() and not EditBoxInFocus and rules.autofocus) or forceFocus) then
@@ -892,7 +899,6 @@ local function instantiateWindow(obj)
 					DisplayTutorial(L["Resizing Windows"], L["You can resize a window by holding <Shift> and dragging the bottom right corner of the window."]);
 				end
 		end
-                ShowContainer();
 	else
 		-- execute pop rules.
 		if((rules.onSend and msgDirection == "out") or (rules.onReceive and msgDirection == "in")) then 
@@ -1052,7 +1058,7 @@ local function placeWindow(win)
                 end
         end
         if(not lastWindow or db.winCascade.enabled == false) then
-                win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", db.winLoc.left/win:GetEffectiveScale(), (db.winLoc.top - WindowParent:GetBottom())/win:GetEffectiveScale());
+                win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", db.winLoc.left/win:GetEffectiveScale(), (db.winLoc.top)/win:GetEffectiveScale());
         else
                 local casc = cascadeDirection[db.winCascade.direction];
                 win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", lastWindow:GetLeft()+casc[1], lastWindow:SafeGetTop()+casc[2]);
@@ -1442,7 +1448,11 @@ local function WindowParent_AnimFinished(self)
                 self:SetHeight(_G.UIParent:GetHeight());
         end
         for i=1, #WindowSoupBowl.windows do
-		WindowSoupBowl.windows[i].obj:SetClampedToScreen(not self.animUp);
+		local win = WindowSoupBowl.windows[i].obj;
+                win:SetClampedToScreen(not self.animUp);
+                if(win:IsVisible()) then
+                                WIM.CallModuleFunction("OnWindowShow", win);
+                end
 	end
 end
 
@@ -1467,7 +1477,8 @@ function ShowContainer(animate)
                                 win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", left, top);
                                 win:SetClampedToScreen(false);
                 end
-                _G.SetUpAnimation(WindowParent, WindowParentAnimTable, WindowParent_AnimFinished, true)
+                _G.SetUpAnimation(WindowParent, WindowParentAnimTable, WindowParent_AnimFinished, true);
+                WIM.CallModuleFunction("OnContainerShow");
 end
 
 function HideContainer(animate)
@@ -1490,7 +1501,8 @@ function HideContainer(animate)
                                 win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", left, top);
                                 win:SetClampedToScreen(false);
                 end
-                _G.SetUpAnimation(WindowParent, WindowParentAnimTable, WindowParent_AnimFinished, false)
+                _G.SetUpAnimation(WindowParent, WindowParentAnimTable, WindowParent_AnimFinished, false);
+                WIM.CallModuleFunction("OnContainerHide");
 end
 
 function ToggleContainer(animate)
@@ -1727,16 +1739,7 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
 	end);
 
 
---[[
--- msg_box context menu
-local info = _G.UIDropDownMenu_CreateInfo();
-info.text = "MsgBoxMenu";
-local msgBoxMenu = AddContextMenu(info);
-    info = _G.UIDropDownMenu_CreateInfo();
-    info.text = _G.CANCEL;
-    info.func = function() _G.CloseDropDownMenus(); end;
-    msgBoxMenu:AddSubItem(info);
-]]
+
 -- define context menu
 local info = _G.UIDropDownMenu_CreateInfo();
 info.text = "MENU_MSGBOX";

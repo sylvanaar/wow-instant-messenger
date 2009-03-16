@@ -1112,9 +1112,13 @@ table.insert(ViewTypes, {
 
 
 function ShowHistoryViewer(user)
+    if(HistoryViewer and not user and HistoryViewer:IsShown()) then
+        HistoryViewer:Hide();
+        return;
+    end
     HistoryViewer = HistoryViewer or createHistoryViewer();
     HistoryViewer.displayUpdate = HistoryViewer.displayUpdate or createDisplayUpdate();
-    HistoryViewer:Show();
+    
     if(user) then
         HistoryViewer.USER = env.realm.."/"..env.character;
         HistoryViewer.SELECT = user;
@@ -1124,6 +1128,7 @@ function ShowHistoryViewer(user)
         HistoryViewer:SelectConvo(user);
         DisplayTutorial(L["WIM History Viewer"], L["WIM History Viewer can be accessed any time by typing:"].." \n|cff69ccf0/wim history|r");
     end
+    HistoryViewer:Show();
 end
 
 RegisterSlashCommand("history", function() ShowHistoryViewer(); end, L["Display history viewer."])

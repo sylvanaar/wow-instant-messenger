@@ -314,7 +314,11 @@ function ShowOptions()
     if(not options.frame) then
         createOptionsFrame();
     end
-    options.frame:Show();
+    if(options.frame:IsShown()) then
+        options.frame:Hide();
+    else
+        options.frame:Show();
+    end
 end
 
 RegisterSlashCommand("options", ShowOptions, L["Display WIM's options."]);

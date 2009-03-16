@@ -16,5 +16,6 @@
     <Script file="ldb.lua"/>
     <Script file="Negotiate.lua"/>
     <Script file="W2W.lua"/>
+    <Script file="Expose.lua"/>
     
 </Ui>

@@ -503,7 +503,7 @@ local function createTabGroup()
             if( not win.popNoShow ) then
                 for i=1,#self.attached do
                     local obj = self.attached[i];
-                    if(obj ~= win and obj:IsVisible()) then
+                    if(obj ~= win and obj:IsShown()) then
                         obj:Hide();
                     end
                 end
@@ -569,7 +569,7 @@ local function createTabGroup()
             while(self.flashTrack_elapsed >= 1) do
                 for i=1, #self.tabs do
                     local tab = self.tabs[i];
-                    if(tab:IsVisible()) then
+                    if(tab:IsShown()) then
                         if(tab.childObj and (tab.childObj.unreadCount or 0) > 0) then
                             if(tab.flashOn) then
                                 tab.flashOn = nil;
