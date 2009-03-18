@@ -1472,12 +1472,12 @@ function ShowContainer(animate)
                 for i=1, #WindowSoupBowl.windows do
                                 local win = WindowSoupBowl.windows[i].obj;
                                 win:SetClampedToScreen(false);
-                                local left, top = win:GetLeft(), win:SafeGetTop();
+                                local left, top = win:GetLeft(), win:SafeGetTop()*win:GetScale();
                                 win:ClearAllPoints();
                                 win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", left, top);
                                 win:SetClampedToScreen(false);
                 end
-                _G.SetUpAnimation(WindowParent, WindowParentAnimTable, WindowParent_AnimFinished, true);
+                _G.securecall("SetUpAnimation", WindowParent, WindowParentAnimTable, WindowParent_AnimFinished, true);
                 WIM.CallModuleFunction("OnContainerShow");
 end
 
@@ -1501,7 +1501,7 @@ function HideContainer(animate)
                                 win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", left, top);
                                 win:SetClampedToScreen(false);
                 end
-                _G.SetUpAnimation(WindowParent, WindowParentAnimTable, WindowParent_AnimFinished, false);
+                _G.securecall("SetUpAnimation", WindowParent, WindowParentAnimTable, WindowParent_AnimFinished, false);
                 WIM.CallModuleFunction("OnContainerHide");
 end
 
