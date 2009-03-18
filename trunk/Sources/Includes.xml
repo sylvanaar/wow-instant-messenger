@@ -4,6 +4,7 @@
     <Script file="ContextMenu.lua" />
     <Script file="Constants.lua" />
     <Script file="StateHandler.lua" />
+    <Script file="Animations.lua" />
     <Script file="WindowHandler.lua" />
     <Script file="Skinner.lua" />
     <script file="TabHandler.lua" />

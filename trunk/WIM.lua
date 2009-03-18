@@ -22,6 +22,7 @@ isPTR = select(4, _G.GetBuildInfo()) >= 30100;
 
 -- is Private Server?
 isPrivateServer = not string.match(_G.GetCVar("realmList"), "worldofwarcraft.com$") and true or false;
+isUS = not string.match(_G.GetCVar("realmList"), "us.login.worldofwarcraft.com") and true or false;
 
 constants = {}; -- constants such as class colors will be stored here. (includes female class names).
 modules = {}; -- module table. consists of all registerd WIM modules/plugins/skins. (treated the same).

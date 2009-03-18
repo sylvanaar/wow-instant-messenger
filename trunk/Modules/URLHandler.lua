@@ -19,6 +19,33 @@ db_defaults.displayColors.webAddress = {
 
 local URL = CreateModule("URLHandler", true);
 
+armoryLinks = {
+    {
+        title = "Armory-Light",
+        url = "http://www.armory-light.com/{eu/us}/{realm}/{user}"
+    },
+    {
+        title = "ArmoryLite",
+        url = "http://armorylite.com/{eu/us}/{realm}/{user}"
+    },
+    {
+        title = "Be Imba!",
+        url = "http://be.imba.hu/?zone={EU/US}&realm={realm}&character={user}"
+    },
+    {
+        title = "Warcrafter",
+        url = "http://{realm}-{eu/us}.warcrafter.net/{user}"
+    },
+    {
+        title = "WoW Armory",
+        url = "http://{eu/www}.wowarmory.com/character-sheet.xml?r={realm}&n={user}"
+    },
+    {
+        title = "WoW-Heros",
+        url = "http://www.wow-heroes.com/index.php?zone={eu/us}&server={realm}&name={user}"
+    }
+};
+
 -- patterns created by Sylvanaar & used in Prat
 local patterns = {
 	-- X@X.Y url (---> email)
@@ -179,3 +206,44 @@ local function setItemRef (link, text, button)
 	SetItemRef_orig(link, text, button);
 end
 _G.SetItemRef = setItemRef;
+
+
+--context menu
+local function MENU_ARMORY_CLICKED(self)
+    local eu_www = isUS and "www" or "eu";
+    local eu_us = isUS and "us" or "eu";
+    local user, realm;
+    if(MENU_ARMORY_USER:find("-")) then
+        user, realm = MENU_ARMORY_USER:split("-");
+    else
+        user = MENU_ARMORY_USER;
+    end
+    realm = realm or env.realm;
+    local link = self.value;
+    link = link:gsub("{eu/www}", eu_www);
+    link = link:gsub("{realm}", realm);
+    link = link:gsub("{user}", user);
+    link = link:gsub("{eu/us}", eu_us);
+    link = link:gsub("{EU/US}", string.upper(eu_us));
+    displayURL("wim_url:"..link);
+end
+
+-- this menu is not available for private servers.. der..
+if(not isPrivateServer) then
+    local info = _G.UIDropDownMenu_CreateInfo();
+    info.text = "MENU_ARMORY";
+    local armoryMenu = AddContextMenu(info.text, info);
+        info.text = L["Profile Links"];
+        info.notCheckable = true;
+        info.isTitle = true;
+        armoryMenu:AddSubItem(AddContextMenu("MENU_ARMORY_TITLE", info));
+        for i=1, #armoryLinks do
+            local info = _G.UIDropDownMenu_CreateInfo();
+            info.text = armoryLinks[i].title;
+            info.value = armoryLinks[i].url;
+            info.notCheckable = true;
+            info.func = MENU_ARMORY_CLICKED;
+            armoryMenu:AddSubItem(AddContextMenu("MENU_ARMORY"..i, info));
+        end
+        --armoryMenu:AddSubItem(GetContextMenu("MENU_CANCEL"));
+end

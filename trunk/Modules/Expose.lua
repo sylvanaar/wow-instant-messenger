@@ -58,7 +58,7 @@ local AnimTable = {
 	}
 
 function Expose:OnContainerShow()
-    _G.securecall("SetUpAnimation", exposeFrame, AnimTable, function(self) self:SetAlpha(0); end, true);
+    WIM.SetUpAnimation(exposeFrame, AnimTable, function(self) self:SetAlpha(0); end, true);
 end
 
 function Expose:OnContainerHide()
@@ -71,7 +71,7 @@ function Expose:OnContainerHide()
     exposeFrame.right:SetPoint("TOPRIGHT", exposeFrame.top, "TOPRIGHT", 0, 0);
     exposeFrame.right:SetPoint("BOTTOMLEFT", exposeFrame.bottom, "TOPRIGHT", -(db.expose.borderSize), 0);
     
-    _G.securecall("SetUpAnimation", exposeFrame, AnimTable, function(self) self:SetAlpha(1); end, false);
+    WIM.SetUpAnimation(exposeFrame, AnimTable, function(self) self:SetAlpha(1); end, false);
 end
 
 
