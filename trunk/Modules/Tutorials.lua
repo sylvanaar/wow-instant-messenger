@@ -16,6 +16,8 @@ local function varFriendly(var)
     return var;
 end
 
+local theButton;
+
 local _FlagTutorial = _G.FlagTutorial;
 function _G.FlagTutorial(id)
     local tut = string.match(tostring(id), "^WIM(.+)");
@@ -25,9 +27,11 @@ function _G.FlagTutorial(id)
         -- update text.
         if(tut ~= varFriendly(L["WIM Update Available!"])) then
             db.shownTutorials[tut] = true;
-            _G.TutorialFrameCheckButton:Enable();
+            _G.TutorialFrameCheckButton:Show();
+            theButton:Hide();
         else
-            _G.TutorialFrameCheckButton:Disable();
+            _G.TutorialFrameCheckButton:Hide();
+            theButton:Show();
         end
         _G.TutorialFrameCheckboxText:SetText(L["Display WIM tips"]);
     else
@@ -54,10 +58,33 @@ function _G.TutorialFrame_OnHide(self)
     end
 end
 
+
+local function createChangelogButton()
+    local button = _G.CreateFrame("Button", "WIM_TutorialButtonChangeLog", _G.TutorialFrame, "UIPanelButtonTemplate");
+    local ok = _G.TutorialFrameOkayButton;
+    button:SetPoint("BOTTOMLEFT", 7, 7);
+    button:SetHeight(ok:GetHeight());
+    button:SetNormalTexture("DialogButtonNormalTexture");
+    button:SetPushedTexture("DialogButtonPushedTexture");
+    button:SetHighlightTexture("DialogButtonHighlightTexture");
+    button:SetDisabledTexture("DialogButtonDisabledTexture");
+    _G.WIM_TutorialButtonChangeLogText:SetText(L["View Updates"]);
+    button:SetNormalFontObject("GameFontNormalSmall");
+    button:SetHighlightFontObject("GameFontNormalSmall");
+    button:SetDisabledFontObject("GameFontNormalSmall");
+    button:SetWidth(_G.WIM_TutorialButtonChangeLogText:GetStringWidth()+30)
+    --button:Disable();
+    button:SetScript("OnClick", ShowChangeLog);
+    
+    return button;
+end
+
+
 local function displayTutorial(title, tutorial)
     local var = varFriendly(title);
     if(not db.shownTutorials[var] or L["WIM Update Available!"] == title) then
         db.shownTutorials[var] = true;
+        theButton = theButton or createChangelogButton();
         _G["TUTORIAL_TITLEWIM"..var] = title;
         _G["TUTORIALWIM"..var] = tutorial;
         _G.TutorialFrame_NewTutorial("WIM"..var);

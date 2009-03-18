@@ -21,6 +21,7 @@ local rawset = rawset;
 local rawget = rawget;
 local next = next;
 local select = select;
+local math = math;
 
 -- set namespace
 setfenv(1, WIM);
@@ -44,8 +45,8 @@ local function clearTables(...)
 end
 
 -- Table Recycling
-local tblInUse = {};
-local tblAvailable = {};
+ tblInUse = {};
+ tblAvailable = {};
 
 local function getNewTable()
     if(#tblAvailable > 0) then
@@ -71,14 +72,14 @@ end
 
 -- thank you stewarta
 local function huff_encode(thestr)
-	thestr=thestr:gsub("\001","\001\002");
-	thestr=thestr:gsub("%z","\001\003");
+	thestr=thestr:gsub("\001","\002\003");
+	thestr=thestr:gsub("%z","\002\004");
 	return thestr;
 end
 
 local function huff_decode(thestr)
-	thestr=thestr:gsub("\001\003","\000");
-	thestr=thestr:gsub("\001\001","\001");
+	thestr=thestr:gsub("\002\004","\000");
+	thestr=thestr:gsub("\002\003","\001");
 	return thestr;
 end
 
@@ -137,12 +138,14 @@ local symbols = {};
 local huff = {};
 
 local function cleanCompress()
+    compressed_size = 0;
     freeTables();
     clearTables(Huffman_compressed, Huffman_large_compressed, hist, leafs, symbols, huff);
 end
 
 -- word size for this huffman algorithm is 8 bits (1 byte). This means the best compression is representing 1 byte with 1 bit, i.e. compress to 0.125 of original size.
 local function CompressHuffman(uncompressed)
+    compressed_size = 0;
     if not type(uncompressed)=="string" then
         cleanCompress();
         return nil, "Can only compress strings";
@@ -264,6 +267,7 @@ local function CompressHuffman(uncompressed)
 	addBits(compressed, symbol, 8);
 	if addBits(compressed, escape_code(leaf.bcode, leaf.blength)) then
 	    -- code word too long. Needs new revision to be able to handle more than 32 bits
+            cleanCompress();
 	    return string_char(0)..uncompressed
 	end
 	addBits(compressed, 3, 2);
@@ -303,23 +307,23 @@ end
 
 -- lookuptable (cached between calls)
 local lshiftMask = {};
-setmetatable(lshiftMask, {
-	__index = function (t, k)
-		local v = bit.lshift(1, k);
-		rawset(t, k, v);
-		return v;
-	end
-});
+local lshiftMask_metamap = {
+    __index = function (t, k)
+	local v = bit.lshift(1, k);
+	rawset(t, k, v);
+	return v;
+    end
+}
 
 -- lookuptable (cached between calls)
 local lshiftMinusOneMask = {};
-setmetatable(lshiftMinusOneMask, {
-	__index = function (t, k)
-		local v = bit.lshift(1, k)-1;
-		rawset(t, k, v);
-		return v;
-	end
-});
+local lshiftMinusOneMask_metamap = {
+    __index = function (t, k)
+	local v = bit.lshift(1, k)-1;
+	rawset(t, k, v);
+	return v;
+    end
+};
 
 local function getCode(bitfield, field_len)
     if field_len>=2 then
@@ -362,7 +366,7 @@ local mt = {};
 
 local function cleanDecompress()
     freeTables();
-    clearTables(Huffman_uncompressed, Huffman_large_uncompressed, map, mt, lshiftMask, lshiftMinusOneMask);
+    clearTables(Huffman_uncompressed, Huffman_large_uncompressed, map, lshiftMask, lshiftMinusOneMask);
 end
 
 local map_metatable1 = {
@@ -380,12 +384,14 @@ local map_metatable2 = {
 };
 
 local function DecompressHuffman(compressed)
-    if not type(uncompressed)=="string" then
+    setmetatable(lshiftMask, lshiftMask_metamap);
+    setmetatable(lshiftMinusOneMask, lshiftMinusOneMask_metamap);
+    if type(compressed) ~= "string" then
         cleanDecompress();
 	return nil, "Can only uncompress strings"
     end
 
-    local compressed_size = #compressed
+    local compressed_size = string.len(compressed);
     --decode header
     local info_byte = string.byte(compressed)
     -- is data compressed
@@ -442,8 +448,8 @@ local function DecompressHuffman(compressed)
 		bitfield, bitfield_len = _bitfield, _bitfield_len
 		c, cl = unescape_code(code, code_len)
 		map[cl][c]=string.char(symbol)
-		minCodeLen = cl<minCodeLen and cl or minCodeLen
-		maxCodeLen = cl>maxCodeLen and cl or maxCodeLen
+		minCodeLen = math.min(minCodeLen, cl); --cl<minCodeLen and cl or minCodeLen
+		maxCodeLen = math.max(maxCodeLen, cl); --cl>maxCodeLen and cl or maxCodeLen
 		--print("symbol: "..string_char(symbol).."  code: "..tobinary(c, cl))
 		n = n + 1
 		state = 0 -- search for next symbol (if any)
@@ -474,10 +480,10 @@ local function DecompressHuffman(compressed)
 		uncompressed_size = uncompressed_size + 1
 		uncompressed[uncompressed_size]=symbol
 		dec_size = dec_size + 1
+                if dec_size>=orig_size then -- checked here for speed reasons
+		    break;
+                end
 		if dec_size >= temp_limit then
-		    if dec_size>=orig_size then -- checked here for speed reasons
-			break;
-		    end
 		    -- process compressed bytes in smaller chunks
 		    large_uncompressed_size = large_uncompressed_size + 1
 		    large_uncompressed[large_uncompressed_size] = table.concat(uncompressed, "", 1, uncompressed_size)
@@ -507,15 +513,15 @@ local function DecompressHuffman(compressed)
 	    end
 	end
     end
-
+    local out = table.concat(large_uncompressed, "", 1, large_uncompressed_size)..table.concat(uncompressed, "", 1, uncompressed_size);
     cleanDecompress();
-    return table.concat(large_uncompressed, "", 1, large_uncompressed_size)..table.concat(uncompressed, "", 1, uncompressed_size)
+    return out;
 end
 
 
 function Compress(uncompressed)
-    if(not uncompressed or string.trim(uncompressed) == "") then
-        return uncompressed or "";
+    if(not uncompressed) then
+        return uncompressed;
     end
     local str, err = CompressHuffman(uncompressed);
     return huff_encode(str);

@@ -25,6 +25,7 @@ function Expose:OnStateChange(state)
             --entered combat
             HideContainer(true);
             inCombat = true;
+            DisplayTutorial(L["Expose"].."?!", L["Your conversations have been hidden in order to clear your screen while in combat. To disable this feature type"].." |cff69ccf0/wim|r");
         elseif(inCombat) then
             --left combat
             ShowContainer(true);
@@ -57,7 +58,7 @@ local AnimTable = {
 	}
 
 function Expose:OnContainerShow()
-    _G.SetUpAnimation(exposeFrame, AnimTable, function(self) self:SetAlpha(0); end, true);
+    _G.securecall("SetUpAnimation", exposeFrame, AnimTable, function(self) self:SetAlpha(0); end, true);
 end
 
 function Expose:OnContainerHide()
@@ -70,7 +71,7 @@ function Expose:OnContainerHide()
     exposeFrame.right:SetPoint("TOPRIGHT", exposeFrame.top, "TOPRIGHT", 0, 0);
     exposeFrame.right:SetPoint("BOTTOMLEFT", exposeFrame.bottom, "TOPRIGHT", -(db.expose.borderSize), 0);
     
-    _G.SetUpAnimation(exposeFrame, AnimTable, function(self) self:SetAlpha(1); end, false);
+    _G.securecall("SetUpAnimation", exposeFrame, AnimTable, function(self) self:SetAlpha(1); end, false);
 end
 
 

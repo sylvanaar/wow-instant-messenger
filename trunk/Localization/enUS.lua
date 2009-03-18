@@ -423,6 +423,7 @@ WIM.AddLocale("enUS", {
     -- ChangeLog.lua --
     ["Change Log"] = true,
     ["View WIM's change log."] = true,
+    ["Available For Download!"] = true,
     
     -- Filters.lua --
     ["Show Alert"] = true,
@@ -439,5 +440,12 @@ WIM.AddLocale("enUS", {
     ["Also"] = true,
     ["More"] = true,
     ["Emoticons"] = true,
+    
+    --Expose.lua
+    ["Your conversations have been hidden in order to clear your screen while in combat. To disable this feature type"] = true,
+    ["Expose"] = true,
+    ["Expose is a Mac OS X inspired feature which enables you to quickly clear your screen of windows and then restore them back to their original position."] = true,
+    ["Auto hide/restore windows during combat."] = true,
+    ["Border Size"] = true,
     
 });

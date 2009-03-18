@@ -12,7 +12,7 @@ local tostring = tostring;
 --set namespace
 setfenv(1, WIM);
 
- SocketPool = {};
+local SocketPool = {};
 local recycled = {};
 
 local socketCount = 0;
@@ -56,7 +56,7 @@ end
 
 local function ProcessData(channel, from, data)
     local cmd, dat = string.match(data, "^(%w+):(.*)$")
-    local str = Decompress(dat);
+    dat = Decompress(dat);
     dPrint(channel..":"..from.."->"..cmd..":"..dat);
     if(CommandHandlers[cmd]) then
         for i = 1, #CommandHandlers[cmd] do
@@ -77,10 +77,11 @@ local function OnEvent(self, event, ...)
             socket.cmd = pcmd;
             return;
         end
-        cmd, args = string.match(data, "^#(%d+):(.*)");
-        if(cmd and args) then
-            local socket = getSocket(from, tonumber(cmd));
-            socket.data = socket.data..args;
+        local sIndex, packet = string.match(data, "^#(%d+):(.*)");
+        if(sIndex and packet) then
+            local socket = getSocket(from, tonumber(sIndex));
+            socket.data = socket.data..packet;
+            local cmd = string.match(socket.data, "^(%w+):(.*)");
             --dPrint(string.len(socket.data)/socket.len*100 .. "%")
             if(CommandHandlers[cmd]) then
                 for i = 1,  #CommandHandlers[cmd] do
@@ -91,12 +92,12 @@ local function OnEvent(self, event, ...)
             end
             if(string.len(socket.data) == socket.len) then
                 ProcessData(channel, from, socket.data);
-                SocketPool[from][tonumber(cmd)] = nil;
+                SocketPool[from][tonumber(sIndex)] = nil;
                 recycleTable(socket);
             end
             return;
         end
-        cmd, args = string.match(data, "^!(.*)");
+        local cmd, args = string.match(data, "^!(.*)");
         if(cmd) then
             ProcessData(channel, from, cmd);
             return;

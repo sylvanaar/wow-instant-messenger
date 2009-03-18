@@ -6,8 +6,8 @@ local currentRevision = tonumber(("$Revision$"):match("(%d+)"));
 local log = {};
 local t_insert = table.insert;
 
-local function addEntry(version, rdate, description)
-    t_insert(log, {v = version, r = rdate, d = description});
+local function addEntry(version, rdate, description, transmitted)
+    t_insert(log, {v = version, r = rdate, d = description, t=transmitted and true});
 end
 
 
@@ -20,6 +20,8 @@ addEntry("3.0.8", "03/??/2008", [[
     -Removed <GM> tag from GM's names & fixed error when whispering a GM.
     *Fixed bug when splitting long messages. Thanks blazeflack.
     *Options & History window now toggle on and off if called more than once.
+    *Fixed various bugs in the Socket & Compression Sources.
+    +View changelog before you upgrade WIM. Changelog shared with friends.
 ]]);
 
 addEntry("3.0.7", "03/12/2008", [[
@@ -112,25 +114,47 @@ addEntry("3.0.3", "10/23/2008", [[
 ]]);
 
 
+local function entryExists(version)
+    for i=1, #log do
+        if(log[i].v == version) then
+            return true;
+        end
+    end
+    return false;
+end
+
+local freshLoad = true;
 local function formatEntry(txt)
-    txt = txt:gsub("[ ]+(%+)", " |r|cff69ccf0+ ");
-    txt = txt:gsub("[ ]+(%*)", " |r|cffc79c6e* ");
-    txt = txt:gsub("[ ]+(%-)", " |r|cffc41f3b- ");
-    return txt;
+    local out = "";
+    for line in txt:gmatch("([^\n]+)\n") do
+        line = line:gsub("^%s*(%+)", " |cff69ccf0+ ");
+        line = line:gsub("^%s*(%*)", " |cffc79c6e* ");
+        line = line:gsub("^%s*(%-)", " |cffc41f3b- ");
+        out = out..line.."|r\n";
+    end
+    return out;
 end
 
 
 local function getEntryText(index)
     local entry = log[index];
     if(not entry) then return ""; end
-    local revision = index == 1 and " - Revision "..WIM.GetRevision() or "";
-    local txt = "|rVersion "..entry.v.."  ("..entry.r..")"..revision.."\n";
+    local revision = entry.v == WIM.version and " - Revision "..WIM.GetRevision() or "";
+    revision = entry.t and " - |cffff0000"..WIM.L["Available For Download!"].."|r" or revision;
+    local txt = "Version "..entry.v.."  ("..entry.r..")"..revision.."\n";
     txt = txt..formatEntry(entry.d);
     
+    freshLoad = false;
     return txt.."\n\n";
 end
 
-
+local function logSort(a, b)
+    if(WIM.CompareVersion(a.v, b.v) > 0) then
+        return true;
+    else
+        return false;
+    end
+end
 
 local changeLogWindow;
 local function createChangeLogWindow()
@@ -158,7 +182,7 @@ local function createChangeLogWindow()
     win:RegisterForDrag("LeftButton");
 
     -- set script events
-    win:SetScript("OnShow", function(self) _G.PlaySound("igMainMenuOpen");  end);
+    win:SetScript("OnShow", function(self) _G.PlaySound("igMainMenuOpen"); self:update();  end);
     win:SetScript("OnHide", function(self) _G.PlaySound("igMainMenuClose");  end);
     win:SetScript("OnDragStart", function(self) self:StartMoving(); end);
     win:SetScript("OnDragStop", function(self) self:StopMovingOrSizing(); end);
@@ -189,17 +213,56 @@ local function createChangeLogWindow()
     win.textFrame.text:SetHeight(200);
     win.textFrame:SetScrollChild(win.textFrame.text);
     
-    local tmp = "";
-    for i=1, #log do
-        tmp = tmp..getEntryText(i);
+    win.update = function(self)
+        local tmp = "";
+        freshLoad = true;
+        table.sort(log, logSort);
+        for i=1, #log do
+            tmp = tmp..getEntryText(i);
+        end
+        self.textFrame.text:SetFontObject(ChatFontNormal);
+        self.textFrame.text:SetText(tmp);
+        self.textFrame:UpdateScrollChildRect();
     end
-    win.textFrame.text:SetFontObject(ChatFontNormal);
-    win.textFrame.text:SetFontObject("h1",QuestFont_Shadow_Huge);
-    win.textFrame.text:SetText(tmp);
-    win.textFrame:UpdateScrollChildRect();
     
     return win;
 end
+
+local function getEntryString(index)
+    local entry = log[index];
+    if(entry) then
+        local out = entry.v.."\003\003"..entry.r.."\003\003"..entry.d;
+        return out;
+    else
+        return;
+    end
+end
+
+WIM.RegisterAddonMessageHandler("CHANGELOG", function(from, data)
+        local v, r, d = string.match(data, "^(.+)\003\003(.+)\003\003(.+)$");
+        WIM.AddChangeLogEntry(v, r, d);
+    end);
+
+WIM.RegisterAddonMessageHandler("GETCHANGELOG", function(from, data)
+        for i=1, #log do
+            if(WIM.CompareVersion(log[i].v, data) > 0) then
+                local vd = getEntryString(i);
+                if(vd) then
+                    --DEFAULT_CHAT_FRAME:AddMessage(vd);
+                    WIM.SendData("WHISPER", from, "CHANGELOG", vd);
+                end
+            end
+        end
+    end);
+
+WIM.RegisterAddonMessageHandler("NEGOTIATE", function(from, data)
+        local v, isBeta = string.match(data, "^(.+):(%d)");
+        local diff = WIM.CompareVersion(v);
+        if(diff > 0 and tonumber(isBeta) == 0 and not entryExists(v)) then
+            WIM.SendData("WHISPER", from, "GETCHANGELOG", WIM.version);
+        end
+    end);
+
 
 function WIM.ShowChangeLog()
     changeLogWindow = changeLogWindow or createChangeLogWindow();
@@ -210,5 +273,19 @@ function WIM.GetRevision()
     return currentRevision;
 end
 
-WIM.RegisterSlashCommand("changelog", WIM.ShowChangeLog, WIM.L["View WIM's change log."]);
+local transmissionReceived = false;
+function WIM.AddChangeLogEntry(version, releaseDate, desc)
+    if(type(version) == "string" and type(releaseDate) == "string" and type(desc) == "string" and not entryExists(version)) then
+        addEntry(version, releaseDate, desc, true);
+        transmissionReceived = true;
+        if(changeLogWindow and changeLogWindow:IsShown()) then
+            changeLogWindow:update();
+        end
+    end
+end
 
+function WIM.ChangeLogUpdated()
+    return transmissionReceived;
+end
+
+WIM.RegisterSlashCommand("changelog", WIM.ShowChangeLog, WIM.L["View WIM's change log."]);

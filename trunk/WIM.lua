@@ -434,9 +434,10 @@ function IsInRaid(user)
     return false;
 end
 
-function CompareVersion(v)
+function CompareVersion(v, withV)
+    withV = withV or version;
     local M, m, r = string.match(v, "(%d+).(%d+).(%d+)");
-    local cM, cm, cr = string.match(version, "(%d+).(%d+).(%d+)");
+    local cM, cm, cr = string.match(withV, "(%d+).(%d+).(%d+)");
     M, m = M*100000, m*1000;
     cM, cm = cM*100000, cm*1000;
     local this, that = cM+cm+cr, M+m+r;
