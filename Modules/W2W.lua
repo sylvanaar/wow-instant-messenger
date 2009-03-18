@@ -285,6 +285,7 @@ function ShowW2WTip(win, anchor, point)
     if(tbl.talentSpec) then
         _G.GameTooltip:AddDoubleLine(L["Talent Spec"]..":", "|cffffffff"..TalentsToString(tbl.talentSpec, win.class).."|r");
     end
+    _G.GameTooltip:AddLine("|cff69ccf0"..L["Right-Click for profile links..."].."|r");
     _G.GameTooltip:Show();
 end
 

@@ -22,6 +22,7 @@ addEntry("3.0.8", "03/??/2008", [[
     *Options & History window now toggle on and off if called more than once.
     *Fixed various bugs in the Socket & Compression Sources.
     +View changelog before you upgrade WIM. Changelog shared with friends.
+    +Added Profile links (example: wowarmory). Right Click location button.
 ]]);
 
 addEntry("3.0.7", "03/12/2008", [[

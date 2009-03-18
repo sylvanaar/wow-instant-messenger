@@ -213,6 +213,8 @@ WIM.AddLocale("enUS", {
     ["Add Friend"] = true,
     ["Ignore User"] = true,
     ["Are you sure you want to\nignore %s?"] = true,
+    ["Right-Click for profile links..."] = true,
+    ["Profile Links"] = true,
     
     -- Tutorials.lua --
     ["Display WIM tips"] = true,

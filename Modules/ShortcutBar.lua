@@ -15,10 +15,12 @@ local buttons = {};
 -- create WIM Module
 local ShortcutBar = CreateModule("ShortcutBar", true);
 
+local buttonCount = 1;
 local function createButton(parent)
-    local button = CreateFrame("Button", nil, parent);
+    local button = CreateFrame("Button", "WIM_ShortcutBarButton"..buttonCount, parent);
     button.icon = button:CreateTexture(nil, "BACKGROUND");
     button.icon:SetAllPoints();
+    button:RegisterForClicks("LeftButtonUp", "RightButtonUp");
     button.Enable = function(self)
             self:Show();
             self.isEnabled = true;
@@ -58,6 +60,7 @@ local function createButton(parent)
         
         
     button:Enable();
+    buttonCount = buttonCount + 1;
     return button;
 end
 
@@ -256,8 +259,14 @@ end
 
 -- Register default buttons.
 RegisterShortcut("location", L["Player Location"], {
-        OnClick = function(self)
-            self.parentWindow:SendWho();
+        OnClick = function(self, button)
+            _G.CloseDropDownMenus();
+            if(button == "LeftButton") then
+                self.parentWindow:SendWho();
+            else
+                WIM.MENU_ARMORY_USER = self.parentWindow.theUser;
+                PopContextMenu("MENU_ARMORY", self:GetName());
+            end
         end,
         OnEnter = function(self)
             local location = self.parentWindow.location ~= "" and self.parentWindow.location or L["Unknown"];
@@ -267,6 +276,7 @@ RegisterShortcut("location", L["Player Location"], {
                 _G.GameTooltip:AddLine("|cff"..self.parentWindow.classColor..self.parentWindow.theUser.."|r");
                 _G.GameTooltip:AddDoubleLine(L["Location"]..":", "|cffffffff"..location.."|r");
                 _G.GameTooltip:AddLine("|cff69ccf0"..L["Click to update..."].."|r");
+                _G.GameTooltip:AddLine("|cff69ccf0"..L["Right-Click for profile links..."].."|r");
                 _G.GameTooltip:Show(txt);
             else
                 --w2w tooltip
