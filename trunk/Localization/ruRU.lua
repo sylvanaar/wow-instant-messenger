@@ -125,7 +125,7 @@ WIM.AddLocale("ruRU", {
 	["Shaman"] = "Шаман",
 	["Warlock"] = "Чернокнижник",
 	["Warrior"] = "Воин",
-	["Death Knight"] = "Рыцарь Сменрти",
+	["Death Knight"] = "Рыцарь Смерти",
     
     -- Female Class Names --
 	["DruidF"] = "Друид",
@@ -137,7 +137,7 @@ WIM.AddLocale("ruRU", {
 	["ShamanF"] = "Шаманка",
 	["WarlockF"] = "Чернокнижница",
 	["WarriorF"] = "Воин",
-	["Death KnightF"] = "Рыцарь Сменрти",
+	["Death KnightF"] = "Рыцарь Смерти",
     
 	["Game Master"] = "Game Master",
 	
@@ -224,15 +224,16 @@ WIM.AddLocale("ruRU", {
     
     -- WhisperEngine.lua --
 	["Whisper Received!"] = "Входящее сообщение!",
-	["You received a whisper which was hidden due to your current activity. You can change how whispers behave in WIM's options by typing"] = "You received a whisper which was hidden due to your current activity. You can change how whispers behave in WIM's options by typing",
+	["You received a whisper which was hidden due to your current activity. You can change how whispers behave in WIM's options by typing"] = "Вы получили шепот, который был скрыт за счет текущей деятельности. Вы можете изменить параметры поведения шепота в WIMе, набрав",
+	["Recently Sent Messages"] = "Недавно отосланные сообщения",
     
     -- Clear.lua --
-	["You are about to clear all of WIM's history!"] = "You are about to clear all of WIM's history!",
-	["This action will reload your user interface."] = "данное действие перезагрузит ваш интерфейс.",
+	["You are about to clear all of WIM's history!"] = "Вы собираетесь удалить всю историю WIMа!",
+	["This action will reload your user interface."] = "Данное действие перезагрузит ваш интерфейс.",
 	["Do you want to continue?"] = "Вы хотите продолжить?",
-	["You are about to restore WIM's filters to it's default settings!"] = "You are about to restore WIM's filters to it's default settings!",
+	["You are about to restore WIM's filters to it's default settings!"] = "Вы собираетесь восстановить настройки фильтров WIMа на настройки по умолчанию!",
 	["Usage"] = "Использование",
-	["Clear various WIM data."] = "Clear various WIM data.",
+	["Clear various WIM data."] = "Очистка различных данных WIMа.",
     
     -- SlashHandler.lua --
 	["WIM Slash Commands"] = "WIM слеш команды",
@@ -258,6 +259,9 @@ WIM.AddLocale("ruRU", {
 	["Default"] = "По умолчанию",
 	["%s is Away From Keyboard: %s"] = "%s отсутствует: %s",
 	["%s does not wish to be disturbed: %s"] = "%s в режиме \"не беспокоить\": %s",
+	["Right-Mouse Click!"] = "Кликните правой клавишой мыши!",
+	["There might be useful tools hidden under the message box. Right-Click to see them!"] = "Полезные инструменты могут быть скрыты под окном. Кликните правой кнопкой мыши чтобы увидеть их!",
+    
     
     -- Options.lua --
 	["Display WIM's options."] = "Отображает настройки WIMа",
@@ -274,7 +278,7 @@ WIM.AddLocale("ruRU", {
 	["Display Tutorials"] = "Показывать руководство",
 	["Reset Tutorials"] = "Сброс руководства",
 	["Credits"] = "Титры",
-	["This is a long message which contains both emoticons and urls 8). WIM's home is www.WIMAddon.com."] = "This is a long message which contains both emoticons and urls 8). WIM's home is www.WIMAddon.com.",
+	["This is a long message which contains both emoticons and urls 8). WIM's home is www.WIMAddon.com."] = "Это длинное сообщение, которое содержит и смайлики и адреса/ссылки 8). Домашняя страничка WIM'а: www.WIMAddon.com.",
 	["Message Formatting"] = "формат сообщения",
 	["Manipulate how WIM displays messages."] = "Управление отображением сообщений WIMом",
 	["Preview"] = "Предосмотр",
@@ -337,14 +341,14 @@ WIM.AddLocale("ruRU", {
 	["Ignore"] = "Игнорировать",
 	["Block"] = "Блокировать",
 	["Filtering"] = "Фильтрация",
-	["Filtering allows you to control which messages are handled as well as how they are handlef by WIM."] = "Filtering allows you to control which messages are handled as well as how they are handlef by WIM.",
+	["Filtering allows you to control which messages are handled as well as how they are handlef by WIM."] = "Фильтрация позволяет вам контролировать, какие сообщения обрабатывать, а также каким образом они будут обрабатываться WIMом.",
 	["Enable Filtering"] = "Включить фильтрацию",
 	["Protected"] = "Под защитой",
 	["Action:"] = "Действие",
 	["Occurrences:"] = "Появление",
 	["Delete Filter"] = "Удалить фитльтр",
 	["History"] = "История",
-	["WIM can store conversations to be viewed at a later time."] = "WIM can store conversations to be viewed at a later time.",
+	["WIM can store conversations to be viewed at a later time."] = "WIM может хранить беседы, которые можно проссматривать в любое время.",
 	["Enable History"] = "Включить историю",
 	["Messages"] = "Сообщений",
 	["Preview history inside message windows."] = "Предпросмотр истории в окне сообщения",
@@ -354,11 +358,11 @@ WIM.AddLocale("ruRU", {
 	["Record Everyone"] = "Записывать всех",
 	["Record Chat"] = "Записывать чат",
 	["Maintenance"] = "Поддержка",
-	["Allowing your history logs to grow too large will affect the game's performance, therefore it is reccomended that you use the following options."] = "Allowing your history logs to grow too large will affect the game's performance, therefore it is reccomended that you use the following options.",
+	["Allowing your history logs to grow too large will affect the game's performance, therefore it is reccomended that you use the following options."] = "Позволяя вести журнал вашей истории, что можен сильно повлиять на производительнось вашей игры, поэтому рекомендуется использовать следующие настройки.",
 	["Save a maximum number of messages per person."] = "Макс. количество сохроняемых сообщений на человека.",
 	["%d |4Week:Weeks;"] = "%d |4ниделя:нидель;",
 	["Automatically delete old messages."] = "Автоматически удалять старые сообщения.",
-	["WIM-2-WIM is a feature which allows users with WIM to interact in ways that normal whispering can not."] = "WIM-2-WIM is a feature which allows users with WIM to interact in ways that normal whispering can not.",
+	["WIM-2-WIM is a feature which allows users with WIM to interact in ways that normal whispering can not."] = "WIM-2-WIM даёт возможность пользователям с WIM взаимодействовать таким образом, что нормальное перешептывание не может.",
 	["Enable WIM-2-WIM"] = "Включить WIM-2-WIM",
 	["Privacy"] = "Личное дело",
 	["Restrict the data that is shared."] = "Ограничить разделение/вывод данных.",
@@ -375,11 +379,12 @@ WIM.AddLocale("ruRU", {
 	["Play special sound for guild members."] = "Специальный звук для членов гильдии.",
 	["Play sound when a whisper is sent."] = "Проиграть звук при отправке сообщения.",
 	["Allow others to see my talent spec."] = "Позволить другим видеть мои таланты.",
-    
+	["Window Strata:"] = "Слой окна",
+	["Unlock from Minimap"] = "Открепить от мини-карты",
     
     -- TabManagement.lua --
 	["Tab Management"] = "Управление закладками",
-	["Automatically manage your open windows and place them into appropriate tab groups."] = "Automatically manage your open windows and place them into appropriate tab groups.",
+	["Automatically manage your open windows and place them into appropriate tab groups."] = "Автоматическое управление открытыми окнами и помещение их в соответствующие вкладки групп.",
 	["Automatically group whispers."] = "Автоматически группировать",
 	["Place friends in their own group."] = "Помещать друзей в отдельную группу.",
 	["Place guild members in their own group."] = "Помещать членов гильдии в отдельную группу.",
@@ -387,7 +392,7 @@ WIM.AddLocale("ruRU", {
 	
         
     -- Talent Specs --
-        ["Affliction"] = "Колдовство",
+    ["Affliction"] = "Колдовство",
 	["Arcane"] = "Тайная магия",
 	["Arms"] = "Оружие",
 	["Assassination"] = "Убийство",
@@ -414,4 +419,25 @@ WIM.AddLocale("ruRU", {
 	["Subtlety"] = "Скрытность",
 	["Survival"] = "Выживание",
 	["Unholy"] = "Нечестивость",
+	
+    -- ChangeLog.lua --
+    ["Change Log"] = "Список изменений",
+    ["View WIM's change log."] = "Просмотр списка изменений WIM'а",
+	
+    -- Filters.lua --
+    ["Show Alert"] = "Показ уведомления",
+    ["WIM has blocked a message from %s."] = "WIM заблокировал сообщение от персонажа: %s.",
+    ["View Blocked Message"] = "Просмотр заблокированного сообщения",
+    ["Blocked Message"] = "Заблокированное сообщение",
+	
+    -- MinimapIcon.lua
+    ["Show Unread Messages"] = "Показать непрочитанные сообщения",
+    ["Show All Windows"] = "Показать все окна",
+    ["Hide All Windows"] = "Скрыть все окна",
+    
+    --Emoticons.lua
+    ["Also"] = "Также",
+    ["More"] = "Еще",
+    ["Emoticons"] = "Смайлики",
+    
 });

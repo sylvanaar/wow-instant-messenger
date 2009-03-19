@@ -14,7 +14,7 @@ setfenv(1, WIM);
 -- Core information
 addonTocName = "WIM";
 version = "3.0.8";
-beta = true; -- flags current version as beta.
+beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight (we'll keep this around for now...)
@@ -22,7 +22,9 @@ isPTR = select(4, _G.GetBuildInfo()) >= 30100;
 
 -- is Private Server?
 isPrivateServer = not string.match(_G.GetCVar("realmList"), "worldofwarcraft.com$") and true or false;
-isUS = not string.match(_G.GetCVar("realmList"), "us.login.worldofwarcraft.com") and true or false;
+
+-- is US or EU server?
+isUS = _G.GetCVar("realmList"):sub(1,2) == "us" and true or false;
 
 constants = {}; -- constants such as class colors will be stored here. (includes female class names).
 modules = {}; -- module table. consists of all registerd WIM modules/plugins/skins. (treated the same).
@@ -286,7 +288,7 @@ function WIM.honorChatFrameEventFilter(event, ...)
                 if chatFilters then 
                         local filter = false;
                         for _, filterFunc in pairs(chatFilters) do
-                                filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = filterFunc(event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
+                                filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = filterFunc(workerFrame, event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
                                 if filter then 
                                         return true, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11; 
                                 end 
@@ -294,17 +296,17 @@ function WIM.honorChatFrameEventFilter(event, ...)
                 end 
                 return false, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11;
         else
-            local msg = arg1;
             if chatFilters then 
-        	local filter, newmsg = false;
+        	local filter, newmsg;
                 for _, filterFunc in pairs(chatFilters) do
-                    filter, newmsg = filterFunc(msg);
-                    if filter then 
-        		return true, ...; 
+                    filter, newmsg = filterFunc(arg1);
+                    arg1 = (newmsg or arg1);
+                    if (filter) then 
+        		return true, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11; 
         	    end 
         	end 
             end 
-            return false, ...;
+            return false, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11;
         end
 end
 

@@ -214,7 +214,7 @@ local function MENU_ARMORY_CLICKED(self)
     local eu_us = isUS and "us" or "eu";
     local user, realm;
     if(MENU_ARMORY_USER:find("-")) then
-        user, realm = MENU_ARMORY_USER:split("-");
+        user, realm = string.split("-", MENU_ARMORY_USER);
     else
         user = MENU_ARMORY_USER;
     end
