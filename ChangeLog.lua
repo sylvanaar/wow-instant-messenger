@@ -12,7 +12,7 @@ end
 
 
 -- ChangeLog Entries.
-addEntry("3.0.8", "03/??/2008", [[
+addEntry("3.0.8", "03/19/2009", [[
     +Added section for WIM in Blizzard's keybinding interface.
     +Added 'Expose' feature as well as options (combat & visual).
     *Fixed they way modules were being handled when WIM enabled is toggled.
@@ -23,9 +23,12 @@ addEntry("3.0.8", "03/??/2008", [[
     *Fixed various bugs in the Socket & Compression Sources.
     +View changelog before you upgrade WIM. Changelog shared with friends.
     +Added Profile links (example: wowarmory). Right Click location button.
+    +Updated translations for ruRU, zhCN, zhTW.
+    +Added BBCode formatting to history.
+    *Fixed possible bug with message event filters.
 ]]);
 
-addEntry("3.0.7", "03/12/2008", [[
+addEntry("3.0.7", "03/12/2009", [[
     +Added context menu management system.
     +Added minimap icon right mouse click menu.
     *Modules were getting loaded on startup regardless of their settings.
@@ -37,7 +40,7 @@ addEntry("3.0.7", "03/12/2008", [[
     +Added koKR translation. (thank you BlueNyx).
 ]]);
 
-addEntry("3.0.6", "03/10/2008", [[
+addEntry("3.0.6", "03/10/2009", [[
     *Fixed: Error when receiving whisper while minimizing.
     *Fixed: Negotiating with guild members would cause addon msg spam.
     *Changed outbound whispers priority from NORMAL to ALERT.

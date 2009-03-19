@@ -1109,6 +1109,24 @@ table.insert(ViewTypes, {
             end
         end
     });
+    
+table.insert(ViewTypes, {
+        text = L["BBCode"],
+        frame = "textFrame",
+        func = function(frame, msg)
+            if(msg.type == 1) then
+                frame.noEscapedStrings = nil;
+                local color = db.displayColors[msg.inbound and "wispIn" or "wispOut"];
+                nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b;
+                frame.nextStamp = msg.time;
+                msg = applyStringModifiers(applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from), frame);
+                msg = msg:gsub("|c[0-9A-Fa-f][0-9A-Fa-f]([0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])", "[color=#%1]");
+                msg = msg:gsub("|r", "[/color]");
+                msg = msg:gsub("(%[color%=%#[0-9A-Fa-f]+%])|Hitem:(%d+)[:%d]*|h([^|]+)|h(%[%/color%])", "[url=http://www.wowhead.com/?item=%2]%1%3%4[/url]");
+                frame:AddMessage("[color=#"..RGBPercentToHex(color.r, color.g, color.b).."]"..msg.."[/color]", color.r, color.g, color.b)
+            end
+        end
+    });
 
 
 function ShowHistoryViewer(user)
