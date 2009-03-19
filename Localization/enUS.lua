@@ -449,5 +449,6 @@ WIM.AddLocale("enUS", {
     ["Expose is a Mac OS X inspired feature which enables you to quickly clear your screen of windows and then restore them back to their original position."] = true,
     ["Auto hide/restore windows during combat."] = true,
     ["Border Size"] = true,
+    ["Only while in an instance."] = true,
     
 });

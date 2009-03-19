@@ -744,8 +744,9 @@ local function General_Expose()
     frame.menu = frame:CreateSection(L["Expose"], L["Expose is a Mac OS X inspired feature which enables you to quickly clear your screen of windows and then restore them back to their original position."]);
     frame.menu.nextOffSetY = -20;
     
-    frame.menu:CreateCheckButton(L["Auto hide/restore windows during combat."], db.expose, "combat");
-    frame.menu.nextOffSetY = -40;
+    local cb1 = frame.menu:CreateCheckButton(L["Auto hide/restore windows during combat."], db.expose, "combat");
+    cb1:CreateCheckButton(L["Only while in an instance."], db.expose, "groupOnly");
+    frame.menu.nextOffSetY = -80;
     frame.menu.size = frame.menu:CreateSlider(L["Border Size"], "1", "200", 1, 200, 1, db.expose, "borderSize");
     return frame;
 end

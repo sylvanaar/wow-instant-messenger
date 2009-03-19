@@ -11,6 +11,7 @@ setfenv(1, WIM);
 
 db_defaults.expose = {
     combat = true,
+    groupOnly = false,
     borderSize = 20,
 };
 
@@ -18,10 +19,16 @@ local Expose = WIM.CreateModule("Expose", true);
 
 local inCombat = false;
 
-function Expose:OnStateChange(state)
+function Expose:OnStateChange(state, combatFlag)
     --if(1) then return; end -- not ready for release.
     if(db.expose.combat) then
-        if(state == "combat") then
+        if(db.expose.groupOnly) then
+            -- check if in group, if not, return.
+            if(not _G.IsInInstance()) then
+                return;
+            end
+        end
+        if(combatFlag) then
             --entered combat
             HideContainer(true);
             inCombat = true;

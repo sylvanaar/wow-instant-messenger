@@ -53,7 +53,7 @@ local function evaluateState()
     
     WIM.lastState = WIM.curState; -- we want to remember our last state.
     
-    WIM.CallModuleFunction("OnStateChange", WIM.curState);
+    WIM.CallModuleFunction("OnStateChange", WIM.curState, flag_combat);
     WIM.dPrint("Evaluated State: "..WIM.curState);
 end
 

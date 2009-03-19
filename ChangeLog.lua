@@ -12,6 +12,12 @@ end
 
 
 -- ChangeLog Entries.
+-- ChangeLog Entries.
+addEntry("3.0.9", "03/??/2009", [[
+    *Windows no longer close when zoning or opening world map.
+    +Added option to only activate expose while inside of an instance.
+]]);
+
 addEntry("3.0.8", "03/19/2009", [[
     +Added section for WIM in Blizzard's keybinding interface.
     +Added 'Expose' feature as well as options (combat & visual).
@@ -165,6 +171,7 @@ local function createChangeLogWindow()
     -- create frame object
     local win = CreateFrame("Frame", "WIM3_ChangeLog", _G.UIParent);
     win:Hide(); -- hide initially, scripts aren't loaded yet.
+    table.insert(UISpecialFrames, "WIM3_ChangeLog");
     
     -- set size and position
     win:SetWidth(700);
@@ -293,3 +300,4 @@ function WIM.ChangeLogUpdated()
 end
 
 WIM.RegisterSlashCommand("changelog", WIM.ShowChangeLog, WIM.L["View WIM's change log."]);
+
