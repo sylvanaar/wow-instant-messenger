@@ -15,6 +15,8 @@ local Module = CreateModule("Negotiate", true);
 local maxVersion = version;
 local alreadyAlerted = false;
 
+db_defaults.rememberWho = false;
+local WHO_LIST = {};
 
 Module:RegisterEvent("FRIENDLIST_UPDATE");
 Module:RegisterEvent("GUILD_ROSTER_UPDATE");
@@ -93,5 +95,31 @@ RegisterAddonMessageHandler("NEGOTIATE", function(from, data)
             -- user has an older version, let him know.
             Negotiate("WHISPER", from);
         end
+        if(db.rememberWho) then
+            WHO_LIST[from] = v..(tonumber(isBeta)==1 and " BETA" or "");
+        end
     end);
     
+    
+function WhoList(arg)
+    if(string.lower(arg) == "on") then
+        db.rememberWho = true;
+        _G.ReloadUI();
+        return;
+    elseif(string.lower(arg) == "off") then
+        db.rememberWho = false;
+        _G.ReloadUI();
+        return;
+    end
+    if(not db.rememberWho) then
+        _G.DEFAULT_CHAT_FRAME:AddMessage("WIM is not set to remember user encounters.");
+        _G.DEFAULT_CHAT_FRAME:AddMessage("usage: /wim who on      /wim who off");
+        return;
+    end
+    local count = 0;
+    for user, v in pairs(WHO_LIST) do
+        _G.DEFAULT_CHAT_FRAME:AddMessage("|Hplayer:"..user.."|h"..user.."|h   "..v);
+        count = count + 1;
+    end
+    _G.DEFAULT_CHAT_FRAME:AddMessage("Total found using WIM: "..count);
+end

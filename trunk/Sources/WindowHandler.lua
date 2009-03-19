@@ -942,12 +942,6 @@ local function instantiateWindow(obj)
 	self.widgets.scroll_up:SetAlpha(db.windowAlpha);
 	self.widgets.scroll_down:SetAlpha(db.windowAlpha);
 	
-	if(db.escapeToHide) then
-		AddEscapeWindow(self);
-	else
-		RemoveEscapeWindow(self);
-	end
-	
         if(not self.customSize) then
                 self:SetWidth(db.winSize.width);
                 self:SetHeight(db.winSize.height);
@@ -1738,6 +1732,44 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
 		end
 	end);
 
+
+
+-- handle escape to close windows
+local escapeFrame = CreateFrame("Frame", "WIM_SpecialWindowMonitor")
+table.insert(_G.UISpecialFrames, "WIM_SpecialWindowMonitor");
+escapeFrame.Hide = function(self)
+                if(WindowParent.animUp or not db.escapeToHide) then
+                                return nil; -- don't close windows if WindowParent is in use.
+                end
+                -- lets do some checks first shall we?
+                local stack = _G.debugstack(1);
+		if(stack:match("TOGGLEWORLDMAP")) then
+				-- we do not want to close the windows.
+                                return;
+		elseif(stack:match("UIParent_OnEvent")) then
+				-- need some checks here. we want to close the windows at some point...
+                                return;
+		end
+                for i=1, #WindowSoupBowl.windows do
+                                local win = WindowSoupBowl.windows[i].obj;
+                                if(win:IsShown()) then
+                                                win:Hide();
+                                end
+                end
+end
+escapeFrame.IsShown = function(self)
+                if(WindowParent.animUp or not db.escapeToHide) then
+                                return nil; -- don't close windows if WindowParent is in use.
+                end
+                for i=1, #WindowSoupBowl.windows do
+                                local win = WindowSoupBowl.windows[i].obj;
+                                if(win:IsVisible()) then
+                                                return 1;
+                                end
+                end
+                return nil;
+end
+escapeFrame:Show();
 
 
 -- define context menu
