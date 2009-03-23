@@ -9,7 +9,7 @@
 			WIM.ShowAllUnreadWindows();
 	</Binding>
 	<Binding name="WIMVISIBLE">
-			WIM.ToggleContainer(true);
+			WIM.ToggleContainer(WIM.db.winAnimation);
 	</Binding>
 	<Binding name="WIMHISTORY">
 			WIM.ShowHistoryViewer();	

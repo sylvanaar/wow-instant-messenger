@@ -4,8 +4,6 @@
 
 --[[
     Extends Modules by adding:
-        Module:OnEvent_Whisper(eventItem)
-        Module:OnEvent_WhisperInform(eventItem)
         Module:PostEvent_Whisper(args[...])
         Module:PostEvent_WhisperInform(args[...])
 ]]
@@ -275,7 +273,7 @@ function WhisperEngine:CHAT_MSG_WHISPER_CONTROLLER(eventItem, ...)
 end
 
 function WhisperEngine:CHAT_MSG_WHISPER(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = honorChatFrameEventFilter("CHAT_MSG_WHISPER", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_WHISPER", ...);
     if(filter) then
         return; -- ChatFrameEventFilter says don't process
     end
@@ -304,7 +302,7 @@ function WhisperEngine:CHAT_MSG_WHISPER_INFORM_CONTROLLER(eventItem, ...)
 end
 
 function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = honorChatFrameEventFilter("CHAT_MSG_WHISPER_INFORM", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_WHISPER_INFORM", ...);
     if(filter) then
         return; -- ChatFrameEventFilter says don't process
     end

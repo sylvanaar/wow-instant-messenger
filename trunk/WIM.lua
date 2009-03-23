@@ -13,8 +13,8 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.0.8";
-beta = false; -- flags current version as beta.
+version = "3.0.9";
+beta = true; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight (we'll keep this around for now...)
@@ -284,20 +284,22 @@ function WIM.honorChatFrameEventFilter(event, ...)
         local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
         local chatFilters = _G.ChatFrame_GetMessageEventFilters(event);
         if(isPTR) then
-                local chatFilters = _G.ChatFrame_GetMessageEventFilters(event);
-                if chatFilters then 
+                if chatFilters then
+                        local narg1, narg2, narg3, narg4, narg5, narg6, narg7, narg8, narg9, narg10, narg11;
                         local filter = false;
                         for _, filterFunc in pairs(chatFilters) do
-                                filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = filterFunc(workerFrame, event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
+                                filter, narg1, narg2, narg3, narg4, narg5, narg6, narg7, narg8, narg9, narg10, narg11 = filterFunc(workerFrame, event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
                                 if filter then 
                                         return true, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11; 
-                                end 
+                                elseif(narg1) then
+                                        arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg1 = narg1, narg2, narg3, narg4, narg5, narg6, narg7, narg8, narg9, narg10, narg11;
+                                end
                         end 
                 end 
                 return false, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11;
         else
             if chatFilters then 
-        	local filter, newmsg;
+        	local filter, newmsg = false;
                 for _, filterFunc in pairs(chatFilters) do
                     filter, newmsg = filterFunc(arg1);
                     arg1 = (newmsg or arg1);
@@ -504,3 +506,5 @@ local wd, month, day, year = _G.CalendarGetDate();
 if(month == 4 and day == 1) then
         aprilFools = true;
 end
+
+

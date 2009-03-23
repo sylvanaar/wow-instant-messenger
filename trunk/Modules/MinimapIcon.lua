@@ -426,18 +426,6 @@ info.text = "MENU_MINIMAP";
 local minimapMenu = AddContextMenu(info.text, info);
     --show unread messages
     info = _G.UIDropDownMenu_CreateInfo();
-    info.text = L["Enable"].." WIM";
-    info.func = function() SetEnabled(not db.enabled); end;
-    info.notCheckable = true;
-    minimapMenu:AddSubItem(AddContextMenu("ENABLE_DISABLE_WIM", info));
-    -- add space
-    info = GetContextMenu("MENU_SPACE") or _G.UIDropDownMenu_CreateInfo();
-    info.text = "";
-    info.isTitle = true;
-    info.notCheckable = true;
-    minimapMenu:AddSubItem(AddContextMenu("MENU_SPACE", info));
-    --show unread messages
-    info = _G.UIDropDownMenu_CreateInfo();
     info.text = L["Show All Windows"];
     info.func = function() ShowAllWindows(); end;
     info.notCheckable = true;
@@ -472,7 +460,19 @@ local minimapMenu = AddContextMenu(info.text, info);
     info.func = ShowOptions;
     info.notCheckable = true;
     minimapMenu:AddSubItem(AddContextMenu("OPTIONS", info));
-
+    -- add space
+    info = GetContextMenu("MENU_SPACE") or _G.UIDropDownMenu_CreateInfo();
+    info.text = "";
+    info.isTitle = true;
+    info.notCheckable = true;
+    minimapMenu:AddSubItem(AddContextMenu("MENU_SPACE", info));
+    --enable disable WIM
+    info = _G.UIDropDownMenu_CreateInfo();
+    info.text = L["Enable"].." WIM";
+    info.func = function() SetEnabled(not db.enabled); end;
+    info.notCheckable = true;
+    minimapMenu:AddSubItem(AddContextMenu("ENABLE_DISABLE_WIM", info));
+    
 
 --------------------------------------
 --      Global Extensions to WIM    --

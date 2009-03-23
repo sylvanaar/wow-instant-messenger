@@ -450,5 +450,7 @@ WIM.AddLocale("enUS", {
     ["Auto hide/restore windows during combat."] = true,
     ["Border Size"] = true,
     ["Only while in an instance."] = true,
+    ["Show Border"] = true,
+    ["Animation Direction:"] = true,
     
 });
