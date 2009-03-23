@@ -531,7 +531,7 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                                                                 es, ts = es > 0 and es or .01, ts > 0 and ts or .01;
                                                                 local x1, y1, x2, y2 = animate.initLeft*es, animate.initTop*es, to:GetLeft()*ts, to:GetTop()*ts;
                                                 		local rise, run = ((y2-y1)>=0) and (y2-y1) or 0, ((x2-x1)>=0) and (x2-x1) or 0;
-                                                		--self:ClearAllPoints();
+                                                		self:ClearAllPoints();
                                                 		self:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", (x1+run*prct)/es, (y1+rise*prct)/es);
                                                 end
                                 	end
