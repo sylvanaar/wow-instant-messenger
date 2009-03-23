@@ -747,6 +747,25 @@ local function General_Expose()
     local cb1 = frame.menu:CreateCheckButton(L["Auto hide/restore windows during combat."], db.expose, "combat");
     cb1:CreateCheckButton(L["Only while in an instance."], db.expose, "groupOnly");
     frame.menu.nextOffSetY = -80;
+    
+    local direction = {L["Up"], L["Down"], L["Left"], L["Right"]};
+    local tsList = {};
+    for i=1, #direction do
+        table.insert(tsList, {
+            text = direction[i],
+            value = i,
+            justifyH = "LEFT",
+        });
+    end
+    frame.menu.directionText = frame.menu:CreateText();
+    frame.menu.directionText:SetText(L["Animation Direction:"]);
+    frame.menu.direction = frame.menu:CreateDropDownMenu(db.expose, "direction", tsList, 100);
+    frame.menu.direction:ClearAllPoints();
+    frame.menu.direction:SetPoint("LEFT", frame.menu.directionText, "LEFT", frame.menu.directionText:GetStringWidth(), 0);
+    frame.menu.lastObj = frame.menu.directionText;
+    frame.menu.nextOffSetY = -40;
+    frame.menu:CreateCheckButton(L["Show Border"], db.expose, "border");
+    frame.menu.nextOffSetY = -20;
     frame.menu.size = frame.menu:CreateSlider(L["Border Size"], "1", "200", 1, 200, 1, db.expose, "borderSize");
     return frame;
 end

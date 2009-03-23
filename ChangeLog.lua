@@ -16,6 +16,12 @@ end
 addEntry("3.0.9", "03/??/2009", [[
     *Windows no longer close when zoning or opening world map.
     +Added option to only activate expose while inside of an instance.
+    +Added version to w2w tooltip.
+    *Expose respects window animation setting.
+    +Added option to enable/disable Expose border (defaulted off).
+    *Changed the order of some items in the Minimap Dropdown Menu.
+    *Fixed bug where Expose wouldn't place windows correctly.
+    +Added Up, Down, Left, Right animation directions for Expose.
 ]]);
 
 addEntry("3.0.8", "03/19/2009", [[

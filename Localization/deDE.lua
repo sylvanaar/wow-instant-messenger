@@ -415,5 +415,10 @@ WIM.AddLocale("deDE", {
     ["Subtlety"] = "Täuschung",
     ["Survival"] = "Überleben",
     ["Unholy"] = "Unheilig",
+
+    -- MinimapIcon.lua
+    ["Show Unread Messages"] = "Zeige ungelesene Nachrichten",
+    ["Show All Windows"] = "Zeige alle Fenster",
+    ["Hide All Windows"] = "Verberge alle Fenster",
     
 });

@@ -12,7 +12,9 @@ setfenv(1, WIM);
 db_defaults.expose = {
     combat = true,
     groupOnly = false,
+    border = false,
     borderSize = 20,
+    direction = 1,
 };
 
 local Expose = WIM.CreateModule("Expose", true);
@@ -30,12 +32,12 @@ function Expose:OnStateChange(state, combatFlag)
         end
         if(combatFlag) then
             --entered combat
-            HideContainer(true);
+            HideContainer(db.winAnimation);
             inCombat = true;
             DisplayTutorial(L["Expose"].."?!", L["Your conversations have been hidden in order to clear your screen while in combat. To disable this feature type"].." |cff69ccf0/wim|r");
         elseif(inCombat) then
             --left combat
-            ShowContainer(true);
+            ShowContainer(db.winAnimation);
         end
     end
 end
@@ -65,20 +67,30 @@ local AnimTable = {
 	}
 
 function Expose:OnContainerShow()
-    WIM.SetUpAnimation(exposeFrame, AnimTable, function(self) self:SetAlpha(0); end, true);
+    if(db.expose.border) then
+        exposeFrame:Show();
+        WIM.SetUpAnimation(exposeFrame, AnimTable, function(self) self:SetAlpha(0); end, true);
+    else
+        exposeFrame:Hide();
+    end
 end
 
 function Expose:OnContainerHide()
-    exposeFrame.top:SetPoint("TOPLEFT", exposeFrame, "TOPLEFT", 0, 0);
-    exposeFrame.top:SetPoint("BOTTOMRIGHT", exposeFrame, "TOPRIGHT", 0, -(db.expose.borderSize));
-    exposeFrame.bottom:SetPoint("BOTTOMLEFT", exposeFrame, "BOTTOMLEFT", 0, 0);
-    exposeFrame.bottom:SetPoint("TOPRIGHT", exposeFrame, "BOTTOMRIGHT", 0, db.expose.borderSize);
-    exposeFrame.left:SetPoint("TOPLEFT", exposeFrame.top, "BOTTOMLEFT", 0, 0);
-    exposeFrame.left:SetPoint("BOTTOMRIGHT", exposeFrame.bottom, "TOPLEFT", db.expose.borderSize, 0);
-    exposeFrame.right:SetPoint("TOPRIGHT", exposeFrame.top, "TOPRIGHT", 0, 0);
-    exposeFrame.right:SetPoint("BOTTOMLEFT", exposeFrame.bottom, "TOPRIGHT", -(db.expose.borderSize), 0);
+    if(db.expose.border) then
+        exposeFrame:Show();
+        exposeFrame.top:SetPoint("TOPLEFT", exposeFrame, "TOPLEFT", 0, 0);
+        exposeFrame.top:SetPoint("BOTTOMRIGHT", exposeFrame, "TOPRIGHT", 0, -(db.expose.borderSize));
+        exposeFrame.bottom:SetPoint("BOTTOMLEFT", exposeFrame, "BOTTOMLEFT", 0, 0);
+        exposeFrame.bottom:SetPoint("TOPRIGHT", exposeFrame, "BOTTOMRIGHT", 0, db.expose.borderSize);
+        exposeFrame.left:SetPoint("TOPLEFT", exposeFrame.top, "BOTTOMLEFT", 0, 0);
+        exposeFrame.left:SetPoint("BOTTOMRIGHT", exposeFrame.bottom, "TOPLEFT", db.expose.borderSize, 0);
+        exposeFrame.right:SetPoint("TOPRIGHT", exposeFrame.top, "TOPRIGHT", 0, 0);
+        exposeFrame.right:SetPoint("BOTTOMLEFT", exposeFrame.bottom, "TOPRIGHT", -(db.expose.borderSize), 0);
     
-    WIM.SetUpAnimation(exposeFrame, AnimTable, function(self) self:SetAlpha(1); end, false);
+        WIM.SetUpAnimation(exposeFrame, AnimTable, function(self) self:SetAlpha(1); end, false);
+    else
+        exposeFrame:Hide();
+    end
 end
 
 

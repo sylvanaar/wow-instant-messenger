@@ -493,7 +493,7 @@ local function MessageWindow_Frame_OnHide(self)
         self:ResetAnimation();
         if(self.type == "demo" and self.demoSave) then
                 -- save window placement settings.
-                db.winLoc.left = self:GetLeft()*self:GetEffectiveScale();
+                db.winLoc.left = self:SafeGetLeft()*self:GetEffectiveScale();
                 db.winLoc.top = self:SafeGetTop()*self:GetEffectiveScale();
                 options.frame:Enable();
                 self.demoSave = nil;
@@ -662,7 +662,7 @@ end
 
 function scaleWindow(self, scale)
 	-- scale down window and preserve location
-	local left, top = self:GetLeft()*self:GetEffectiveScale(), self:SafeGetTop()*self:GetEffectiveScale();
+	local left, top = self:SafeGetLeft()*self:GetEffectiveScale(), self:SafeGetTop()*self:GetEffectiveScale();
 	local setScale = self.SetScale_Orig or self.SetScale;
 	setScale(self, (scale > 0) and scale or 0.01)
 	--self:ClearAllPoints();
@@ -959,7 +959,7 @@ local function instantiateWindow(obj)
                         if(widgetObj.enabled and string.match(widgetObj.type, obj.type)) then
                                 widgetObj:Show();
                                 local w, h = widgetObj:GetWidth(), widgetObj:GetHeight();
-                                minWidth = _G.math.max(minWidth, (self:GetLeft() - widgetObj:GetLeft()) + w + (widgetObj:GetRight() - self:GetRight()));
+                                minWidth = _G.math.max(minWidth, (self:SafeGetLeft() - widgetObj:GetLeft()) + w + (widgetObj:GetRight() - self:SafeGetRight()));
                                 minHeight = _G.math.max(minHeight, (self:SafeGetTop() - widgetObj:GetTop() - WindowParent:GetBottom()) + h + (widgetObj:GetBottom() - self:SafeGetBottom() - WindowParent:GetBottom()));
                         else
                                 widgetObj:Hide()
@@ -991,7 +991,7 @@ local function instantiateWindow(obj)
                         self.widgets.chat_display:Hide();
 			local a = self.animation;
 			obj:SetClampedToScreen(false);
-			a.initLeft = self:GetLeft();
+			a.initLeft = self:SafeGetLeft();
 			a.initTop = self:SafeGetTop();
 			a.to = MinimapIcon or nil;
 			a.elapsed, a.time = 0, .5;
@@ -1015,7 +1015,12 @@ local function instantiateWindow(obj)
 		self.animation[key] = nil;
 	end
     end
-    
+    obj.SafeGetLeft = function(self)
+                return self:GetLeft() - WindowParent:GetLeft();
+    end
+    obj.SafeGetRight = function(self)
+                return self:GetRight() - WindowParent:GetLeft();
+    end
     obj.SafeGetTop = function(self)
                 return self:GetTop() - WindowParent:GetBottom();
     end
@@ -1055,7 +1060,7 @@ local function placeWindow(win)
                 win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", db.winLoc.left/win:GetEffectiveScale(), (db.winLoc.top)/win:GetEffectiveScale());
         else
                 local casc = cascadeDirection[db.winCascade.direction];
-                win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", lastWindow:GetLeft()+casc[1], lastWindow:SafeGetTop()+casc[2]);
+                win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", lastWindow:SafeGetLeft()+casc[1], lastWindow:SafeGetTop()+casc[2]);
         end
 end
 
@@ -1421,9 +1426,19 @@ end
 
 
 local function WindowParent_AnimPos(self, fraction)
-                --WindowParent:SetWidth(_G.UIParent:GetWidth());
-                --WindowParent:SetHeight(_G.UIParent:GetHeight());
-                return "BOTTOMLEFT", _G.UIParent, "BOTTOMLEFT", 0, fraction*(_G.UIParent:GetHeight());
+                if(db.expose.direction == 1) then
+                                -- UP
+                                return "BOTTOMLEFT", _G.UIParent, "BOTTOMLEFT", 0, fraction*(_G.UIParent:GetHeight());
+                elseif(db.expose.direction == 2) then
+                                -- DOWN
+                                return "BOTTOMLEFT", _G.UIParent, "BOTTOMLEFT", 0, -fraction*(_G.UIParent:GetHeight());
+                elseif(db.expose.direction == 3) then
+                                -- LEFT
+                                return "BOTTOMLEFT", _G.UIParent, "BOTTOMLEFT", -fraction*(_G.UIParent:GetWidth()), 0;
+                elseif(db.expose.direction == 4) then
+                                -- RIGHT
+                                return "BOTTOMLEFT", _G.UIParent, "BOTTOMLEFT", fraction*(_G.UIParent:GetWidth()), 0;
+                end
 end
 
 local WindowParentAnimTable = {
@@ -1463,15 +1478,20 @@ function ShowContainer(animate)
                 end
                 WindowParent.animFinished = false;
                 WindowParent.inSequence = true;
-                for i=1, #WindowSoupBowl.windows do
+                --[[for i=1, #WindowSoupBowl.windows do
                                 local win = WindowSoupBowl.windows[i].obj;
                                 win:SetClampedToScreen(false);
-                                local left, top = win:GetLeft(), win:SafeGetTop()*win:GetScale();
+                                local left, top = win:SafeGetLeft(), win:SafeGetTop()*win:GetScale();
                                 win:ClearAllPoints();
                                 win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", left, top);
                                 win:SetClampedToScreen(false);
+                end]]
+                if(animate) then
+                                WIM.SetUpAnimation(WindowParent, WindowParentAnimTable, WindowParent_AnimFinished, true);
+                else
+                                WindowParent:SetPoint(WindowParent_AnimPos(WindowParent, 100));
+                                WindowParent_AnimFinished(WindowParent);
                 end
-                WIM.SetUpAnimation(WindowParent, WindowParentAnimTable, WindowParent_AnimFinished, true);
                 WIM.CallModuleFunction("OnContainerShow");
 end
 
@@ -1490,12 +1510,17 @@ function HideContainer(animate)
                 for i=1, #WindowSoupBowl.windows do
                                 local win = WindowSoupBowl.windows[i].obj;
                                 win:SetClampedToScreen(false);
-                                local left, top = win:GetLeft(), win:SafeGetTop();
+                                local left, top = win:SafeGetLeft(), win:SafeGetTop();
                                 win:ClearAllPoints();
                                 win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", left, top);
                                 win:SetClampedToScreen(false);
                 end
-                WIM.SetUpAnimation(WindowParent, WindowParentAnimTable, WindowParent_AnimFinished, false);
+                if(animate) then
+                                WIM.SetUpAnimation(WindowParent, WindowParentAnimTable, WindowParent_AnimFinished, false);
+                else
+                                WindowParent:SetPoint(WindowParent_AnimPos(WindowParent, 0));
+                                WindowParent_AnimFinished(WindowParent);
+                end
                 WIM.CallModuleFunction("OnContainerHide");
 end
 
@@ -1607,7 +1632,7 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnMouseWheel", functi
 	end);
 
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w,demo", "OnMouseDown", function(self)
-                self:GetParent().prevLeft = self:GetParent():GetLeft();
+                self:GetParent().prevLeft = self:GetParent():SafeGetLeft();
                 self:GetParent().prevTop = self:GetParent():SafeGetTop();
                 MessageWindow_MovementControler_OnDragStart(self);
 	end);
@@ -1618,7 +1643,7 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w,demo", "OnMouseUp", func
                         self:Hide();
                         self:Show();
                 end
-                if(self:GetParent().prevLeft == self:GetParent():GetLeft() and self:GetParent().prevTop == self:GetParent():SafeGetTop() and self.parentWindow ~= DemoWindow) then
+                if(self:GetParent().prevLeft == self:GetParent():SafeGetLeft() and self:GetParent().prevTop == self:GetParent():SafeGetTop() and self.parentWindow ~= DemoWindow) then
                         --[ Frame was clicked not dragged
                         local msg_box = self:GetParent().widgets.msg_box;
                         if(EditBoxInFocus == nil) then
