@@ -22,6 +22,7 @@ addEntry("3.0.9", "03/??/2009", [[
     *Changed the order of some items in the Minimap Dropdown Menu.
     *Fixed bug where Expose wouldn't place windows correctly.
     +Added Up, Down, Left, Right animation directions for Expose.
+    *Fixed animation when window is in TOPRIGHT and BOTTOMRIGHT corners.
 ]]);
 
 addEntry("3.0.8", "03/19/2009", [[
