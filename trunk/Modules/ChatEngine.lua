@@ -177,7 +177,7 @@ function Party:OnWindowDestroyed(self)
     end
 end
 
-function Party:CHAT_MSG_OFFICER(msg, from, language)
+function Party:CHAT_MSG_PARTY(msg, from, language)
     local win = getChatWindow(_G.PARTY, "party");
     local color = _G.ChatTypeInfo["PARTY"];
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
@@ -276,10 +276,11 @@ local function loadChatOptions()
         return f;
     end
     
-    RegisterOptionFrame(L["Chat"], _G.GUILD, createGuildChat);
-    RegisterOptionFrame(L["Chat"], _G.GUILD_RANK1_DESC, createOfficerChat);
-    RegisterOptionFrame(L["Chat"], _G.PARTY, createPartyChat);
-    RegisterOptionFrame(L["Chat"], _G.RAID, createRaidChat);
+    local desc = L["WIM will manage this chat type within its own message windows."];
+    RegisterOptionFrame(L["Chat"], _G.GUILD, createGuildChat, desc);
+    RegisterOptionFrame(L["Chat"], _G.GUILD_RANK1_DESC, createOfficerChat, desc);
+    RegisterOptionFrame(L["Chat"], _G.PARTY, createPartyChat, desc);
+    RegisterOptionFrame(L["Chat"], _G.RAID, createRaidChat, desc);
     
     dPrint("Chat Options Initialized...");
     ChatOptions.optionsLoaded = true;
