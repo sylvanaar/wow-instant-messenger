@@ -383,6 +383,17 @@ local function getWindowBy(userName)
     end
 end
 
+
+--Clean up the frame's points and make sure the main point TOPLEFT,BOTTOMRIGHT is set
+function cleanPoints(win)
+                local x, y;
+                for i = 1, win:GetNumPoints() do
+                                local p1, parent, p2, tx, ty = win:GetPoint(i);
+                                _G.DEFAULT_CHAT_FRAME:AddMessage(p1..", ".._G.tostring(parent)..", "..p2..", "..tx..", "..ty);
+                end
+                _G.DEFAULT_CHAT_FRAME:AddMessage("    "..win:SafeGetLeft()..", "..win:SafeGetTop());
+end
+
 -- climb up inherritance tree and find parent window recursively.
 local function getParentMessageWindow(obj)
     if(not obj) then
@@ -665,7 +676,7 @@ function scaleWindow(self, scale)
 	local left, top = self:SafeGetLeft()*self:GetEffectiveScale(), self:SafeGetTop()*self:GetEffectiveScale();
 	local setScale = self.SetScale_Orig or self.SetScale;
 	setScale(self, (scale > 0) and scale or 0.01)
-	--self:ClearAllPoints();
+	self:ClearAllPoints();
         local curScale = self:GetEffectiveScale();
         curScale = (curScale > 0) and curScale or 0.01;
 	self:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", left/curScale, top/curScale);
@@ -1005,7 +1016,7 @@ local function instantiateWindow(obj)
 	if(self.animation.mode) then
 		self:SetClampedToScreen(not WindowParent.animUp);
 		self:SetScale_Orig(db.winSize.scale/100);
-                --self:ClearAllPoints();
+                self:ClearAllPoints();
 		self:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", self.animation.initLeft, self.animation.initTop - WindowParent:GetBottom());
                 self.widgets.chat_display:Show();
                 self.widgets.chat_display:SetParent(self);
@@ -1048,7 +1059,7 @@ local function instantiateWindow(obj)
 end
 
 local function placeWindow(win)
-        --win:ClearAllPoints();
+        win:ClearAllPoints();
         local lastWindow = nil;
         for i=1, #windowsByAge do
                 if(windowsByAge[i] ~= win and windowsByAge[i]:IsShown() and windowsByAge[i].hasMoved == false) then
@@ -1267,11 +1278,11 @@ function CreateWhisperWindow(playerName)
 end
 
 function CreateChatWindow(chatName)
-    return createWindow(playerName, "chat");
+    return createWindow(chatName, "chat");
 end
 
 function CreateW2WWindow(chatName)
-    return createWindow(playerName, "w2w");
+    return createWindow(chatName, "w2w");
 end
 
 function DestroyWindow(playerNameOrObject)
@@ -1752,6 +1763,8 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
                         return _G.format(L["%s is Away From Keyboard: %s"], "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]", arg1);
                 elseif(event == "CHAT_MSG_DND") then
                         return _G.format(L["%s does not wish to be disturbed: %s"], "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]", arg1);
+                elseif(event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_OFFICER" or event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER") then
+                        return "[|Hplayer:"..arg2.."|h"..arg2.."|h]: "..arg1;
 		else
 			return "Unknown event received...";
 		end

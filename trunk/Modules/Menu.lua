@@ -95,7 +95,7 @@ local function createButton(parent)
         end);
     button:SetScript("OnUpdate", function(self, elapsed)
             if(self.win) then
-                if(self.win.online ~= nil and not self.win.online) then
+                if(self.win.online ~= nil and not self.win.online and self.win.type == "whisper") then
                     self.text:SetTextColor(.5, .5, .5);
                     self.status:SetTexture("Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\blipRed");
                     self.canFade = true;
@@ -192,6 +192,7 @@ local function createGroup(title, list, maxButtons, showNone)
                 button.text:SetJustifyH("LEFT");
                 button.shown = true;
                 maxWidth = _G.math.max(maxWidth, button:GetMinimumWidth());
+                self:Show();
             end
         end
         self.title:Show();
@@ -208,6 +209,7 @@ local function createGroup(title, list, maxButtons, showNone)
                 self.buttons[1].text:SetTextColor(.5, .5, .5);
             else
                 self.title:Hide();
+                self:Hide();
             end
         end
         self.width = maxWidth+18*2;
