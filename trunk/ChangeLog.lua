@@ -13,7 +13,7 @@ end
 
 -- ChangeLog Entries.
 -- ChangeLog Entries.
-addEntry("3.0.9", "03/??/2009", [[
+addEntry("3.0.9", "03/24/2009", [[
     *Windows no longer close when zoning or opening world map.
     +Added option to only activate expose while inside of an instance.
     +Added version to w2w tooltip.
