@@ -129,7 +129,7 @@ end
 
 
 local function tabOnUpdate(self, elapsed)
-    if(not self.dragFrame and self.dragging) then
+    if(IsShiftKeyDown() and not self.dragFrame and self.dragging) then
         return;
     end
     local dragFrame = self.dragFrame or self
@@ -243,7 +243,7 @@ local function createTabGroup()
             --detach window from tab group
             win.tabStrip:Detach(win);
             win:Show();
-            --win:ClearAllPoints();
+            win:ClearAllPoints();
             win:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0);
         end);
         tab.dragFrame:SetScript("OnDragStop", function(self)
@@ -252,12 +252,12 @@ local function createTabGroup()
             
             local win = self.draggedObject;
             win.isMoving = nil;
-            --win:ClearAllPoints();
+            win:ClearAllPoints();
             self.draggedObj = nil;
             self.parentWindow = nil;
             self.tabStrip = self.parentTab.tabStrip;
 
-            --win:ClearAllPoints();
+            win:ClearAllPoints();
             win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", win:GetLeft(), win:GetTop());
             
             -- account for win's helper frame.

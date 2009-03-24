@@ -2,6 +2,7 @@
 ..\FrameXML\UI.xsd">
 
     <Script file="WhisperEngine.lua"/>
+    <Script file="ChatEngine.lua"/>
     <Script file="MinimapIcon.lua"/>
     <Script file="URLHandler.lua"/>
     <Script file="Sounds.lua"/>
