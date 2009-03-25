@@ -791,25 +791,34 @@ local function instantiateWindow(obj)
     end
     
     obj.UpdateIcon = function(self)
-	local icon = self.widgets.class_icon;
-	local classTag = obj.class;
-        if(self.class == "") then
-		classTag = "blank"
-	else
-		if(constants.classes[self.class]) then
-			classTag = string.lower(constants.classes[self.class].tag);
-                        classTag = string.gsub(classTag, "f$", "");
-		else
-			classTag = "blank";
-		end
-	end
-	icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.class_icon[classTag]));
-        if(constants.classes[self.class]) then
-                self.classColor = constants.classes[self.class].color;
-                if(GetSelectedSkin().message_window.widgets.from.use_class_color) then
-                                self.widgets.from:SetTextColor(RGBHexToPercent(constants.classes[self.class].color));
+        local icon = self.widgets.class_icon;
+        if(self.type == "chat" and self.chatType) then
+                icon:SetTexture(GetSelectedSkin().message_window.widgets.class_icon.chatAlphaMask);
+                local color = _G.ChatTypeInfo[string.upper(self.chatType)];
+                icon:SetTexCoord(0,1,0,1);
+                icon:SetGradient("VERTICAL", color.r, color.g, color.b, color.r, color.g, color.b);
+        else
+                local classTag = obj.class;
+                icon:SetGradient("VERTICAL", 1, 1, 1, 1, 1, 1);
+                icon:SetTexture(GetSelectedSkin().message_window.widgets.class_icon.texture);
+                if(self.class == "") then
+                	classTag = "blank"
+                else
+                	if(constants.classes[self.class]) then
+                		classTag = string.lower(constants.classes[self.class].tag);
+                                classTag = string.gsub(classTag, "f$", "");
+                	else
+                		classTag = "blank";
+                	end
                 end
-	end
+                icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.class_icon[classTag]));
+                if(constants.classes[self.class]) then
+                        self.classColor = constants.classes[self.class].color;
+                        if(GetSelectedSkin().message_window.widgets.from.use_class_color) then
+                                        self.widgets.from:SetTextColor(RGBHexToPercent(constants.classes[self.class].color));
+                        end
+                end
+          end
     end
     
     obj.UpdateCharDetails = function(self)
