@@ -14,10 +14,14 @@ db_defaults.tabs.whispers = {
     friends = false,
     guild = false,
 };
+db_defaults.tabs.chat = {
+    enabled = false,
+};
 
 local Tabs = WIM.CreateModule("Tabs", true);
 
 local Whispers = windows.active.whisper;
+local Chats = windows.active.chat;
 
 
 
@@ -84,6 +88,25 @@ local function getAvailableWhisperGroup()
     end
 end
 
+-- get first chat related tab group found
+local function getAvailableChatGroup()
+    local ungrouped = nil;
+    for user, win in pairs(Chats) do
+        if(win.tabStrip) then
+            return win.tabStrip;
+        else
+            ungrouped = win;
+        end
+    end
+    if(ungrouped) then
+        local tabStrip = GetAvailableTabGroup();
+	tabStrip:Attach(ungrouped);
+        return tabStrip;
+    else
+        return nil;
+    end
+end
+
 function Tabs:OnWindowCreated(win)
     if(db.tabs.whispers.enabled and win.type == "whisper") then
         local group = nil;
@@ -102,6 +125,11 @@ function Tabs:OnWindowCreated(win)
             return;
         end
         group = getAvailableWhisperGroup();
+        if(group) then
+            group:Attach(win);
+        end
+    elseif(db.tabs.chat.enabled and win.type == "chat") then
+        local group = getAvailableChatGroup();
         if(group) then
             group:Attach(win);
         end

@@ -35,6 +35,7 @@ local function getChatWindow(ChatName, chatType)
         -- otherwise, create a new one.
         Windows[ChatName] = CreateChatWindow(ChatName);
         Windows[ChatName].chatType = chatType;
+        Windows[ChatName]:UpdateIcon();
         return Windows[ChatName];
     end
 end
@@ -246,10 +247,12 @@ local function loadChatOptions()
         return;
     end
     
+    local desc = L["WIM will manage this chat type within its own message windows."];
+    
     -- standard chat template
     local function createChatTemplate(chatName, moduleName)
         local f = options.CreateOptionsFrame();
-        f.sub = f:CreateSection(chatName);
+        f.sub = f:CreateSection(chatName, desc);
         f.sub.nextOffSetY = -10;
         f.sub:CreateCheckButton(L["Enable"], WIM.modules[moduleName], "enabled", nil, function(self, button) EnableModule(moduleName, self:GetChecked()); end);
         f.sub.nextOffSetY = -15;
@@ -276,11 +279,10 @@ local function loadChatOptions()
         return f;
     end
     
-    local desc = L["WIM will manage this chat type within its own message windows."];
-    RegisterOptionFrame(L["Chat"], _G.GUILD, createGuildChat, desc);
-    RegisterOptionFrame(L["Chat"], _G.GUILD_RANK1_DESC, createOfficerChat, desc);
-    RegisterOptionFrame(L["Chat"], _G.PARTY, createPartyChat, desc);
-    RegisterOptionFrame(L["Chat"], _G.RAID, createRaidChat, desc);
+    RegisterOptionFrame(L["Chat"], _G.GUILD, createGuildChat);
+    RegisterOptionFrame(L["Chat"], _G.GUILD_RANK1_DESC, createOfficerChat);
+    RegisterOptionFrame(L["Chat"], _G.PARTY, createPartyChat);
+    RegisterOptionFrame(L["Chat"], _G.RAID, createRaidChat);
     
     dPrint("Chat Options Initialized...");
     ChatOptions.optionsLoaded = true;

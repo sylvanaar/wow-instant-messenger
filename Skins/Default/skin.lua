@@ -66,6 +66,7 @@ local WIM_ClassicSkin = {
         widgets = {
             class_icon = {
                 texture = "Interface\\AddOns\\"..WIM.addonTocName.."\\skins\\default\\class_icons",
+                chatAlphaMask = "Interface\\AddOns\\"..WIM.addonTocName.."\\skins\\default\\chatAlphaMask",
                 width = 64,
                 height = 64,
                 points = {
