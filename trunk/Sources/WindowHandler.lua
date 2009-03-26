@@ -797,6 +797,9 @@ local function instantiateWindow(obj)
                 local color = _G.ChatTypeInfo[string.upper(self.chatType)];
                 icon:SetTexCoord(0,1,0,1);
                 icon:SetGradient("VERTICAL", color.r, color.g, color.b, color.r, color.g, color.b);
+                if(GetSelectedSkin().message_window.widgets.from.use_class_color) then
+                                self.widgets.from:SetTextColor(color.r, color.g, color.b);
+                end
         else
                 local classTag = obj.class;
                 icon:SetGradient("VERTICAL", 1, 1, 1, 1, 1, 1);
@@ -1762,8 +1765,8 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseDown", function(sel
 
 RegisterMessageFormatting(L["Default"], function(smf, event, ...)
 		local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
+                arg11 = arg11 or 0;
 		if(event == "CHAT_MSG_WHISPER") then
-			arg11 = arg11 or 0;
 			return "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]: "..arg1;
 		elseif(event == "CHAT_MSG_WHISPER_INFORM") then
                         arg11 = arg11 or 0;
@@ -1772,8 +1775,8 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
                         return _G.format(L["%s is Away From Keyboard: %s"], "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]", arg1);
                 elseif(event == "CHAT_MSG_DND") then
                         return _G.format(L["%s does not wish to be disturbed: %s"], "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]", arg1);
-                elseif(event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_OFFICER" or event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER") then
-                        return "[|Hplayer:"..arg2.."|h"..arg2.."|h]: "..arg1;
+                elseif(event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_OFFICER" or event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_SAY") then
+                        return "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]: "..arg1;
 		else
 			return "Unknown event received...";
 		end

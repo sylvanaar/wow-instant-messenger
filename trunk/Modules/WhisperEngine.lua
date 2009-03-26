@@ -201,7 +201,7 @@ function WhisperEngine:OnWindowShow(win)
 end
 
 local splitMessage, splitMessageLinks = {}, {};
-local function SendSplitMessage(theMsg, to)
+function SendSplitMessage(PRIORITY, HEADER, theMsg, CHANNEL, EXTRA, to)
         -- parse out links as to not split them incorrectly.
         theMsg, results = string.gsub(theMsg, "(|H[^|]+|h[^|]+|h)", function(theLink)
                 table.insert(splitMessageLinks, theLink);
@@ -222,7 +222,7 @@ local function SendSplitMessage(theMsg, to)
                                 local index = _G.tonumber(string.match(link, "(%d+)"));
                                 return splitMessageLinks[index] or link;
                         end);
-                        _G.ChatThrottleLib:SendChatMessage("ALERT", "WIM", chunk, "WHISPER", nil, to);
+                        _G.ChatThrottleLib:SendChatMessage(PRIORITY, HEADER, chunk, CHANNEL, EXTRA, to);
                         chunk = (splitMessage[i] or "").." ";
                 end
         end
@@ -243,10 +243,10 @@ RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
         local msgCount = math.ceil(string.len(msg)/255);
         if(msgCount == 1) then
             Windows[obj.theUser].msgSent = true;
-            _G.ChatThrottleLib:SendChatMessage("NORMAL", "WIM", msg, "WHISPER", nil, obj.theUser);
+            _G.ChatThrottleLib:SendChatMessage("ALERT", "WIM", msg, "WHISPER", nil, obj.theUser);
         elseif(msgCount > 1) then
             Windows[obj.theUser].msgSent = true;
-            SendSplitMessage(msg, obj.theUser);
+            SendSplitMessage("ALERT", "WIM", msg, "WHISPER", nil, obj.theUser);
         end
         self:SetText("");
     end);

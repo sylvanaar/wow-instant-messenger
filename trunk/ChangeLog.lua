@@ -4,15 +4,25 @@
 ]]
 local currentRevision = tonumber(("$Revision$"):match("(%d+)"));
 local log = {};
+local beta_log = {};
 local t_insert = table.insert;
 
 local function addEntry(version, rdate, description, transmitted)
     t_insert(log, {v = version, r = rdate, d = description, t=transmitted and true});
 end
 
+local function addBetaEntry(version, rdate, description, transmitted)
+    t_insert(log, {v = version, r = rdate, d = description, t=transmitted and true});
+end
 
 -- ChangeLog Entries.
--- ChangeLog Entries.
+addBetaEntry("3.0.10", "03/??/2009", [[
+    *Fixed some resizing issues.
+    *Fixed bug when seperating tabs.
+    *Fixed bug with W2W tooltip - version information.
+    *When sending messages, priorities are now set to ALERT in ChatThrottleLib.
+]]);
+
 addEntry("3.0.9", "03/24/2009", [[
     *Windows no longer close when zoning or opening world map.
     +Added option to only activate expose while inside of an instance.
@@ -235,6 +245,9 @@ local function createChangeLogWindow()
         local tmp = "";
         freshLoad = true;
         table.sort(log, logSort);
+        for i=1, #beta_log do
+            tmp = tmp..getEntryText(i);
+        end
         for i=1, #log do
             tmp = tmp..getEntryText(i);
         end
