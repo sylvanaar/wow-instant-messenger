@@ -72,9 +72,6 @@ local function getChatWindow(ChatName, chatType)
         Windows[ChatName].chatType = chatType;
         Windows[ChatName]:UpdateIcon();
         Windows[ChatName].widgets.chat_info:SetActive(true);
-        if((chatType == "guild" or chatType == "officer") and _G.IsInGuild()) then
-            _G.GuildRoster();
-        end
         return Windows[ChatName];
     end
 end
@@ -136,6 +133,7 @@ function Guild:OnWindowDestroyed(self)
         local chatName = self.theUser;
         Windows[chatName].chatType = nil;
         Windows[chatName].unreadCount = nil;
+        Windows[chatName].chatLoaded = nil;
         Windows[chatName] = nil;
         Guild.guildWindow = nil;
     end
@@ -166,6 +164,10 @@ function Guild:CHAT_MSG_GUILD(arg1, arg2, arg3, ...)
     local win = getChatWindow(_G.GUILD, "guild");
     local color = _G.ChatTypeInfo["GUILD"];
     self.guildWindow = win;
+    if(not self.chatLoaded) then
+        Guild:GUILD_ROSTER_UPDATE();
+    end
+    self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_GUILD", arg1, arg2, arg3, ...);
@@ -203,6 +205,7 @@ function Officer:OnWindowDestroyed(self)
         local chatName = self.theUser;
         Windows[chatName].chatType = nil;
         Windows[chatName].unreadCount = nil;
+        Windows[chatName].chatLoaded = nil;
         Windows[chatName] = nil;
         Officer.officerWin = nil;
     end
@@ -232,6 +235,10 @@ function Officer:CHAT_MSG_OFFICER(arg1, arg2, arg3, ...)
     local win = getChatWindow(_G.GUILD_RANK1_DESC, "officer");
     local color = _G.ChatTypeInfo["OFFICER"];
     Officer.officerWindow = win;
+    if(not self.chatLoaded) then
+        Officer:GUILD_ROSTER_UPDATE();
+    end
+    self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_OFFICER", arg1, arg2, arg3, ...);
@@ -268,6 +275,7 @@ function Party:OnWindowDestroyed(self)
         local chatName = self.theUser;
         Windows[chatName].chatType = nil;
         Windows[chatName].unreadCount = nil;
+        Windows[chatName].chatLoaded = nil;
         Windows[chatName] = nil;
         Party.partyWindow = nil;
     end
@@ -275,7 +283,13 @@ end
 
 function Party:PARTY_MEMBERS_CHANGED()
     if(Party.partyWindow) then
-    
+        local count = 0;
+        for i=1, 4 do
+            if(_G.GetPartyMember(i)) then
+                count = count + 1;
+            end
+        end
+        Party.partyWindow.widgets.chat_info:SetText(count + 1);
     end
 end
 
@@ -283,6 +297,10 @@ function Party:CHAT_MSG_PARTY(arg1, arg2, arg3, ...)
     local win = getChatWindow(_G.PARTY, "party");
     local color = _G.ChatTypeInfo["PARTY"];
     Party.partyWindow = win;
+    if(not self.chatLoaded) then
+        Party:PARTY_MEMBERS_CHANGED();
+    end
+    self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_PARTY", arg1, arg2, arg3, ...);
@@ -319,6 +337,7 @@ function Raid:OnWindowDestroyed(self)
         local chatName = self.theUser;
         Windows[chatName].chatType = nil;
         Windows[chatName].unreadCount = nil;
+        Windows[chatName].chatLoaded = nil;
         Windows[chatName] = nil;
     end
 end
@@ -326,6 +345,7 @@ end
 function Raid:CHAT_MSG_RAID(arg1, arg2, arg3, ...)
     local win = getChatWindow(_G.RAID, "raid");
     local color = _G.ChatTypeInfo["RAID"];
+    self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_RAID", arg1, arg2, arg3, ...);
@@ -334,6 +354,7 @@ end
 function Raid:CHAT_MSG_RAID_LEADER(arg1, arg2, arg3, ...)
     local win = getChatWindow(_G.RAID, "raid");
     local color = _G.ChatTypeInfo["RAID_LEADER"];
+    self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_RAID_LEADER", arg1, arg2, arg3, ...);
@@ -368,6 +389,7 @@ function Say:OnWindowDestroyed(self)
         local chatName = self.theUser;
         Windows[chatName].chatType = nil;
         Windows[chatName].unreadCount = nil;
+        Windows[chatName].chatLoaded = nil;
         Windows[chatName] = nil;
     end
 end
@@ -375,6 +397,7 @@ end
 function Say:CHAT_MSG_SAY(arg1, arg2, arg3, ...)
     local win = getChatWindow(_G.SAY, "say");
     local color = _G.ChatTypeInfo["SAY"];
+    self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_SAY", arg1, arg2, arg3, ...);
