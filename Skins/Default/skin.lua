@@ -144,6 +144,16 @@ local WIM_ClassicSkin = {
                     {"BOTTOMRIGHT", "class_icon", -14, 14}
                 }
             },
+            chat_info = {
+                NormalTexture = "", -- by default we don't want a texture, but your skin is welcome to have one.
+                PushedTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\w2w",
+                HighlightTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\w2w",
+                HighlightAlphaMode = "ADD",
+                points = {
+                    {"TOPLEFT", "class_icon", 14, -14},
+                    {"BOTTOMRIGHT", "class_icon", -14, 14}
+                }
+            },
             chatting = {
                 NormalTexture = "Interface\\GossipFrame\\PetitionGossipIcon",
                 PushedTexture = "Interface\\GossipFrame\\PetitionGossipIcon",
