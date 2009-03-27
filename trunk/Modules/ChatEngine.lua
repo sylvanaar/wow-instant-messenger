@@ -471,7 +471,6 @@ function Channel:OnEnable()
     end
     RegisterWidget("chat_info", createWidget_Chat);
     self:RegisterChatEvent("CHAT_MSG_CHANNEL");
-    self:RegisterChatEvent("CHAT_MSG_CHANNEL_LIST"); 
     self:RegisterChatEvent("CHAT_MSG_CHANNEL_JOIN");
     self:RegisterChatEvent("CHAT_MSG_CHANNEL_LEAVE");
     self:RegisterChatEvent("CHAT_MSG_CHANNEL_NOTICE");
@@ -480,7 +479,6 @@ end
 
 function Channel:OnDisable()
     self:UnregisterChatEvent("CHAT_MSG_CHANNEL");
-    self:UnregisterChatEvent("CHAT_MSG_CHANNEL_LIST");
     self:UnregisterChatEvent("CHAT_MSG_CHANNEL_JOIN");
     self:UnregisterChatEvent("CHAT_MSG_CHANNEL_LEAVE");
     self:UnregisterChatEvent("CHAT_MSG_CHANNEL_NOTICE");
@@ -500,22 +498,9 @@ function Channel:OnWindowDestroyed(self)
     end
 end
 
+
 Channel.waitingList = {};
-local function getChatList(win)
-    local id = win.channelIdentifier;
-    if(id) then
-        if(Channel.waitingList[id]) then
-            --if we haven't got a response back after 10 seconds, send again...
-            if(_G.time() - Channel.waitingList[id] > 10) then
-                Channel.waitingList[id] = _G.time();
-                _G.ListChannelByName(win.channelNumber);
-            end
-        else
-            Channel.waitingList[id] = _G.time();
-            _G.ListChannelByName(win.channelNumber);
-        end
-    end
-end
+--GetChannelRosterInfo(id, rosterIndex)
 
 local function loadChatList(win, ...)
     cleanChatList(win);
@@ -528,7 +513,7 @@ local function updateJoinLeave(event, ...)
     local arg1, who, arg3, channelIdentifier, arg5, arg6, arg7, channelNumber, arg9 = ...;
     for _, win in pairs(Windows) do
         if(win.channelIdentifier == channelIdentifier) then
-            getChatList(win);
+            win.widgets.chat_info:SetText(GetChannelCount(win.channelNumber));
             local color = _G.ChatTypeInfo["CHANNEL"..channelNumber];
             win:AddEventMessage(color.r, color.g, color.b, event, ...);
             return;
@@ -572,27 +557,9 @@ function Channel:CHAT_MSG_CHANNEL_NOTICE_USER(...)
     end
 end
 
-function Channel:CHAT_MSG_CHANNEL_LIST_CONTROLLER(eventController, arg1, arg2, arg3, arg4)
-    if(self.waitingList[arg4]) then
-        eventController:BlockFromChatFrame();
-        self.waitingList[arg4] = nil;
-    end
-end
-
-function Channel:CHAT_MSG_CHANNEL_LIST(arg1, arg2, arg3, arg4)
-    if(arg4 and arg4 ~= "") then
-        --first check if we are handling this channel
-        for _, win in pairs(Windows) do
-            if(win.channelIdentifier == arg4) then
-                    -- process the data for this channel
-                    loadChatList(win, string.split("%,", arg1));
-                    win.widgets.chat_info:SetText(#win.chatList);
-                    if(win.channelSpecial) then
-                        win.channelSpecial = _G.time();
-                    end
-                return;
-            end
-        end
+function Channel:OnWindowShow(win)
+    if(win.type == "chat" and win.chatType == "channel") then
+        win.widgets.chat_info:SetText(GetChannelCount(win.channelNumber));
     end
 end
 
@@ -612,9 +579,7 @@ function Channel:CHAT_MSG_CHANNEL(arg1, arg2, arg3, ...)
     end
     win.channelNumber = arg8;
     win.channelIdentifier = arg4;
-    if(not win.chatLoaded or arg1 == "") then
-        getChatList(win);
-    end
+    win.widgets.chat_info:SetText(GetChannelCount(win.channelNumber));
     self.chatLoaded = true;
     if(arg1 and _G.strlen(arg1) > 0) then
         arg3 = CleanLanguageArg(arg3);
@@ -694,3 +659,12 @@ function CleanLanguageArg(arg)
     end
 end
 
+function GetChannelCount(id)
+    for i=1, 20 do
+        local name, header, collapsed, channelNumber, count, active, category, voiceEnabled, voiceActive = _G.GetChannelDisplayInfo(i);
+        if(id == channelNumber) then
+            return count;
+        end
+    end
+    return 0;
+end
