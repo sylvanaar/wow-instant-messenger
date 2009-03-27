@@ -1775,9 +1775,26 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
                         return _G.format(L["%s is Away From Keyboard: %s"], "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]", arg1);
                 elseif(event == "CHAT_MSG_DND") then
                         return _G.format(L["%s does not wish to be disturbed: %s"], "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]", arg1);
-                elseif(event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_OFFICER" or event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_SAY") then
+                elseif(event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_OFFICER" or event == "CHAT_MSG_PARTY" or
+                                event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_SAY" or
+                                event == "CHAT_MSG_CHANNEL") then
                         return "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]: "..arg1;
-		else
+                elseif(event == "CHAT_MSG_CHANNEL_JOIN") then
+                        return string.format(_G.CHAT_CHANNEL_JOIN_GET, arg2);
+                elseif(event == "CHAT_MSG_CHANNEL_LEAVE") then
+                        return string.format(_G.CHAT_CHANNEL_LEAVE_GET, arg2);
+                elseif(event == "CHAT_MSG_CHANNEL_NOTICE_USER") then
+                        if(_G.strlen(arg5) > 0) then
+				-- TWO users in this notice (E.G. x kicked y)
+				return _G.format(_G["CHAT_"..arg1.."_NOTICE"], arg8, arg4, arg2, arg5);
+			elseif ( arg1 == "INVITE" ) then
+				return _G.format(_G["CHAT_"..arg1.."_NOTICE"], arg4, arg2);
+			else
+				return _G.format(_G["CHAT_"..arg1.."_NOTICE"], arg8, arg4, arg2);
+			end
+		elseif(event == "CHAT_MSG_CHANNEL_NOTICE") then
+                        return _G.format(_G["CHAT_"..arg1.."_NOTICE"], arg8, arg4);
+                else
 			return "Unknown event received...";
 		end
 	end);
@@ -1788,7 +1805,7 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
 local escapeFrame = CreateFrame("Frame", "WIM_SpecialWindowMonitor")
 table.insert(_G.UISpecialFrames, "WIM_SpecialWindowMonitor");
 escapeFrame.Hide = function(self)
-                if(WindowParent.animUp or not db.escapeToHide) then
+                if(WindowParent.animUp or not (db and db.escapeToHide)) then
                                 return nil; -- don't close windows if WindowParent is in use.
                 end
                 -- lets do some checks first shall we?
@@ -1808,7 +1825,7 @@ escapeFrame.Hide = function(self)
                 end
 end
 escapeFrame.IsShown = function(self)
-                if(WindowParent.animUp or not db.escapeToHide) then
+                if(WindowParent.animUp or not (db and db.escapeToHide)) then
                                 return nil; -- don't close windows if WindowParent is in use.
                 end
                 for i=1, #WindowSoupBowl.windows do
