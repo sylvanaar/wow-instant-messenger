@@ -32,12 +32,12 @@ function Expose:OnStateChange(state, combatFlag)
         end
         if(combatFlag) then
             --entered combat
-            HideContainer(db.winAnimation);
+            HideContainer(db and db.winAnimation);
             inCombat = true;
             DisplayTutorial(L["Expose"].."?!", L["Your conversations have been hidden in order to clear your screen while in combat. To disable this feature type"].." |cff69ccf0/wim|r");
         elseif(inCombat) then
             --left combat
-            ShowContainer(db.winAnimation);
+            ShowContainer(db and db.winAnimation);
         end
     end
 end
