@@ -16,7 +16,7 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addBetaEntry("3.0.10", "03/??/2009", [[
+addBetaEntry("3.0.10", "04/??/2009", [[
     *Fixed some resizing issues.
     *Fixed bug when seperating tabs.
     *Fixed bug with W2W tooltip - version information.
