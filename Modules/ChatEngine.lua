@@ -1,25 +1,30 @@
 -- imports
 local WIM = WIM;
 local _G = _G;
-local CreateFrame = CreateFrame;
 local hooksecurefunc = hooksecurefunc;
 local table = table;
 local pairs = pairs;
-local strupper = strupper;
-local gsub = gsub;
-local strlen = strlen;
-local strsub = strsub;
 local string = string;
-local IsShiftKeyDown = IsShiftKeyDown;
 local select = select;
-local unpack = unpack;
 local math = math;
-local time = time;
 
 -- set name space
 setfenv(1, WIM);
 
 local Windows = windows.active.chat;
+
+db_defaults.chat = {
+    world = {
+        enabled = false,
+    },
+    custom = {
+        enabled = false,
+    },
+    channelSettings = {
+        
+    }
+};
+
 
 local function createWidget_Chat()
     local button = _G.CreateFrame("Button");
@@ -542,6 +547,7 @@ function Channel:CHAT_MSG_CHANNEL_NOTICE(...)
     end
     -- create new window if arg1 is YOU_JOINED
     if(arg1 == "YOU_JOINED") then
+        -- open window.
         Channel:CHAT_MSG_CHANNEL("", "", nil, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
     end
 end
@@ -568,7 +574,16 @@ function Channel:CHAT_MSG_CHANNEL(arg1, arg2, arg3, ...)
     -- arg7 Generic Channels (1 for General, 2 for Trade, 22 for LocalDefense, 23 for WorldDefense and 26 for LFG)
     -- arg8 Channel Number
     -- arg9 Channel Name
+    local isWorld = arg7 and arg7 > 0;
     local channelName = string.split(" - ", arg9);
+    --check options. do we want the specified channels.
+    if(isWorld and not db.chat.world.enabled) then
+        return;
+    elseif(not isWorld and not db.chat.custom.enabled) then
+        return;
+    elseif(not db.chat.channelSettings[channelName] or not db.chat.channelSettings[channelName].monitor) then
+        return;
+    end
     local win = getChatWindow(channelName, "channel");
     local color = _G.ChatTypeInfo["CHANNEL"..arg8];
     if(arg7 == 1 or arg7 == 2 or arg7 == 22 or arg7 == 23 or arg7 == 26) then
@@ -585,6 +600,14 @@ function Channel:CHAT_MSG_CHANNEL(arg1, arg2, arg3, ...)
         arg3 = CleanLanguageArg(arg3);
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
         win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_CHANNEL", arg1, arg2, arg3, ...);
+    end
+end
+
+function Channel:SettingsChanged()
+    if(db.chat.world.enabled or db.chat.world.enabled) then
+        self:Enable();
+    else
+        self:Disable();
     end
 end
 
@@ -608,6 +631,128 @@ local function loadChatOptions()
         f.sub.nextOffSetY = -10;
         f.sub:CreateCheckButton(L["Enable"], WIM.modules[moduleName], "enabled", nil, function(self, button) EnableModule(moduleName, self:GetChecked()); end);
         f.sub.nextOffSetY = -15;
+        return f;
+    end
+    
+    local channelList = {};
+    local function getChannelList(world)
+        --clear list
+        for k, _ in pairs (channelList) do
+            channelList[k] = nil;
+        end
+        for i=1, 20 do
+            local name, header, collapsed, channelNumber, count, active, category, voiceEnabled, voiceActive = _G.GetChannelDisplayInfo(i);
+            if((world and category == "CHANNEL_CATEGORY_WORLD") or (not world and category == "CHANNEL_CATEGORY_CUSTOM")) then
+                table.insert(channelList, name.."*"..(active and "1" or "0").."*"..(channelNumber or "0"));
+            end
+        end
+        return channelList;
+    end
+    
+    
+    local channelScrollCount = 1;
+    local function createChannelChatTemplate(chatName, channelType, channelListFun)
+        local f = options.CreateOptionsFrame();
+        f.sub = f:CreateSection(chatName, desc);
+        f.sub.nextOffSetY = -10;
+        f.sub.enabled = f.sub:CreateCheckButton(L["Enable"], db.chat[channelType], "enabled", nil, function(self, button) Channel:SettingsChanged(); end);
+        f.sub.nextOffSetY = -20;
+        
+        --list
+        f.sub.list = f.sub:ImportCustomObject(_G.CreateFrame("Frame"));
+        options.AddFramedBackdrop(f.sub.list);
+        f.sub.list:SetFullSize();
+        f.sub.list:SetHeight(5 * 18);
+        f.sub.list.scroll = _G.CreateFrame("ScrollFrame", f.sub:GetName().."ChannelScroll"..channelScrollCount, f.sub.list, "FauxScrollFrameTemplate");
+        channelScrollCount = channelScrollCount + 1;
+        f.sub.list.scroll:SetPoint("TOPLEFT", 0, -1);
+        f.sub.list.scroll:SetPoint("BOTTOMRIGHT", -23, 0);
+        f.sub.list.scroll.update = function(self)
+            local channelList = channelListFun();
+            local offset = _G.FauxScrollFrame_GetOffset(self);
+            for i=1, #f.sub.list.buttons do
+                local index = i+offset;
+                if(index <= #channelList) then
+                    local name, active, channelNumber = string.split("*", channelList[index]);
+                    active = active == "1";
+                    f.sub.list.buttons[i]:Show();
+                    f.sub.list.buttons[i].channelName = name;
+                    f.sub.list.buttons[i].title:SetText("|cffffffff"..channelNumber..". |r"..name);
+                    f.sub.list.buttons[i].cb1:SetChecked(db.chat.channelSettings[name] and db.chat.channelSettings[name].monitor);
+                    local color = _G.ChatTypeInfo["CHANNEL"..channelNumber];
+                    f.sub.list.buttons[i].title:SetTextColor(color.r, color.g, color.b);
+                    if(active) then
+                        f.sub.list.buttons[i].title:SetAlpha(1);
+                    else
+                        f.sub.list.buttons[i].title:SetAlpha(.4);
+                    end
+                else
+                    f.sub.list.buttons[i]:Hide();
+                end
+            end
+            _G.FauxScrollFrame_Update(self, #channelList, #f.sub.list.buttons, 18);
+        end
+        f.sub.list.scroll:SetScript("OnVerticalScroll", function(self, offset)
+            _G.FauxScrollFrame_OnVerticalScroll(self, offset, 18, f.sub.list.scroll.update);
+        end);
+        f.sub.list:SetScript("OnShow", function(self)
+            self.scroll:update();
+        end);
+        f.sub.list.createButton = function(self)
+            self.buttons = self.buttons or {};
+            local button = _G.CreateFrame("Button", nil, self);
+            button:SetHeight(18);
+            button:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestTitleHighlight", "ADD");
+            button.title = button:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+            button.title:SetPoint("TOPLEFT", 30, 0);
+            button.title:SetPoint("BOTTOMRIGHT");
+            button.title:SetJustifyH("LEFT")
+            local font, height, flags = button.title:GetFont();
+            button.title:SetFont(font, 14, flags);
+            button.title:SetTextColor(_G.GameFontNormal:GetTextColor());
+            button.title:SetText("Test");
+            button.cb1 = _G.CreateFrame("CheckButton", nil, button, "UICheckButtonTemplate");
+            button.cb1:SetPoint("LEFT");
+            button.cb1:SetScale(.65);
+            button.cb1:SetScript("OnEnter", function(self)
+                self:GetParent():GetParent().help:SetJustifyH("LEFT");
+                self:GetParent():GetParent().help:SetText(L["Have WIM monitor this channel."]);
+                self:GetParent():LockHighlight();
+            end);
+            button.cb1:SetScript("OnLeave", function(self)
+                self:GetParent():GetParent().help:SetText("");
+                self:GetParent():UnlockHighlight();
+            end);
+            button.cb1:SetScript("OnClick", function(self)
+                local name = self:GetParent().channelName;
+                if(not db.chat.channelSettings[name]) then
+                    db.chat.channelSettings[name] = {};
+                end
+                db.chat.channelSettings[name].monitor = self:GetChecked();
+            end);
+            
+            if(#self.buttons == 0) then
+                button:SetPoint("TOPLEFT");
+                button:SetPoint("TOPRIGHT", -25, 0);
+            else
+                button:SetPoint("TOPLEFT", self.buttons[#self.buttons], "BOTTOMLEFT");
+                button:SetPoint("TOPRIGHT", self.buttons[#self.buttons], "BOTTOMRIGHT");
+            end
+            
+            table.insert(self.buttons, button);
+        end
+        for i=1, 5 do
+            f.sub.list:createButton();
+        end
+        f.sub.list.help = f.sub.list:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+        f.sub.list.help:SetPoint("TOPLEFT", f.sub.list, "BOTTOMLEFT", 0, 0);
+        f.sub.list.help:SetPoint("BOTTOMRIGHT", f.sub.list, "BOTTOMRIGHT", 0, -12);
+        f.sub.list.help:SetText("");
+        f.sub.list.help:SetJustifyH("LEFT");
+        local font, height, flags = f.sub.list.help:GetFont();
+        f.sub.list.help:SetFont(font, 12, flags);
+        
+        
         return f;
     end
     
@@ -636,11 +781,23 @@ local function loadChatOptions()
         return f;
     end
     
+    local function createWorldChat()
+        local f = createChannelChatTemplate(L["World Chat"], "world", function() return getChannelList(true); end);
+        return f;
+    end
+    
+    local function createCustomChat()
+        local f = createChannelChatTemplate(L["Custom Chat"], "custom", getChannelList);
+        return f;
+    end
+    
     RegisterOptionFrame(L["Chat"], _G.GUILD, createGuildChat);
     RegisterOptionFrame(L["Chat"], _G.GUILD_RANK1_DESC, createOfficerChat);
     RegisterOptionFrame(L["Chat"], _G.PARTY, createPartyChat);
     RegisterOptionFrame(L["Chat"], _G.RAID, createRaidChat);
     RegisterOptionFrame(L["Chat"], _G.SAY, createSayChat);
+    RegisterOptionFrame(L["Chat"], L["World Chat"], createWorldChat);
+    RegisterOptionFrame(L["Chat"], L["Custom Chat"], createCustomChat);
     
     dPrint("Chat Options Initialized...");
     ChatOptions.optionsLoaded = true;
