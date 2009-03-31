@@ -130,6 +130,93 @@ local function createPopRuleFrame(winType)
     frame.main.alwaysOther = frame.main:CreateCheckButton(L["Use the same rules for all states."], db.pop_rules[frame.type], "alwaysOther", nil, function(self)
             if(self:GetChecked()) then
                 frame.main.selectedState = "other";
+                frame.main.tabs.buttons[#frame.main.tabs.buttons]:Click();
+                for i=1, #frame.main.tabs.buttons-1 do
+                    frame.main.tabs.buttons[i]:Hide();
+                end
+            else
+                for i=1, #frame.main.tabs.buttons-1 do
+                    frame.main.tabs.buttons[i]:Show();
+                end
+            end
+        end);
+    frame.main.nextOffSetY = -40;
+    frame.main.selectedState = "other";
+
+    frame.main.options = frame.main:CreateSection();
+    options.AddFramedBackdrop(frame.main.options);
+    frame.main.options.getDBTree = function() return db.pop_rules[frame.type][frame.main.selectedState]; end;
+    frame.main.options:CreateCheckButton(L["Pop-Up window when message is sent."], frame.main.options.getDBTree, "onSend");
+    frame.main.options:CreateCheckButton(L["Pop-Up window when message is received."], frame.main.options.getDBTree, "onReceive");
+    frame.main.options:CreateCheckButton(L["Auto focus a window when it is shown."], frame.main.options.getDBTree, "autofocus");
+    frame.main.options:CreateCheckButton(L["Keep focus on window after sending a message."], frame.main.options.getDBTree, "keepfocus");
+    frame.main.options:CreateCheckButton(L["Suppress messages from the default chat frame."], frame.main.options.getDBTree, "supress");
+    
+    frame.main.tabs = CreateFrame("Frame", nil, frame.main);
+    frame.main.tabs:SetPoint("BOTTOMLEFT", frame.main.options, "TOPLEFT", 0, 1);
+    frame.main.tabs:SetPoint("BOTTOMRIGHT", frame.main.options, "TOPRIGHT", 1 , 1);
+    frame.main.tabs:SetHeight(20);
+    frame.main.tabs.buttons = {};
+    local function createButton(tg)
+            local state = states[#tg.buttons+1];
+            local button = CreateFrame("Button", nil, tg);
+            button.text = button:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+            button.text:SetAllPoints();
+            button.text:SetText(_G[_G.string.upper(state)] or L["state_resting"]);
+            button.state = state;
+            if(#tg.buttons == 0) then
+                button:SetPoint("BOTTOMLEFT");
+            else
+                button:SetPoint("BOTTOMLEFT", tg.buttons[#tg.buttons], "BOTTOMRIGHT", 2, 0);
+            end
+            button:SetHeight(tg:GetHeight());
+            button:SetWidth(55);
+            button.bg = button:CreateTexture(nil, "BACKGROUND");
+            button.bg:SetAllPoints();
+            button.bg:SetTexture(1,1,1,.25);
+            button:SetScript("OnClick", function(self)
+                    frame.main.selectedState = self.state;
+                    frame.main.options:Hide();
+                    frame.main.options:Show();
+                    for _,button in pairs(frame.main.tabs.buttons) do
+                        if(self.state == button.state) then
+                            button:SetAlpha(1);
+                        else
+                            button:SetAlpha(.35);
+                        end
+                    end
+            end);
+            table.insert(tg.buttons, button);
+            if(#tg.buttons == #states) then
+                button:Click();
+            end
+    end
+    for i=1,#states do
+        createButton(frame.main.tabs);
+    end    
+    
+    
+    frame:SetScript("OnShow", function(self)
+            if(self.main.alwaysOther:GetChecked()) then
+                --self.main.stateList:Hide();
+            else
+                --self.main.stateList:Show();
+            end
+        end);
+    
+    return frame;
+end
+
+local function createPopRuleFrame_OLD(winType)
+    local frame = options.CreateOptionsFrame();
+    frame.type = winType;
+    frame.main = frame:CreateSection(L["Window Behavior"], L["You can control how windows behave while you are in different situations."]);
+    frame.main.nextOffSetY = -20;
+    frame.main.intercept = frame.main:CreateCheckButton(L["Intercept Slash Commands"], db.pop_rules[frame.type], "intercept");
+    frame.main.nextOffSetY = -20;
+    frame.main.alwaysOther = frame.main:CreateCheckButton(L["Use the same rules for all states."], db.pop_rules[frame.type], "alwaysOther", nil, function(self)
+            if(self:GetChecked()) then
+                frame.main.selectedState = "other";
                 frame:Hide();
                 frame:Show();
             else
@@ -773,7 +860,9 @@ local function General_Expose()
     return frame;
 end
 
-
+local function ChatPopRules()
+    return createPopRuleFrame("chat");
+end
 
 RegisterOptionFrame(L["General"], L["Main"], General_Main);
 RegisterOptionFrame(L["General"], L["Window Settings"], General_WindowSettings);
@@ -788,6 +877,9 @@ RegisterOptionFrame(L["General"], L["Expose"], General_Expose);
 RegisterOptionFrame(L["Whispers"], L["Display Settings"], Whispers_DisplaySettings);
 RegisterOptionFrame(L["Whispers"], L["Window Behavior"], WhisperPopRules);
 RegisterOptionFrame(L["Whispers"], L["Filtering"], Whispers_Filters);
+
+RegisterOptionFrame(L["Chat"], L["Window Behavior"], ChatPopRules);
+RegisterOptionFrame(L["Chat"]); -- breaker
 
 RegisterOptionFrame("WIM-2-WIM", L["General"], W2W_Main);
 RegisterOptionFrame("WIM-2-WIM", L["Privacy"], W2W_Privacy);

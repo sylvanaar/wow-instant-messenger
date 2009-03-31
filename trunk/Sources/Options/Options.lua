@@ -260,6 +260,11 @@ function options.UpdateSubCategories(self)
             self.buttons[i].subIndex = i;
             self.buttons[i].text:SetText(self.category[i].title);
             self.buttons[i]:Show();
+            if(self.category[i].frame) then
+                self.buttons[i]:Enable();
+            else
+                self.buttons[i]:Disable();
+            end
             if(i == subCategorySelected) then
                 self.buttons[i]:LockHighlight();
                 self.buttons[i]:Click();

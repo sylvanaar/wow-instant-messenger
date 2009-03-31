@@ -22,6 +22,7 @@ addBetaEntry("3.0.10", "03/??/2009", [[
     *Fixed bug with W2W tooltip - version information.
     *When sending messages, priorities are now set to ALERT in ChatThrottleLib.
     *Fixed db indexing errors occurring on load.
+    *Revised the UI for Window Behaviors.
 ]]);
 
 addEntry("3.0.9", "03/24/2009", [[
