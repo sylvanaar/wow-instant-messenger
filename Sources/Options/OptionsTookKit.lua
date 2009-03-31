@@ -377,9 +377,9 @@ local function CreateSection(parent, title, desc)
         frame.description:SetJustifyH("LEFT");
         frame.description:SetJustifyV("TOP");
         frame:SetScript("OnUpdate", function(self, elapsed)
-                if(frame:GetWidth() < frame.description:GetStringWidth()) then
-                    frame.description:SetHeight(frame.description:GetStringWidth()/parent:GetWidth()*(frame.description:GetStringHeight()+
-                                    frame.description:GetSpacing()) + (frame.description:GetStringHeight()+frame.description:GetSpacing()));
+                if(frame:GetWidth() < self.description:GetStringWidth()) then
+                    self.description:SetHeight(self.description:GetStringWidth()/parent:GetWidth()*(self.description:GetStringHeight()+
+                                    self.description:GetSpacing()) + (self.description:GetStringHeight()+self.description:GetSpacing()));
                 end
                 frame:Hide();
                 frame:Show();
