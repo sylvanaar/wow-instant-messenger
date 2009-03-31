@@ -131,16 +131,11 @@ local function createPopRuleFrame(winType)
             if(self:GetChecked()) then
                 frame.main.selectedState = "other";
                 frame.main.tabs.buttons[#frame.main.tabs.buttons]:Click();
-                for i=1, #frame.main.tabs.buttons-1 do
-                    frame.main.tabs.buttons[i]:Hide();
-                end
-            else
-                for i=1, #frame.main.tabs.buttons-1 do
-                    frame.main.tabs.buttons[i]:Show();
-                end
             end
+            frame:Hide();
+            frame:Show();
         end);
-    frame.main.nextOffSetY = -40;
+    frame.main.nextOffSetY = -80;
     frame.main.selectedState = "other";
 
     frame.main.options = frame.main:CreateSection();
@@ -156,6 +151,9 @@ local function createPopRuleFrame(winType)
     frame.main.tabs:SetPoint("BOTTOMLEFT", frame.main.options, "TOPLEFT", 0, 1);
     frame.main.tabs:SetPoint("BOTTOMRIGHT", frame.main.options, "TOPRIGHT", 1 , 1);
     frame.main.tabs:SetHeight(20);
+    frame.main.tabs.title = frame.main.tabs:CreateFontString(nil, "OVERLAY", "GameFontNormal");
+    frame.main.tabs.title:SetPoint("BOTTOMLEFT", frame.main.tabs, "TOPLEFT", 0, 10);
+    frame.main.tabs.title:SetText(L["Behaviors per current state"]..":");
     frame.main.tabs.buttons = {};
     local function createButton(tg)
             local state = states[#tg.buttons+1];
@@ -198,62 +196,15 @@ local function createPopRuleFrame(winType)
     
     frame:SetScript("OnShow", function(self)
             if(self.main.alwaysOther:GetChecked()) then
-                --self.main.stateList:Hide();
+                for i=1, #frame.main.tabs.buttons-1 do
+                    frame.main.tabs.buttons[i]:Hide();
+                end
+                frame.main.tabs.title:Hide();
             else
-                --self.main.stateList:Show();
-            end
-        end);
-    
-    return frame;
-end
-
-local function createPopRuleFrame_OLD(winType)
-    local frame = options.CreateOptionsFrame();
-    frame.type = winType;
-    frame.main = frame:CreateSection(L["Window Behavior"], L["You can control how windows behave while you are in different situations."]);
-    frame.main.nextOffSetY = -20;
-    frame.main.intercept = frame.main:CreateCheckButton(L["Intercept Slash Commands"], db.pop_rules[frame.type], "intercept");
-    frame.main.nextOffSetY = -20;
-    frame.main.alwaysOther = frame.main:CreateCheckButton(L["Use the same rules for all states."], db.pop_rules[frame.type], "alwaysOther", nil, function(self)
-            if(self:GetChecked()) then
-                frame.main.selectedState = "other";
-                frame:Hide();
-                frame:Show();
-            else
-                frame:Hide();
-                frame:Show();
-            end
-        end);
-    frame.main.nextOffSetY = -20;
-    frame.main.selectedState = "other";
-    local itemList = {};
-    for i=1, #states do
-        table.insert(itemList, {
-            text = L["Behaviors for state:"].." "..L["state_"..states[i]],
-            value = states[i],
-            justifyH = "LEFT",
-            func = function(self)
-                frame.main.selectedState = self.value;
-                frame.main.options:Hide();
-                frame.main.options:Show();
-            end,
-        });
-    end
-    frame.main.stateList = frame.main:CreateDropDownMenu(frame.main, "selectedState", itemList, 300);
-    frame.main.options = frame.main:CreateSection();
-    options.AddFramedBackdrop(frame.main.options);
-    frame.main.options.getDBTree = function() return db.pop_rules[frame.type][frame.main.selectedState]; end;
-    frame.main.options:CreateCheckButton(L["Pop-Up window when message is sent."], frame.main.options.getDBTree, "onSend");
-    frame.main.options:CreateCheckButton(L["Pop-Up window when message is received."], frame.main.options.getDBTree, "onReceive");
-    frame.main.options:CreateCheckButton(L["Auto focus a window when it is shown."], frame.main.options.getDBTree, "autofocus");
-    frame.main.options:CreateCheckButton(L["Keep focus on window after sending a message."], frame.main.options.getDBTree, "keepfocus");
-    frame.main.options:CreateCheckButton(L["Suppress messages from the default chat frame."], frame.main.options.getDBTree, "supress");
-    
-    frame:SetScript("OnShow", function(self)
-            if(self.main.alwaysOther:GetChecked()) then
-                self.main.stateList:Hide();
-            else
-                self.main.stateList:Show();
+                for i=1, #frame.main.tabs.buttons-1 do
+                    frame.main.tabs.buttons[i]:Show();
+                end
+                frame.main.tabs.title:Show();
             end
         end);
     

@@ -937,7 +937,7 @@ local function instantiateWindow(obj)
 				self:Show();
                                 setWindowAsFadedIn(self);
 			end
-                        if(self:IsVisible() and not _G.ChatFrameEditBox:wimIsVisible() and not EditBoxInFocus and rules.autofocus and msgDirection == "in") then
+                        if(self:IsVisible() and not _G.ChatFrameEditBox:wimIsVisible() and not EditBoxInFocus and rules.autofocus) then
                                 self.widgets.msg_box:SetFocus();
                         end
 		end
