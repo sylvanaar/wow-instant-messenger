@@ -13,8 +13,8 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.0.10";
-beta = false; -- flags current version as beta.
+version = "3.0.11";
+beta = true; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight (we'll keep this around for now...)
@@ -350,10 +350,12 @@ function WIM:VARIABLES_LOADED()
     _G.WIM3_Cache = _G.WIM3_Cache or {};
     env.cache = _G.WIM3_Cache;
     _G.WIM3_Filters = _G.WIM3_Filters or GetDefaultFilters();
+    _G.WIM3_ChatFilters = _G.WIM3_ChatFilters or {};
     if(#_G.WIM3_Filters == 0) then
         _G.WIM3_Filters = GetDefaultFilters();
     end
     filters = _G.WIM3_Filters;
+    chatFilters = _G.WIM3_ChatFilters;
     
     _G.WIM3_History = _G.WIM3_History or {};
     history = _G.WIM3_History;

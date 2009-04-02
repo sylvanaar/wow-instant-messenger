@@ -18,10 +18,14 @@ db_defaults.sounds = {
         friend_sml = "IM",
         guild = false,
         guild_sml = "IM"
+    },
+    chat = {
+        msgin = true,
+        msgin_sml = "IM",
+        msgout = false,
+        msgout_sml = "IM",
     }
 };
-
-local Sounds = CreateModule("Sounds", true);
 
 local function playSound(smlKey)
     local path = SML:Fetch(SOUND, smlKey);
@@ -30,6 +34,8 @@ local function playSound(smlKey)
     end
 end
 
+--Whisper Sounds
+local Sounds = CreateModule("Sounds", true);
 
 -- Sound events
 function Sounds:PostEvent_Whisper(...)
@@ -52,6 +58,49 @@ function Sounds:PostEvent_WhisperInform(...)
 end
 
 
+--Chat Sounds
+local ChatSounds = CreateModule("ChatSounds", true);
+
+-- Sound events
+function ChatSounds:PostEvent_ChatMessage(event, ...)
+    local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9 = ...;
+    local isWorld = arg7 and arg7 > 0;
+    if(arg2 == _G.UnitName("player")) then
+        --message sent
+        if(db and db.sounds.chat.msgout) then
+            playSound(db.sounds.chat.msgout_sml);
+        end
+    else
+        --message received.
+        if(db and db.sounds.chat.msgin) then
+            local d = db.sounds.chat;
+            if(d.guild and event == "CHAT_MSG_GUILD") then
+                playSound(db.sounds.chat.guild_sml);
+            elseif(d.officer and event == "CHAT_MSG_OFFICER") then
+                playSound(db.sounds.chat.officer_sml);
+            elseif(d.party and event == "CHAT_MSG_PARTY") then
+                playSound(db.sounds.chat.party_sml);
+            elseif(d.raidleader and event == "CHAT_MSG_RAID_LEADER") then
+                playSound(db.sounds.chat.raidleader_sml);
+            elseif(d.raid and (event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER")) then
+                playSound(db.sounds.chat.raid_sml);
+            elseif(d.say and event == "CHAT_MSG_SAY") then
+                playSound(db.sounds.chat.say_sml);
+            elseif(d.world and event == "CHAT_MSG_CHANNEL" and isWorld) then
+                playSound(db.sounds.chat.world_sml);
+            elseif(d.custom and event == "CHAT_MSG_CHANNEL") then
+                playSound(db.sounds.chat.custom_sml);
+            else
+                -- default sound
+                playSound(db.sounds.chat.msgin_sml);
+            end
+        end
+    end
+end
+
+
+
+
 
 -- import WIM's stock sounds into LibSharedMedia-3.0
 SML:Register(SOUND, "IM", "Interface\\AddOns\\"..addonTocName.."\\Sounds\\wisp.wav");
@@ -67,3 +116,5 @@ end
 -- This is a core module and must always be loaded...
 Sounds.canDisable = false;
 Sounds:Enable();
+ChatSounds.canDisable = false;
+ChatSounds:Enable();
