@@ -16,13 +16,15 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addBetaEntry("3.0.10", "04/??/2009", [[
+addEntry("3.0.10", "04/02/2009", [[
     *Fixed some resizing issues.
     *Fixed bug when seperating tabs.
     *Fixed bug with W2W tooltip - version information.
     *When sending messages, priorities are now set to ALERT in ChatThrottleLib.
     *Fixed db indexing errors occurring on load.
     *Revised the UI for Window Behaviors.
+    *Updated isPrivateServer check to account for battle.net accounts.
+    -Removed April Fools Joke.
 ]]);
 
 addEntry("3.0.9", "03/24/2009", [[
