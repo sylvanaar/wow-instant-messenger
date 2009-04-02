@@ -438,10 +438,6 @@ local WIM_ClassicSkin_Yellow = {
     }
 };
 
--- preprocessing - :-)
-if(WIM.aprilFools) then
-    WIM_ClassicSkin.message_window.widgets.class_icon.texture = WIM_ClassicSkin.message_window.widgets.class_icon.texture .. "2";
-end
 
 ----------------------------------------------------------
 --                  Register Skin                       --

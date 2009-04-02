@@ -13,7 +13,7 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.0.9";
+version = "3.0.10";
 beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
@@ -21,7 +21,9 @@ debug = false; -- turn debugging on and off.
 isPTR = select(4, _G.GetBuildInfo()) >= 30100;
 
 -- is Private Server?
-isPrivateServer = not string.match(_G.GetCVar("realmList"), "worldofwarcraft.com$") and true or false;
+isPrivateServer = not (string.match(_G.GetCVar("realmList"), "worldofwarcraft.com$")
+                        or string.match(_G.GetCVar("realmList"), "battle.net$")
+                        or string.match(_G.GetCVar("realmListbn"), "battle.net$")) and true or false;
 
 -- is US or EU server?
 isUS = _G.GetCVar("realmList"):sub(1,2) == "us" and true or false;
@@ -499,12 +501,6 @@ function GetTalentSpec()
                 talents = i==tabs and talents..pointsSpent or talents..pointsSpent.."/";
         end
         return talents ~= "" and talents or "0/0/0";
-end
-
-
-local wd, month, day, year = _G.CalendarGetDate();
-if(month == 4 and day == 1) then
-        aprilFools = true;
 end
 
 
