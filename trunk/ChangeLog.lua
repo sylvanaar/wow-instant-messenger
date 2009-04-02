@@ -16,6 +16,10 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addBetaEntry("3.0.11", "04/??/2009", [[
+    *Rearranged WIM's options. Sounds & History are now in category Whispers.
+]]);
+
 addEntry("3.0.10", "04/02/2009", [[
     *Fixed some resizing issues.
     *Fixed bug when seperating tabs.

@@ -460,16 +460,21 @@ local function Whispers_DisplaySettings()
     return frame;
 end
 
-local function Whispers_Filters()
+local function Whispers_Filters(isChat)
     local filterTypes = {L["Pattern"], L["User Type"], L["User Level"]};
     local filterActions = {L["Allow"], L["Ignore"], L["Block"]}
     local frame = options.CreateOptionsFrame();
+    local filters = isChat and chatFilters or filters;
     frame.sub = frame:CreateSection(L["Filtering"], L["Filtering allows you to control which messages are handled as well as how they are handlef by WIM."]);
     frame.sub.nextOffSetY = -10;
-    frame.sub:CreateCheckButton(L["Enable Filtering"], WIM.modules.Filters, "enabled", nil, function(self, button) EnableModule("Filters", self:GetChecked()); end);
+    frame.sub:CreateCheckButton(L["Enable Filtering"], isChat and WIM.modules.ChatFilters or WIM.modules.Filters, "enabled", nil, function(self, button) EnableModule(isChat and "ChatFilters" or "Filters", self:GetChecked()); end);
     frame.sub.nextOffSetY = -15;
     frame.list = frame.sub:ImportCustomObject(CreateFrame("Frame"));
-    options.frame.filterList = frame.list;
+    if(isChat) then
+        options.frame.chatFilterList = frame.list;
+    else
+        options.frame.filterList = frame.list;
+    end
     options.AddFramedBackdrop(frame.list);
     frame.list:SetFullSize();
     frame.list:SetHeight(filterListCount * 32);
@@ -596,8 +601,8 @@ local function Whispers_Filters()
         frame.list:createButton();
     end
     frame.nextOffSetY = -5;
-    frame.add = frame:CreateButton(L["Add Filter"], function(self) ShowFilterFrame(); end);
-    frame.edit = frame:CreateButton(L["Edit Filter"], function(self) ShowFilterFrame(filters[frame.list.selected], frame.list.selected); end);
+    frame.add = frame:CreateButton(L["Add Filter"], function(self) ShowFilterFrame(nil, nil, isChat); end);
+    frame.edit = frame:CreateButton(L["Edit Filter"], function(self) ShowFilterFrame(filters[frame.list.selected], frame.list.selected, isChat); end);
     frame.edit:ClearAllPoints();
     frame.edit:SetPoint("LEFT", frame.add, "RIGHT", 0, 0);
     frame.delete = frame:CreateButton(L["Delete Filter"], function(self)
@@ -730,53 +735,47 @@ local function General_Tabs()
 end
 
 
-local function General_Sounds()
+local function General_Sounds(isChat)
     local f = options.CreateOptionsFrame();
     f.sub = f:CreateSection(L["Sounds"], L["Configure various sound events and how they are triggered."]);
     f.sub.nextOffSetY = -20;
-    local soundList1 = {};
-    local soundList2 = {};
-    local soundList3 = {};
-    local soundList4 = {};
-    for sound, _ in pairs(libs.SML.MediaTable.sound) do
-        table.insert(soundList1, {
-            text = sound,
-            value = sound,
-            justifyH = "LEFT",
-            func = function(self)
-                _G.PlaySoundFile(libs.SML:Fetch(libs.SML.MediaType.SOUND, self.value));
-            end
-        });
-        table.insert(soundList2, {
-            text = sound,
-            value = sound,
-            justifyH = "LEFT",
-            func = function(self)
-                _G.PlaySoundFile(libs.SML:Fetch(libs.SML.MediaType.SOUND, self.value));
-            end
-        });
-        table.insert(soundList3, {
-            text = sound,
-            value = sound,
-            justifyH = "LEFT",
-            func = function(self)
-                _G.PlaySoundFile(libs.SML:Fetch(libs.SML.MediaType.SOUND, self.value));
-            end
-        });
-        table.insert(soundList4, {
-            text = sound,
-            value = sound,
-            justifyH = "LEFT",
-            func = function(self)
-                _G.PlaySoundFile(libs.SML:Fetch(libs.SML.MediaType.SOUND, self.value));
-            end
-        });
+    local soundList = {};
+
+    local whisperCount = 4;
+    local chatCount = 10;
+
+    for i = 1, (isChat and chatCount or whisperCount) do
+        soundList[i] = {};
+        for sound, _ in pairs(libs.SML.MediaTable.sound) do
+            table.insert(soundList[i], {
+                text = sound,
+                value = sound,
+                justifyH = "LEFT",
+                func = function(self)
+                    _G.PlaySoundFile(libs.SML:Fetch(libs.SML.MediaType.SOUND, self.value));
+                end
+            });
+        end
     end
-    f.sub.whispers = f.sub:CreateCheckButtonMenu(L["Play sound when a whisper is received."], db.sounds.whispers, "msgin", nil, nil, soundList1, db.sounds.whispers, "msgin_sml");
-    f.sub.whispers:CreateCheckButtonMenu(L["Play special sound for friends."], db.sounds.whispers, "friend", nil, nil, soundList2, db.sounds.whispers, "friend_sml");
-    f.sub.whispers:CreateCheckButtonMenu(L["Play special sound for guild members."], db.sounds.whispers, "guild", nil, nil, soundList3, db.sounds.whispers, "guild_sml");
-    f.sub.nextOffSetY = -70;
-    f.sub:CreateCheckButtonMenu(L["Play sound when a whisper is sent."], db.sounds.whispers, "msgout", nil, nil, soundList4, db.sounds.whispers, "msgout_sml");
+    if(isChat) then
+        f.sub.chat = f.sub:CreateCheckButtonMenu(L["Play sound when a message is received."], db.sounds.chat, "msgin", nil, nil, soundList[1], db.sounds.chat, "msgin_sml");
+        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.GUILD), db.sounds.chat, "guild", nil, nil, soundList[2], db.sounds.chat, "guild_sml");
+        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.GUILD_RANK1_DESC), db.sounds.chat, "officer", nil, nil, soundList[3], db.sounds.chat, "officer_sml");
+        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.PARTY), db.sounds.chat, "party", nil, nil, soundList[4], db.sounds.chat, "party_sml");
+        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.RAID), db.sounds.chat, "raid", nil, nil, soundList[5], db.sounds.chat, "raid_sml");
+        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.RAID_LEADER), db.sounds.chat, "raidleader", nil, nil, soundList[6], db.sounds.chat, "raidleader_sml");
+        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.SAY), db.sounds.chat, "say", nil, nil, soundList[7], db.sounds.chat, "say_sml");
+        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(L["World Chat"]), db.sounds.chat, "world", nil, nil, soundList[8], db.sounds.chat, "world_sml");
+        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(L["Custom Chat"]), db.sounds.chat, "custom", nil, nil, soundList[9], db.sounds.chat, "custom_sml");
+        f.sub.nextOffSetY = -250;
+        f.sub:CreateCheckButtonMenu(L["Play sound when a message is sent."], db.sounds.chat, "msgout", nil, nil, soundList[10], db.sounds.chat, "msgout_sml");
+    else
+        f.sub.whispers = f.sub:CreateCheckButtonMenu(L["Play sound when a whisper is received."], db.sounds.whispers, "msgin", nil, nil, soundList[1], db.sounds.whispers, "msgin_sml");
+        f.sub.whispers:CreateCheckButtonMenu(L["Play special sound for friends."], db.sounds.whispers, "friend", nil, nil, soundList[2], db.sounds.whispers, "friend_sml");
+        f.sub.whispers:CreateCheckButtonMenu(L["Play special sound for guild members."], db.sounds.whispers, "guild", nil, nil, soundList[3], db.sounds.whispers, "guild_sml");
+        f.sub.nextOffSetY = -70;
+        f.sub:CreateCheckButtonMenu(L["Play sound when a whisper is sent."], db.sounds.whispers, "msgout", nil, nil, soundList[4], db.sounds.whispers, "msgout_sml");
+    end
     return f;
 end
 
@@ -820,15 +819,18 @@ RegisterOptionFrame(L["General"], L["Window Settings"], General_WindowSettings);
 RegisterOptionFrame(L["General"], L["Display Settings"], General_VisualSettings);
 RegisterOptionFrame(L["General"], L["Fonts"], General_Fonts);
 RegisterOptionFrame(L["General"], L["Message Formatting"], General_MessageFormatting);
-RegisterOptionFrame(L["General"], L["History"], General_History);
 RegisterOptionFrame(L["General"], L["Tab Management"], General_Tabs);
-RegisterOptionFrame(L["General"], L["Sounds"], General_Sounds);
 RegisterOptionFrame(L["General"], L["Expose"], General_Expose);
 
 RegisterOptionFrame(L["Whispers"], L["Display Settings"], Whispers_DisplaySettings);
-RegisterOptionFrame(L["Whispers"], L["Window Behavior"], WhisperPopRules);
+RegisterOptionFrame(L["Whispers"], L["History"], General_History);
 RegisterOptionFrame(L["Whispers"], L["Filtering"], Whispers_Filters);
+RegisterOptionFrame(L["Whispers"], L["Sounds"], General_Sounds);
+RegisterOptionFrame(L["Whispers"], L["Window Behavior"], WhisperPopRules);
 
+RegisterOptionFrame(L["Chat"], L["History"], nil);
+RegisterOptionFrame(L["Chat"], L["Filtering"], function() return Whispers_Filters(true); end);
+RegisterOptionFrame(L["Chat"], L["Sounds"], function() return General_Sounds(true); end);
 RegisterOptionFrame(L["Chat"], L["Window Behavior"], ChatPopRules);
 RegisterOptionFrame(L["Chat"]); -- breaker
 

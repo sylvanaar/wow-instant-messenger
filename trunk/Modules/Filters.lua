@@ -297,6 +297,73 @@ function Filters:OnDisable()
 end
 
 
+--Chat Filters
+local ChatFilters = CreateModule("ChatFilters");
+
+-- This module requires LibChatHandler-1.0
+_G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(ChatFilters);
+
+function ChatFilters:OnEnable()
+    if(db.enabled) then
+        ChatFilters:RegisterChatEvent("CHAT_MSG_GUILD", 1);
+        ChatFilters:RegisterChatEvent("CHAT_MSG_OFFICER", 1);
+        ChatFilters:RegisterChatEvent("CHAT_MSG_PARTY", 1);
+        ChatFilters:RegisterChatEvent("CHAT_MSG_RAID", 1);
+        ChatFilters:RegisterChatEvent("CHAT_MSG_RAID_LEADER", 1);
+        ChatFilters:RegisterChatEvent("CHAT_MSG_SAY", 1);
+        ChatFilters:RegisterChatEvent("CHAT_MSG_CHANNEL", 1);
+    end
+end
+
+function ChatFilters:OnDisable()
+    ChatFilters:UnregisterChatEvent("CHAT_MSG_GUILD");
+    ChatFilters:UnregisterChatEvent("CHAT_MSG_OFFICER");
+    ChatFilters:UnregisterChatEvent("CHAT_MSG_PARTY");
+    ChatFilters:UnregisterChatEvent("CHAT_MSG_RAID");
+    ChatFilters:UnregisterChatEvent("CHAT_MSG_RAID_LEADER");
+    ChatFilters:UnregisterChatEvent("CHAT_MSG_SAY");
+    ChatFilters:UnregisterChatEvent("CHAT_MSG_CHANNEL");
+end
+
+local function chatController(self, eventItem, msg, from)
+    if(not db or not db.enabled) then
+        return;
+    end
+    local isSent = from == _G.UnitName("player");
+    for i=1, #chatFilters do
+        if(((isSent and chatFilters[i].sent) or (not isSent and chatFilters[i].received)) and chatFilters[i].enabled) then
+            local result = processFilter(eventItem, chatFilters[i]);
+            if(result == 1) then
+                break;
+            elseif(result == 2) then
+                eventItem.ignoredByWIM = true;
+                break;
+            elseif(result == 3) then
+                if(chatFilters[i].notify) then
+                    logBlockedEvent(eventItem);
+                end
+                eventItem:Block();
+                break;
+            end
+        end
+    end
+    if(options.frame and options.frame.chatFilterList) then
+        options.frame.chatFilterList:Hide();
+        options.frame.chatFilterList:Show();
+    end
+end
+
+
+ChatFilters.CHAT_MSG_GUILD_CONTROLLER = chatController;
+ChatFilters.CHAT_MSG_OFFICER_CONTROLLER = chatController;
+ChatFilters.CHAT_MSG_PARTY_CONTROLLER = chatController;
+ChatFilters.CHAT_MSG_RAID_CONTROLLER = chatController;
+ChatFilters.CHAT_MSG_RAID_LEADER_CONTROLLER = chatController;
+ChatFilters.CHAT_MSG_SAY_CONTROLLER = chatController;
+ChatFilters.CHAT_MSG_CHANNEL_CONTROLLER = chatController;
+
+
+
 -- Globals
 function GetDefaultFilters()
     return DefaultFilters;
@@ -395,11 +462,13 @@ local function createFilterFrame()
             info.value = 2;
             info.func = win.by.click;
             _G.UIDropDownMenu_AddButton(info, _G.UIDROPDOWNMENU_MENU_LEVEL);
-            local info = _G.UIDropDownMenu_CreateInfo();
-            info.text = L["Level"];
-            info.value = 3;
-            info.func = win.by.click;
-            _G.UIDropDownMenu_AddButton(info, _G.UIDROPDOWNMENU_MENU_LEVEL);
+            if(not win.isChat) then
+                local info = _G.UIDropDownMenu_CreateInfo();
+                info.text = L["Level"];
+                info.value = 3;
+                info.func = win.by.click;
+                _G.UIDropDownMenu_AddButton(info, _G.UIDROPDOWNMENU_MENU_LEVEL);
+            end
         end
     win.by:SetScript("OnShow", function(self)
             win.filter.type = win.filter.type or 1;
@@ -635,13 +704,19 @@ local function createFilterFrame()
     win.save:SetScript("OnClick", function(self)
             if(win.saveIndex) then
                 -- save edited filter
+                local filters = win.isChat and chatFilters or filters;
                 filters[win.saveIndex] = win.filter;
             else
                 -- add new filter
+                local filters = win.isChat and chatFilters or filters;
                 win.filter.enabled = true;
                 win.filter.stats = 0;
                 table.insert(filters, 1, win.filter);
-                options.frame.filterList.selected = 1;
+                if(win.isChat) then
+                    options.frame.chatFilterList.selected = 1;
+                else
+                    options.frame.filterList.selected = 1;
+                end
             end
             win:Hide();
         end);
@@ -665,8 +740,13 @@ local function createFilterFrame()
             if(options.frame) then
                 options.frame:Enable();
             end
-            options.frame.filterList:Hide();
-            options.frame.filterList:Show();
+            if(self.isChat) then
+                options.frame.chatFilterList:Hide();
+                options.frame.chatFilterList:Show();
+            else
+                options.frame.filterList:Hide();
+                options.frame.filterList:Show();
+            end
         end);
     
     table.insert(_G.UISpecialFrames,win:GetName());
@@ -680,8 +760,8 @@ end
 
 
 
-function ShowFilterFrame(filter, index)
-    if(not options.frame or not options.frame.filterList) then
+function ShowFilterFrame(filter, index, isChat)
+    if(not options.frame or not (options.frame.filterList or options.frame.chatFilterList)) then
         -- no reason for this frame to be called when options window has not been loaded.
         return;
     end
@@ -695,6 +775,7 @@ function ShowFilterFrame(filter, index)
         filterFrame.filter = {};
     end
     filterFrame.title:SetText(filterFrame.saveIndex and L["Edit Filter"] or L["Add Filter"]);
+    filterFrame.isChat = isChat;
     filterFrame:Show();
 end
 
@@ -705,19 +786,46 @@ local function setItemRef (link, text, button)
 	if (_G.strsub(link, 1, 10) == "WIMBLOCKED") then
             local msgId = _G.tonumber(link:match("(%d+)"));
 	    if(msgId and blockedEvents[msgId]) then
-                local win = GetWhisperWindowByUser(blockedEvents[msgId][3]);
-                win:Pop(true);
-                win.widgets.chat_display:AddMessage("   ");
-                win.widgets.chat_display:AddMessage("|cffff0000"..L["Blocked Message"]..":|r");
-                local color = WIM.db.displayColors.wispIn;
-                win:AddEventMessage(color.r, color.g, color.b, blockedEvents[msgId][1], blockedEvents[msgId][2],
+                local event = blockedEvents[msgId][1];
+                local args = {"\009\002"..blockedEvents[msgId][2],
                     blockedEvents[msgId][3], blockedEvents[msgId][4], blockedEvents[msgId][5], blockedEvents[msgId][6],
                     blockedEvents[msgId][7], blockedEvents[msgId][8], blockedEvents[msgId][9], blockedEvents[msgId][10],
-                    blockedEvents[msgId][11], blockedEvents[msgId][12]);
-                win.widgets.chat_display:AddMessage("   ");
+                    blockedEvents[msgId][11], blockedEvents[msgId][12]};
+                local win;
+                if(event:find("WHISPER_INFORM")) then
+                    modules.WhisperEngine:CHAT_MSG_WHISPER_INFORM(_G.unpack(args));
+                elseif(event:find("WHISPER")) then
+                    modules.WhisperEngine:CHAT_MSG_WHISPER(_G.unpack(args));
+                elseif(event:find("RAID_LEADER")) then
+                    modules.RaidChat:CHAT_MSG_RAID_LEADER(_G.unpack(args));
+                elseif(event:find("RAID")) then
+                    modules.RaidChat:CHAT_MSG_RAID(_G.unpack(args));
+                elseif(event:find("GUILD")) then
+                    modules.GuildChat:CHAT_MSG_GUILD(_G.unpack(args));
+                elseif(event:find("OFFICER")) then
+                    modules.OfficerChat:CHAT_MSG_OFFICER(_G.unpack(args));
+                elseif(event:find("PARTY")) then
+                    modules.PartyChat:CHAT_MSG_PARTY(_G.unpack(args));
+                elseif(event:find("SAY")) then
+                    modules.SayChat:CHAT_MSG_SAY(_G.unpack(args));
+                elseif(event:find("CHANNEL")) then
+                    modules.ChannelChat:CHAT_MSG_CHANNEL(_G.unpack(args));
+                end
             end
 	    return;
 	end
 	SetItemRef_orig(link, text, button);
 end
 _G.SetItemRef = setItemRef;
+
+
+local function blockCatcher(msg, smf)
+    if(msg and msg:match("\009\002")) then
+        smf:AddMessage("    ");
+        smf:AddMessage("|cffff0000"..L["Blocked Message"]..":|r");
+        smf.parentWindow:Pop(true);
+        msg = msg:gsub("\009\002", "");
+    end
+    return msg;
+end
+RegisterStringModifier(blockCatcher, true);
