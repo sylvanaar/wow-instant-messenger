@@ -810,7 +810,7 @@ function Channel:CHAT_MSG_CHANNEL(...)
         else
             win:Pop("out");
         end
-        CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_SAY", ...);
+        CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_CHANNEL", ...);
     end
 end
 
@@ -822,6 +822,58 @@ function Channel:SettingsChanged()
     end
 end
 
+
+
+
+
+-- alert management
+local ChatAlerts = CreateModule("ChatAlerts");
+function ChatAlerts:OnWindowShow(win)
+    if(win.type == "chat") then
+        MinimapPopAlert(win.theUser);
+    end
+end
+ChatAlerts.OnWindowDestroyed = ChatAlerts.OnWindowShow;
+
+
+function ChatAlerts:PostEvent_ChatMessage(event, ...)
+    local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
+    if(arg2 == _G.UnitName("player")) then
+        return; -- we don't count our own messages as new.
+    end
+    event = event:gsub("CHAT_MSG_", "");
+    if(event == "CHANNEL") then
+        local isWorld = arg7 and arg7 > 0;
+        local channelName = string.split(" - ", arg9);
+        local win = getChatWindow(channelName, "channel");
+        if(win and not win:IsVisible() and win.unreadCount) then
+            local color = _G.ChatTypeInfo["CHANNEL"..arg8];
+            MinimapPushAlert(win.theUser, RGBPercentToHex(color.r, color.g, color.b), win.unreadCount);
+        end
+    else
+        local win;
+        if(event == "GUILD") then
+            win = getChatWindow(_G.GUILD, "guild");
+        elseif(event == "OFFICER") then
+            win = getChatWindow(_G.GUILD_RANK1_DESC, "officer");
+        elseif(event == "PARTY") then
+            win = getChatWindow(_G.PARTY, "party");
+        elseif(event == "RAID" or event == "RAID_LEADER") then
+            win = getChatWindow(_G.RAID, "raid");
+        elseif(event == "SAY") then
+            win = getChatWindow(_G.SAY, "say");
+        end
+        
+        if(win and not win:IsVisible() and win.unreadCount) then
+            local color = _G.ChatTypeInfo[string.upper(win.chatType)];
+            MinimapPushAlert(win.theUser, RGBPercentToHex(color.r, color.g, color.b), win.unreadCount);
+        end
+    end
+end
+
+-- should never be disabled.
+ChatAlerts.canDisable = false;
+ChatAlerts:Enable();
 
 
 
