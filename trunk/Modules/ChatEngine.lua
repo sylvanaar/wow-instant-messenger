@@ -71,13 +71,12 @@ db_defaults.pop_rules.chat = {
 db_defaults.chat = {
     world = {
         enabled = false,
+        channelSettings = {}
     },
     custom = {
         enabled = false,
+        channelSettings = {}
     },
-    channelSettings = {
-        
-    }
 };
 
 
@@ -767,7 +766,7 @@ function Channel:CHAT_MSG_CHANNEL_CONTROLLER(eventController, arg1, arg2, arg3, 
         return;
     elseif(not isWorld and not db.chat.custom.enabled) then
         return;
-    elseif(getRuleSet().supress) then
+    elseif(getRuleSet().supress and db.chat[isWorld and "world" or "custom"].channelSettings[channelName] and db.chat[isWorld and "world" or "custom"].channelSettings[channelName].monitor) then
         eventController:BlockFromChatFrame(self);
     end
 end
@@ -787,7 +786,7 @@ function Channel:CHAT_MSG_CHANNEL(...)
         return;
     elseif(not isWorld and not db.chat.custom.enabled) then
         return;
-    elseif(not db.chat.channelSettings[channelName] or not db.chat.channelSettings[channelName].monitor) then
+    elseif(not db.chat[isWorld and "world" or "custom"].channelSettings[channelName] or not db.chat[isWorld and "world" or "custom"].channelSettings[channelName].monitor) then
         return;
     end
     local win = getChatWindow(channelName, "channel");
@@ -890,13 +889,13 @@ local function loadChatOptions()
                     active = active == "1";
                     f.sub.list.buttons[i]:Show();
                     f.sub.list.buttons[i].channelName = name;
-                    if(not db.chat.channelSettings[name]) then
-                        db.chat.channelSettings[name] = {};
+                    if(not db.chat[channelType].channelSettings[name]) then
+                        db.chat[channelType].channelSettings[name] = {};
                     end
                     f.sub.list.buttons[i].title:SetText("|cffffffff"..channelNumber..". |r"..name);
-                    f.sub.list.buttons[i].cb1:SetChecked(db.chat.channelSettings[name] and db.chat.channelSettings[name].monitor);
-                    f.sub.list.buttons[i].cb2:SetChecked(db.chat.channelSettings[name] and db.chat.channelSettings[name].suppress);
-                    f.sub.list.buttons[i].cb2.except:SetChecked(db.chat.channelSettings[name] and db.chat.channelSettings[name].suppress_except);
+                    f.sub.list.buttons[i].cb1:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].monitor);
+                    f.sub.list.buttons[i].cb2:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].suppress);
+                    f.sub.list.buttons[i].cb2.except:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].suppress_except);
                     local color = _G.ChatTypeInfo["CHANNEL"..channelNumber];
                     f.sub.list.buttons[i].title:SetTextColor(color.r, color.g, color.b);
                     if(active) then
@@ -954,7 +953,7 @@ local function loadChatOptions()
             end);
             button.cb1:SetScript("OnClick", function(self)
                 local name = self:GetParent().channelName;
-                db.chat.channelSettings[name].monitor = self:GetChecked();
+                db.chat[channelType].channelSettings[name].monitor = self:GetChecked();
             end);
             
             --supress chat
@@ -966,7 +965,7 @@ local function loadChatOptions()
             button.cb2.text:SetText(L["Suppress"]);
             button.cb2:SetScript("OnClick", function(self)
                     local name = self:GetParent().channelName;
-                    db.chat.channelSettings[name].suppress = self:GetChecked();
+                    db.chat[channelType].channelSettings[name].suppress = self:GetChecked();
             end)
                 --except when hidden
                 button.cb2.except = _G.CreateFrame("CheckButton", nil, button.cb2, "UICheckButtonTemplate");
@@ -985,7 +984,7 @@ local function loadChatOptions()
                 end)
                 button.cb2.except:SetScript("OnClick", function(self)
                     local name = self:GetParent():GetParent().channelName;
-                    db.chat.channelSettings[name].suppress_except = self:GetChecked();
+                    db.chat[channelType].channelSettings[name].suppress_except = self:GetChecked();
                 end)
             
             

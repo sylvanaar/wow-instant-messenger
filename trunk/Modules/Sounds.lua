@@ -21,9 +21,18 @@ db_defaults.sounds = {
     },
     chat = {
         msgin = true,
-        msgin_sml = "IM",
+        msgin_sml = "Chat Blip",
         msgout = false,
-        msgout_sml = "IM",
+        msgout_sml = "Chat Blip",
+        
+        guild_sml = "Chat Blip",
+        officer_sml = "Chat Blip",
+        party_sml = "Chat Blip",
+        raid_sml = "Chat Blip",
+        raidleader_sml = "Chat Blip",
+        say_sml = "Chat Blip",
+        world_sml = "Chat Blip",
+        custom_sml = "Chat Blip",
     }
 };
 
@@ -106,6 +115,7 @@ end
 SML:Register(SOUND, "IM", "Interface\\AddOns\\"..addonTocName.."\\Sounds\\wisp.wav");
 SML:Register(SOUND, "iChat In", "Interface\\AddOns\\"..addonTocName.."\\Sounds\\ichatIn.mp3");
 SML:Register(SOUND, "iChat Out", "Interface\\AddOns\\"..addonTocName.."\\Sounds\\ichatOut.mp3");
+SML:Register(SOUND, "Chat Blip", "Interface\\AddOns\\"..addonTocName.."\\Sounds\\chat.mp3");
 
 --[[ Test Scrolling Dropdown menu.
 for i=1,20 do
