@@ -761,12 +761,13 @@ function Channel:CHAT_MSG_CHANNEL_CONTROLLER(eventController, arg1, arg2, arg3, 
     -- arg9 Channel Name
     local isWorld = arg7 and arg7 > 0;
     local channelName = string.split(" - ", arg9);
+    local neverSuppress = db.chat[isWorld and "world" or "custom"].channelSettings[channelName] and db.chat[isWorld and "world" or "custom"].channelSettings[channelName].neverSuppress;
     --check options. do we want the specified channels.
     if(isWorld and not db.chat.world.enabled) then
         return;
     elseif(not isWorld and not db.chat.custom.enabled) then
         return;
-    elseif(getRuleSet().supress and db.chat[isWorld and "world" or "custom"].channelSettings[channelName] and db.chat[isWorld and "world" or "custom"].channelSettings[channelName].monitor) then
+    elseif(not neverSuppress and getRuleSet().supress and db.chat[isWorld and "world" or "custom"].channelSettings[channelName] and db.chat[isWorld and "world" or "custom"].channelSettings[channelName].monitor) then
         eventController:BlockFromChatFrame(self);
     end
 end
@@ -804,11 +805,16 @@ function Channel:CHAT_MSG_CHANNEL(...)
     if(arg1 and _G.strlen(arg1) > 0) then
         arg3 = CleanLanguageArg(arg3);
         win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_CHANNEL", ...);
+        local neverPop = db.chat[isWorld and "world" or "custom"].channelSettings[channelName] and db.chat[isWorld and "world" or "custom"].channelSettings[channelName].neverPop;
         if(arg2 ~= _G.UnitName("player")) then
             win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
-            win:Pop("in");
+            if(not neverPop) then
+                win:Pop("in");
+            end
         else
-            win:Pop("out");
+            if(not neverPop) then
+                win:Pop("out");
+            end
         end
         CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_CHANNEL", ...);
     end
@@ -846,7 +852,8 @@ function ChatAlerts:PostEvent_ChatMessage(event, ...)
         local isWorld = arg7 and arg7 > 0;
         local channelName = string.split(" - ", arg9);
         local win = getChatWindow(channelName, "channel");
-        if(win and not win:IsVisible() and win.unreadCount) then
+        local showAlert = db.chat[isWorld and "world" or "custom"].channelSettings[channelName] and db.chat[isWorld and "world" or "custom"].channelSettings[channelName].showAlerts;
+        if(showAlert and win and not win:IsVisible() and win.unreadCount) then
             local color = _G.ChatTypeInfo["CHANNEL"..arg8];
             MinimapPushAlert(win.theUser, RGBPercentToHex(color.r, color.g, color.b), win.unreadCount);
         end
@@ -946,8 +953,9 @@ local function loadChatOptions()
                     end
                     f.sub.list.buttons[i].title:SetText("|cffffffff"..channelNumber..". |r"..name);
                     f.sub.list.buttons[i].cb1:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].monitor);
-                    f.sub.list.buttons[i].cb2:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].suppress);
-                    f.sub.list.buttons[i].cb2.except:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].suppress_except);
+                    f.sub.list.buttons[i].neverPop:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].neverPop);
+                    f.sub.list.buttons[i].neverSuppress:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].neverSuppress);
+                    f.sub.list.buttons[i].showAlerts:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].showAlerts);
                     local color = _G.ChatTypeInfo["CHANNEL"..channelNumber];
                     f.sub.list.buttons[i].title:SetTextColor(color.r, color.g, color.b);
                     if(active) then
@@ -1008,37 +1016,63 @@ local function loadChatOptions()
                 db.chat[channelType].channelSettings[name].monitor = self:GetChecked();
             end);
             
-            --supress chat
-            button.cb2 = _G.CreateFrame("CheckButton", nil, button, "UICheckButtonTemplate");
-            button.cb2:SetPoint("TOPLEFT", button.cb1, "BOTTOMRIGHT", 20, 0);
-            button.cb2:SetScale(.75);
-            button.cb2.text = button.cb2:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
-            button.cb2.text:SetPoint("LEFT", button.cb2, "RIGHT", 0, 0);
-            button.cb2.text:SetText(L["Suppress"]);
-            button.cb2:SetScript("OnClick", function(self)
+            -- Never Pop
+            button.neverPop = _G.CreateFrame("CheckButton", nil, button, "UICheckButtonTemplate");
+            button.neverPop:SetPoint("TOPLEFT", button.cb1, "BOTTOMRIGHT", 20, 0);
+            button.neverPop:SetScale(.75);
+            button.neverPop.text = button.neverPop:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+            button.neverPop.text:SetPoint("LEFT", button.neverPop, "RIGHT", 0, 0);
+            button.neverPop.text:SetText(L["Never Pop"]);
+            button.neverPop:SetScript("OnClick", function(self)
                     local name = self:GetParent().channelName;
-                    db.chat[channelType].channelSettings[name].suppress = self:GetChecked();
+                    db.chat[channelType].channelSettings[name].neverPop = self:GetChecked();
             end)
-                --except when hidden
-                button.cb2.except = _G.CreateFrame("CheckButton", nil, button.cb2, "UICheckButtonTemplate");
-                button.cb2.except:SetPoint("TOPLEFT", button.cb2, "BOTTOMLEFT", 15, 0);
-                button.cb2.except.text = button.cb2.except:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
-                button.cb2.except.text:SetPoint("LEFT", button.cb2.except, "RIGHT", 0, 0);
-                button.cb2.except.text:SetText(L["Except when hidden"]);
-                button.cb2.except:SetScript("OnUpdate", function(self)
-                        if(self:GetParent():GetChecked()) then
-                            self:Enable();
-                            self.text:SetTextColor(1,1,1);
-                        else
-                            self:Disable();
-                            self.text:SetTextColor(.5,.5,.5);
-                        end
-                end)
-                button.cb2.except:SetScript("OnClick", function(self)
-                    local name = self:GetParent():GetParent().channelName;
-                    db.chat[channelType].channelSettings[name].suppress_except = self:GetChecked();
-                end)
+            button.neverPop:SetScript("OnEnter", function(self)
+                self:GetParent():GetParent().help:SetJustifyH("LEFT");
+                self:GetParent():GetParent().help:SetText(L["Never have this window pop-up on my screen."]);
+            end);
+            button.neverPop:SetScript("OnLeave", function(self)
+                self:GetParent():GetParent().help:SetText("");
+            end);
+
+            -- Never Suppress
+            button.neverSuppress = _G.CreateFrame("CheckButton", nil, button, "UICheckButtonTemplate");
+            button.neverSuppress:SetPoint("TOPLEFT", button.neverPop, "BOTTOMLEFT", 0, 0);
+            button.neverSuppress:SetScale(.75);
+            button.neverSuppress.text = button.neverSuppress:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+            button.neverSuppress.text:SetPoint("LEFT", button.neverSuppress, "RIGHT", 0, 0);
+            button.neverSuppress.text:SetText(L["Never Supress"]);
+            button.neverSuppress:SetScript("OnClick", function(self)
+                    local name = self:GetParent().channelName;
+                    db.chat[channelType].channelSettings[name].neverSuppress = self:GetChecked();
+            end)
+            button.neverSuppress:SetScript("OnEnter", function(self)
+                self:GetParent():GetParent().help:SetJustifyH("LEFT");
+                self:GetParent():GetParent().help:SetText(L["Never suppress messages from the default chat frame."]);
+            end);
+            button.neverSuppress:SetScript("OnLeave", function(self)
+                self:GetParent():GetParent().help:SetText("");
+            end);
             
+            
+            -- Show Minimap Alerts
+            button.showAlerts = _G.CreateFrame("CheckButton", nil, button, "UICheckButtonTemplate");
+            button.showAlerts:SetPoint("TOPLEFT", button.neverPop, "TOPRIGHT", 150, 0);
+            button.showAlerts:SetScale(.75);
+            button.showAlerts.text = button.showAlerts:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+            button.showAlerts.text:SetPoint("LEFT", button.showAlerts, "RIGHT", 0, 0);
+            button.showAlerts.text:SetText(L["Show Minimap Alerts"]);
+            button.showAlerts:SetScript("OnClick", function(self)
+                    local name = self:GetParent().channelName;
+                    db.chat[channelType].channelSettings[name].showAlerts = self:GetChecked();
+            end)
+            button.showAlerts:SetScript("OnEnter", function(self)
+                self:GetParent():GetParent().help:SetJustifyH("LEFT");
+                self:GetParent():GetParent().help:SetText(L["Show unread message alert on minimap."]);
+            end);
+            button.showAlerts:SetScript("OnLeave", function(self)
+                self:GetParent():GetParent().help:SetText("");
+            end);
             
             
             if(#self.buttons == 0) then
