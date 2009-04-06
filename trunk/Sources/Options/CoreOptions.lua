@@ -18,8 +18,9 @@ db_defaults.stats = {
 }
 
 local credits = {
-    "|cff69ccf0"..L["Created by:"].."|r Pazza <Bronzebeard>",
-    "|cff69ccf0"..L["Special Thanks:"].."|r Stewarta <Emerald Dream - EU>, Zeke <Coilfang>,\n     Morphieus <Spinebreaker>, Nachonut <Bronzebeard>,\n     Chiaki <Frostwolf - EU>",
+    "Pazza <Bronzebeard-US>",
+    "Stewarta <Emerald Dream - EU>\n\nZeke <Coilfang - US>\nMorphieus <Spinebreaker>\nNachonut <Bronzebeard - US>\n\nChiaki <Frostwolf - EU> - deDE\n"..
+    "BlueNyx <bluenyx@gmail.com> - koKR\nStingerSoft <stingersoft@iti.lt> - ruRU\nJunxian <junxian1121@hotmail.com> - zhCN & zhTW\n"
 };
 
 local states = {"arena", "combat", "pvp", "raid", "party", "resting", "other"};
@@ -41,10 +42,7 @@ local function General_Main()
     frame.welcome.reset:ClearAllPoints();
     frame.welcome.reset:SetPoint("LEFT", frame.welcome.cb3, "RIGHT", frame.welcome.cb2.text:GetStringWidth()+30, 0);
     frame.welcome.lastObj = frame.welcome.cb3;
-    frame.credits = frame:CreateSection(L["Credits"], table.concat(credits, "\n"));
-    frame.credits:ClearAllPoints();
-    frame.credits:SetFullSize();
-    frame.credits:SetPoint("BOTTOM", 0, 10);
+    
     return frame;
 end
 
@@ -810,6 +808,19 @@ local function General_Expose()
     return frame;
 end
 
+local function General_Credits()
+    local frame = options.CreateOptionsFrame();
+    frame.menu = frame:CreateSection(L["Credits"]);
+    frame.menu.nextOffSetY = -20;
+    
+    frame.menu.createdBy = frame.menu:CreateSection("|cff69ccf0"..L["Created By:"].."|r", credits[1]);
+    frame.menu.nextOffSetY = -20;
+    
+    frame.menu.createdBy = frame.menu:CreateSection("|cff69ccf0"..L["Special Thanks:"].."|r", credits[2]);
+    
+    return frame;
+end
+
 local function ChatPopRules()
     return createPopRuleFrame("chat");
 end
@@ -821,6 +832,8 @@ RegisterOptionFrame(L["General"], L["Fonts"], General_Fonts);
 RegisterOptionFrame(L["General"], L["Message Formatting"], General_MessageFormatting);
 RegisterOptionFrame(L["General"], L["Tab Management"], General_Tabs);
 RegisterOptionFrame(L["General"], L["Expose"], General_Expose);
+RegisterOptionFrame(L["General"]);
+RegisterOptionFrame(L["General"], L["Credits"], General_Credits);
 
 RegisterOptionFrame(L["Whispers"], L["Display Settings"], Whispers_DisplaySettings);
 RegisterOptionFrame(L["Whispers"], L["History"], General_History);

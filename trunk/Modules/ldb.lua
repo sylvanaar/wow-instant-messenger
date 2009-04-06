@@ -11,9 +11,10 @@ local LDB = CreateModule("LDB", true);
 
 local isLdbLoaded = false;
 local icon = "Interface\\Addons\\"..addonTocName.."\\Skins\\Default\\minimap";
+local iconNew = "Interface\\Addons\\"..addonTocName.."\\Skins\\Default\\minimap_new";
 local data = {
     type = "launcher",
-    text = L["No New Messages"],
+    text = "", --L["No New Messages"],
     icon = icon,
     OnClick = function(frame, button)
 	if(button == "LeftButton") then
@@ -26,17 +27,26 @@ local data = {
             end
         else
             if(db.minimap.rightClickNew) then
-                ShowAllUnreadWindows();
+                if(_G.IsShiftKeyDown()) then
+                    -- display tools menu
+                    PopContextMenu("MENU_MINIMAP", frame:GetName());
+                else
+                    ShowAllUnreadWindows();
+                end
             else
-                -- display tools menu
-                
+                if(_G.IsShiftKeyDown()) then
+                    ShowAllUnreadWindows();
+                else
+                    -- display tools menu
+                    PopContextMenu("MENU_MINIMAP", frame:GetName());
+                end
             end
         end
     end,
     OnTooltipShow = function(tooltip)
 	tooltip:AddLine("WIM |cff00ff00(v"..version..")|r");
         for i=1, #Notes do
-            tooltip:AddLine("|cffffffff"..Notes[i].tag..": "..Notes[i].text.."|r");
+            tooltip:AddDoubleLine("|cff"..Notes[i].color..Notes[i].tag..":|r", "|cffffffff"..Notes[i].text.."|r");
         end
     end,
 };
@@ -69,7 +79,7 @@ updateFrame:SetScript("OnUpdate", function(self, elapsed)
                     data.icon = icon;
                 else
                     -- show variant
-                    data.icon = "";
+                    data.icon = iconNew;
                 end
             else
                 self.icon = true;
