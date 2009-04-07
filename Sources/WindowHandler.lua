@@ -1777,7 +1777,7 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
                         return _G.format(L["%s does not wish to be disturbed: %s"], "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]", arg1);
                 elseif(event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_OFFICER" or event == "CHAT_MSG_PARTY" or
                                 event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_SAY" or
-                                event == "CHAT_MSG_CHANNEL") then
+                                event == "CHAT_MSG_CHANNEL" or event == "CHAT_MSG_BATTLEGROUND" or event == "CHAT_MSG_BATTLEGROUND_LEADER") then
                         return "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]: "..arg1;
                 elseif(event == "CHAT_MSG_CHANNEL_JOIN") then
                         return string.format(_G.CHAT_CHANNEL_JOIN_GET, arg2);
