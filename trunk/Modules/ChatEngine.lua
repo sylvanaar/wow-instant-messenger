@@ -16,11 +16,11 @@ local Windows = windows.active.chat;
 db_defaults.pop_rules.chat = {
         --pop-up rule sets based off of your location
         resting = {
-            onSend = true,
-            onReceive = true,
-            supress = true,
-            autofocus = true,
-            keepfocus = true,
+            onSend = false,
+            onReceive = false,
+            supress = false,
+            autofocus = false,
+            keepfocus = false,
         },
         combat = {
             onSend = false,
@@ -30,9 +30,9 @@ db_defaults.pop_rules.chat = {
             keepfocus = false,
         },
         pvp = {
-            onSend = true,
-            onReceive = true,
-            supress = true,
+            onSend = false,
+            onReceive = false,
+            supress = false,
             autofocus = false,
             keepfocus = false,
         },
@@ -44,28 +44,28 @@ db_defaults.pop_rules.chat = {
             keepfocus = false,
         },
         party = {
-            onSend = true,
-            onReceive = true,
-            supress = true,
+            onSend = false,
+            onReceive = false,
+            supress = false,
             autofocus = false,
             keepfocus = false,
         },
         raid = {
-            onSend = true,
-            onReceive = true,
-            supress = true,
+            onSend = false,
+            onReceive = false,
+            supress = false,
             autofocus = false,
             keepfocus = false,
         },
         other = {
-            onSend = true,
-            onReceive = true,
-            supress = true,
+            onSend = false,
+            onReceive = false,
+            supress = false,
             autofocus = false,
             keepfocus = false,
         },
-        alwaysOther = false,
-        intercept = true,
+        alwaysOther = true,
+        intercept = false,
 }
 
 db_defaults.chat = {
@@ -77,6 +77,24 @@ db_defaults.chat = {
         enabled = false,
         channelSettings = {}
     },
+    guild = {
+        showAlerts = true,
+    },
+    officer = {
+        showAlerts = true,
+    },
+    raid = {
+        showAlerts = true,
+    },
+    party = {
+        showAlerts = true,
+    },
+    battleground = {
+    
+    },
+    say = {
+    
+    }
 };
 
 
@@ -161,6 +179,8 @@ RegisterWidgetTrigger("msg_box", "chat", "OnEnterPressed", function(self)
             TARGET = "PARTY";
         elseif(obj.chatType == "raid") then
             TARGET = "RAID";
+        elseif(obj.chatType == "battleground") then
+            TARGET = "BATTLEGROUND";
         elseif(obj.chatType == "say") then
             TARGET = "SAY";
         elseif(obj.chatType == "channel") then
@@ -245,7 +265,7 @@ function Guild:CHAT_MSG_GUILD_CONTROLLER(eventController, ...)
         eventController:BlockFromDelegate(self);
         return;
     end
-    if(getRuleSet().supress) then
+    if(not db.chat.guild.neverSuppress and getRuleSet().supress) then
         eventController:BlockFromChatFrame(self);
     end
 end
@@ -266,9 +286,13 @@ function Guild:CHAT_MSG_GUILD(...)
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_GUILD", ...);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
-        win:Pop("in");
+        if(not db.chat.guild.neverPop) then
+            win:Pop("in");
+        end
     else
-        win:Pop("out");
+        if(not db.chat.guild.neverPop) then
+            win:Pop("out");
+        end
     end
     CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_GUILD", ...);
 end
@@ -339,7 +363,7 @@ function Officer:CHAT_MSG_OFFICER_CONTROLLER(eventController, ...)
         eventController:BlockFromDelegate(self);
         return;
     end
-    if(getRuleSet().supress) then
+    if(not db.chat.officer.neverSuppress and getRuleSet().supress) then
         eventController:BlockFromChatFrame(self);
     end
 end
@@ -360,9 +384,13 @@ function Officer:CHAT_MSG_OFFICER(...)
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_OFFICER", ...);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
-        win:Pop("in");
+        if(not db.chat.officer.neverPop) then
+            win:Pop("in");
+        end
     else
-        win:Pop("out");
+        if(not db.chat.officer.neverPop) then
+            win:Pop("out");
+        end
     end
     CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_OFFICER", ...);
 end
@@ -427,7 +455,7 @@ function Party:CHAT_MSG_PARTY_CONTROLLER(eventController, ...)
         eventController:BlockFromDelegate(self);
         return;
     end
-    if(getRuleSet().supress) then
+    if(not db.chat.party.neverSuppress and getRuleSet().supress) then
         eventController:BlockFromChatFrame(self);
     end
 end
@@ -448,9 +476,13 @@ function Party:CHAT_MSG_PARTY(...)
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_PARTY", ...);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
-        win:Pop("in");
+        if(not db.chat.party.neverPop) then
+            win:Pop("in");
+        end
     else
-        win:Pop("out");
+        if(not db.chat.party.neverPop) then
+            win:Pop("out");
+        end
     end
     CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_PARTY", ...);
 end
@@ -513,7 +545,7 @@ function Raid:CHAT_MSG_RAID_CONTROLLER(eventController, ...)
         eventController:BlockFromDelegate(self);
         return;
     end
-    if(getRuleSet().supress) then
+    if(not db.chat.raid.neverSuppress and getRuleSet().supress) then
         eventController:BlockFromChatFrame(self);
     end
 end
@@ -534,9 +566,13 @@ function Raid:CHAT_MSG_RAID(...)
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_RAID", ...);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
-        win:Pop("in");
+        if(not db.chat.raid.neverPop) then
+            win:Pop("in");
+        end
     else
-        win:Pop("out");
+        if(not db.chat.raid.neverPop) then
+            win:Pop("out");
+        end
     end
     CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_RAID", ...);
 end
@@ -546,7 +582,7 @@ function Raid:CHAT_MSG_RAID_LEADER_CONTROLLER(eventController, ...)
         eventController:BlockFromDelegate(self);
         return;
     end
-    if(getRuleSet().supress) then
+    if(not db.chat.raid.neverSuppress and getRuleSet().supress) then
         eventController:BlockFromChatFrame(self);
     end
 end
@@ -567,14 +603,139 @@ function Raid:CHAT_MSG_RAID_LEADER(...)
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_RAID_LEADER", ...);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
-        win:Pop("in");
+        if(not db.chat.raid.neverPop) then
+            win:Pop("in");
+        end
     else
-        win:Pop("out");
+        if(not db.chat.raid.neverPop) then
+            win:Pop("out");
+        end
     end
     CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_RAID_LEADER", ...);
 end
 
 
+
+--------------------------------------
+--            Battleground Chat             --
+--------------------------------------
+
+-- create RaidChat Module
+local Battleground = CreateModule("BattlegroundChat");
+
+-- This Module requires LibChatHandler-1.0
+_G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(Battleground);
+
+function Battleground:OnEnable()
+    if(not db.chatBeta) then
+        return;
+    end
+    RegisterWidget("chat_info", createWidget_Chat);
+    self:RegisterChatEvent("CHAT_MSG_BATTLEGROUND");
+    self:RegisterChatEvent("CHAT_MSG_BATTLEGROUND_LEADER");
+end
+
+function Battleground:OnDisable()
+    self:UnregisterChatEvent("CHAT_MSG_BATTLEGROUND");
+    self:UnregisterChatEvent("CHAT_MSG_BATTLEGROUND_LEADER");
+end
+
+function Battleground:OnWindowDestroyed(self)
+    if(self.type == "chat" and self.chatType == "battleground") then
+        local chatName = self.theUser;
+        Windows[chatName].chatType = nil;
+        Windows[chatName].unreadCount = nil;
+        Windows[chatName].chatLoaded = nil;
+        Windows[chatName].battlegroundWindow = nil;
+        Windows[chatName] = nil;
+    end
+end
+
+local function getBattlegroundCount()
+    for i=1, 20 do
+        local name, header, collapsed, channelNumber, count, active, category, voiceEnabled, voiceActive = _G.GetChannelDisplayInfo(i);
+        if(name == _G.BATTLEGROUND) then
+            return count;
+        end
+    end
+    return 0;
+end
+
+function Battleground:OnWindowShow(win)
+    if(win.type == "chat" and win.chatType == "battleground") then
+        win.widgets.chat_info:SetText(getBattlegroundCount());
+    end
+end
+
+function Battleground:CHAT_MSG_BATTLEGROUND_CONTROLLER(eventController, ...)
+    if(eventController.ignoredByWIM) then
+        eventController:BlockFromDelegate(self);
+        return;
+    end
+    if(not db.chat.battleground.neverSuppress and getRuleSet().supress) then
+        eventController:BlockFromChatFrame(self);
+    end
+end
+
+function Battleground:CHAT_MSG_BATTLEGROUND(...)
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_BATTLEGROUND", ...);
+    if(filter) then
+        return;
+    end
+    local win = getChatWindow(_G.BATTLEGROUND, "battleground");
+    win.widgets.chat_info:SetText(getBattlegroundCount());
+    local color = _G.ChatTypeInfo["BATTLEGROUND"];
+    self.battlegroundWindow = win;
+    self.chatLoaded = true;
+    arg3 = CleanLanguageArg(arg3);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BATTLEGROUND", ...);
+    if(arg2 ~= _G.UnitName("player")) then
+        win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
+        if(not db.chat.battleground.neverPop) then
+            win:Pop("in");
+        end
+    else
+        if(not db.chat.battleground.neverPop) then
+            win:Pop("out");
+        end
+    end
+    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_BATTLEGROUND", ...);
+end
+
+function Battleground:CHAT_MSG_BATTLEGROUND_LEADER_CONTROLLER(eventController, ...)
+    if(eventController.ignoredByWIM) then
+        eventController:BlockFromDelegate(self);
+        return;
+    end
+    if(not db.chat.battleground.neverSuppress and getRuleSet().supress) then
+        eventController:BlockFromChatFrame(self);
+    end
+end
+
+function Battleground:CHAT_MSG_BATTLEGROUND_LEADER(...)
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_BATTLEGROUND_LEADER", ...);
+    if(filter) then
+        return;
+    end
+    local win = getChatWindow(_G.BATTLEGROUND, "battleground");
+    win.widgets.chat_info:SetText(getBattlegroundCount());
+    local color = _G.ChatTypeInfo["BATTLEGROUND_LEADER"];
+    self.battlegroundWindow = win;
+    self.chatLoaded = true;
+    arg3 = CleanLanguageArg(arg3);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BATTLEGROUND_LEADER", ...);
+    if(arg2 ~= _G.UnitName("player")) then
+        win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
+        if(not db.chat.battleground.neverPop) then
+            win:Pop("in");
+        end
+    else
+        if(not db.chat.battleground.neverPop) then
+            win:Pop("out");
+        end
+    end
+    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_BATTLEGROUND_LEADER", ...);
+end
 
 --------------------------------------
 --            Say Chat            --
@@ -614,7 +775,7 @@ function Say:CHAT_MSG_SAY_CONTROLLER(eventController, ...)
         eventController:BlockFromDelegate(self);
         return;
     end
-    if(getRuleSet().supress) then
+    if(not db.chat.say.neverSuppress and getRuleSet().supress) then
         eventController:BlockFromChatFrame(self);
     end
 end
@@ -631,9 +792,13 @@ function Say:CHAT_MSG_SAY(...)
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_SAY", ...);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
-        win:Pop("in");
+        if(not db.chat.say.neverPop) then
+            win:Pop("in");
+        end
     else
-        win:Pop("out");
+        if(not db.chat.say.neverPop) then
+            win:Pop("out");
+        end
     end
     CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_SAY", ...);
 end
@@ -859,19 +1024,21 @@ function ChatAlerts:PostEvent_ChatMessage(event, ...)
         end
     else
         local win;
-        if(event == "GUILD") then
+        if(event == "GUILD" and db.chat.guild.showAlerts) then
             win = getChatWindow(_G.GUILD, "guild");
-        elseif(event == "OFFICER") then
+        elseif(event == "OFFICER" and db.chat.officer.showAlerts) then
             win = getChatWindow(_G.GUILD_RANK1_DESC, "officer");
-        elseif(event == "PARTY") then
+        elseif(event == "PARTY" and db.chat.party.showAlerts) then
             win = getChatWindow(_G.PARTY, "party");
-        elseif(event == "RAID" or event == "RAID_LEADER") then
+        elseif((event == "RAID" or event == "RAID_LEADER") and db.chat.raid.showAlerts) then
             win = getChatWindow(_G.RAID, "raid");
-        elseif(event == "SAY") then
+        elseif((event == "BATTLEGROUND" or event == "BATTLEGROUND_LEADER") and db.chat.battleground.showAlerts) then
+            win = getChatWindow(_G.BATTLEGROUND, "battleground");
+        elseif(event == "SAY" and db.chat.say.showAlerts) then
             win = getChatWindow(_G.SAY, "say");
         end
         
-        if(win and not win:IsVisible() and win.unreadCount) then
+        if(win and not win:IsVisible() and win.unreadCount and win.unreadCount > 0) then
             local color = _G.ChatTypeInfo[string.upper(win.chatType)];
             MinimapPushAlert(win.theUser, RGBPercentToHex(color.r, color.g, color.b), win.unreadCount);
         end
@@ -895,12 +1062,17 @@ local function loadChatOptions()
     local desc = L["WIM will manage this chat type within its own message windows."];
     
     -- standard chat template
-    local function createChatTemplate(chatName, moduleName)
+    local function createChatTemplate(chatName, moduleName, chatType)
+        local chatDB = db.chat[chatType];
         local f = options.CreateOptionsFrame();
         f.sub = f:CreateSection(chatName, desc);
         f.sub.nextOffSetY = -10;
         f.sub:CreateCheckButton(L["Enable"], WIM.modules[moduleName], "enabled", nil, function(self, button) EnableModule(moduleName, self:GetChecked()); end);
-        f.sub.nextOffSetY = -15;
+        f.sub.nextOffSetY = -30;
+        f.sub:CreateCheckButton(L["Show Minimap Alerts"], chatDB, "showAlerts");
+        f.sub.nextOffSetY = -25;
+        f.sub:CreateCheckButton(L["Never pop-up on my screen."], chatDB, "neverPop");
+        f.sub:CreateCheckButton(L["Never suppress messages."], chatDB, "neverSuppress");
         return f;
     end
     
@@ -1111,27 +1283,32 @@ local function loadChatOptions()
     end
     
     local function createGuildChat()
-        local f = createChatTemplate(_G.GUILD, "GuildChat");
+        local f = createChatTemplate(_G.GUILD, "GuildChat", "guild");
         return f;
     end
     
     local function createOfficerChat()
-        local f = createChatTemplate(_G.GUILD_RANK1_DESC, "OfficerChat");
+        local f = createChatTemplate(_G.GUILD_RANK1_DESC, "OfficerChat", "officer");
         return f;
     end
     
     local function createPartyChat()
-        local f = createChatTemplate(_G.PARTY, "PartyChat");
+        local f = createChatTemplate(_G.PARTY, "PartyChat", "party");
         return f;
     end
     
     local function createRaidChat()
-        local f = createChatTemplate(_G.RAID, "RaidChat");
+        local f = createChatTemplate(_G.RAID, "RaidChat", "raid");
+        return f;
+    end
+    
+    local function createBattlegroundChat()
+        local f = createChatTemplate(_G.BATTLEGROUND, "BattlegroundChat", "battleground");
         return f;
     end
     
     local function createSayChat()
-        local f = createChatTemplate(_G.SAY, "SayChat");
+        local f = createChatTemplate(_G.SAY, "SayChat", "say");
         return f;
     end
     
@@ -1149,6 +1326,7 @@ local function loadChatOptions()
     RegisterOptionFrame(L["Chat"], _G.GUILD_RANK1_DESC, createOfficerChat);
     RegisterOptionFrame(L["Chat"], _G.PARTY, createPartyChat);
     RegisterOptionFrame(L["Chat"], _G.RAID, createRaidChat);
+    RegisterOptionFrame(L["Chat"], _G.BATTLEGROUND, createBattlegroundChat);
     RegisterOptionFrame(L["Chat"], _G.SAY, createSayChat);
     RegisterOptionFrame(L["Chat"], L["World Chat"], createWorldChat);
     RegisterOptionFrame(L["Chat"], L["Custom Chat"], createCustomChat);

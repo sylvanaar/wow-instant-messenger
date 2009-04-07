@@ -121,7 +121,7 @@ end
 local function createPopRuleFrame(winType)
     local frame = options.CreateOptionsFrame();
     frame.type = winType;
-    frame.main = frame:CreateSection(L["Window Behavior"], L["You can control how windows behave while you are in different situations."]);
+    frame.main = frame:CreateSection((winType == "chat" and _G.CHAT..": " or "")..L["Window Behavior"], L["You can control how windows behave while you are in different situations."]);
     frame.main.nextOffSetY = -20;
     frame.main.intercept = frame.main:CreateCheckButton(L["Intercept Slash Commands"], db.pop_rules[frame.type], "intercept");
     frame.main.nextOffSetY = -20;
@@ -463,7 +463,7 @@ local function Whispers_Filters(isChat)
     local filterActions = {L["Allow"], L["Ignore"], L["Block"]}
     local frame = options.CreateOptionsFrame();
     local filters = isChat and chatFilters or filters;
-    frame.sub = frame:CreateSection(L["Filtering"], L["Filtering allows you to control which messages are handled as well as how they are handlef by WIM."]);
+    frame.sub = frame:CreateSection((isChat and _G.CHAT..": " or "")..L["Filtering"], L["Filtering allows you to control which messages are handled as well as how they are handlef by WIM."]);
     frame.sub.nextOffSetY = -10;
     frame.sub:CreateCheckButton(L["Enable Filtering"], isChat and WIM.modules.ChatFilters or WIM.modules.Filters, "enabled", nil, function(self, button) EnableModule(isChat and "ChatFilters" or "Filters", self:GetChecked()); end);
     frame.sub.nextOffSetY = -15;
@@ -618,11 +618,12 @@ local function Whispers_Filters(isChat)
     return frame;
 end
 
-local function General_History()
+local function General_History(isChat)
+    local historyDB = isChat and db.history.chat or db.history;
     local f = options.CreateOptionsFrame();
-    f.sub = f:CreateSection(L["History"], L["WIM can store conversations to be viewed at a later time."]);
+    f.sub = f:CreateSection((isChat and _G.CHAT..": " or "")..L["History"], L["WIM can store conversations to be viewed at a later time."]);
     f.sub.nextOffSetY = -10;
-    f.sub:CreateCheckButton(L["Enable History"], WIM.modules.History, "enabled", nil, function(self, button) EnableModule("History", self:GetChecked()); end);
+    f.sub:CreateCheckButton(L["Enable History"], isChat and WIM.modules.HistoryChat or WIM.modules.History, "enabled", nil, function(self, button) EnableModule(isChat and "HistoryChat" or "History", self:GetChecked()); end);
     f.sub.nextOffSetY = -15;
     local tsList = {};
     for i=1, 10 do
@@ -632,21 +633,34 @@ local function General_History()
             justifyH = "LEFT",
         });
     end
-    f.sub:CreateCheckButtonMenu(L["Preview history inside message windows."], db.history, "preview", nil, nil, tsList, db.history, "previewCount");
-    f.sub.nextOffSetY = -10;
-    f.sub.whispers = f.sub:CreateCheckButton(L["Record Whispers"], db.history.whispers, "enabled");
-    f.sub.whispers:CreateCheckButton(L["Record Friends"], db.history.whispers, "friends");
-    f.sub.whispers:CreateCheckButton(L["Record Guild"], db.history.whispers, "guild");
-    f.sub.whispers:CreateCheckButton(L["Record Everyone"], db.history.whispers, "all");
+    f.sub:CreateCheckButtonMenu(L["Preview history inside message windows."], historyDB, "preview", nil, nil, tsList, historyDB, "previewCount");
+    f.sub.nextOffSetY = -15;
 
-    f.sub.chat = f.sub:CreateCheckButton(L["Record Chat"], db.history.chat, "enabled");
+    if(not isChat) then
+        f.sub:CreateCheckButton(L["Record Friends"], historyDB.whispers, "friends");
+        f.sub:CreateCheckButton(L["Record Guild"], historyDB.whispers, "guild");
+        f.sub:CreateCheckButton(L["Record Everyone"], historyDB.whispers, "all");
+    else
+        f.sub.col1 = f.sub:CreateCheckButton(_G.GUILD, historyDB, "guild");
+        f.sub:CreateCheckButton(_G.GUILD_RANK1_DESC, historyDB, "officer");
+        f.sub:CreateCheckButton(_G.PARTY, historyDB, "party");
+        f.sub:CreateCheckButton(_G.RAID, historyDB, "raid");
+        
+        f.sub.col2 = f.sub:CreateCheckButton(_G.SAY, historyDB, "say");
+        f.sub.col2:ClearAllPoints();
+        f.sub.col2:SetPoint("TOPLEFT", f.sub.col1, 200, 0);
+        f.sub:CreateCheckButton(_G.BATTLEGROUND, historyDB, "battleground");
+        f.sub:CreateCheckButton(L["World Chat"], historyDB, "world");
+        f.sub:CreateCheckButton(L["Custom Chat"], historyDB, "custom");
+    end
+    --[[f.sub.chat = f.sub:CreateCheckButton(L["Record Chat"], db.history.chat, "enabled");
     f.sub.chat:ClearAllPoints();
     f.sub.chat:SetPoint("TOPLEFT", f.sub.whispers, 200, 0);
     f.sub.chat:CreateCheckButton(L["Record Friends"], db.history.chat, "friends");
     f.sub.chat:CreateCheckButton(L["Record Guild"], db.history.chat, "guild");
     f.sub.chat:CreateCheckButton(L["Record Everyone"], db.history.chat, "all");
     f.sub.chat:Disable();
-    f.sub.lastObj = f.sub.whispers;
+    f.sub.lastObj = f.sub.whispers;]]
     
     f.maint = f:CreateSection(L["Maintenance"], L["Allowing your history logs to grow too large will affect the game's performance, therefore it is reccomended that you use the following options."]);
     f.maint:ClearAllPoints();
@@ -662,7 +676,7 @@ local function General_History()
         });
     end
     f.maint.nextOffSetY = -10;
-    f.maint:CreateCheckButtonMenu(L["Save a maximum number of messages per person."], db.history, "maxPer", nil, nil, tsList, db.history, "maxCount");
+    f.maint:CreateCheckButtonMenu(L["Save a maximum number of messages per person."], historyDB, "maxPer", nil, nil, tsList, db.history, "maxCount");
     --f.maint.nextOffSetY = -10;
     local tsList2 = {};
     for i=1, 5 do
@@ -672,7 +686,7 @@ local function General_History()
             justifyH = "LEFT",
         });
     end
-    f.maint:CreateCheckButtonMenu(L["Automatically delete old messages."], db.history, "ageLimit", nil, nil, tsList2, db.history, "maxAge");
+    f.maint:CreateCheckButtonMenu(L["Automatically delete old messages."], historyDB, "ageLimit", nil, nil, tsList2, db.history, "maxAge");
     return f;
 end
 
@@ -735,12 +749,12 @@ end
 
 local function General_Sounds(isChat)
     local f = options.CreateOptionsFrame();
-    f.sub = f:CreateSection(L["Sounds"], L["Configure various sound events and how they are triggered."]);
+    f.sub = f:CreateSection((isChat and _G.CHAT..": " or "")..L["Sounds"], L["Configure various sound events and how they are triggered."]);
     f.sub.nextOffSetY = -20;
     local soundList = {};
 
     local whisperCount = 4;
-    local chatCount = 10;
+    local chatCount = 11;
 
     for i = 1, (isChat and chatCount or whisperCount) do
         soundList[i] = {};
@@ -762,10 +776,12 @@ local function General_Sounds(isChat)
         f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.PARTY), db.sounds.chat, "party", nil, nil, soundList[4], db.sounds.chat, "party_sml");
         f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.RAID), db.sounds.chat, "raid", nil, nil, soundList[5], db.sounds.chat, "raid_sml");
         f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.RAID_LEADER), db.sounds.chat, "raidleader", nil, nil, soundList[6], db.sounds.chat, "raidleader_sml");
+        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.BATTLEGROUND), db.sounds.chat, "battleground", nil, nil, soundList[5], db.sounds.chat, "battleground_sml");
+        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.BATTLEGROUND_LEADER), db.sounds.chat, "battlegroundleader", nil, nil, soundList[6], db.sounds.chat, "battleground_sml");
         f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.SAY), db.sounds.chat, "say", nil, nil, soundList[7], db.sounds.chat, "say_sml");
         f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(L["World Chat"]), db.sounds.chat, "world", nil, nil, soundList[8], db.sounds.chat, "world_sml");
         f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(L["Custom Chat"]), db.sounds.chat, "custom", nil, nil, soundList[9], db.sounds.chat, "custom_sml");
-        f.sub.nextOffSetY = -250;
+        f.sub.nextOffSetY = -300;
         f.sub:CreateCheckButtonMenu(L["Play sound when a message is sent."], db.sounds.chat, "msgout", nil, nil, soundList[10], db.sounds.chat, "msgout_sml");
     else
         f.sub.whispers = f.sub:CreateCheckButtonMenu(L["Play sound when a whisper is received."], db.sounds.whispers, "msgin", nil, nil, soundList[1], db.sounds.whispers, "msgin_sml");
@@ -841,7 +857,7 @@ RegisterOptionFrame(L["Whispers"], L["Filtering"], Whispers_Filters);
 RegisterOptionFrame(L["Whispers"], L["Sounds"], General_Sounds);
 RegisterOptionFrame(L["Whispers"], L["Window Behavior"], WhisperPopRules);
 
-RegisterOptionFrame(L["Chat"], L["History"], nil);
+RegisterOptionFrame(L["Chat"], L["History"], function() return General_History(true); end);
 RegisterOptionFrame(L["Chat"], L["Filtering"], function() return Whispers_Filters(true); end);
 RegisterOptionFrame(L["Chat"], L["Sounds"], function() return General_Sounds(true); end);
 RegisterOptionFrame(L["Chat"], L["Window Behavior"], ChatPopRules);

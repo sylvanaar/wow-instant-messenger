@@ -23,16 +23,17 @@ db_defaults.history = {
     ageLimit = true,
     maxAge = 60*60*24*7*2,
     whispers = {
-        enabled = true,
         friends = true,
         guild = true,
         all = false
     },
     chat = {
-        enabled = false,
-        friends = true,
-        guild = true,
-        all = true
+        preview = true,
+        previewCount = 25,
+        maxPer = true,
+        maxCount = 500,
+        ageLimit = true,
+        maxAge = 60*60*24*7*2,
     }
 };
 db_defaults.displayColors.historyIn = {
@@ -117,26 +118,24 @@ end
 
 
 local function recordWhisper(inbound, ...)
-    if(db.history.whispers.enabled) then
-        local msg, from = ...;
-        local db = db.history.whispers;
-        local win = windows.active.whisper[from] or windows.active.chat[from] or windows.active.w2w[from];
-        if(win and (lists.gm[from] or db.all or (db.friends and lists.friends[from]) or (db.guild and lists.guild[from]))) then
-            win.widgets.history:SetHistory(true);
-            local history = getPlayerHistoryTable(from);
-            history.info.gm = lists.gm[from];
-            table.insert(history, {
-                convo = from,
-                type = 1, -- whisper
-                inbound = inbound or false,
-                from = inbound and from or env.character,
-                msg = msg,
-                time = _G.time();
-            });
-            if(WIM.db.history.maxPer) then
-                while(WIM.db.history.maxCount < #history) do
-                    table.remove(history, 1);
-                end
+    local msg, from = ...;
+    local db = db.history.whispers;
+    local win = windows.active.whisper[from] or windows.active.chat[from] or windows.active.w2w[from];
+    if(win and (lists.gm[from] or db.all or (db.friends and lists.friends[from]) or (db.guild and lists.guild[from]))) then
+        win.widgets.history:SetHistory(true);
+        local history = getPlayerHistoryTable(from);
+        history.info.gm = lists.gm[from];
+        table.insert(history, {
+            convo = from,
+            type = 1, -- whisper
+            inbound = inbound or false,
+            from = inbound and from or env.character,
+            msg = msg,
+            time = _G.time();
+        });
+        if(WIM.db.history.maxPer) then
+            while(WIM.db.history.maxCount < #history) do
+                table.remove(history, 1);
             end
         end
     end
@@ -185,7 +184,7 @@ function History:OnEnable()
     for widget in Widgets("history") do
         local win = widget.parentWindow;
         if(win) then
-            local history = history[env.realm] and history[env.realm][env.character] and history[env.realm][env.character][win.theUser];
+            local history = history[env.realm] and history[env.realm][env.character] and history[env.realm][env.character][win.theUser] and win.type == "whisper";
             if(history) then
                 widget:SetHistory(true);
             end
@@ -198,7 +197,9 @@ function History:OnDisable()
         return;
     end
     for widget in Widgets("history") do
-        widget:SetHistory(false); -- module is disabled, hide Icons.
+        if(widget.parentWindow.type == "whisper") then
+            widget:SetHistory(false); -- module is disabled, hide Icons.
+        end
     end
 end
 
@@ -230,6 +231,46 @@ function History:OnWindowCreated(win)
                 win.widgets.chat_display:AddMessage(" ");
             end
             clearTmpTable();
+        end
+    end
+end
+
+
+--Chat History
+local ChatHistory = CreateModule("HistoryChat");
+
+-- synonymous functions
+ChatHistory.OnWindowDestroyed = History.OnWindowDestroyed;
+
+
+function ChatHistory:OnEnableWIM()
+    -- clean up history if asked to.
+    if(db.history.chat.ageLimit) then
+        deleteOldHistory(true);
+    end
+end
+
+function ChatHistory:OnEnable()
+    RegisterWidget("history", createWidget);
+    for widget in Widgets("history") do
+        local win = widget.parentWindow;
+        if(win) then
+            local chatName = win.theUser
+            local history = history[env.realm] and history[env.realm][env.character] and history[env.realm][env.character][chatName] and win.type == "chat";
+            if(history) then
+                widget:SetHistory(true);
+            end
+        end
+    end
+end
+
+function ChatHistory:OnDisable()
+    if(db.modules.HistoryChat.enabled) then
+        return;
+    end
+    for widget in Widgets("history") do
+        if(widget.parentWindow.type == "chat") then
+            widget:SetHistory(false); -- module is disabled, hide Icons.
         end
     end
 end
@@ -1121,7 +1162,7 @@ table.insert(ViewTypes, {
 	                nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b; 
 	                frame.nextStamp = msg.time;
                         local chatColor = "[color=#"..RGBPercentToHex(color.r, color.g, color.b).."]";
-                        local chatColorPattern = "%[color%=%#"..RGBPercentToHex(color.r, color.g, color.b).."%]%[%/color%]";
+                        local chatColorPattern = "%[color%=%#"..RGBPercentToHex(color.r, color.g, color.b).."%]%s*%[%/color%]";
 	                msg = applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from) 
 	                msg = applyStringModifiers(msg, frame); 
 	                msg = msg:gsub("|c[0-9A-Fa-f][0-9A-Fa-f]([0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])|Hwim_url:([^|]*)|h.-|h|r", "[/color][url=%2][color=#%1]%2[/color][/url]"..chatColor); 
