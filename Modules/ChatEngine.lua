@@ -986,7 +986,7 @@ function Channel:CHAT_MSG_CHANNEL(...)
 end
 
 function Channel:SettingsChanged()
-    if(db.chat.world.enabled or db.chat.world.enabled) then
+    if(db.chat.world.enabled or db.chat.custom.enabled) then
         self:Enable();
     else
         self:Disable();
@@ -1128,6 +1128,7 @@ local function loadChatOptions()
                     f.sub.list.buttons[i].neverPop:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].neverPop);
                     f.sub.list.buttons[i].neverSuppress:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].neverSuppress);
                     f.sub.list.buttons[i].showAlerts:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].showAlerts);
+                    f.sub.list.buttons[i].noHistory:SetChecked(db.chat[channelType].channelSettings[name] and db.chat[channelType].channelSettings[name].noHistory);
                     local color = _G.ChatTypeInfo["CHANNEL"..channelNumber];
                     f.sub.list.buttons[i].title:SetTextColor(color.r, color.g, color.b);
                     if(active) then
@@ -1243,6 +1244,25 @@ local function loadChatOptions()
                 self:GetParent():GetParent().help:SetText(L["Show unread message alert on minimap."]);
             end);
             button.showAlerts:SetScript("OnLeave", function(self)
+                self:GetParent():GetParent().help:SetText("");
+            end);
+            
+            -- Don't record history
+            button.noHistory = _G.CreateFrame("CheckButton", nil, button, "UICheckButtonTemplate");
+            button.noHistory:SetPoint("TOPLEFT", button.showAlerts, "BOTTOMLEFT", 0, 0);
+            button.noHistory:SetScale(.75);
+            button.noHistory.text = button.noHistory:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+            button.noHistory.text:SetPoint("LEFT", button.noHistory, "RIGHT", 0, 0);
+            button.noHistory.text:SetText(L["No History"]);
+            button.noHistory:SetScript("OnClick", function(self)
+                    local name = self:GetParent().channelName;
+                    db.chat[channelType].channelSettings[name].noHistory = self:GetChecked();
+            end)
+            button.noHistory:SetScript("OnEnter", function(self)
+                self:GetParent():GetParent().help:SetJustifyH("LEFT");
+                self:GetParent():GetParent().help:SetText(L["Do not record history for this channel."]);
+            end);
+            button.noHistory:SetScript("OnLeave", function(self)
                 self:GetParent():GetParent().help:SetText("");
             end);
             
