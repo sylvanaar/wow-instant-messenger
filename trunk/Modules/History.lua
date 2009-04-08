@@ -56,6 +56,8 @@ local tmpTable = {};
 
 local ViewTypes = {};
 
+local ChannelCache = {};
+
 local function clearTmpTable()
     for key, _ in pairs(tmpTable) do
         tmpTable[key] = nil;
@@ -149,13 +151,14 @@ function History:PostEvent_WhisperInform(...)
     recordWhisper(false, ...);
 end
 
-local function deleteOldHistory()
+local function deleteOldHistory(isChat)
+    local historyDB = isChat and db.history.chat or db.history;
     local count = 0;
     for realm, characters in pairs(history) do
         for character, convos in pairs(characters) do
             for convo, messages in pairs(convos) do
                 for i=#messages, 1, -1 do
-                    if((time() - messages[i].time) > db.history.maxAge) then
+                    if((time() - messages[i].time) > historyDB.maxAge and ((isChat and messages[i].type == 2) or (not isChat and messages[i].type == 1))) then
                         dPrint("Deleting History."..realm.."."..character.."."..convo.."["..i.."]");
                         table.remove(messages, i);
                         count = count + 1;
@@ -271,6 +274,79 @@ function ChatHistory:OnDisable()
     for widget in Widgets("history") do
         if(widget.parentWindow.type == "chat") then
             widget:SetHistory(false); -- module is disabled, hide Icons.
+        end
+    end
+end
+
+
+local function recordChannelChat(recordAs, ChannelType, ...)
+    local msg, from = ...;
+    local db = db.history.whispers;
+    local win = windows.active.chat[recordAs];
+    if(win) then
+        win.widgets.history:SetHistory(true);
+        local history = getPlayerHistoryTable(recordAs);
+        history.info.chat = true;
+        history.info.channelNumber = channelNumber;
+        _G.test = history;
+        table.insert(history, {
+            event = ChannelType,
+            channelName = recordAs,
+            type = 2, -- chat
+            from = from,
+            msg = msg,
+            time = _G.time();
+        });
+        if(WIM.db.history.chat.maxPer) then
+            while(WIM.db.history.chat.maxCount < #history) do
+                table.remove(history, 1);
+            end
+        end
+    end
+end
+
+
+function ChatHistory:PostEvent_ChatMessage(event, ...)
+    local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
+    event = event:gsub("CHAT_MSG_", "");
+    if(event == "CHANNEL") then
+        local recordAs;
+        local isWorld = arg7 and arg7 > 0;
+        local chatType = isWorld and "world" or "custom";
+        local channelName = string.split(" - ", arg9);
+        local channelNumber = arg8;
+        recordAs = channelName;
+        if(recordAs and ((isWorld and db.history.chat.world) or (not isWorld and db.history.chat.custom))) then
+            local noHistory = db.chat[isWorld and "world" or "custom"].channelSettings[channelName] and db.chat[isWorld and "world" or "custom"].channelSettings[channelName].noHistory;
+            if(not noHistory) then
+                recordChannelChat(recordAs, event, ...);
+            end
+        end
+    else
+        local recordAs;
+        local chatType;
+        if(event == "GUILD" and db.history.chat.guild) then
+            recordAs = _G.GUILD;
+            chatType = "guild";
+        elseif(event == "OFFICER" and db.history.chat.officer) then
+            recordAs = _G.GUILD_RANK1_DESC;
+            chatType = "officer";
+        elseif(event == "PARTY" and db.history.chat.party) then
+            recordAs = _G.PARTY;
+            chatType = "party";
+        elseif((event == "RAID" or event == "RAID_LEADER") and db.history.chat.raid) then
+            recordAs = _G.RAID;
+            chatType = "raid";
+        elseif((event == "BATTLEGROUND" or event == "BATTLEGROUND_LEADER") and db.history.chat.battleground) then
+            recordAs = _G.BATTLEGROUND;
+            chatType = "battleground";
+        elseif(event == "SAY" and db.history.chat.say) then
+            recordAs = _G.SAY;
+            chatType = "say";
+        end
+        
+        if(recordAs) then
+            recordChannelChat(recordAs, event, ...);
         end
     end
 end
@@ -519,10 +595,15 @@ local function createHistoryViewer()
                 button.text:SetJustifyH("LEFT");
                 
                 button.SetUser = function(self, user)
-                        local user, gmTag = string.match(user, "([^*]+)(*?)$");
-                        local color = gmTag == "*" and constants.classes[L["Game Master"]].color or "ffffff";
+                        local original, extra, color = user, "";
+                        local user, gmTag = string.match(original, "([^*]+)(*?)$");
+                        color = gmTag == "*" and constants.classes[L["Game Master"]].color or "ffffff";
+                        if(string.match(original, "^*")) then
+                            extra = " |TInterface\\AddOns\\WIM\\Skins\\Default\\minimap.tga:20:20:0:0|t";
+                            color = "fff569";
+                        end
                         self.user = user;
-                        self.text:SetText("     |cff"..color..user.."|r"..(gmTag == "*" and " |TInterface\\ChatFrame\\UI-ChatIcon-Blizz.blp:0:2:0:0|t" or ""));
+                        self.text:SetText("     |cff"..color..user.."|r"..extra..(gmTag == "*" and " |TInterface\\ChatFrame\\UI-ChatIcon-Blizz.blp:0:2:0:0|t" or ""));
                         if(user == win.SELECT) then
                             self:Click();
                         end
@@ -975,11 +1056,15 @@ local function createHistoryViewer()
         if(realm and character and history[realm] and history[realm][character]) then
             local tbl = history[realm][character];
             for convo, t in pairs(tbl) do
+                ChannelCache[convo] = t.info and t.info.channelNumber or nil;
+                convo = (t.info and t.info.chat and "*" or "")..convo
                 addToTableUnique(win.USERLIST, convo..(t.info and t.info.gm and "*" or ""));
             end
         elseif(realm and (not character or character == "") and history[realm]) then
             for character, tbl in pairs(history[realm]) do
                 for convo, t in pairs(tbl) do
+                    ChannelCache[convo] = t.info and t.info.channelNumber or nil;
+                    convo = (t.info and t.info.chat and "*" or "")..convo
                     addToTableUnique(win.USERLIST, convo..(t.info and t.info.gm and "*" or ""));
                 end
             end
@@ -1047,6 +1132,7 @@ local function createDisplayUpdate()
     local displayUpdate = CreateFrame("Frame");
     displayUpdate:Hide();
     displayUpdate.firstPass = true;
+    displayUpdate.tmpTable = {};
     displayUpdate.Process = function(self)
             self.i = self.i or 1;
             if(not self.curList or not self.curList[self.i]) then
@@ -1054,16 +1140,26 @@ local function createDisplayUpdate()
                 return;
             end
             HistoryViewer.progressBar.bar.bg:SetWidth(HistoryViewer.progressBar.bar:GetWidth()*self.i/#self.curList);
+            
+            -- clear tmpTable
+            for k, _ in pairs(self.tmpTable) do
+                self.tmpTable[k] = nil;
+            end
+            -- load tmpTable
+            for k, v in pairs(self.curList[self.i]) do
+                self.tmpTable[k] = v;
+            end
+            
             if(self.filter) then
-                if(self.min <= self.curList[self.i].time and self.max > self.curList[self.i].time) then
-                    ViewTypes[HistoryViewer.TAB].func(self.frame, self.curList[self.i]);
+                if(self.min <= self.tmpTable.time and self.max > self.tmpTable.time) then
+                    ViewTypes[HistoryViewer.TAB].func(self.frame, self.tmpTable);
                 else
                     self.i = self.i + 1;
                     self:Process();
                     return;
                 end
             else
-                ViewTypes[HistoryViewer.TAB].func(self.frame, self.curList[self.i]);
+                ViewTypes[HistoryViewer.TAB].func(self.frame, self.tmpTable);
             end
             self.i = self.i + 1;
         end;
@@ -1122,19 +1218,30 @@ local function createDisplayUpdate()
     return displayUpdate;
 end
 
+local colorWhite = {r=1, g=1, b=1};
 local chatFrameMsgId = -1;
 table.insert(ViewTypes, {
         text = L["Chat View"],
         frame = "chatFrame",
         func = function(frame, msg)
+            local color;
             if(msg.type == 1) then
-                local color = db.displayColors[msg.inbound and "wispIn" or "wispOut"];
+                color = db.displayColors[msg.inbound and "wispIn" or "wispOut"];
                 nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b;
-                frame.nextStamp = msg.time;
-                frame:AddMessage(applyStringModifiers(applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from,
-                        nil, nil, nil, nil, nil, nil, nil, nil, chatFrameMsgId), frame), color.r, color.g, color.b);
-                chatFrameMsgId = chatFrameMsgId > -1000 and chatFrameMsgId - 1 or -1;
+            elseif(msg.type == 2) then
+                if(msg.event == CHANNEL) then
+                    color = _G.ChatTypeInfo["CHANNEL"..msg.channelNumber];
+                else
+                    color = _G.ChatTypeInfo[msg.event];
+                end
+                color = color or colorWhite;
+                nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b;
             end
+                frame.nextStamp = msg.time;
+                frame:AddMessage(applyStringModifiers(applyMessageFormatting(frame, "CHAT_MSG_"..(msg.event or "WHISPER"), msg.msg, msg.from,
+                        nil, nil, nil, nil, 0, msg.channelName and ChannelCache[msg.channelName], msg.channelName, nil, chatFrameMsgId), frame), color.r, color.g, color.b);
+                chatFrameMsgId = chatFrameMsgId > -1000 and chatFrameMsgId - 1 or -1;
+                
         end
     });
 table.insert(ViewTypes, {
@@ -1142,11 +1249,12 @@ table.insert(ViewTypes, {
         frame = "textFrame",
         func = function(frame, msg)
             frame.noEscapedStrings = true;
-            if(msg.type == 1) then
+            if(msg.type == 1 or msg.type == 2) then
                 local color = db.displayColors[msg.inbound and "wispIn" or "wispOut"];
                 nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b;
                 frame.nextStamp = msg.time;
-                frame:AddMessage(applyStringModifiers(applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from), frame), color.r, color.g, color.b)
+                frame:AddMessage(applyStringModifiers(applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from,
+                nil, nil, nil, nil, 0, msg.channelName and ChannelCache[msg.channelName], msg.channelName), frame), color.r, color.g, color.b)
             end
         end
     });
@@ -1155,25 +1263,34 @@ table.insert(ViewTypes, {
 table.insert(ViewTypes, { 
 	        text = L["BBCode"], 
 	        frame = "textFrame", 
-	        func = function(frame, msg) 
-	            if(msg.type == 1) then 
-	                frame.noEscapedStrings = nil; 
-	                local color = db.displayColors[msg.inbound and "wispIn" or "wispOut"]; 
-	                nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b; 
-	                frame.nextStamp = msg.time;
-                        local chatColor = "[color=#"..RGBPercentToHex(color.r, color.g, color.b).."]";
-                        local chatColorPattern = "%[color%=%#"..RGBPercentToHex(color.r, color.g, color.b).."%]%s*%[%/color%]";
-	                msg = applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from) 
-	                msg = applyStringModifiers(msg, frame); 
-	                msg = msg:gsub("|c[0-9A-Fa-f][0-9A-Fa-f]([0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])|Hwim_url:([^|]*)|h.-|h|r", "[/color][url=%2][color=#%1]%2[/color][/url]"..chatColor); 
-	                msg = msg:gsub("|c[0-9A-Fa-f][0-9A-Fa-f]([0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])", "[color=#%1]"); 
-	                msg = msg:gsub("|r", "[/color]"); 
-	                msg = msg:gsub("(%[color%=%#[0-9A-Fa-f]+%])|Hitem:(%d+)[:%d]*|h([^|]+)|h(%[%/color%])", "[/color][url=http://www.wowhead.com/?item=%2]%1%3%4[/url]"..chatColor); 
-	                msg = chatColor..msg.."[/color]"; 
-	                msg = msg:gsub("(%[color%=%#[0-9A-Fa-f]+%])(%[color%=%#[0-9A-Fa-f]+%])(.-)(%[%/color%])", "%2%3%4%1");
-                        msg = msg:gsub(chatColorPattern, "");
-	                frame:AddMessage(msg, color.r, color.g, color.b) 
-	            end 
+	        func = function(frame, msg)
+                    local color;
+	            if(msg.type == 1) then
+                        color = db.displayColors[msg.inbound and "wispIn" or "wispOut"];
+                        nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b;
+                    elseif(msg.type == 2) then
+                        if(msg.event == CHANNEL) then
+                            color = _G.ChatTypeInfo["CHANNEL"..msg.channelNumber];
+                        else
+                            color = _G.ChatTypeInfo[msg.event];
+                        end
+                        color = color or colorWhite;
+                        nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b;
+                    end
+	            frame.noEscapedStrings = nil; 
+	            frame.nextStamp = msg.time;
+                    local chatColor = "[color=#"..RGBPercentToHex(color.r, color.g, color.b).."]";
+                    local chatColorPattern = "%[color%=%#"..RGBPercentToHex(color.r, color.g, color.b).."%]%s*%[%/color%]";
+	            msg = applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from) 
+	            msg = applyStringModifiers(msg, frame); 
+	            msg = msg:gsub("|c[0-9A-Fa-f][0-9A-Fa-f]([0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])|Hwim_url:([^|]*)|h.-|h|r", "[/color][url=%2][color=#%1]%2[/color][/url]"..chatColor); 
+	            msg = msg:gsub("|c[0-9A-Fa-f][0-9A-Fa-f]([0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])", "[color=#%1]"); 
+	            msg = msg:gsub("|r", "[/color]"); 
+	            msg = msg:gsub("(%[color%=%#[0-9A-Fa-f]+%])|Hitem:(%d+)[:%d]*|h([^|]+)|h(%[%/color%])", "[/color][url=http://www.wowhead.com/?item=%2]%1%3%4[/url]"..chatColor); 
+	            msg = chatColor..msg.."[/color]"; 
+	            msg = msg:gsub("(%[color%=%#[0-9A-Fa-f]+%])(%[color%=%#[0-9A-Fa-f]+%])(.-)(%[%/color%])", "%2%3%4%1");
+                    msg = msg:gsub(chatColorPattern, "");
+	            frame:AddMessage(msg, color.r, color.g, color.b) 
 	        end 
 	    });  
 
