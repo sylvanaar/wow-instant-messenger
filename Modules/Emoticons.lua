@@ -66,7 +66,7 @@ local function filterEmoticons(theMsg, smf)
     end
     
     --check if special formatting is not wanted
-    if(smf and smf.noEscapedStrings) then
+    if(smf and (smf.noEscapedStrings or smf.noEmoticons)) then
         return theMsg;
     end
 

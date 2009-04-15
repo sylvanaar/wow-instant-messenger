@@ -1277,7 +1277,8 @@ table.insert(ViewTypes, {
                         color = color or colorWhite;
                         nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b;
                     end
-	            frame.noEscapedStrings = nil; 
+	            frame.noEscapedStrings = nil;
+                    frame.noEmoticons = true;
 	            frame.nextStamp = msg.time;
                     local chatColor = "[color=#"..RGBPercentToHex(color.r, color.g, color.b).."]";
                     local chatColorPattern = "%[color%=%#"..RGBPercentToHex(color.r, color.g, color.b).."%]%s*%[%/color%]";

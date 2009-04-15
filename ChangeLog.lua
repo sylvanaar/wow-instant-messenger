@@ -16,11 +16,13 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addBetaEntry("3.0.11", "04/??/2009", [[
+addEntry("3.1.1", "04/15/2009", [[
     *Rearranged WIM's options. Sounds & History are now in category Whispers.
     *Revised BBCode export to avoid nested color tags. Thank you Stewart.
     +Added credits menu to options. A lot of people deserve a big thanks.
     *Updated LDB Module to behave the same as the minimap icon.
+    *Emoticons are no longer parsed in BBCode History View.
+    +New Chat Engine! Disabled by default. See WIM's Options (/wim).
 ]]);
 
 addEntry("3.0.10", "04/02/2009", [[
