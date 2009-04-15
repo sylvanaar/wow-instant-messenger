@@ -202,14 +202,6 @@ local function createSubCategory(index)
 end
 
 function options.UpdateCategories(self)
-    --delete once chat is released.
-    if(not db.chatBeta) then
-        local chatIndex = getCategoryIndexByName(L["Chat"]);
-        if(chatIndex) then
-            table.remove(Categories, chatIndex);
-        end
-    end
-
     self = self or options.frame.nav;
     self.sub:Hide();
     self.sub:ClearAllPoints();

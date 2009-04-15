@@ -19,7 +19,7 @@ db_defaults.stats = {
 
 local credits = {
     "Pazza <Bronzebeard-US>",
-    "Stewarta <Emerald Dream - EU>\n\nZeke <Coilfang - US>\nMorphieus <Spinebreaker>\nNachonut <Bronzebeard - US>\n\nChiaki <Frostwolf - EU> - deDE\n"..
+    "Stewarta <Emerald Dream - EU>\n\nAstaldo <Bronzebeard - EU>\nZeke <Coilfang - US>\nMorphieus <Spinebreaker>\nNachonut <Bronzebeard - US>\n\nChiaki <Frostwolf - EU> - deDE\n"..
     "BlueNyx <bluenyx@gmail.com> - koKR\nStingerSoft <stingersoft@iti.lt> - ruRU\nJunxian <junxian1121@hotmail.com> - zhCN & zhTW\n"
 };
 
@@ -740,9 +740,7 @@ local function General_Tabs()
     f.sub.whispers:CreateCheckButton(L["Place friends in their own group."], db.tabs.whispers, "friends", L["Does not apply to windows already opened."]);
     f.sub.whispers:CreateCheckButton(L["Place guild members in their own group."], db.tabs.whispers, "guild", L["Does not apply to windows already opened."]);
     f.sub.nextOffSetY = -80;
-    if(db.chatBeta) then
-        f.sub.chat = f.sub:CreateCheckButton(L["Automatically group chat windows."], db.tabs.chat, "enabled", L["Does not apply to windows already opened."]);
-    end
+    f.sub.chat = f.sub:CreateCheckButton(L["Automatically group chat windows."], db.tabs.chat, "enabled", L["Does not apply to windows already opened."]);
     return f;
 end
 

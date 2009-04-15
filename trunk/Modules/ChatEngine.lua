@@ -211,9 +211,6 @@ local Guild = CreateModule("GuildChat");
 _G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(Guild);
 
 function Guild:OnEnable()
-    if(not db.chatBeta) then
-        return;
-    end
     RegisterWidget("chat_info", createWidget_Chat);
     self:RegisterChatEvent("CHAT_MSG_GUILD");
     self:RegisterChatEvent("CHAT_MSG_GUILD_ACHIEVEMENT");
@@ -312,9 +309,6 @@ local Officer = CreateModule("OfficerChat");
 _G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(Officer);
 
 function Officer:OnEnable()
-    if(not db.chatBeta) then
-        return;
-    end
     RegisterWidget("chat_info", createWidget_Chat);
     self:RegisterChatEvent("CHAT_MSG_OFFICER");
     self:RegisterEvent("GUILD_ROSTER_UPDATE");
@@ -409,9 +403,6 @@ local Party = CreateModule("PartyChat");
 _G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(Party);
 
 function Party:OnEnable()
-    if(not db.chatBeta) then
-        return;
-    end
     RegisterWidget("chat_info", createWidget_Chat);
     self:RegisterChatEvent("CHAT_MSG_PARTY");
     self:RegisterEvent("PARTY_MEMBERS_CHANGED");
@@ -500,9 +491,6 @@ local Raid = CreateModule("RaidChat");
 _G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(Raid);
 
 function Raid:OnEnable()
-    if(not db.chatBeta) then
-        return;
-    end
     RegisterWidget("chat_info", createWidget_Chat);
     self:RegisterChatEvent("CHAT_MSG_RAID");
     self:RegisterChatEvent("CHAT_MSG_RAID_LEADER");
@@ -627,9 +615,6 @@ local Battleground = CreateModule("BattlegroundChat");
 _G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(Battleground);
 
 function Battleground:OnEnable()
-    if(not db.chatBeta) then
-        return;
-    end
     RegisterWidget("chat_info", createWidget_Chat);
     self:RegisterChatEvent("CHAT_MSG_BATTLEGROUND");
     self:RegisterChatEvent("CHAT_MSG_BATTLEGROUND_LEADER");
@@ -748,9 +733,6 @@ local Say = CreateModule("SayChat");
 _G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(Say);
 
 function Say:OnEnable()
-    if(not db.chatBeta) then
-        return;
-    end
     RegisterWidget("chat_info", createWidget_Chat);
     self:RegisterChatEvent("CHAT_MSG_SAY");
 end
@@ -816,9 +798,6 @@ local Channel = CreateModule("ChannelChat");
 _G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(Channel);
 
 function Channel:OnEnable()
-    if(not db.chatBeta) then
-        return;
-    end
     RegisterWidget("chat_info", createWidget_Chat);
     self:RegisterChatEvent("CHAT_MSG_CHANNEL");
     self:RegisterChatEvent("CHAT_MSG_CHANNEL_JOIN");
@@ -1055,9 +1034,6 @@ ChatAlerts:Enable();
 -- create ChatOptions Module
 local ChatOptions = CreateModule("ChatOptions");
 local function loadChatOptions()
-    if(not db.chatBeta or ChatOptions.optionsLoaded) then
-        return;
-    end
     
     local desc = L["WIM will manage this chat type within its own message windows."];
     

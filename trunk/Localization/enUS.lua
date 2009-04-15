@@ -453,4 +453,24 @@ WIM.AddLocale("enUS", {
     ["Show Border"] = true,
     ["Animation Direction:"] = true,
     
+    --ChatEngine.lua
+    ["WIM will manage this chat type within its own message windows."] = true,
+    ["Show Minimap Alerts"] = true,
+    ["Never pop-up on my screen."] = true,
+    ["Never suppress messages."] = true,
+    ["Have WIM monitor this channel."] = true,
+    ["Never Pop"] = true,
+    ["Never have this window pop-up on my screen."] = true,
+    ["Never Supress"] = true,
+    ["Never suppress messages from the default chat frame."] = true,
+    ["Show unread message alert on minimap."] = true,
+    ["No History"] = true,
+    ["Do not record history for this channel."] = true,
+    ["World Chat"] = true,
+    ["Custom Chat"] = true,
+    ["Chat"] = true,
+    ["Play special sound for %s."] = true,
+    ["Play sound when a message is received."] = true,
+    ["Play sound when a message is sent."] = true,
+    
 });
