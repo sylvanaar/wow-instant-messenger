@@ -1,3 +1,16 @@
+--[[
+    Extends Modules by adding:
+        Module:GuildMember_Online(name)
+        Module:GuildMember_Offline(name)
+        Module:Friend_Online(name)
+        Module:Friend_Offline(name)
+        Module:PartyMember_Online(name)
+        Module:PartyMember_Offline(name)
+        Module:RaidMember_Online(name)
+        Module:RaidMember_Offline(name)
+]]
+
+
 -- imports
 local WIM = WIM;
 local _G = _G;
@@ -22,57 +35,157 @@ Module:RegisterEvent("FRIENDLIST_UPDATE");
 Module:RegisterEvent("GUILD_ROSTER_UPDATE");
 Module:RegisterEvent("PARTY_MEMBERS_CHANGED");
 
--- Counters to avoid spamming Negotiate.
-local friends_c = 0;
-local guild_c = 0;
-local party_c = 0;
+
+-- lessen broadcasts, target new users instead
+ OnlineCache = {};
+local function getCache(tag)
+    if(not OnlineCache[tag]) then
+        OnlineCache[tag] = {};
+    end
+    return OnlineCache[tag];
+end
+
+local function isCache(tag)
+    if(OnlineCache[tag]) then
+        local count = 0;
+        for k, _ in pairs(OnlineCache[tag]) do
+            count = count + 1;
+        end
+        return count > 0;
+    else
+        return false;
+    end
+end
+
+local function tagToModuleName(tag)
+    if(tag == "friends") then
+        return "Friend";
+    elseif(tag == "guild") then
+        return "GuildMember";
+    elseif(tag == "party") then
+        return "PartyMember"
+    elseif(tag == "raid") then
+        return "RaidMember";
+    else
+        return "UNKNOWN_TAG"
+    end
+end
+
+local function shouldNegotiate(tag, user, token)
+    local cache = getCache(tag);
+    if(cache[user]) then
+        cache[user] = token;
+        return false;
+    else
+        cache[user] = token;
+        CallModuleFunction(tagToModuleName(tag).."_Online", user);
+        return true;
+    end
+end
+
+local function cleanCachebyToken(tag, token)
+    local cache = getCache(tag);
+    for k, t in pairs(cache) do
+        if(t ~= token) then
+            CallModuleFunction(tagToModuleName(tag).."_Offline", k);
+            cache[k] = nil;
+        end
+    end
+end
 
 
+-- negotiate with target player/channel
 local function Negotiate(ttype, target)
     SendData(ttype, target, "NEGOTIATE", version..":"..(beta and "1" or "0"));
 end
 
-local function getFriendsOnline()
-    local count = 0;
-    for i=1, _G.GetNumFriends() do 
-	local name, level, class, area, connected, status, note = _G.GetFriendInfo(i);
-	if(connected) then
-            count = count + 1;
-        end
-    end
-    return count;
-end
-
 
 function Module:FRIENDLIST_UPDATE()
-    if(friends ~= getFriendsOnline()) then
-        friends_c = 0;
-        for i=1, _G.GetNumFriends() do 
-            local name, level, class, area, connected, status, note = _G.GetFriendInfo(i);
-            if(connected) then
-                friends_c = friends_c + 1;
-                Negotiate("WHISPER", name); --[set place holder for quick lookup
-            end
+    local token = _G.GetTime();
+    for i=1, _G.GetNumFriends() do 
+        local name, level, class, area, connected, status, note = _G.GetFriendInfo(i);
+        if(connected and shouldNegotiate("friends", name, token)) then
+            Negotiate("WHISPER", name); --[set place holder for quick lookup
         end
     end
+    cleanCachebyToken("friends", token);
 end
 
 function Module:GUILD_ROSTER_UPDATE()
-    if( guild_c ~= _G.GetNumGuildMembers()) then
+    if(isCache("guild")) then
+        --negotiate with new only
+        local token = _G.GetTime();
+        for i=1, _G.GetNumGuildMembers() do 
+	    local name, _, _, _, _, _, _, _, online, _, _ = _G.GetGuildRosterInfo(i);
+	    if(name and online and shouldNegotiate("guild", name, token)) then
+		Negotiate("WHISPER", name);
+	    end
+	end
+        cleanCachebyToken("guild", token);
+    else
+        --build cache
+        local token = _G.GetTime();
+        for i=1, _G.GetNumGuildMembers() do 
+	    local name, _, _, _, _, _, _, _, online, _, _ = _G.GetGuildRosterInfo(i);
+	    if(name and online and shouldNegotiate("guild", name, token)) then
+		-- do nothing, we're broadcasting...
+	    end
+	end
         Negotiate("GUILD");
-        guild_c = _G.GetNumGuildMembers();
     end
 end
 
 function Module:PARTY_MEMBERS_CHANGED()
     if(_G.GetNumRaidMembers() > 0) then
-        if(party_c ~= _G.GetNumRaidMembers()) then
+        if(isCache("raid")) then
+            --negotiate with new only
+            local token = _G.GetTime();
+            for i=1, 40 do
+                local unit = "raid"..i;
+                local name, online = _G.UnitName(unit), _G.UnitIsConnected(unit);
+                if(name and online and shouldNegotiate("raid", name, token)) then
+                    Negotiate("WHISPER", name);
+                end
+            end
+            cleanCachebyToken("raid", token);
+        else
+            -- build cache
+            local token = _G.GetTime();
+            for i=1, 40 do
+                local unit = "raid"..i;
+                local name, online = _G.UnitName(unit), _G.UnitIsConnected(unit);
+                if(name and online and shouldNegotiate("raid", name, token)) then
+                    -- do nothing, we're broadcasting...
+                end
+            end
             Negotiate("RAID");
-            party_c = _G.GetNumRaidMembers();
+            cleanCachebyToken("raid", token);
         end
     else
-        Negotiate("PARTY");
-        party_c = 0; -- this can be reset. not worth over head of counting party members.
+        if(isCache("party")) then
+            --negotiate with new only
+            local token = _G.GetTime();
+            for i=1, 5 do
+                local unit = "party"..i;
+                local name, online = _G.UnitName(unit), _G.UnitIsConnected(unit);
+                if(name and online and shouldNegotiate("party", name, token)) then
+                    Negotiate("WHISPER", name);
+                end
+            end
+            cleanCachebyToken("party", token);
+        else
+            -- build cache
+            local token = _G.GetTime();
+            for i=1, 5 do
+                local unit = "party"..i;
+                local name, online = _G.UnitName(unit), _G.UnitIsConnected(unit);
+                if(name and online and shouldNegotiate("party", name, token)) then
+                    -- do nothing, we're broadcasting...
+                end
+            end
+            Negotiate("PARTY");
+            cleanCachebyToken("party", token);
+        end
     end
 end
 
@@ -123,3 +236,31 @@ function WhoList(arg)
     end
     _G.DEFAULT_CHAT_FRAME:AddMessage("Total found using WIM: "..count);
 end
+
+
+--[[ DEBUGGING
+function Module:GuildMember_Online(name)
+    _G.DEFAULT_CHAT_FRAME:AddMessage("Guild Online: "..name);
+end
+function Module:GuildMember_Offline(name)
+    _G.DEFAULT_CHAT_FRAME:AddMessage("Guild Offiline: "..name);
+end
+function Module:Friend_Online(name)
+    _G.DEFAULT_CHAT_FRAME:AddMessage("Friend Online: "..name);
+end
+function Module:Friend_Offline(name)
+    _G.DEFAULT_CHAT_FRAME:AddMessage("Friend Offiline: "..name);
+end
+function Module:PartyMember_Online(name)
+    _G.DEFAULT_CHAT_FRAME:AddMessage("Party Online: "..name);
+end
+function Module:PartyMember_Offline(name)
+    _G.DEFAULT_CHAT_FRAME:AddMessage("Party Offline: "..name);
+end
+function Module:RaidMember_Online(name)
+    _G.DEFAULT_CHAT_FRAME:AddMessage("Raid Online: "..name);
+end
+function Module:RaidMember_Offline(name)
+    _G.DEFAULT_CHAT_FRAME:AddMessage("Raid Offline: "..name);
+end
+]]

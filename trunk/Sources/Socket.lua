@@ -21,6 +21,11 @@ socketFrame:RegisterEvent("CHAT_MSG_ADDON");
 
 local CommandHandlers = {};
 
+WIM.stats.Socket = {
+  i = 0,
+  o = 0,
+};
+local Stats = WIM.stats.Socket;
 
 local function getNewTable()
     if(#recycled > 0) then
@@ -67,10 +72,12 @@ local function ProcessData(channel, from, data)
     end
 end
 
+
 local function OnEvent(self, event, ...)
     local addon, data, channel, from = ...;
     -- we are only processing WIM addon messages
     if(addon == "WIM") then
+        Stats.i = Stats.i + string.len(data);
         local cmd, args, pcmd = string.match(data, "^#HEADER:(%d+):(%d+):(%w+)");
         if(cmd and args) then
             local socket = createNewSocket(from, tonumber(cmd), tonumber(args));
@@ -118,6 +125,17 @@ function RegisterAddonMessageHandler(command, callBack, progressCallBack)
 end
 
 
+local function debugSentData(msg, ttype, target)
+    if(WIM.beta) then
+        WIM.debugSentData = WIM.debugSentData or {};
+        table.insert(WIM.debugSentData, "["..msg.."],["..(ttype or "NIL").."],["..(target or "NIL").."]");
+        if(#WIM.debugSentData > 100) then
+            table.remove(WIM.debugSentData, #WIM.debugSentData);
+        end
+    end
+end
+
+
 -- outbound Traffic:
 function SendData(ttype, target, cmd, data)
     if(isPrivateServer) then
@@ -129,6 +147,7 @@ function SendData(ttype, target, cmd, data)
         -- we do not want to send any messages to GM's
         return;
     end
+    debugSentData(string.upper(cmd)..":"..data, ttype, target); -- for debugging
     if((string.len(cmd) + string.len(data) + 1) <= 200) then
         msg = string.upper(cmd)..":"..data;
     else
@@ -137,15 +156,19 @@ function SendData(ttype, target, cmd, data)
     --local msg = string.upper(cmd)..":"..data
     local msgCount = math.ceil(string.len(msg)/200);
     if(msgCount == 1) then
+        Stats.o = Stats.o + string.len(msg) + 1;
         _G.ChatThrottleLib:SendAddonMessage("NORMAL", "WIM", "!"..msg, ttype, target);
     else
         socketCount = socketCount + 1;
         local header = "#HEADER:"..socketCount..":"..string.len(msg)..":"..string.upper(cmd);
         local prefix = "#"..socketCount..":";
+        Stats.o = Stats.o + string.len(header);
         _G.ChatThrottleLib:SendAddonMessage("NORMAL", "WIM", header, ttype, target);
         for i=1, msgCount do
             local chunk = string.sub(msg, ((i-1)*200+1), (((i-1)*200)+200));
+            Stats.o = Stats.o + string.len(prefix) + string.len(chunk);
             _G.ChatThrottleLib:SendAddonMessage("BULK", "WIM", prefix..chunk, ttype, target);
         end
     end
 end
+

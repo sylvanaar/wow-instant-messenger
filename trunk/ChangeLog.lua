@@ -16,6 +16,13 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+
+addBetaEntry("3.1.2", "04/??/2009", [[
+    +Added HTML history view/export.
+    *Optimized Negotiation Module to significantly reduce addon spam.
+    *Channel counts weren't updating propperly.
+]]);
+
 addEntry("3.1.1", "04/15/2009", [[
     *Rearranged WIM's options. Sounds & History are now in category Whispers.
     *Revised BBCode export to avoid nested color tags. Thank you Stewart.
