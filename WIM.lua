@@ -13,8 +13,8 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.1.1";
-beta = false; -- flags current version as beta.
+version = "3.1.2";
+beta = true; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
 -- WOTLK check by CKKnight (we'll keep this around for now...)
@@ -32,6 +32,7 @@ constants = {}; -- constants such as class colors will be stored here. (includes
 modules = {}; -- module table. consists of all registerd WIM modules/plugins/skins. (treated the same).
 windows = {active = {whisper = {}, chat = {}, w2w = {}}}; -- table of WIM windows.
 libs = {}; -- table of loaded library references.
+stats = {};
 
 -- default options. live data is found in WIM.db
 -- modules may insert fields into this table to

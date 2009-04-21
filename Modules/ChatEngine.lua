@@ -160,6 +160,7 @@ local function getChatWindow(ChatName, chatType)
     end
 end
 
+
 local function cleanChatList(win)
     if(win.chatList) then
         for k, _ in pairs(win.chatList) do
@@ -234,6 +235,11 @@ function Guild:OnWindowDestroyed(self)
     end
 end
 
+function Guild:OnWindowShow(self)
+    if(self.type == "chat" and self.chatType == "guild") then
+        _G.GuildRoster();
+    end
+end
 
 function Guild:GUILD_ROSTER_UPDATE()
     if(self.guildWindow) then
@@ -1337,6 +1343,9 @@ function ChatOptions:OnEnableWIM()
 end
 
 
+-- global reference
+GetChatWindow = getChatWindow;
+
 function CleanLanguageArg(arg)
     if(arg and arg ~= "Universal" and arg ~= _G.DEFAULT_CHAT_FRAME.defaultLanguage) then
         return arg;
@@ -1345,11 +1354,22 @@ function CleanLanguageArg(arg)
     end
 end
 
+local channelCountCache = {};
 function GetChannelCount(id)
     for i=1, 20 do
         local name, header, collapsed, channelNumber, count, active, category, voiceEnabled, voiceActive = _G.GetChannelDisplayInfo(i);
+        if(header and collapsed) then
+            _G.ExpandChannelHeader(i);
+            return GetChannelCount(id);
+        end
         if(id == channelNumber) then
-            return count;
+            if(_G.GetSelectedDisplayChannel() ~= i) then
+                _G.SetSelectedDisplayChannel(i);
+                name, header, collapsed, channelNumber, count, active, category, voiceEnabled, voiceActive = _G.GetChannelDisplayInfo(i);
+            end
+            channelCountCache[id] = channelCountCache[id] or "...";
+            channelCountCache[id] = count or channelCountCache[id];
+            return channelCountCache[id];
         end
     end
     return 0;

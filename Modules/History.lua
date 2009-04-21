@@ -1295,6 +1295,50 @@ table.insert(ViewTypes, {
 	        end 
 	    });  
 
+table.insert(ViewTypes, { 
+	        text = "HTML", 
+	        frame = "textFrame", 
+	        func = function(frame, msg)
+                    local color;
+	            if(msg.type == 1) then
+                        color = db.displayColors[msg.inbound and "wispIn" or "wispOut"];
+                        nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b;
+                    elseif(msg.type == 2) then
+                        if(msg.event == CHANNEL) then
+                            color = _G.ChatTypeInfo["CHANNEL"..msg.channelNumber];
+                        else
+                            color = _G.ChatTypeInfo[msg.event];
+                        end
+                        color = color or colorWhite;
+                        nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b;
+                    end
+	            frame.noEscapedStrings = nil;
+                    frame.noEmoticons = true;
+	            frame.nextStamp = msg.time;
+                    local chatColor = "<font color='#"..RGBPercentToHex(color.r, color.g, color.b).."'>";
+                    local chatColorPattern = "%<font color%='%#"..RGBPercentToHex(color.r, color.g, color.b).."'%>%s*%<%/font%>";
+	            msg = applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from) 
+	            msg = applyStringModifiers(msg, frame);
+                    
+                    -- html escapes
+                    msg = msg:gsub("&", "&amp;");
+                    msg = msg:gsub("<", "&lt;");
+                    msg = msg:gsub(">", "&gt;");
+                    msg = msg:gsub("\"", "&quot;");
+                    
+                    -- color & URL handling...
+	            msg = msg:gsub("|c[0-9A-Fa-f][0-9A-Fa-f]([0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])|Hwim_url:([^|]*)|h.-|h|r", "</color><a href='%2'><font color='#%1'>%2</font></a>"..chatColor); 
+	            msg = msg:gsub("|c[0-9A-Fa-f][0-9A-Fa-f]([0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f])", "<font color='#%1'>"); 
+	            msg = msg:gsub("|r", "</font>"); 
+	            msg = msg:gsub("(%<font color%='%#[0-9A-Fa-f]+'%>)|Hitem:(%d+)[:%d]*|h([^|]+)|h(%[%/color%])", "</font><a href='http://www.wowhead.com/?item=%2'>%1%3%4</a>"..chatColor); 
+	            msg = chatColor..msg.."</font>"; 
+	            msg = msg:gsub("(%<font color%='%#[0-9A-Fa-f]+'%>)(%<font color%='%#[0-9A-Fa-f]+'%>)(.-)(%<%/font%>)", "%2%3%4%1");
+                    msg = "<br>"..msg:gsub(chatColorPattern, "");
+	            frame:AddMessage(msg, color.r, color.g, color.b) 
+	        end 
+	    });  
+
+
 function ShowHistoryViewer(user)
     if(HistoryViewer and not user and HistoryViewer:IsShown()) then
         HistoryViewer:Hide();
