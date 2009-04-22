@@ -20,7 +20,7 @@ end
 addBetaEntry("3.1.2", "04/??/2009", [[
     +Added HTML history view/export.
     *Optimized Negotiation Module to significantly reduce addon spam.
-    *Channel counts weren't updating propperly.
+    *Channel counts weren't updating propperly. 
 ]]);
 
 addEntry("3.1.1", "04/15/2009", [[

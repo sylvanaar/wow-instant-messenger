@@ -142,8 +142,8 @@ function Module:PARTY_MEMBERS_CHANGED()
             local token = _G.GetTime();
             for i=1, 40 do
                 local unit = "raid"..i;
-                local name, online = _G.UnitName(unit), _G.UnitIsConnected(unit);
-                if(name and online and shouldNegotiate("raid", name, token)) then
+                local name = _G.UnitName(unit);
+                if(name and _G.UnitIsConnected(unit) and shouldNegotiate("raid", name, token)) then
                     Negotiate("WHISPER", name);
                 end
             end
@@ -153,8 +153,8 @@ function Module:PARTY_MEMBERS_CHANGED()
             local token = _G.GetTime();
             for i=1, 40 do
                 local unit = "raid"..i;
-                local name, online = _G.UnitName(unit), _G.UnitIsConnected(unit);
-                if(name and online and shouldNegotiate("raid", name, token)) then
+                local name = _G.UnitName(unit);
+                if(name and _G.UnitIsConnected(unit) and shouldNegotiate("raid", name, token)) then
                     -- do nothing, we're broadcasting...
                 end
             end
@@ -167,8 +167,8 @@ function Module:PARTY_MEMBERS_CHANGED()
             local token = _G.GetTime();
             for i=1, 5 do
                 local unit = "party"..i;
-                local name, online = _G.UnitName(unit), _G.UnitIsConnected(unit);
-                if(name and online and shouldNegotiate("party", name, token)) then
+                local name = _G.UnitName(unit);
+                if(name and _G.UnitIsConnected(unit) and shouldNegotiate("party", name, token)) then
                     Negotiate("WHISPER", name);
                 end
             end
@@ -178,8 +178,8 @@ function Module:PARTY_MEMBERS_CHANGED()
             local token = _G.GetTime();
             for i=1, 5 do
                 local unit = "party"..i;
-                local name, online = _G.UnitName(unit), _G.UnitIsConnected(unit);
-                if(name and online and shouldNegotiate("party", name, token)) then
+                local name = _G.UnitName(unit);
+                if(name and _G.UnitIsConnected(unit) and shouldNegotiate("party", name, token)) then
                     -- do nothing, we're broadcasting...
                 end
             end
