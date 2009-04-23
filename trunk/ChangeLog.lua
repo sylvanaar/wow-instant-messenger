@@ -21,7 +21,7 @@ addBetaEntry("3.1.2", "04/??/2009", [[
     +Added HTML history view/export.
     *Optimized Negotiation Module to significantly reduce addon spam.
     *Channel counts weren't updating propperly.
-    *Fixed bug in history viewer. Messages from some realms couldn't be deleted.
+    *Fixed bug in history viewer. Messages from some realms couldn't be deleted. 
 ]]);
 
 addEntry("3.1.1", "04/15/2009", [[

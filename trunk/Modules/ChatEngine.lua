@@ -98,6 +98,8 @@ db_defaults.chat = {
 };
 
 
+local USERLIST_BUTTON_COUNT = 5;
+
 local function getRuleSet()
     local curState = db.pop_rules.chat.alwaysOther and "other" or curState
     return db.pop_rules.chat[curState];
@@ -128,13 +130,16 @@ local function createWidget_Chat()
     button.UpdateSkin = function(self)
             --self.flash.bg:SetTexture(GetSelectedSkin().message_window.widgets.w2w.HighlightTexture);
         end
-    button:SetScript("OnEnter", function(self)
+    button:SetScript("OnClick", function(self)
             if(self.active) then
-                
+                ChatUserList.listCount = self.parentWindow.CHAT_listCount;
+                ChatUserList.listFun = self.parentWindow.CHAT_listFun;
+                ChatUserList:PopUp(self, "TOPRIGHT", "TOPLEFT")
+                ChatUserList:SetChannel(self.parentWindow.widgets.from:GetText());
             end
         end);
     button:SetScript("OnLeave", function(self)
-
+                --ChatUserList:Hide();
         end);
     
     return button;
@@ -156,6 +161,15 @@ local function getChatWindow(ChatName, chatType)
         Windows[ChatName]:UpdateIcon();
         Windows[ChatName].widgets.chat_info:SetActive(true);
         Windows[ChatName].chatList = Windows[ChatName].chatList or {};
+        
+        if(chatType == "guild") then
+            Windows[ChatName].CHAT_listCount = _G.GetNumGuildMembers;
+            Windows[ChatName].CHAT_listFun = _G.GetGuildRosterInfo;
+        else
+            Windows[ChatName].CHAT_listCount = nil;
+            Windows[ChatName].CHAT_listFun = nil;
+        end
+        
         return Windows[ChatName];
     end
 end
@@ -950,7 +964,9 @@ function Channel:CHAT_MSG_CHANNEL(...)
     end
     win.channelNumber = arg8;
     win.channelIdentifier = arg4;
-    win.widgets.chat_info:SetText(GetChannelCount(win.channelNumber));
+    if(win:IsVisible()) then
+        win.widgets.chat_info:SetText(GetChannelCount(win.channelNumber));
+    end
     self.chatLoaded = true;
     if(arg1 and _G.strlen(arg1) > 0) then
         arg3 = CleanLanguageArg(arg3);
@@ -1337,9 +1353,157 @@ local function loadChatOptions()
     ChatOptions.optionsLoaded = true;
 end
 
+
+local function createUserList()
+    local win = _G.CreateFrame("Frame", "WIM3_ChatUserList", WIM.WindowParent);
+    win:EnableMouse(true);
+    win:Hide();
+    win:SetPoint("CENTER");
+    -- set backdrop
+    win:SetBackdrop({bgFile = "Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\Menu_bg",
+        edgeFile = "Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\Menu", 
+        tile = true, tileSize = 32, edgeSize = 32, 
+        insets = { left = 32, right = 32, top = 32, bottom = 32 }});
+    win:SetWidth(200);
+    win.title = _G.CreateFrame("Frame", win:GetName().."Title", win);
+    win.title:SetHeight(17);
+    win.title:SetPoint("TOPLEFT", 20, -18); win.title:SetPoint("TOPRIGHT", -20, -18);
+    win.title.bg = win.title:CreateTexture(nil, "BACKGROUND");
+    win.title.bg:SetAllPoints();
+    win.title.text = win.title:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+    local font = win.title.text:GetFont();
+    win.title.text:SetFont(font, 11, "");
+    win.title.text:SetAllPoints();
+    win.title.text:SetJustifyV("TOP");
+    win.title.text:SetJustifyH("RIGHT");
+    win.title.text:SetText("Testing...");
+    win.buttons = {};
+    
+    for i = 1, USERLIST_BUTTON_COUNT do
+        local button = _G.CreateFrame("Button", win:GetName().."Button1", win);
+        button:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestLogTitleHighlight", "ADD");
+        button:GetHighlightTexture():SetVertexColor(.196, .388, .8);
+        button:SetHeight(20);
+        button.text = button:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+        button.text:SetText("  Button "..i);
+        button.text:SetJustifyH("LEFT");
+        button.text:SetAllPoints();
+        button.SetUser = function(self, user)
+            self.user = user;
+            self.text:SetText("  "..user);
+        end
+        
+        button:SetScript("OnClick", function(self, button)
+            --if(button == "RightButton") then
+                --_G.ChannelRosterFrame_ShowDropdown(self.user);
+            --end
+        end);
+        
+        
+        if(i == 1) then
+            button:SetPoint("TOPLEFT", 20, -35);
+            button:SetPoint("RIGHT", -30, 0);
+        else
+            button:SetPoint("TOPLEFT", win.buttons[i-1], "BOTTOMLEFT");
+            button:SetPoint("TOPRIGHT", win.buttons[i-1], "BOTTOMRIGHT");
+        end
+       
+       table.insert(win.buttons, button); 
+    end
+    win:SetHeight(#win.buttons*win.buttons[1]:GetHeight() + 35 + 20);
+    win.scroll = _G.CreateFrame("ScrollFrame", win:GetName().."Scroll", win, "FauxScrollFrameTemplate");
+    win.scroll:SetPoint("TOPLEFT", win.buttons[1], "TOPLEFT", 0, 0);
+    win.scroll:SetPoint("BOTTOMRIGHT", win.buttons[#win.buttons], "BOTTOMRIGHT", -10, 0);
+    
+    win.scroll:SetScript("OnVerticalScroll", function(self, offset)
+        _G.FauxScrollFrame_OnVerticalScroll(self, offset, win.buttons[1]:GetHeight(), win.updateList);
+    end);
+    
+    win:SetScript("OnHide", function(self)
+        self:Hide();
+        self.attachedTo = nil;
+        self.listCount = nil;
+        self.listFun = nil;
+        self:SetParent(_G.UIParent);
+    end);
+    
+    win:SetScript("OnUpdate", function(self, elapsed)
+        if(_G.MouseIsOver(self) or (self.attachedTo and _G.MouseIsOver(self.attachedTo))) then
+            self.idleTime = 0;
+        else
+            self.idleTime = self.idleTime + elapsed;
+            if(self.idleTime > 1) then
+                self:Hide();
+            end
+        end
+    end);
+    
+    
+    win.SetChannel = function(self, title)
+        self.title.text:SetText(string.format(L["Users in %s"], title or _G.CHAT).."  ");
+    end
+    
+    win.PopUp = function(self, attachTo, point, point2, offsetX, offsetY)
+        if(self.attachedTo == attachTo) then
+            self:Hide();
+            return;
+        end
+        self:SetParent(attachTo);
+        self:SetParentWindow(attachTo.parentWindow);
+        self.attachedTo = attachTo;
+        self:SetPoint(point, attachTo, point2, offsetX, offsetY);
+        self:Show();
+        win:updateList();
+    end
+    
+    win.updateList = function(self)
+        self = win;
+        if(self.listCount and self.listFun) then
+            local count = self.listCount();
+            local offset = _G.FauxScrollFrame_GetOffset(win.scroll);
+            for i=1, USERLIST_BUTTON_COUNT do
+                self.buttons[i]:Show();
+                local index = i + offset;
+                if(index <= count) then
+                    self.buttons[i]:SetUser(self.listFun(index));
+                    self.buttons[i]:Show();
+                else
+                    self.buttons[i]:Hide();
+                end
+            end
+            
+            _G.FauxScrollFrame_Update(win.scroll, count, USERLIST_BUTTON_COUNT, self.buttons[1]:GetHeight());
+        else
+            self:Hide();
+        end
+    end
+    
+    win.SetParentWindow = function(self, parent, start)
+        start = start or self;
+        start.parentWindow = parent;
+        if(start.GetChildren) then
+            for i=1, select("#", start:GetChildren()) do
+                self:SetParentWindow(parent, select(i, start:GetChildren()));
+            end
+        end
+    end
+    
+    return win;
+end
+
+
+
+
+
+
 function ChatOptions:OnEnableWIM()
     loadChatOptions();
     --load joined channels.
+    
+    --create user List
+    if(not ChatUserList) then
+        ChatUserList = createUserList();
+    end
 end
 
 
@@ -1356,6 +1520,9 @@ end
 
 local channelCountCache = {};
 function GetChannelCount(id)
+    if(ChatUserList:IsVisible()) then
+        return channelCountCache[id] or "...";
+    end
     for i=1, 20 do
         local name, header, collapsed, channelNumber, count, active, category, voiceEnabled, voiceActive = _G.GetChannelDisplayInfo(i);
         if(header and collapsed) then

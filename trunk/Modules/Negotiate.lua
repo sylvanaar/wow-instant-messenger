@@ -34,6 +34,7 @@ local WHO_LIST = {};
 Module:RegisterEvent("FRIENDLIST_UPDATE");
 Module:RegisterEvent("GUILD_ROSTER_UPDATE");
 Module:RegisterEvent("PARTY_MEMBERS_CHANGED");
+Module:RegisterEvent("CHAT_MSG_SYSTEM");
 
 
 -- lessen broadcasts, target new users instead
@@ -109,6 +110,19 @@ function Module:FRIENDLIST_UPDATE()
         end
     end
     cleanCachebyToken("friends", token);
+end
+
+-- check to see if a guildie logs on or off...
+function Module:CHAT_MSG_SYSTEM(msg)
+    local ERR_FRIEND_ONLINE_SS = string.gsub(_G.ERR_FRIEND_ONLINE_SS, "%[", "%%[");
+        ERR_FRIEND_ONLINE_SS = string.gsub(ERR_FRIEND_ONLINE_SS, "%]", "%%]");
+        ERR_FRIEND_ONLINE_SS = string.gsub(ERR_FRIEND_ONLINE_SS, "%%s", "(.+)");
+    local ERR_FRIEND_OFFLINE_S = string.gsub(_G.ERR_FRIEND_OFFLINE_S, "%%s", "(.+)");
+    local user = FormatUserName(string.match(msg, ERR_FRIEND_ONLINE_SS)) or FormatUserName(string.match(msg, ERR_FRIEND_OFFLINE_S));
+    if(user and lists.guild and lists.guild[user]) then
+        -- user online or offline is a guildie, lets refresh.
+        _G.GuildRoster();
+    end
 end
 
 function Module:GUILD_ROSTER_UPDATE()
