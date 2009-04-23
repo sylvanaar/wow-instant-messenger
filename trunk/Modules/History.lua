@@ -628,7 +628,7 @@ local function createHistoryViewer()
                             button1 = L["Yes"],
                             button2 = L["No"],
                             OnAccept = function()
-                                local realm, character = string.match(win.USER, "^([%w%s]+)/?(.*)$");
+                                local realm, character = string.match(win.USER, "^([^/]+)/?(.*)$");
                                 if(realm and character and history[realm] and history[realm][character]) then
                                     history[realm][character][self:GetParent().user] = nil;
                                     if(isEmptyTable(history[realm][character])) then
@@ -736,7 +736,7 @@ local function createHistoryViewer()
             for key, _ in pairs(win.SEARCHLIST) do
                 win.SEARCHLIST[key] = nil;
             end
-            local realm, character = string.match(win.USER, "^([%w%s]+)/?(.*)$");
+            local realm, character = string.match(win.USER, "^([^/]+)/?(.*)$");
             if(realm and character and history[realm] and history[realm][character]) then
                 for convo, tbl in pairs(history[realm][character]) do
                     for i=1, #tbl do
