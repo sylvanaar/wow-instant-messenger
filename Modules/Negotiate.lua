@@ -78,6 +78,9 @@ local function shouldNegotiate(tag, user, token)
         cache[user] = token;
         return false;
     else
+        if(user == _G.UNKNOWN) then
+            return false;
+        end
         cache[user] = token;
         CallModuleFunction(tagToModuleName(tag).."_Online", user);
         return true;
@@ -156,7 +159,8 @@ function Module:PARTY_MEMBERS_CHANGED()
             local token = _G.GetTime();
             for i=1, 40 do
                 local unit = "raid"..i;
-                local name = _G.UnitName(unit);
+                local name, realm = _G.UnitName(unit);
+                name = name and realm and string.len(realm) > 2 and name.."-"..realm or name;
                 if(name and _G.UnitIsConnected(unit) and shouldNegotiate("raid", name, token)) then
                     Negotiate("WHISPER", name);
                 end
@@ -167,7 +171,8 @@ function Module:PARTY_MEMBERS_CHANGED()
             local token = _G.GetTime();
             for i=1, 40 do
                 local unit = "raid"..i;
-                local name = _G.UnitName(unit);
+                local name, realm = _G.UnitName(unit);
+                name = name and realm and string.len(realm) > 2 and name.."-"..realm or name;
                 if(name and _G.UnitIsConnected(unit) and shouldNegotiate("raid", name, token)) then
                     -- do nothing, we're broadcasting...
                 end
@@ -181,7 +186,8 @@ function Module:PARTY_MEMBERS_CHANGED()
             local token = _G.GetTime();
             for i=1, 5 do
                 local unit = "party"..i;
-                local name = _G.UnitName(unit);
+                local name, realm = _G.UnitName(unit);
+                name = name and realm and string.len(realm) > 2 and name.."-"..realm or name;
                 if(name and _G.UnitIsConnected(unit) and shouldNegotiate("party", name, token)) then
                     Negotiate("WHISPER", name);
                 end
@@ -192,7 +198,8 @@ function Module:PARTY_MEMBERS_CHANGED()
             local token = _G.GetTime();
             for i=1, 5 do
                 local unit = "party"..i;
-                local name = _G.UnitName(unit);
+                local name, realm = _G.UnitName(unit);
+                name = name and realm and string.len(realm) > 2 and name.."-"..realm or name;
                 if(name and _G.UnitIsConnected(unit) and shouldNegotiate("party", name, token)) then
                     -- do nothing, we're broadcasting...
                 end
