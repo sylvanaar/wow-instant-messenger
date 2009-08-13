@@ -17,7 +17,7 @@ end
 
 -- ChangeLog Entries.
 
-addBetaEntry("3.1.2", "08/??/2009", [[
+addEntry("3.1.2", "08/13/2009", [[
     *Updated TOC for 3.2
     +Added HTML history view/export.
     *Optimized Negotiation Module to significantly reduce addon spam.
