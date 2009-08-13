@@ -17,11 +17,13 @@ end
 
 -- ChangeLog Entries.
 
-addBetaEntry("3.1.2", "04/??/2009", [[
+addBetaEntry("3.1.2", "08/??/2009", [[
+    *Updated TOC for 3.2
     +Added HTML history view/export.
     *Optimized Negotiation Module to significantly reduce addon spam.
     *Channel counts weren't updating propperly.
     *Fixed bug in history viewer. Messages from some realms couldn't be deleted.
+    *Pushed update to update outdated libraries.
 ]]);
 
 addEntry("3.1.1", "04/15/2009", [[
