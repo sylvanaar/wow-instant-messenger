@@ -17,6 +17,10 @@ end
 
 -- ChangeLog Entries.
 
+addEntry("3.1.3", "08/24/2009", [[
+    *Pushing update to force new LibWho-2.0
+]]);
+
 addEntry("3.1.2", "08/13/2009", [[
     *Updated TOC for 3.2
     +Added HTML history view/export.
