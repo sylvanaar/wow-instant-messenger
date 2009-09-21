@@ -17,6 +17,12 @@ end
 
 -- ChangeLog Entries.
 
+addBetaEntry("3.1.4", "09/??/2009", [[
+    *Updated French translations. (Thank you vibé)
+    *Updated various libraries.
+]]);
+
+
 addEntry("3.1.3", "08/24/2009", [[
     *Pushing update to force new LibWho-2.0
 ]]);
