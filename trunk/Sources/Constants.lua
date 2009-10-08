@@ -19,6 +19,8 @@ local classList = {
      "Shaman", "Warlock", "Warrior",  "Death Knight"
 };
 
+constants.classListEng = classList;
+
 --Male Classes - this doesn't apply to every locale
 classes[L["Druid"]]	= {
                               color = "ff7d0a",

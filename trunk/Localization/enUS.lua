@@ -473,5 +473,7 @@ WIM.AddLocale("enUS", {
     ["Play special sound for %s."] = true,
     ["Play sound when a message is received."] = true,
     ["Play sound when a message is sent."] = true,
+    ["Do not play sounds for this channel."] = true,
+    ["No Sound"] = true,
     
 });
