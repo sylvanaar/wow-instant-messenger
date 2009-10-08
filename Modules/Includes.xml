@@ -18,5 +18,6 @@
     <Script file="Negotiate.lua"/>
     <Script file="W2W.lua"/>
     <Script file="Expose.lua"/>
+    <Script file="ClickControl.lua"/>
     
 </Ui>
