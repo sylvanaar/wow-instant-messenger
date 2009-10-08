@@ -639,7 +639,11 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnTabPressed", functi
                 index = win.tabStrip.attached[index - 1] and (index - 1) or #win.tabStrip.attached;
             else
                 -- forwards
-                index = win.tabStrip.attached[index + 1] and (index + 1) or 1;
+                if(not db.tabAdvance) then
+                    index = win.tabStrip.attached[index + 1] and (index + 1) or 1;
+                else
+                    return;
+                end
             end
             win.tabStrip:JumpToTab(win.tabStrip.attached[index]);
         end

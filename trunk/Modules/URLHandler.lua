@@ -41,7 +41,7 @@ armoryLinks = {
         url = "http://{eu/www}.wowarmory.com/character-sheet.xml?r={realm}&n={user}"
     },
     {
-        title = "WoW-Heros",
+        title = "WoW-Heroes",
         url = "http://www.wow-heroes.com/index.php?zone={eu/us}&server={realm}&name={user}"
     }
 };

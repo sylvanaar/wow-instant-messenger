@@ -37,12 +37,12 @@ local function General_Main()
     frame.welcome.cb2:CreateCheckButton(L["Unlock from Minimap"], db.minimap, "free", nil, function(self, button) modules.MinimapIcon:OnEnable() end);
     frame.welcome.cb2:CreateCheckButton(L["<Right-Click> to show unread messages."], db.minimap, "rightClickNew");
     frame.welcome.nextOffSetY = -75;
+    frame.welcome.tabFun = frame.welcome:CreateCheckButton(L["Press <Tab> to advance to next tell target."], WIM.db, "tabAdvance");
     frame.welcome.cb3 = frame.welcome:CreateCheckButton(L["Display Tutorials"], WIM.modules.Tutorials, "enabled", nil, function(self, button) EnableModule("Tutorials", self:GetChecked()); end);
     frame.welcome.reset = frame.welcome:CreateButton(L["Reset Tutorials"], function() db.shownTutorials = {}; end);
     frame.welcome.reset:ClearAllPoints();
     frame.welcome.reset:SetPoint("LEFT", frame.welcome.cb3, "RIGHT", frame.welcome.cb2.text:GetStringWidth()+30, 0);
     frame.welcome.lastObj = frame.welcome.cb3;
-    
     return frame;
 end
 
