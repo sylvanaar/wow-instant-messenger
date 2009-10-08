@@ -17,11 +17,14 @@ end
 
 -- ChangeLog Entries.
 
-addBetaEntry("3.1.4", "10/??/2009", [[
+addBetaEntry("3.1.5", "10/??/2009", [[
     *Updated French translations. (Thank you vibé)
     *Updated various libraries.
     +Added option '<Tab> to advance tell target.' (Thank you Nathan)
     +Added WIM API RegisterPreSendFilterText(function).
+    +Added option to World & Custom channels to disable sounds.
+    *Fixed bug in History Viewer when viewing blocked users.
+    +Added class selection to level filter.
 ]]);
 
 

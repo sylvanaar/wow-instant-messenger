@@ -4,6 +4,7 @@ local _G = _G;
 local PlaySoundFile = PlaySoundFile;
 local SML = _G.LibStub:GetLibrary("LibSharedMedia-3.0");
 local SOUND = SML.MediaType.SOUND;
+local string = string;
 
 --set namespace
 setfenv(1, WIM);
@@ -101,10 +102,30 @@ function ChatSounds:PostEvent_ChatMessage(event, ...)
                 playSound(db.sounds.chat.battleground_sml);    
             elseif(d.say and event == "CHAT_MSG_SAY") then
                 playSound(db.sounds.chat.say_sml);
-            elseif(d.world and event == "CHAT_MSG_CHANNEL" and isWorld) then
-                playSound(db.sounds.chat.world_sml);
-            elseif(d.custom and event == "CHAT_MSG_CHANNEL") then
-                playSound(db.sounds.chat.custom_sml);
+            elseif(event == "CHAT_MSG_CHANNEL" and isWorld) then
+                local channelName = string.split(" - ", arg9);
+                local noSound = db.chat["world"] and db.chat["world"].channelSettings and
+                                db.chat["world"].channelSettings[channelName] and
+                                db.chat["world"].channelSettings[channelName].noSound;
+                if(not noSound) then
+                    if(d.world) then
+                        playSound(db.sounds.chat.world_sml);
+                    else
+                        playSound(db.sounds.chat.msgin_sml);
+                    end
+                end
+            elseif(event == "CHAT_MSG_CHANNEL") then
+                local channelName = string.split(" - ", arg9);
+                local noSound = db.chat["custom"] and db.chat["custom"].channelSettings and
+                                db.chat["custom"].channelSettings[channelName] and
+                                db.chat["custom"].channelSettings[channelName].noSound;
+                if(not noSound) then
+                    if(d.custom) then
+                        playSound(db.sounds.chat.custom_sml);
+                    else
+                        playSound(db.sounds.chat.msgin_sml);
+                    end
+                end
             else
                 -- default sound
                 playSound(db.sounds.chat.msgin_sml);

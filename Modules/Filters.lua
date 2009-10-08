@@ -119,7 +119,19 @@ local function whoCallback(result, eventItem, filter)
     local arg1, name = eventItem:GetArgs();
     if(result and result.Online and result.Name == name) then
         userCache[name] = result.Level;
-        if(result.Level < filter.level) then
+	-- class check here
+	local triggerClass, classTag = true, "blank";
+	if(constants.classes[result.class]) then
+	    classTag = string.gsub(constants.classes[result.class].tag, "F$", "");
+	    if(not filter.classSpecific) then
+		triggerClass = true;
+	    else
+		if(filter.classSpecific ~= classTag) then
+		    triggerClass = false;
+		end
+	    end
+	end
+        if(result.Level < filter.level and triggerClass) then
             if(filter.action == 1) then
                 dPrint("Filter->WhoCallBack: Allow()");
                 filter.stats = filter.stats + 1;
@@ -586,8 +598,8 @@ local function createFilterFrame()
         tile = true, tileSize = 8, edgeSize = 8, 
         insets = { left = 3, right = 3, top = 6, bottom = 6 }});
     win.level.slider:SetHeight(17);
-    win.level.slider:SetPoint("CENTER");
-    win.level.slider:SetPoint("LEFT", 20, 0);
+    --win.level.slider:SetPoint("CENTER");
+    win.level.slider:SetPoint("TOPLEFT", 20, -30);
     win.level.slider:SetPoint("RIGHT", -65, 0);
     win.level.slider:SetThumbTexture("Interface\\Buttons\\UI-SliderBar-Button-Horizontal");
     win.level.slider:SetOrientation("HORIZONTAL");
@@ -615,6 +627,41 @@ local function createFilterFrame()
             win.filter.level = win.filter.level or 2;
             self:SetValue(tonumber(win.filter.level));
         end);
+    win.level.classText = win.level:CreateFontString(win:GetName().."ClassSpecific", "OVERLAY", "ChatFontSmall");
+    win.level.classText:SetText(L["Apply to:"]);
+    win.level.classText:SetPoint("TOPLEFT", 20, -70);
+    win.level.classText:SetTextColor(_G.GameFontNormal:GetTextColor());
+    win.level.class = CreateFrame("Frame", win:GetName().."ClassList", win.level, "UIDropDownMenuTemplate");
+    win.level.class:SetPoint("TOPLEFT", win.level.classText, "TOPLEFT", win.level.classText:GetStringWidth()+8, 8);
+    win.level.class.click = function(self)
+            self = self or _G.this;
+            win.filter.classSpecific = self.value;
+            _G.UIDropDownMenu_SetSelectedValue(win.level.class, self.value);
+            win.level.class:Hide();
+            win.level.class:Show();
+        end
+    win.level.class.init = function(self)
+            local info = _G.UIDropDownMenu_CreateInfo();
+            info.text = L["All Classes"];
+            info.value = 0;
+            info.func = win.level.class.click;
+	    local classes = constants.classListEng;
+	    _G.UIDropDownMenu_AddButton(info, _G.UIDROPDOWNMENU_MENU_LEVEL);
+	    for i=1, #classes do
+                local info = _G.UIDropDownMenu_CreateInfo();
+                info.text = L[classes[i]];
+                info.value = constants.classes[L[classes[i]]].tag;
+                info.func = win.level.class.click;
+		_G.UIDropDownMenu_AddButton(info, _G.UIDROPDOWNMENU_MENU_LEVEL);
+	    end
+        end
+    win.level.class:SetScript("OnShow", function(self)
+            win.filter.classSpecific = win.filter.classSpecific or 0;
+            _G.UIDropDownMenu_Initialize(self, self.init);
+            _G.UIDropDownMenu_SetSelectedValue(self, win.filter.classSpecific);
+        end);
+
+    
     
     
     --create incoming out going
@@ -708,6 +755,9 @@ local function createFilterFrame()
     win.save.text:SetText(L["Save"]);
     win.save:SetWidth(win.save.text:GetStringWidth()+60);
     win.save:SetScript("OnClick", function(self)
+	    if win.filter.classSpecific == 0 then
+		win.filter.classSpecific = nil;
+	    end
             if(win.saveIndex) then
                 -- save edited filter
                 local filters = win.isChat and chatFilters or filters;
@@ -829,7 +879,9 @@ local function blockCatcher(msg, smf)
     if(msg and msg:match("\009\002")) then
         smf:AddMessage("    ");
         smf:AddMessage("|cffff0000"..L["Blocked Message"]..":|r");
-        smf.parentWindow:Pop(true);
+	if(smf.parentWindow) then
+            smf.parentWindow:Pop(true);
+	end
         msg = msg:gsub("\009\002", "");
     end
     return msg;

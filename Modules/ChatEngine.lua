@@ -1265,6 +1265,27 @@ local function loadChatOptions()
                 self:GetParent():GetParent().help:SetText("");
             end);
             
+	    
+	    -- Don't play sounds
+            button.noSound = _G.CreateFrame("CheckButton", nil, button, "UICheckButtonTemplate");
+            button.noSound:SetPoint("TOPLEFT", button.noHistory, "TOPRIGHT", 100, 0);
+            button.noSound:SetScale(.75);
+            button.noSound.text = button.noSound:CreateFontString(nil, "OVERLAY", "ChatFontNormal");
+            button.noSound.text:SetPoint("LEFT", button.noSound, "RIGHT", 0, 0);
+            button.noSound.text:SetText(L["No Sound"]);
+            button.noSound:SetScript("OnClick", function(self)
+                    local name = self:GetParent().channelName;
+                    db.chat[channelType].channelSettings[name].noSound = self:GetChecked();
+            end)
+            button.noSound:SetScript("OnEnter", function(self)
+                self:GetParent():GetParent().help:SetJustifyH("LEFT");
+                self:GetParent():GetParent().help:SetText(L["Do not play sounds for this channel."]);
+            end);
+            button.noSound:SetScript("OnLeave", function(self)
+                self:GetParent():GetParent().help:SetText("");
+            end);
+	    
+	    
             
             if(#self.buttons == 0) then
                 button:SetPoint("TOPLEFT");
