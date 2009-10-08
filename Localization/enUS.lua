@@ -383,6 +383,7 @@ WIM.AddLocale("enUS", {
     ["Allow others to see my talent spec."] = true,
     ["Window Strata:"] = true,
     ["Unlock from Minimap"] = true,
+    ["Press <Tab> to advance to next tell target."] = true,
     
     -- TabManagement.lua --
     ["Tab Management"] = true,

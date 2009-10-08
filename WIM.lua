@@ -13,7 +13,7 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.1.4";
+version = "3.1.5";
 beta = true; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 
@@ -53,7 +53,6 @@ lists = {};
 
 -- list of all the events registered from attached modules.
 local Events = {};
-
 
 -- create a frame to moderate events and frame updates.
     local workerFrame = CreateFrame("Frame", "WIM_workerFrame");
@@ -507,3 +506,27 @@ function GetTalentSpec()
 end
 
 
+
+
+-- list of PreSendFilterText(text)
+local preSendFilterTextFunctions = {};
+function PreSendFilterText(text)
+    for i=1, #preSendFilterTextFunctions do
+	text = preSendFilterTextFunctions[i](text);
+    end
+    return text;
+end
+
+function RegisterPreSendFilterText(func)
+    if(type(func) == "function") then
+        table.insert(preSendFilterTextFunctions, func);
+    end
+end
+
+--[[ Example usage
+RegisterPreSendFilterText(
+function(text)
+    return "john";
+end
+);
+]]

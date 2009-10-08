@@ -239,7 +239,7 @@ end
 
 RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
         local obj = self:GetParent();
-        local msg = self:GetText();
+        local msg = PreSendFilterText(self:GetText());
         local msgCount = math.ceil(string.len(msg)/255);
         if(msgCount == 1) then
             Windows[obj.theUser].msgSent = true;

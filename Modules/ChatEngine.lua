@@ -186,6 +186,7 @@ end
 
 RegisterWidgetTrigger("msg_box", "chat", "OnEnterPressed", function(self)
         local obj, msg, TARGET, NUMBER = self:GetParent(), self:GetText();
+	msg = PreSendFilterText(msg);
         if(obj.chatType == "guild") then
             TARGET = "GUILD";
         elseif(obj.chatType == "officer") then

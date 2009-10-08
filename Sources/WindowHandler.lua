@@ -73,6 +73,7 @@ db_defaults.ignoreArrowKeys = true;
 db_defaults.pop_rules = {};
 db_defaults.whoLookups = true;
 db_defaults.hoverLinks = false;
+db_defaults.tabAdvance = false;
 
 
 local WindowSoupBowl = {
@@ -1761,6 +1762,23 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseUp", function(self,
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseDown", function(self, button)
                                 MSG_CONTEXT_MENU_EDITBOX = self;
                 end);
+
+RegisterWidgetTrigger("msg_box", "whisper,w2w", "OnTabPressed", function(self)
+                if(db.tabAdvance and not _G.IsShiftKeyDown()) then
+                		-- Get the current whisper target
+                		local whisperTarget = getParentMessageWindow(self).theUser
+                		-- Lookup the next whisper target
+                		local nextWhisperTarget = _G.ChatEdit_GetNextTellTarget(whisperTarget)
+                
+                		if nextWhisperTarget ~= "" then
+                			local win = GetWhisperWindowByUser(nextWhisperTarget);
+                			win:Hide();
+                			win:Pop(true); -- force popup
+                			win.widgets.msg_box:SetFocus();
+                			_G.ChatEdit_SetLastTellTarget(nextWhisperTarget);
+                		end
+                end
+	end);
 
 
 RegisterMessageFormatting(L["Default"], function(smf, event, ...)
