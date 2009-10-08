@@ -25,6 +25,7 @@ addBetaEntry("3.1.5", "10/??/2009", [[
     +Added option to World & Custom channels to disable sounds.
     *Fixed bug in History Viewer when viewing blocked users.
     +Added class selection to level filter.
+    +Added option to Expose to delay if currently typing.
 ]]);
 
 

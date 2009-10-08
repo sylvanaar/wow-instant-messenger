@@ -15,11 +15,14 @@ db_defaults.expose = {
     border = false,
     borderSize = 20,
     direction = 1,
+    protect = 1,
 };
 
 local Expose = WIM.CreateModule("Expose", true);
 
 local inCombat = false;
+
+local isWaiting = false;
 
 function Expose:OnStateChange(state, combatFlag)
     --if(1) then return; end -- not ready for release.
@@ -30,8 +33,15 @@ function Expose:OnStateChange(state, combatFlag)
                 return;
             end
         end
+	isWaiting = false;
         if(combatFlag) then
             --entered combat
+	    if(db.expose.protect) then
+		if(EditBoxInFocus and EditBoxInFocus:GetText() ~= "") then
+		    isWaiting = true;
+		    return;
+		end
+	    end
             HideContainer(db and db.winAnimation);
             inCombat = true;
             DisplayTutorial(L["Expose"].."?!", L["Your conversations have been hidden in order to clear your screen while in combat. To disable this feature type"].." |cff69ccf0/wim|r");
@@ -92,6 +102,16 @@ function Expose:OnContainerHide()
         exposeFrame:Hide();
     end
 end
+
+
+-- delay expose if currently typing
+
+-- no longer typing, trigger expose.
+RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusLost", function(self)
+    if(isWaiting) then
+	WIM:PLAYER_ENTERING_WORLD(); -- hack to refresh states.
+    end
+end);
 
 
 -- This module will always remain running.

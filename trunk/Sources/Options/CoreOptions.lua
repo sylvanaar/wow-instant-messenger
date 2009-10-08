@@ -797,8 +797,9 @@ local function General_Expose()
     frame.menu.nextOffSetY = -20;
     
     local cb1 = frame.menu:CreateCheckButton(L["Auto hide/restore windows during combat."], db.expose, "combat");
+    cb1:CreateCheckButton(L["Delay if I am typing a message."], db.expose, "protect");
     cb1:CreateCheckButton(L["Only while in an instance."], db.expose, "groupOnly");
-    frame.menu.nextOffSetY = -80;
+    frame.menu.nextOffSetY = -90;
     
     local direction = {L["Up"], L["Down"], L["Left"], L["Right"]};
     local tsList = {};
