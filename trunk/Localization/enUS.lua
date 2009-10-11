@@ -475,5 +475,8 @@ WIM.AddLocale("enUS", {
     ["Play sound when a message is sent."] = true,
     ["Do not play sounds for this channel."] = true,
     ["No Sound"] = true,
+    ["Sensitivity"] = true,
+    ["Enable WorldFrame Click Detection."] = true,
+    ["The UI must be reloaded in order to disable this module fully. Reload UI now?"] = true,
     
 });
