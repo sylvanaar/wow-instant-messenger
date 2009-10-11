@@ -114,24 +114,36 @@ local function logBlockedEvent(eventItem)
 end
 
 
+local function checkClass(result, filter)
+    -- class check here
+    local triggerClass, classTag = true, "blank";
+    if(constants.classes[result.Class]) then
+        classTag = string.gsub(constants.classes[result.Class].tag, "F$", "");
+        if(not filter.classSpecific) then
+		triggerClass = true;
+        else
+		if(filter.classSpecific ~= classTag) then
+		    triggerClass = false;
+	    end
+        end
+    end
+    return triggerClass;
+end
+
+local function cacheUser(result)
+    if(not userCache[result.Name]) then
+	userCache[result.Name] = {};
+    end
+    for key, val in pairs(result) do
+	userCache[result.Name][key] = val;
+    end
+end
 
 local function whoCallback(result, eventItem, filter)
     local arg1, name = eventItem:GetArgs();
     if(result and result.Online and result.Name == name) then
-        userCache[name] = result.Level;
-	-- class check here
-	local triggerClass, classTag = true, "blank";
-	if(constants.classes[result.class]) then
-	    classTag = string.gsub(constants.classes[result.class].tag, "F$", "");
-	    if(not filter.classSpecific) then
-		triggerClass = true;
-	    else
-		if(filter.classSpecific ~= classTag) then
-		    triggerClass = false;
-		end
-	    end
-	end
-        if(result.Level < filter.level and triggerClass) then
+        cacheUser(result);
+        if(result.Level < filter.level and checkClass(result, filter)) then
             if(filter.action == 1) then
                 dPrint("Filter->WhoCallBack: Allow()");
                 filter.stats = filter.stats + 1;
@@ -209,7 +221,7 @@ local function processFilter(eventItem, filter)
         elseif(windows.active.whisper[name]) then
             return;
         elseif(userCache[name]) then
-            if(userCache[name] < filter.level) then
+            if(userCache[name].Level < filter.level and checkClass(userCache[name], filter)) then
                 return filter.action;
             else
                 return;
