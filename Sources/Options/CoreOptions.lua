@@ -38,6 +38,25 @@ local function General_Main()
     frame.welcome.cb2:CreateCheckButton(L["<Right-Click> to show unread messages."], db.minimap, "rightClickNew");
     frame.welcome.nextOffSetY = -75;
     frame.welcome.tabFun = frame.welcome:CreateCheckButton(L["Press <Tab> to advance to next tell target."], WIM.db, "tabAdvance");
+    
+    local sensitivity = {};
+    table.insert(sensitivity, {
+            text = L["Sensitivity"],
+            isTitle = true,
+            justifyH = "LEFT",
+        });
+    for i=1,10 do
+        table.insert(sensitivity, {
+            text = i,
+            value = i*.05,
+            justifyH = "LEFT",
+        });
+    end
+    frame.welcome.sensitivity = frame.welcome:CreateCheckButtonMenu(L["Enable WorldFrame Click Detection."], WIM.modules.ClickControl, "enabled", nil, function(self, button) EnableModule("ClickControl", self:GetChecked()); end, sensitivity, db.ClickControl, "clickSensitivity");
+    frame.welcome.nextOffSetY = -45;
+    
+    
+    
     frame.welcome.cb3 = frame.welcome:CreateCheckButton(L["Display Tutorials"], WIM.modules.Tutorials, "enabled", nil, function(self, button) EnableModule("Tutorials", self:GetChecked()); end);
     frame.welcome.reset = frame.welcome:CreateButton(L["Reset Tutorials"], function() db.shownTutorials = {}; end);
     frame.welcome.reset:ClearAllPoints();

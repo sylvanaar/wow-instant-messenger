@@ -26,6 +26,7 @@ addBetaEntry("3.1.5", "10/??/2009", [[
     *Fixed bug in History Viewer when viewing blocked users.
     +Added class selection to level filter.
     +Added option to Expose to delay if currently typing.
+    +Added World Frame Click Detection. You can now click out of a WIM window.
 ]]);
 
 

@@ -87,6 +87,35 @@ function ClickControl:OnEnable()
     end
 end
 
---IsMouseLooking()
---GetMouseButtonClicked()
---IsMouseButtonDown([button])
+function ClickControl:OnDisable()
+    if(isInitialized) then
+    -- alert to reload UI.
+        _G.StaticPopupDialogs["WIM_CLICKCONTROL_DISABLE"] = {
+            text = L["The UI must be reloaded in order to disable this module fully. Reload UI now?"],
+            button1 = _G.TEXT(_G.YES),
+            button2 = _G.TEXT(_G.NO),
+            OnShow = function(self) end,
+            OnHide = function() end,
+            OnAccept = function() _G.ReloadUI(); end,
+            OnCancel = function() end,
+            timeout = 0,
+            whileDead = 1,
+            hideOnEscape = 1
+        };        
+        _G.StaticPopup_Show ("WIM_CLICKCONTROL_DISABLE", theLink);
+    end
+end
+
+
+
+------------------------------------------
+--  Sub Functionality, Editbox Focus    --
+------------------------------------------
+
+function ClickControl:OnWorldFrameClick(button)
+    if(EditBoxInFocus) then
+        local editBox = EditBoxInFocus;
+        editBox:Hide();
+        editBox:Show();
+    end
+end
