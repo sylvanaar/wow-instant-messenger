@@ -289,7 +289,7 @@ function Guild:CHAT_MSG_GUILD_CONTROLLER(eventController, ...)
 end
 
 function Guild:CHAT_MSG_GUILD(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_GUILD", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_GUILD", ...);
     if(filter) then
         return;
     end
@@ -301,7 +301,7 @@ function Guild:CHAT_MSG_GUILD(...)
     end
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
-    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_GUILD", ...);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_GUILD", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
         if(not db.chat.guild.neverPop) then
@@ -312,7 +312,7 @@ function Guild:CHAT_MSG_GUILD(...)
             win:Pop("out");
         end
     end
-    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_GUILD", ...);
+    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_GUILD", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
 
 
@@ -384,7 +384,7 @@ function Officer:CHAT_MSG_OFFICER_CONTROLLER(eventController, ...)
 end
 
 function Officer:CHAT_MSG_OFFICER(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_OFFICER", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_OFFICER", ...);
     if(filter) then
         return;
     end
@@ -396,7 +396,7 @@ function Officer:CHAT_MSG_OFFICER(...)
     end
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
-    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_OFFICER", ...);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_OFFICER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
         if(not db.chat.officer.neverPop) then
@@ -407,7 +407,7 @@ function Officer:CHAT_MSG_OFFICER(...)
             win:Pop("out");
         end
     end
-    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_OFFICER", ...);
+    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_OFFICER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
 
 
@@ -473,7 +473,7 @@ function Party:CHAT_MSG_PARTY_CONTROLLER(eventController, ...)
 end
 
 function Party:CHAT_MSG_PARTY(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_PARTY", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_PARTY", ...);
     if(filter) then
         return;
     end
@@ -485,7 +485,7 @@ function Party:CHAT_MSG_PARTY(...)
     end
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
-    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_PARTY", ...);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_PARTY", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
         if(not db.chat.party.neverPop) then
@@ -496,7 +496,7 @@ function Party:CHAT_MSG_PARTY(...)
             win:Pop("out");
         end
     end
-    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_PARTY", ...);
+    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_PARTY", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
 
 
@@ -560,7 +560,7 @@ function Raid:CHAT_MSG_RAID_CONTROLLER(eventController, ...)
 end
 
 function Raid:CHAT_MSG_RAID(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_RAID", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_RAID", ...);
     if(filter) then
         return;
     end
@@ -572,7 +572,7 @@ function Raid:CHAT_MSG_RAID(...)
     end
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
-    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_RAID", ...);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_RAID", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
         if(not db.chat.raid.neverPop) then
@@ -583,7 +583,7 @@ function Raid:CHAT_MSG_RAID(...)
             win:Pop("out");
         end
     end
-    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_RAID", ...);
+    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_RAID", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
 
 function Raid:CHAT_MSG_RAID_LEADER_CONTROLLER(eventController, ...)
@@ -597,7 +597,7 @@ function Raid:CHAT_MSG_RAID_LEADER_CONTROLLER(eventController, ...)
 end
 
 function Raid:CHAT_MSG_RAID_LEADER(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_RAID_LEADER", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_RAID_LEADER", ...);
     if(filter) then
         return;
     end
@@ -609,7 +609,7 @@ function Raid:CHAT_MSG_RAID_LEADER(...)
     end
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
-    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_RAID_LEADER", ...);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_RAID_LEADER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
         if(not db.chat.raid.neverPop) then
@@ -620,7 +620,7 @@ function Raid:CHAT_MSG_RAID_LEADER(...)
             win:Pop("out");
         end
     end
-    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_RAID_LEADER", ...);
+    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_RAID_LEADER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
 
 
@@ -684,7 +684,7 @@ function Battleground:CHAT_MSG_BATTLEGROUND_CONTROLLER(eventController, ...)
 end
 
 function Battleground:CHAT_MSG_BATTLEGROUND(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_BATTLEGROUND", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_BATTLEGROUND", ...);
     if(filter) then
         return;
     end
@@ -694,7 +694,7 @@ function Battleground:CHAT_MSG_BATTLEGROUND(...)
     self.battlegroundWindow = win;
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
-    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BATTLEGROUND", ...);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BATTLEGROUND", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
         if(not db.chat.battleground.neverPop) then
@@ -705,7 +705,7 @@ function Battleground:CHAT_MSG_BATTLEGROUND(...)
             win:Pop("out");
         end
     end
-    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_BATTLEGROUND", ...);
+    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_BATTLEGROUND", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
 
 function Battleground:CHAT_MSG_BATTLEGROUND_LEADER_CONTROLLER(eventController, ...)
@@ -719,7 +719,7 @@ function Battleground:CHAT_MSG_BATTLEGROUND_LEADER_CONTROLLER(eventController, .
 end
 
 function Battleground:CHAT_MSG_BATTLEGROUND_LEADER(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_BATTLEGROUND_LEADER", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_BATTLEGROUND_LEADER", ...);
     if(filter) then
         return;
     end
@@ -729,7 +729,7 @@ function Battleground:CHAT_MSG_BATTLEGROUND_LEADER(...)
     self.battlegroundWindow = win;
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
-    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BATTLEGROUND_LEADER", ...);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BATTLEGROUND_LEADER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
         if(not db.chat.battleground.neverPop) then
@@ -740,7 +740,7 @@ function Battleground:CHAT_MSG_BATTLEGROUND_LEADER(...)
             win:Pop("out");
         end
     end
-    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_BATTLEGROUND_LEADER", ...);
+    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_BATTLEGROUND_LEADER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
 
 --------------------------------------
@@ -784,7 +784,7 @@ function Say:CHAT_MSG_SAY_CONTROLLER(eventController, ...)
 end
 
 function Say:CHAT_MSG_SAY(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_SAY", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_SAY", ...);
     if(filter) then
         return;
     end
@@ -792,7 +792,7 @@ function Say:CHAT_MSG_SAY(...)
     local color = _G.ChatTypeInfo["SAY"];
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
-    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_SAY", ...);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_SAY", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
         if(not db.chat.say.neverPop) then
@@ -803,7 +803,7 @@ function Say:CHAT_MSG_SAY(...)
             win:Pop("out");
         end
     end
-    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_SAY", ...);
+    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_SAY", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
 
 
@@ -938,7 +938,7 @@ function Channel:CHAT_MSG_CHANNEL_CONTROLLER(eventController, arg1, arg2, arg3, 
 end
 
 function Channel:CHAT_MSG_CHANNEL(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_CHANNEL", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_CHANNEL", ...);
     if(filter) then
         return;
     end
@@ -971,7 +971,7 @@ function Channel:CHAT_MSG_CHANNEL(...)
     self.chatLoaded = true;
     if(arg1 and _G.strlen(arg1) > 0) then
         arg3 = CleanLanguageArg(arg3);
-        win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_CHANNEL", ...);
+        win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_CHANNEL", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
         local neverPop = db.chat[isWorld and "world" or "custom"].channelSettings[channelName] and db.chat[isWorld and "world" or "custom"].channelSettings[channelName].neverPop;
         if(arg2 ~= _G.UnitName("player")) then
             win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
@@ -983,7 +983,7 @@ function Channel:CHAT_MSG_CHANNEL(...)
                 win:Pop("out");
             end
         end
-        CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_CHANNEL", ...);
+        CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_CHANNEL", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     end
 end
 

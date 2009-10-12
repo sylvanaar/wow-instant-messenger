@@ -836,11 +836,12 @@ function ShowFilterFrame(filter, index, isChat)
     if(not filterFrame) then
         filterFrame = createFilterFrame();
     end
+    filterFrame.filter = {};
     if(type(filter) == "table" and type(index) == "number") then
         filterFrame.saveIndex = index;
-        filterFrame.filter = filter;
-    else
-        filterFrame.filter = {};
+	for key, val in pairs(filter) do
+	    filterFrame.filter[key] = val;
+	end
     end
     filterFrame.title:SetText(filterFrame.saveIndex and L["Edit Filter"] or L["Add Filter"]);
     filterFrame.isChat = isChat;
