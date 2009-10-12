@@ -273,14 +273,14 @@ function WhisperEngine:CHAT_MSG_WHISPER_CONTROLLER(eventItem, ...)
 end
 
 function WhisperEngine:CHAT_MSG_WHISPER(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_WHISPER", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_WHISPER", ...);
     if(filter) then
         return; -- ChatFrameEventFilter says don't process
     end
     local color = WIM.db.displayColors.wispIn; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
-    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER", ...);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     win:Pop("in");
     _G.ChatEdit_SetLastTellTarget(arg2);
     win.online = true;
@@ -289,7 +289,7 @@ function WhisperEngine:CHAT_MSG_WHISPER(...)
 end
 
 -- CHAT_MSG_WHISPER_INFORM  CONTROLLER (For Supression from Chat Frame)
-function WhisperEngine:CHAT_MSG_WHISPER_INFORM_CONTROLLER(eventItem, ...)
+function WhisperEngine:CHAT_MSG_WHISPER_INFORM_CONTROLLER(eventItem, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12)
     if(eventItem.ignoredByWIM) then
         return;
     end
@@ -302,18 +302,18 @@ function WhisperEngine:CHAT_MSG_WHISPER_INFORM_CONTROLLER(eventItem, ...)
 end
 
 function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = honorChatFrameEventFilter("CHAT_MSG_WHISPER_INFORM", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_WHISPER_INFORM", ...);
     if(filter) then
         return; -- ChatFrameEventFilter says don't process
     end
     local color = db.displayColors.wispOut; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2);
-    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER_INFORM", ...);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER_INFORM", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     win:Pop("out");
     _G.ChatEdit_SetLastToldTarget(arg2);
     win.online = true;
     win.msgSent = false;
-    CallModuleFunction("PostEvent_WhisperInform", ...);
+    CallModuleFunction("PostEvent_WhisperInform", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     addToTableUnique(recentSent, arg1);
         if(#recentSent > maxRecent) then
                 table.remove(recentSent, 1);
