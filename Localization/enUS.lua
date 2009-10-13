@@ -384,6 +384,7 @@ WIM.AddLocale("enUS", {
     ["Window Strata:"] = true,
     ["Unlock from Minimap"] = true,
     ["Press <Tab> to advance to next tell target."] = true,
+    ["Colorize names."] = true,
     
     -- TabManagement.lua --
     ["Tab Management"] = true,
