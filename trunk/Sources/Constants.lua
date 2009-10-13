@@ -106,3 +106,27 @@ classes.GetClassByTag = function(t)
           return classes.GetClassByTag(ft);
      end
 end
+
+function classes.GetMyColoredName()
+     local name = _G.UnitName("player");
+     local class, englishClass = _G.UnitClass("player");
+     local classColorTable = _G.RAID_CLASS_COLORS[englishClass];
+     return string.format("\124cff%.2x%.2x%.2x", classColorTable.r*255, classColorTable.g*255, classColorTable.b*255)..name.."\124r"
+end
+
+function classes.GetColoredNameByChatEvent(event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12)
+     if(arg12 and arg12 ~= "") then
+          local localizedClass, englishClass, localizedRace, englishRace, sex = _G.GetPlayerInfoByGUID(arg12)
+          if ( englishClass ) then
+               local classColorTable = _G.RAID_CLASS_COLORS[englishClass];
+               if ( not classColorTable ) then
+                    return arg2;
+               end
+               return string.format("\124cff%.2x%.2x%.2x", classColorTable.r*255, classColorTable.g*255, classColorTable.b*255)..arg2.."\124r"
+          else
+               return arg2;
+          end
+    else
+          return arg2;
+    end
+end

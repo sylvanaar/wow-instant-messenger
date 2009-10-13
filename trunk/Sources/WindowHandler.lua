@@ -68,6 +68,7 @@ db_defaults.winCascade = {
 db_defaults.winFade = true;
 db_defaults.winAnimation = true;
 db_defaults.wordwrap_indent = false;
+db_defaults.coloredNames = true;
 db_defaults.escapeToHide = true;
 db_defaults.ignoreArrowKeys = true;
 db_defaults.pop_rules = {};
@@ -1782,13 +1783,14 @@ RegisterWidgetTrigger("msg_box", "whisper,w2w", "OnTabPressed", function(self)
 
 
 RegisterMessageFormatting(L["Default"], function(smf, event, ...)
-		local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11 = ...;
+		local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = ...;
                 arg11 = arg11 or 0;
+                local doColoredNames = constants.classes.GetColoredNameByChatEvent;
 		if(event == "CHAT_MSG_WHISPER") then
-			return "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]: "..arg1;
+			return "[|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and doColoredNames(event, ...) or arg2).."|h]: "..arg1;
 		elseif(event == "CHAT_MSG_WHISPER_INFORM") then
                         arg11 = arg11 or 0;
-			return "[|Hplayer:".._G.UnitName("player")..":"..arg11.."|h".._G.UnitName("player").."|h]: "..arg1;
+			return "[|Hplayer:".._G.UnitName("player")..":"..arg11.."|h"..(db.coloredNames and constants.classes.GetMyColoredName() or _G.UnitName("player")).."|h]: "..arg1;
                 elseif(event == "CHAT_MSG_AFK") then
                         return _G.format(L["%s is Away From Keyboard: %s"], "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]", arg1);
                 elseif(event == "CHAT_MSG_DND") then
@@ -1796,7 +1798,7 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
                 elseif(event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_OFFICER" or event == "CHAT_MSG_PARTY" or
                                 event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_SAY" or
                                 event == "CHAT_MSG_CHANNEL" or event == "CHAT_MSG_BATTLEGROUND" or event == "CHAT_MSG_BATTLEGROUND_LEADER") then
-                        return "[|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h]: "..arg1;
+                        return "[|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and doColoredNames(event, ...) or arg2).."|h]: "..arg1;
                 elseif(event == "CHAT_MSG_CHANNEL_JOIN") then
                         return string.format(_G.CHAT_CHANNEL_JOIN_GET, arg2);
                 elseif(event == "CHAT_MSG_CHANNEL_LEAVE") then

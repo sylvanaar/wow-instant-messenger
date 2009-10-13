@@ -29,6 +29,7 @@ addBetaEntry("3.1.5", "10/??/2009", [[
     +Added World Frame Click Detection. You can now click out of a WIM window.
     *Fixed bug when editing filters. Changes saved even though user clicked 'Cancel'.
     *Fixed bug -- Wasn't updating args from message event filters.
+    +Added Name/Class colorizing to names in chat.
 ]]);
 
 
@@ -362,19 +363,3 @@ function WIM.ChangeLogUpdated()
 end
 
 WIM.RegisterSlashCommand("changelog", WIM.ShowChangeLog, WIM.L["View WIM's change log."]);
-
-
---local coloredName = GetColoredName(event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
---[[
-	if ( info and info.colorNameByClass and arg12 ~= "" ) then
-		local localizedClass, englishClass, localizedRace, englishRace, sex = GetPlayerInfoByGUID(arg12)
-		
-		if ( englishClass ) then
-			local classColorTable = RAID_CLASS_COLORS[englishClass];
-			if ( not classColorTable ) then
-				return arg2;
-			end
-			return string.format("\124cff%.2x%.2x%.2x", classColorTable.r*255, classColorTable.g*255, classColorTable.b*255)..arg2.."\124r"
-		end
-	end
-]]
