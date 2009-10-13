@@ -12,6 +12,8 @@ local tostring = tostring;
 --set namespace
 setfenv(1, WIM);
 
+db_defaults.disableAddonMessages = isPrivateServer;
+
 local SocketPool = {};
 local recycled = {};
 
@@ -138,7 +140,7 @@ end
 
 -- outbound Traffic:
 function SendData(ttype, target, cmd, data)
-    if(isPrivateServer) then
+    if(disableAddonMessages) then
         return; -- we don't want to send addon messages if on a private server.
     end
     data = tostring(data);
@@ -172,3 +174,16 @@ function SendData(ttype, target, cmd, data)
     end
 end
 
+
+
+-- register some tools for WIM;
+local function addonMessages()
+  if(db.disableAddonMessages) then
+    db.disableAddonMessages = false;
+    _G.DEFAULT_CHAT_FRAME:AddMessage("WIM: Addon Messages "..L["Disabled"]);
+  else
+    db.disableAddonMessages = true;
+    _G.DEFAULT_CHAT_FRAME:AddMessage("WIM: Addon Messages "..L["Enabled"]);
+  end
+end
+RegisterSlashCommand("addon_messages", _G.ReloadUI, L["Enable/Disable addon messages."]); -- ReloadUI()

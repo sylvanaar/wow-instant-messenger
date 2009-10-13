@@ -31,6 +31,7 @@ addBetaEntry("3.2.1", "10/??/2009", [[
     *Fixed bug -- Wasn't updating args from message event filters.
     +Added Name/Class colorizing to names in chat.
     +Added Message Format option 'Bracket names.'.
+    -Removed isPrivateServer restriction from W2W (/wim addon_messages)
 ]]);
 
 

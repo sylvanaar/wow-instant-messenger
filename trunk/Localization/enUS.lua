@@ -115,6 +115,8 @@ WIM.AddLocale("enUS", {
     ["Recent Activity"] = true,
     ["Keep windows on top of your UI."] = true,
     
+    ["Enable/Disable addon messages."] = true,
+    
     -- Class Names --
     ["Druid"] = true,
     ["Hunter"] = true,

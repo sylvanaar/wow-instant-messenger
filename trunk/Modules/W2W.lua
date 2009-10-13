@@ -165,10 +165,10 @@ end
 
 
 function W2W:OnEnable()
-    if(isPrivateServer) then
+    --if(isPrivateServer) then
         -- Private servers can not handle AddonMessages
-        W2W:Disable();
-    else
+    --    W2W:Disable();
+    --else
         RegisterWidget("w2w", createWidget_W2W);
         RegisterWidget("chatting", createWidget_Chatting);
         for user, _ in pairs(Windows) do
@@ -176,7 +176,7 @@ function W2W:OnEnable()
         end
         myTimer:Show();
         UpdateAllServices();
-    end
+    --end
 end
 
 function W2W:OnDisable()
