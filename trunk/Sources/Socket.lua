@@ -176,7 +176,7 @@ end
 
 
 
--- register some tools for WIM;
+-- Private Server Checks
 local function addonMessages()
   if(db.disableAddonMessages) then
     db.disableAddonMessages = false;
@@ -187,3 +187,5 @@ local function addonMessages()
   end
 end
 RegisterSlashCommand("addon_messages", addonMessages, L["Enable/Disable addon messages."]); -- ReloadUI()
+
+
