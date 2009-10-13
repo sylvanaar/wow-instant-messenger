@@ -42,6 +42,7 @@ db_defaults = {
     enabled = true,
     showToolTips = true,
     modules = {},
+    alertedPrivateServer = false,
 };
 
 -- WIM.env is an evironmental reference for the current instance of WIM.
@@ -158,6 +159,23 @@ local function onEnable()
         end
     DisplayTutorial(L["WIM (WoW Instant Messenger)"], L["WIM is currently running. To access WIM's wide array of options type:"].." |cff69ccf0/wim|r");
     dPrint("WIM is now enabled.");
+    
+    --Private Server Check
+    if(isPrivateServer and not db.alertedPrivateServer) then
+      _G.StaticPopupDialogs["WIM_PRIVATE_SERVER"] = {
+        text = L["WIM has detected that you are playing on a private server. Some servers can not process ChatAddonMessages. Would you like to enable them anyway?"],
+        button1 = _G.TEXT(_G.YES),
+        button2 = _G.TEXT(_G.NO),
+        OnShow = function(self) end,
+        OnHide = function() end,
+        OnAccept = function() db.disableAddonMessages = false; db.alertedPrivateServer = true; end,
+        OnCancel = function() db.disableAddonMessages = true; db.alertedPrivateServer = true; end,
+        timeout = 0,
+        whileDead = 1,
+        hideOnEscape = 1
+      };        
+      _G.StaticPopup_Show ("WIM_PRIVATE_SERVER", theLink);
+    end
 end
 
 -- called when WIM is disabled.

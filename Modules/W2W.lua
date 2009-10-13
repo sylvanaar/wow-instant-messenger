@@ -18,6 +18,7 @@ db_defaults.w2w = {
     shareTalentSpec = true,
 };
 
+
 local myServices = {};
 local profileTip;
 
@@ -165,18 +166,13 @@ end
 
 
 function W2W:OnEnable()
-    --if(isPrivateServer) then
-        -- Private servers can not handle AddonMessages
-    --    W2W:Disable();
-    --else
-        RegisterWidget("w2w", createWidget_W2W);
-        RegisterWidget("chatting", createWidget_Chatting);
-        for user, _ in pairs(Windows) do
-            SendServiceList(user);
-        end
-        myTimer:Show();
-        UpdateAllServices();
-    --end
+    RegisterWidget("w2w", createWidget_W2W);
+    RegisterWidget("chatting", createWidget_Chatting);
+    for user, _ in pairs(Windows) do
+        SendServiceList(user);
+    end
+    myTimer:Show();
+    UpdateAllServices();
 end
 
 function W2W:OnDisable()
