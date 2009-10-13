@@ -140,7 +140,7 @@ end
 
 -- outbound Traffic:
 function SendData(ttype, target, cmd, data)
-    if(disableAddonMessages) then
+    if(db.disableAddonMessages) then
         return; -- we don't want to send addon messages if on a private server.
     end
     data = tostring(data);
@@ -180,10 +180,10 @@ end
 local function addonMessages()
   if(db.disableAddonMessages) then
     db.disableAddonMessages = false;
-    _G.DEFAULT_CHAT_FRAME:AddMessage("WIM: Addon Messages "..L["Disabled"]);
+    _G.DEFAULT_CHAT_FRAME:AddMessage("WIM: Addon Messages "..L["Enabled"]);
   else
     db.disableAddonMessages = true;
-    _G.DEFAULT_CHAT_FRAME:AddMessage("WIM: Addon Messages "..L["Enabled"]);
+    _G.DEFAULT_CHAT_FRAME:AddMessage("WIM: Addon Messages "..L["Disabled"]);
   end
 end
-RegisterSlashCommand("addon_messages", _G.ReloadUI, L["Enable/Disable addon messages."]); -- ReloadUI()
+RegisterSlashCommand("addon_messages", addonMessages, L["Enable/Disable addon messages."]); -- ReloadUI()
