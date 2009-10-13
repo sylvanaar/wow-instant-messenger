@@ -17,7 +17,7 @@ end
 
 -- ChangeLog Entries.
 
-addBetaEntry("3.1.5", "10/??/2009", [[
+addBetaEntry("3.2.1", "10/??/2009", [[
     *Updated French translations. (Thank you vibé)
     *Updated various libraries.
     +Added option '<Tab> to advance tell target.' (Thank you Nathan)
@@ -30,6 +30,7 @@ addBetaEntry("3.1.5", "10/??/2009", [[
     *Fixed bug when editing filters. Changes saved even though user clicked 'Cancel'.
     *Fixed bug -- Wasn't updating args from message event filters.
     +Added Name/Class colorizing to names in chat.
+    +Added Message Format option 'Bracket names.'.
 ]]);
 
 
