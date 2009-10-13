@@ -76,12 +76,26 @@ local function General_MessageFormatting()
     f.nextOffSetY = -15;
     local itemList = {};
     local formats = GetMessageFormattingList();
+    f.default = {};
+    f.updateOptions = function()
+        for _, obj in pairs(f.default) do
+            if(db.messageFormat == L["Default"]) then
+                obj:Enable();
+            else
+                obj:Disable();
+            end
+        end
+    end
     for i=1, #formats do
         table.insert(itemList, {
             text = formats[i],
             value = formats[i],
             justifyH = "LEFT",
-            func = function() f.prev:Hide(); f.prev:Show(); end,
+            func = function(self)
+                f.prev:Hide();
+                f.prev:Show();
+                f.updateOptions();
+            end,
         });
     end
     db.messageFormat = isInTable(formats, db.messageFormat) and db.messageFormat or formats[1];
@@ -129,11 +143,24 @@ local function General_MessageFormatting()
             func = function() f.prev:Hide(); f.prev:Show(); end,
         });
     end
+    -- format non-related options.
     f:CreateCheckButtonMenu(L["Display Time Stamps"], modules.TimeStamps, "enabled", nil, function(self, button) EnableModule("TimeStamps", self:GetChecked()); f.prev:Hide(); f.prev:Show(); end, tsList, db, "timeStampFormat", function(self, button) f.prev:Hide(); f.prev:Show(); end);
     f:CreateCheckButton(L["Display Emoticons"], modules.Emoticons, "enabled", nil, function(self, button) EnableModule("Emoticons", self:GetChecked()); f.prev:Hide(); f.prev:Show(); end);
     f:CreateCheckButton(L["Display URLs as Links"], modules.URLHandler, "enabled", nil, function(self, button) EnableModule("URLHandler", self:GetChecked()); f.prev:Hide(); f.prev:Show(); end);
     f:CreateCheckButton(L["Indent long messages."], db, "wordwrap_indent", nil, function(self, button) UpdateAllWindowProps(); f.prev:Hide(); f.prev:Show(); end);
-    f:CreateCheckButton(L["Colorize names."], db, "coloredNames", nil, function(self, button) UpdateAllWindowProps(); f.prev:Hide(); f.prev:Show(); end);
+    -- options specific to WIM's formatting.
+    f.default.color = f:CreateCheckButton(L["Colorize names."], db, "coloredNames", nil, function(self, button) UpdateAllWindowProps(); f.prev:Hide(); f.prev:Show(); end);
+    fList = {};
+    for i=1, #lists.bracketing do
+        table.insert(fList, {
+            text = lists.bracketing[i][1].." "..lists.bracketing[i][2],
+            value = i,
+            justifyH = "LEFT",
+            func = function() f.prev:Hide(); f.prev:Show(); end,
+        });
+    end
+    f.default.bracket = f:CreateCheckButtonMenu(L["Bracket names."], db.formatting.bracketing, "enabled", nil, function(self, button) f.prev:Hide(); f.prev:Show(); end, fList, db.formatting.bracketing, "type");
+    
     return frame;
 end
 
