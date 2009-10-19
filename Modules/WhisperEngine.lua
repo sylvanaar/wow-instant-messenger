@@ -439,20 +439,20 @@ local function replyTellTarget(TellNotTold)
     if(db.enabled) then
         local curState = curState;
         curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
-        if(db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
-            local lastTell;
-            if(TellNotTold) then
-                lastTell = _G.ChatEdit_GetLastTellTarget();
-            else
-                lastTell = _G.ChatEdit_GetLastToldTarget();
-            end
-            if ( lastTell ~= "" ) then
-                local win = getWhisperWindowByUser(lastTell);
-                win.widgets.msg_box.setText = 1;
-                win:Pop(true); -- force popup
-                win.widgets.msg_box:SetFocus();
-		_G.ChatEdit_OnEscapePressed(_G.ChatFrameEditBox);
-            end
+        local lastTell; 
+	if(TellNotTold) then 
+		lastTell = _G.ChatEdit_GetLastTellTarget(); 
+	else 
+		lastTell = _G.ChatEdit_GetLastToldTarget(); 
+	end             
+	if(lastTell ~= "" and db.pop_rules.whisper.intercept) then 
+		local win = getWhisperWindowByUser(lastTell); 
+		if(win:IsVisible() or db.pop_rules.whisper[curState].onSend) then 
+			win.widgets.msg_box.setText = 1; 
+			win:Pop(true); -- force popup 
+			win.widgets.msg_box:SetFocus();
+			_G.ChatEdit_OnEscapePressed(_G.ChatFrameEditBox); 
+		end      
         end
     end
 end

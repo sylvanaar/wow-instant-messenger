@@ -32,6 +32,7 @@ addBetaEntry("3.2.1", "10/??/2009", [[
     +Added Name/Class colorizing to names in chat.
     +Added Message Format option 'Bracket names.'.
     -Removed isPrivateServer restriction from W2W (/wim addon_messages)
+    *Modified replyTellTarget hook's behavior (Thank you Stewart)
 ]]);
 
 
