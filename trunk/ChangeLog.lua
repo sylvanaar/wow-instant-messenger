@@ -17,7 +17,7 @@ end
 
 -- ChangeLog Entries.
 
-addBetaEntry("3.2.1", "10/19/2009", [[
+addEntry("3.2.1", "10/19/2009", [[
     *Updated French translations. (Thank you vibé)
     *Updated various libraries.
     +Added option '<Tab> to advance tell target.' (Thank you Nathan)
@@ -33,6 +33,7 @@ addBetaEntry("3.2.1", "10/19/2009", [[
     +Added Message Format option 'Bracket names.'.
     -Removed isPrivateServer restriction from W2W (/wim addon_messages)
     *Modified replyTellTarget hook's behavior (Thank you Stewart)
+    *Updated Russian translations (Thank you Stingersoft)
 ]]);
 
 
