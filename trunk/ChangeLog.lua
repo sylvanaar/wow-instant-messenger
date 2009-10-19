@@ -17,6 +17,10 @@ end
 
 -- ChangeLog Entries.
 
+--[[addBetaEntry("3.2.2", "10/??/2009", 
+    
+);]]
+
 addEntry("3.2.1", "10/19/2009", [[
     *Updated French translations. (Thank you vibé)
     *Updated various libraries.
