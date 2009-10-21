@@ -143,7 +143,7 @@ function SendData(ttype, target, cmd, data)
     if(db.disableAddonMessages) then
         return; -- we don't want to send addon messages if on a private server.
     end
-    data = tostring(data);
+    data = data and tostring(data) or ""; --tostring(data);
     ttype = string.upper(ttype);
     if(ttype == "WHISPER" and IsGM(target)) then
         -- we do not want to send any messages to GM's

@@ -14,9 +14,10 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.2.1";
-beta = false; -- flags current version as beta.
+version = "3.2.2";
+beta = true; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
+useProtocol2 = false; -- test switch for new W2W Protocol. (Dev use only)
 
 -- WOTLK check by CKKnight (we'll keep this around for now...)
 isPTR = select(4, _G.GetBuildInfo()) >= 30100;

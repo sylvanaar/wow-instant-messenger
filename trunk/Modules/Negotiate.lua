@@ -100,7 +100,7 @@ end
 
 -- negotiate with target player/channel
 local function Negotiate(ttype, target)
-    SendData(ttype, target, "NEGOTIATE", version..":"..(beta and "1" or "0"));
+    SendData(ttype, target, O["NEGOTIATE"], version..":"..(beta and "1" or "0"));
 end
 
 
@@ -211,21 +211,30 @@ function Module:PARTY_MEMBERS_CHANGED()
 end
 
 function Module:OnWindowCreated(win)
-    if(win.type == "whisper") then
+    if(win.type == "whisper" and not useProtocol2) then
         Negotiate("WHISPER", win.theUser);
     end
 end
 
-RegisterAddonMessageHandler("NEGOTIATE", function(from, data)
+function Module:VersionCheck(versionData)
+    local v, isBeta = string.match(versionData, "^(.+):(%d)");
+    local diff = CompareVersion(v);
+    if(diff > 0) then
+        if(not alreadyAlerted and tonumber(isBeta) == 0) then
+            -- there is a newer version
+            alreadyAlerted = true;
+            DisplayTutorial(L["WIM Update Available!"], _G.format(L["There is a newer version of WIM available for download. You can download it at %s."], "|cff69ccf0WIMAddon.com|r"))
+        end
+        return 1;
+    elseif(diff < 0) then
+        return -1;
+    end
+    return 0;
+end
+
+RegisterAddonMessageHandler(O["NEGOTIATE"], function(from, data)
         local v, isBeta = string.match(data, "^(.+):(%d)");
-        local diff = CompareVersion(v);
-        if(diff > 0) then
-            if(not alreadyAlerted and tonumber(isBeta) == 0) then
-                -- there is a newer version
-                alreadyAlerted = true;
-                DisplayTutorial(L["WIM Update Available!"], _G.format(L["There is a newer version of WIM available for download. You can download it at %s."], "|cff69ccf0WIMAddon.com|r"))
-            end
-        elseif(diff < 0) then
+        if(Module:VersionCheck(data) < 0) then
             -- user has an older version, let him know.
             Negotiate("WHISPER", from);
         end
@@ -257,31 +266,3 @@ function WhoList(arg)
     end
     _G.DEFAULT_CHAT_FRAME:AddMessage("Total found using WIM: "..count);
 end
-
-
---[[ DEBUGGING
-function Module:GuildMember_Online(name)
-    _G.DEFAULT_CHAT_FRAME:AddMessage("Guild Online: "..name);
-end
-function Module:GuildMember_Offline(name)
-    _G.DEFAULT_CHAT_FRAME:AddMessage("Guild Offiline: "..name);
-end
-function Module:Friend_Online(name)
-    _G.DEFAULT_CHAT_FRAME:AddMessage("Friend Online: "..name);
-end
-function Module:Friend_Offline(name)
-    _G.DEFAULT_CHAT_FRAME:AddMessage("Friend Offiline: "..name);
-end
-function Module:PartyMember_Online(name)
-    _G.DEFAULT_CHAT_FRAME:AddMessage("Party Online: "..name);
-end
-function Module:PartyMember_Offline(name)
-    _G.DEFAULT_CHAT_FRAME:AddMessage("Party Offline: "..name);
-end
-function Module:RaidMember_Online(name)
-    _G.DEFAULT_CHAT_FRAME:AddMessage("Raid Online: "..name);
-end
-function Module:RaidMember_Offline(name)
-    _G.DEFAULT_CHAT_FRAME:AddMessage("Raid Offline: "..name);
-end
-]]

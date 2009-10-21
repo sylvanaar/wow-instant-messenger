@@ -10,6 +10,12 @@ local mod = mod;
 -- set namespace
 setfenv(1, WIM);
 
+-- dev flag check
+    if(useProtocol2) then
+	return;
+    end
+
+
 local W2W = CreateModule("W2W", true);
 
 db_defaults.w2w = {

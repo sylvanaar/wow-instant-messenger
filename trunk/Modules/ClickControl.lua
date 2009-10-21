@@ -74,6 +74,7 @@ function ClickControl:OnEnable()
                 local p = getButtonTable(button);
                 p.mouseDown = false;
                 p.clickStop = _G.GetTime();
+                p.clickStart = p.clickStart or 0;
                 if((p.clickStop - p.clickStart) < db.ClickControl.clickSensitivity and buttonCount < 2 and not p.move) then
                     worldFrameClicked(button);
                 end
