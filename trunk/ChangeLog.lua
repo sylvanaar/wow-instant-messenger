@@ -19,6 +19,7 @@ end
 
 addBetaEntry("3.2.2", "10/??/2009", [[
     *Fixed bug which caused arithmetic on nil error.
+    +Added scroll bars to WIM's option menus.
 ]]);
 
 addEntry("3.2.1", "10/19/2009", [[
