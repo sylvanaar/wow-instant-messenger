@@ -2,6 +2,7 @@
 local WIM = WIM;
 local _G = _G;
 local pairs = pairs;
+local GetTime = GetTime;
 
 
 --set namespace
@@ -63,8 +64,7 @@ function ClickControl:OnEnable()
             if(ClickControl.enabled) then
                 local p = getButtonTable(button);
                 p.mouseDown = true;
-                p.clickStart = _G.GetTime();
-            --_G.DEFAULT_CHAT_FRAME:AddMessage("MouseDown "..button);
+                p.clickStart = GetTime();
             end
         end);
     
@@ -73,12 +73,11 @@ function ClickControl:OnEnable()
                 local buttonCount = getButtonDownCount(); -- we need to know this cause we don't want to count moving.
                 local p = getButtonTable(button);
                 p.mouseDown = false;
-                p.clickStop = _G.GetTime();
-                if(((p.clickStop or 0) - (p.clickStart or 99999999)) < db.ClickControl.clickSensitivity and buttonCount < 2 and not p.move) then
+                p.clickStop = GetTime();
+                if(((p.clickStop or 999999999) - (p.clickStart or 0)) < db.ClickControl.clickSensitivity and buttonCount < 2 and not p.move) then
                     worldFrameClicked(button);
                 end
                 cleanButtonTable(button);
-                --_G.DEFAULT_CHAT_FRAME:AddMessage("MouseUp: ".. button .. " - " .. (p.clickStop - p.clickStart) .. " seconds");
             end
 	end);
         

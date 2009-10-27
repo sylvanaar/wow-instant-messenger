@@ -17,9 +17,9 @@ end
 
 -- ChangeLog Entries.
 
-addBetaEntry("3.2.2", "10/??/2009", [[
-    *Fixed bug which caused arithmetic on nil error.
-    +Added scroll bars to WIM's option menus.
+addEntry("3.2.2", "10/??/2009", [[
+    *Fixed bug which caused arithmetic error in ClickControl.lua.
+    +Added scroll bars to WIM's sound option menus (More adaptations to come).
 ]]);
 
 addEntry("3.2.1", "10/19/2009", [[
