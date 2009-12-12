@@ -17,7 +17,12 @@ end
 
 -- ChangeLog Entries.
 
-addEntry("3.2.2", "10/??/2009", [[
+addEntry("3.2.3", "12/??/2009", [[
+    *Updated TOC to 3.3
+    *Added event handling for new CHAT_MSG_PARTY_LEADER.
+]]);
+
+addEntry("3.2.2", "10/27/2009", [[
     *Fixed bug which caused arithmetic error in ClickControl.lua.
     +Added scroll bars to WIM's sound option menus (More adaptations to come).
 ]]);

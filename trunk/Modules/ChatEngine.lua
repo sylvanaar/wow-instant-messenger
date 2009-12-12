@@ -426,6 +426,7 @@ _G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(Party);
 function Party:OnEnable()
     RegisterWidget("chat_info", createWidget_Chat);
     self:RegisterChatEvent("CHAT_MSG_PARTY");
+    self:RegisterChatEvent("CHAT_MSG_PARTY_LEADER");
     self:RegisterEvent("PARTY_MEMBERS_CHANGED");
 end
 
@@ -498,7 +499,8 @@ function Party:CHAT_MSG_PARTY(...)
     end
     CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_PARTY", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
-
+Party.CHAT_MSG_PARTY_LEADER_CONTROLLER = Party.CHAT_MSG_PARTY_CONTROLLER;
+Party.CHAT_MSG_PARTY_LEADER = Party.CHAT_MSG_PARTY;
 
 
 --------------------------------------
