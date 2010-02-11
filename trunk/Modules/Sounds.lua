@@ -90,7 +90,7 @@ function ChatSounds:PostEvent_ChatMessage(event, ...)
                 playSound(db.sounds.chat.guild_sml);
             elseif(d.officer and event == "CHAT_MSG_OFFICER") then
                 playSound(db.sounds.chat.officer_sml);
-            elseif(d.party and event == "CHAT_MSG_PARTY") then
+            elseif(d.party and (event == "CHAT_MSG_PARTY" or event == "CHAT_MSG_PARTY_LEADER")) then
                 playSound(db.sounds.chat.party_sml);
             elseif(d.raidleader and event == "CHAT_MSG_RAID_LEADER") then
                 playSound(db.sounds.chat.raidleader_sml);

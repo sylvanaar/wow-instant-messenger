@@ -499,8 +499,43 @@ function Party:CHAT_MSG_PARTY(...)
     end
     CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_PARTY", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
-Party.CHAT_MSG_PARTY_LEADER_CONTROLLER = Party.CHAT_MSG_PARTY_CONTROLLER;
-Party.CHAT_MSG_PARTY_LEADER = Party.CHAT_MSG_PARTY;
+
+function Party:CHAT_MSG_PARTY_LEADER_CONTROLLER(eventController, ...)
+    if(eventController.ignoredByWIM) then
+        eventController:BlockFromDelegate(self);
+        return;
+    end
+    if(not db.chat.party.neverSuppress and getRuleSet().supress) then
+        eventController:BlockFromChatFrame(self);
+    end
+end
+
+function Party:CHAT_MSG_PARTY_LEADER(...)
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_PARTY_LEADER", ...);
+    if(filter) then
+        return;
+    end
+    local win = getChatWindow(_G.PARTY, "party");
+    local color = _G.ChatTypeInfo["PARTY_LEADER"];
+    self.raidWindow = win;
+    if(not self.chatLoaded) then
+        Party:PARTY_MEMBERS_CHANGED();
+    end
+    self.chatLoaded = true;
+    arg3 = CleanLanguageArg(arg3);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_PARTY_LEADER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+    if(arg2 ~= _G.UnitName("player")) then
+        win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
+        if(not db.chat.party.neverPop) then
+            win:Pop("in");
+        end
+    else
+        if(not db.chat.party.neverPop) then
+            win:Pop("out");
+        end
+    end
+    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_PARTY_LEADER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+end
 
 
 --------------------------------------
