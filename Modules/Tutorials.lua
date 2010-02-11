@@ -3,6 +3,18 @@ local WIM = WIM;
 local _G = _G;
 local string = string;
 local tostring = tostring;
+local getn = getn;
+
+
+-- needed for tutorials
+local MAX_TUTORIAL_VERTICAL_TILE = 30;
+local MAX_TUTORIAL_IMAGES = 3;
+local MAX_TUTORIAL_KEYS = 4;
+
+local TUTORIALFRAME_TOP_HEIGHT = 80;
+local TUTORIALFRAME_MIDDLE_HEIGHT = 10;
+local TUTORIALFRAME_BOTTOM_HEIGHT = 30;
+local TUTORIALFRAME_WIDTH = 364;
 
 --set namespace
 setfenv(1, WIM);
@@ -23,42 +35,23 @@ function _G.FlagTutorial(id)
     local tut = string.match(tostring(id), "^WIM(.+)");
     if(tut) then
         -- flag internally
-        _G.TutorialFrame.wimTip = true;
+        --_G.TutorialFrame.wimTip = true;
         -- update text.
         if(tut ~= varFriendly(L["WIM Update Available!"])) then
             db.shownTutorials[tut] = true;
-            _G.TutorialFrameCheckButton:Show();
-            theButton:Hide();
-        else
-            _G.TutorialFrameCheckButton:Hide();
-            theButton:Show();
         end
-        _G.TutorialFrameCheckboxText:SetText(L["Display WIM tips"]);
+        --_G.TutorialFrameCheckboxText:SetText(L["Display WIM tips"]);
     else
         -- this tutorial isn't WIM's call origional function
-        _G.TutorialFrameCheckButton:Enable();
-        _G.TutorialFrameCheckboxText:SetText(_G.ENABLE_TUTORIAL_TEXT);
-        _G.TutorialFrame.wimTip = false;
+        --_G.TutorialFrameCheckButton:Enable();
+        --_G.TutorialFrameCheckboxText:SetText(_G.ENABLE_TUTORIAL_TEXT);
+        --_G.TutorialFrame.wimTip = false;
         _FlagTutorial(id);
     end
 end
 
-local _TutorialFrame_OnHide = _G.TutorialFrame_OnHide;
-function _G.TutorialFrame_OnHide(self)
-    self = self or _G.TutorialFrame;
-    if(self.wimTip) then
-        -- handle own code here.
-        _G.PlaySound("igMainMenuClose");
-	if(not _G.TutorialFrameCheckButton:GetChecked()) then
-            Tutorials:Disable();
-        end
-    else
-        -- not wim's tip, operate as normal
-        _TutorialFrame_OnHide(self);
-    end
-end
 
-
+--[[
 local function createChangelogButton()
     local button = _G.CreateFrame("Button", "WIM_TutorialButtonChangeLog", _G.TutorialFrame, "UIPanelButtonTemplate");
     local ok = _G.TutorialFrameOkayButton;
@@ -78,13 +71,13 @@ local function createChangelogButton()
     
     return button;
 end
-
+]]
 
 local function displayTutorial(title, tutorial)
     local var = varFriendly(title);
     if(not db.shownTutorials[var] or L["WIM Update Available!"] == title) then
         db.shownTutorials[var] = true;
-        theButton = theButton or createChangelogButton();
+        --theButton = theButton or createChangelogButton();
         _G["TUTORIAL_TITLEWIM"..var] = title;
         _G["TUTORIALWIM"..var] = tutorial;
         _G.TutorialFrame_NewTutorial("WIM"..var);
@@ -101,21 +94,226 @@ function Tutorials:OnDisable()
 end
 
 
-local _TutorialFrame_NewTutorial = _G.TutorialFrame_NewTutorial;
-_G.TutorialFrame_NewTutorial = function(id)
-    _TutorialFrame_NewTutorial(id);
-    local button = _G.LAST_TUTORIAL_BUTTON_SHOWN;
-    if(button) then
-        -- set OnHide to restore button's image.
-        button:SetScript("OnHide", function(self)
-                self:SetNormalTexture("Interface\\TutorialFrame\\TutorialFrameAlert");
-                self:SetHighlightTexture("Interface\\TutorialFrame\\TutorialFrameAlert", "ADD");
-            end);
-        -- set buttons image to WIM tutorial.
-        if(button.id and string.match(button.id, "^WIM")) then
-            button:SetNormalTexture("Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\tutorial");
-            button:SetHighlightTexture("Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\tutorial", "ADD");
+
+local _IsTutorialFlagged = _G.IsTutorialFlagged;
+function _G.IsTutorialFlagged(id)
+    if(string.match(id, "^[0-9]+$")) then
+        --Blizzard Tutorial, resume...
+        return _IsTutorialFlagged(id);
+    else
+        -- WIM Tutorial
+        return false;
+    end
+end
+
+-- base definitions
+local ARROW_TYPES = {
+	"ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
+	"ArrowCurveUpRight", "ArrowCurveUpLeft", "ArrowCurveDownRight", "ArrowCurveDownLeft",
+	"ArrowCurveRightDown", "ArrowCurveRightUp", "ArrowCurveLeftDown", "ArrowCurveLeftUp",
+}
+
+local ARROW_SIZES = {
+	["ArrowUp"] = {x = 68, y = 89},
+	["ArrowDown"] = {x = 68, y = 89},
+	["ArrowLeft"] = {x = 89, y = 68},
+	["ArrowRight"] = {x = 89, y = 68},
+	["ArrowCurveUpRight"] = {x = 66, y = 81},
+	["ArrowCurveUpLeft"] = {x = 66, y = 81},
+	["ArrowCurveDownRight"] = {x = 66, y = 81},
+	["ArrowCurveDownLeft"] = {x = 66, y = 81},
+	["ArrowCurveRightDown"] = {x = 82, y = 66},
+	["ArrowCurveRightUp"] = {x = 82, y = 66},
+	["ArrowCurveLeftDown"] = {x = 82, y = 66},
+	["ArrowCurveLeftUp"] = {x = 82, y = 66},
+}
+
+local MOUSE_SIZE = { x = 76, y = 101}
+
+local DISPLAY_DATA = {
+    ["Base"] = {
+		tileHeight = 7, 
+		anchorData = {align = "LEFT", xOff = 15, yOff = 30},
+		textBox = {topLeft_xOff = 33, topLeft_yOff = -75, bottomRight_xOff = -29, bottomRight_yOff = 35},
+    },
+};
+
+local TUTORIAL_HISTORY = {};
+
+-- Tutorial Frame Hook used to implement WIM custom Tutorials.
+local _TutorialFrame_Update = _G.TutorialFrame_Update;
+function _G.TutorialFrame_Update(currentTutorial)
+    WIM.addToTableUnique(TUTORIAL_HISTORY, currentTutorial);
+    if(string.match(currentTutorial, "^[0-9]+$")) then
+        --Blizzard Tutorial, resume...
+        _G.DEFAULT_CHAT_FRAME:AddMessage("Blizzard Tutorial ID: "..currentTutorial);
+        _TutorialFrame_Update(currentTutorial);
+    else
+        -- WIM Tutorial
+        _G.DEFAULT_CHAT_FRAME:AddMessage("WIM Tutorial ID: "..currentTutorial);
+        _G.FlagTutorial(currentTutorial);
+	_G.TutorialFrame.id = currentTutorial;
+
+	local displayData = DISPLAY_DATA[ currentTutorial ];
+	if ( not displayData ) then
+		displayData = DISPLAY_DATA["Base"];
+	end
+	
+	-- setup the frame
+	_G.TutorialFrame_ClearTextures();
+	local anchorData = displayData.anchorData;
+	_G.TutorialFrame:SetPoint( anchorData.align, _G.UIParent, anchorData.align, anchorData.xOff, anchorData.yOff );
+
+	local anchorParentLeft = _G.TutorialFrameLeft1;
+	local anchorParentRight = _G.TutorialFrameRight1;
+	for i = 2, displayData.tileHeight do
+		local leftTexture = _G["TutorialFrameLeft"..i];
+		local rightTexture = _G["TutorialFrameRight"..i];
+		leftTexture:SetPoint("TOPLEFT", anchorParentLeft, "BOTTOMLEFT", 0, 0);
+		rightTexture:SetPoint("TOPRIGHT", anchorParentRight, "BOTTOMRIGHT", 0, 0);
+		leftTexture:Show();
+		rightTexture:Show();
+		anchorParentLeft = leftTexture;
+		anchorParentRight = rightTexture;
+	end
+	_G.TutorialFrameBottom:SetPoint("TOPLEFT", anchorParentLeft, "BOTTOMLEFT", 0, 0);
+	_G.TutorialFrameBottom:SetPoint("TOPRIGHT", anchorParentRight, "TOPRIGHT", 0, 0);
+
+	local height = TUTORIALFRAME_TOP_HEIGHT + (displayData.tileHeight * TUTORIALFRAME_MIDDLE_HEIGHT) + TUTORIALFRAME_BOTTOM_HEIGHT;
+	_G.TutorialFrame:SetSize(TUTORIALFRAME_WIDTH, height);
+
+	-- setup the text
+	local title = _G["TUTORIAL_TITLE"..currentTutorial];
+	local text = _G["TUTORIAL"..currentTutorial];
+	if ( title and text) then
+		_G.TutorialFrameTitle:SetText(title);
+		_G.TutorialFrameText:SetText(text);
+	end
+	if ( displayData.textBox) then
+		_G.TutorialFrameTextScrollFrame:SetPoint("TOPLEFT", _G.TutorialFrame, "TOPLEFT", displayData.textBox.topLeft_xOff, displayData.textBox.topLeft_yOff);
+		_G.TutorialFrameTextScrollFrame:SetPoint("BOTTOMRIGHT", _G.TutorialFrame, "BOTTOMRIGHT", displayData.textBox.bottomRight_xOff, displayData.textBox.bottomRight_yOff);
+	end
+
+	-- setup the callout
+	local callOut = displayData.callOut;
+	if(callOut) then
+		_G.TutorialFrameCallOut:SetSize(callOut.width, callOut.height);
+		_G.TutorialFrameCallOut:SetPoint( callOut.align, callOut.parent, callOut.align, callOut.xOff, callOut.yOff );
+		_G.TutorialFrameCallOut:Show();
+		_G.TutorialFrameCallOutPulser:Play();
+	end
+
+	-- setup images
+	for i = 1, MAX_TUTORIAL_IMAGES do
+		local imageTexture = _G["TutorialFrameImage"..i];
+		local imageData = displayData["imageData"..i];
+		if(imageData and imageTexture) then
+			imageTexture:SetTexture(imageData.file);
+			imageTexture:SetPoint( imageData.align, TutorialFrame, imageData.align, imageData.xOff, imageData.yOff );
+			if ( imageData.layer ) then
+				imageTexture:SetDrawLayer(imageData.layer);
+			end
+			imageTexture:Show();
+		elseif( imageTexture ) then
+			imageTexture:ClearAllPoints();
+			imageTexture:SetTexture("");
+			imageTexture:Hide();
+		end
+	end
+
+	-- setup mouse
+	local mouseData = displayData.mouseData;
+	if(mouseData) then
+		local mouseTexture = _G["TutorialFrameMouse"..mouseData.image];
+		mouseTexture:SetPoint( mouseData.align, _G.TutorialFrame, mouseData.align, mouseData.xOff, mouseData.yOff );
+		
+		local scale = 1.0;
+		if ( mouseData.scale ) then
+			scale = mouseData.scale;
+		end
+		mouseTexture:SetWidth( MOUSE_SIZE.x * scale );
+		mouseTexture:SetHeight( MOUSE_SIZE.y * scale );
+		
+		if ( mouseData.layer ) then
+			mouseTexture:SetDrawLayer(mouseData.layer);
+		end
+		mouseTexture:Show();
+	end
+
+	-- setup keys
+	for i = 1, MAX_TUTORIAL_KEYS do
+		local keyTexture = _G["TutorialFrameKey"..i];
+		local keyString = _G["TutorialFrameKeyString"..i];
+		local keyData = displayData["keyData"..i];
+		if(keyTexture and keyString and keyData) then
+			keyTexture:SetPoint( keyData.align, _G.TutorialFrame, keyData.align, keyData.xOff, keyData.yOff );
+			keyString:SetText( GetBindingText(GetBindingKey(keyData.command), "KEY_") );
+			if ( keyData.layer ) then
+				keyTexture:SetDrawLayer(keyData.layer);
+				keyString:SetDrawLayer(keyData.layer);
+			end
+			keyTexture:Show();
+			keyString:Show();
+		elseif ( keyTexture ) then
+			keyTexture:ClearAllPoints();
+			keyTexture:Hide();
+			keyString:Hide();
+		end
+	end
+        
+        -- setup arrows
+	for i = 1, getn(ARROW_TYPES) do
+		arrowData = displayData[ ARROW_TYPES[i] ];
+		arrowTexture = _G[ "TutorialFrame"..ARROW_TYPES[i] ];
+		if ( arrowData and arrowTexture ) then
+			arrowTexture:SetPoint( arrowData.align, _G.TutorialFrame, arrowData.align, arrowData.xOff, arrowData.yOff );
+			if ( arrowData.layer ) then
+				arrowTexture:SetDrawLayer(arrowData.layer);
+			end
+			if ( arrowData.scale ) then
+				arrowTexture:SetWidth( ARROW_SIZES[ARROW_TYPES[i]].x * arrowData.scale );
+				arrowTexture:SetHeight( ARROW_SIZES[ARROW_TYPES[i]].y * arrowData.scale );
+			end
+			arrowTexture:Show();
+		elseif ( arrowTexture ) then
+			arrowTexture:ClearAllPoints();
+			arrowTexture:Hide();
+		end
+	end
+	
+	-- show
+	_G.TutorialFrame:Show();
+	_G.TutorialFrame_CheckNextPrevButtons();
+    end
+end
+
+
+local function getHistoryIndex(id)
+    for i=1, #TUTORIAL_HISTORY do
+        if(TUTORIAL_HISTORY[i] == id) then
+            return i;
         end
+    end
+    return;
+end
+
+local _GetNextCompleatedTutorial = _G.GetNextCompleatedTutorial;
+function _G.GetNextCompleatedTutorial(id)
+    if(string.match(id, "^[0-9]+$")) then
+        return _GetNextCompleatedTutorial(id);
+    else
+        local i = getHistoryIndex(id);
+        return i and TUTORIAL_HISTORY[i+1];
+    end
+end
+
+local _GetPrevCompleatedTutorial = _G.GetPrevCompleatedTutorial;
+function _G.GetPrevCompleatedTutorial(id)
+    if(string.match(id, "^[0-9]+$")) then
+        return _GetPrevCompleatedTutorial(id);
+    else
+        local i = getHistoryIndex(id);
+        return i and TUTORIAL_HISTORY[i-1];
     end
 end
 
@@ -126,4 +324,4 @@ function DisplayTutorial(title, tutorial)
 end
 
 -- this is used to show tutorial even if Tutorials are disabled.
-DisplayTutorialForce = displayTutorial; 
+DisplayTutorialForce = displayTutorial;
