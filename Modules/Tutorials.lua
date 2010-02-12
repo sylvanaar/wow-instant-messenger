@@ -34,29 +34,35 @@ local _FlagTutorial = _G.FlagTutorial;
 function _G.FlagTutorial(id)
     local tut = string.match(tostring(id), "^WIM(.+)");
     if(tut) then
-        -- flag internally
-        --_G.TutorialFrame.wimTip = true;
-        -- update text.
         if(tut ~= varFriendly(L["WIM Update Available!"])) then
             db.shownTutorials[tut] = true;
         end
-        --_G.TutorialFrameCheckboxText:SetText(L["Display WIM tips"]);
     else
-        -- this tutorial isn't WIM's call origional function
-        --_G.TutorialFrameCheckButton:Enable();
-        --_G.TutorialFrameCheckboxText:SetText(_G.ENABLE_TUTORIAL_TEXT);
-        --_G.TutorialFrame.wimTip = false;
         _FlagTutorial(id);
     end
 end
 
 
---[[
+local function setWIMorBlizzard(wim)
+    local alert = _G.TutorialFrameAlertButton;
+    if(wim) then
+        _G.TutorialFrameTop:SetTexture("Interface\\AddOns\\"..WIM.addonTocName.."\\Modules\\Textures\\UI-TUTORIAL-FRAME");
+        _G.TutorialFrameBottom:SetTexture("Interface\\AddOns\\"..WIM.addonTocName.."\\Modules\\Textures\\UI-TUTORIAL-FRAME");
+        alert:SetNormalTexture("Interface\\AddOns\\"..WIM.addonTocName.."\\Modules\\Textures\\UI-TUTORIAL-FRAME");
+        alert:SetHighlightTexture("Interface\\AddOns\\"..WIM.addonTocName.."\\Modules\\Textures\\UI-TUTORIAL-FRAME");
+    else
+        _G.TutorialFrameTop:SetTexture("Interface\\TutorialFrame\\UI-TUTORIAL-FRAME");
+        _G.TutorialFrameBottom:SetTexture("Interface\\TutorialFrame\\UI-TUTORIAL-FRAME");
+        alert:SetNormalTexture("Interface\\TutorialFrame\\UI-TUTORIAL-FRAME");
+        alert:SetHighlightTexture("Interface\\TutorialFrame\\UI-TUTORIAL-FRAME");
+    end
+end
+
 local function createChangelogButton()
     local button = _G.CreateFrame("Button", "WIM_TutorialButtonChangeLog", _G.TutorialFrame, "UIPanelButtonTemplate");
     local ok = _G.TutorialFrameOkayButton;
-    button:SetPoint("BOTTOMLEFT", 7, 7);
-    button:SetHeight(ok:GetHeight());
+    button:SetPoint("BOTTOM", 0, 40);
+    button:SetHeight(22);
     button:SetNormalTexture("DialogButtonNormalTexture");
     button:SetPushedTexture("DialogButtonPushedTexture");
     button:SetHighlightTexture("DialogButtonHighlightTexture");
@@ -66,18 +72,17 @@ local function createChangelogButton()
     button:SetHighlightFontObject("GameFontNormalSmall");
     button:SetDisabledFontObject("GameFontNormalSmall");
     button:SetWidth(_G.WIM_TutorialButtonChangeLogText:GetStringWidth()+30)
-    --button:Disable();
+    button:Hide();
     button:SetScript("OnClick", ShowChangeLog);
     
     return button;
 end
-]]
 
 local function displayTutorial(title, tutorial)
     local var = varFriendly(title);
     if(not db.shownTutorials[var] or L["WIM Update Available!"] == title) then
         db.shownTutorials[var] = true;
-        --theButton = theButton or createChangelogButton();
+        theButton = theButton or createChangelogButton();
         _G["TUTORIAL_TITLEWIM"..var] = title;
         _G["TUTORIALWIM"..var] = tutorial;
         _G.TutorialFrame_NewTutorial("WIM"..var);
@@ -132,7 +137,7 @@ local MOUSE_SIZE = { x = 76, y = 101}
 
 local DISPLAY_DATA = {
     ["Base"] = {
-		tileHeight = 7, 
+		tileHeight = 10, 
 		anchorData = {align = "LEFT", xOff = 15, yOff = 30},
 		textBox = {topLeft_xOff = 33, topLeft_yOff = -75, bottomRight_xOff = -29, bottomRight_yOff = 35},
     },
@@ -143,14 +148,19 @@ local TUTORIAL_HISTORY = {};
 -- Tutorial Frame Hook used to implement WIM custom Tutorials.
 local _TutorialFrame_Update = _G.TutorialFrame_Update;
 function _G.TutorialFrame_Update(currentTutorial)
+    if(theButton) then
+        theButton:Hide();
+    end
     WIM.addToTableUnique(TUTORIAL_HISTORY, currentTutorial);
     if(string.match(currentTutorial, "^[0-9]+$")) then
         --Blizzard Tutorial, resume...
-        _G.DEFAULT_CHAT_FRAME:AddMessage("Blizzard Tutorial ID: "..currentTutorial);
+        dPrint("Blizzard Tutorial ID: "..currentTutorial);
+        setWIMorBlizzard(false);
         _TutorialFrame_Update(currentTutorial);
     else
         -- WIM Tutorial
-        _G.DEFAULT_CHAT_FRAME:AddMessage("WIM Tutorial ID: "..currentTutorial);
+        dPrint("WIM Tutorial ID: "..currentTutorial);
+        setWIMorBlizzard(true);
         _G.FlagTutorial(currentTutorial);
 	_G.TutorialFrame.id = currentTutorial;
 
@@ -185,6 +195,9 @@ function _G.TutorialFrame_Update(currentTutorial)
 	-- setup the text
 	local title = _G["TUTORIAL_TITLE"..currentTutorial];
 	local text = _G["TUTORIAL"..currentTutorial];
+        if(title == L["WIM Update Available!"]) then
+            theButton:Show();
+        end
 	if ( title and text) then
 		_G.TutorialFrameTitle:SetText(title);
 		_G.TutorialFrameText:SetText(text);
