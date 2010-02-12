@@ -111,29 +111,6 @@ function _G.IsTutorialFlagged(id)
     end
 end
 
--- base definitions
-local ARROW_TYPES = {
-	"ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
-	"ArrowCurveUpRight", "ArrowCurveUpLeft", "ArrowCurveDownRight", "ArrowCurveDownLeft",
-	"ArrowCurveRightDown", "ArrowCurveRightUp", "ArrowCurveLeftDown", "ArrowCurveLeftUp",
-}
-
-local ARROW_SIZES = {
-	["ArrowUp"] = {x = 68, y = 89},
-	["ArrowDown"] = {x = 68, y = 89},
-	["ArrowLeft"] = {x = 89, y = 68},
-	["ArrowRight"] = {x = 89, y = 68},
-	["ArrowCurveUpRight"] = {x = 66, y = 81},
-	["ArrowCurveUpLeft"] = {x = 66, y = 81},
-	["ArrowCurveDownRight"] = {x = 66, y = 81},
-	["ArrowCurveDownLeft"] = {x = 66, y = 81},
-	["ArrowCurveRightDown"] = {x = 82, y = 66},
-	["ArrowCurveRightUp"] = {x = 82, y = 66},
-	["ArrowCurveLeftDown"] = {x = 82, y = 66},
-	["ArrowCurveLeftUp"] = {x = 82, y = 66},
-}
-
-local MOUSE_SIZE = { x = 76, y = 101}
 
 local DISPLAY_DATA = {
     ["Base"] = {
@@ -234,40 +211,11 @@ function _G.TutorialFrame_Update(currentTutorial)
 		end
 	end
 
-	-- setup mouse
-	local mouseData = displayData.mouseData;
-	if(mouseData) then
-		local mouseTexture = _G["TutorialFrameMouse"..mouseData.image];
-		mouseTexture:SetPoint( mouseData.align, _G.TutorialFrame, mouseData.align, mouseData.xOff, mouseData.yOff );
-		
-		local scale = 1.0;
-		if ( mouseData.scale ) then
-			scale = mouseData.scale;
-		end
-		mouseTexture:SetWidth( MOUSE_SIZE.x * scale );
-		mouseTexture:SetHeight( MOUSE_SIZE.y * scale );
-		
-		if ( mouseData.layer ) then
-			mouseTexture:SetDrawLayer(mouseData.layer);
-		end
-		mouseTexture:Show();
-	end
-
 	-- setup keys
 	for i = 1, MAX_TUTORIAL_KEYS do
 		local keyTexture = _G["TutorialFrameKey"..i];
 		local keyString = _G["TutorialFrameKeyString"..i];
-		local keyData = displayData["keyData"..i];
-		if(keyTexture and keyString and keyData) then
-			keyTexture:SetPoint( keyData.align, _G.TutorialFrame, keyData.align, keyData.xOff, keyData.yOff );
-			keyString:SetText( GetBindingText(GetBindingKey(keyData.command), "KEY_") );
-			if ( keyData.layer ) then
-				keyTexture:SetDrawLayer(keyData.layer);
-				keyString:SetDrawLayer(keyData.layer);
-			end
-			keyTexture:Show();
-			keyString:Show();
-		elseif ( keyTexture ) then
+		if ( keyTexture ) then
 			keyTexture:ClearAllPoints();
 			keyTexture:Hide();
 			keyString:Hide();
@@ -275,20 +223,8 @@ function _G.TutorialFrame_Update(currentTutorial)
 	end
         
         -- setup arrows
-	for i = 1, getn(ARROW_TYPES) do
-		arrowData = displayData[ ARROW_TYPES[i] ];
-		arrowTexture = _G[ "TutorialFrame"..ARROW_TYPES[i] ];
-		if ( arrowData and arrowTexture ) then
-			arrowTexture:SetPoint( arrowData.align, _G.TutorialFrame, arrowData.align, arrowData.xOff, arrowData.yOff );
-			if ( arrowData.layer ) then
-				arrowTexture:SetDrawLayer(arrowData.layer);
-			end
-			if ( arrowData.scale ) then
-				arrowTexture:SetWidth( ARROW_SIZES[ARROW_TYPES[i]].x * arrowData.scale );
-				arrowTexture:SetHeight( ARROW_SIZES[ARROW_TYPES[i]].y * arrowData.scale );
-			end
-			arrowTexture:Show();
-		elseif ( arrowTexture ) then
+	for i = 1, 12 do
+		if ( arrowTexture ) then
 			arrowTexture:ClearAllPoints();
 			arrowTexture:Hide();
 		end
