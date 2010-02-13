@@ -111,6 +111,12 @@ function _G.IsTutorialFlagged(id)
     end
 end
 
+local ARROW_TYPES = {
+	"ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight",
+	"ArrowCurveUpRight", "ArrowCurveUpLeft", "ArrowCurveDownRight", "ArrowCurveDownLeft",
+	"ArrowCurveRightDown", "ArrowCurveRightUp", "ArrowCurveLeftDown", "ArrowCurveLeftUp",
+}
+
 
 local DISPLAY_DATA = {
     ["Base"] = {
@@ -223,7 +229,8 @@ function _G.TutorialFrame_Update(currentTutorial)
 	end
         
         -- setup arrows
-	for i = 1, 12 do
+	for i = 1, getn(ARROW_TYPES) do
+                local arrowTexture = _G[ "TutorialFrame"..ARROW_TYPES[i] ];
 		if ( arrowTexture ) then
 			arrowTexture:ClearAllPoints();
 			arrowTexture:Hide();

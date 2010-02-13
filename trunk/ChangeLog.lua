@@ -17,10 +17,12 @@ end
 
 -- ChangeLog Entries.
 
-addEntry("3.3.1", "02/??/2010", [[
+addBetaEntry("3.3.1", "02/??/2010", [[
     *Updated TOC to 3.3
     *Added party event handling for new CHAT_MSG_PARTY_LEADER.
     *Updated WIM to work with the new tutorial system.
+    +Added 'Windows Settings' option 'Clamp window to screen'.
+    +Added new WIM Module API Events (OnWindowLeaveScreen, OnWindowEnterScreen).
 ]]);
 
 addEntry("3.2.2", "10/27/2009", [[
