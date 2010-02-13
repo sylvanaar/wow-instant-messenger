@@ -271,7 +271,8 @@ local function General_WindowSettings()
     frame.menu.height = frame.menu:CreateSlider(L["Default Height"], "150", "600", 150, 600, 1, db.winSize, "height", function(self) UpdateAllWindowProps(); end);
     frame.menu.nextOffSetY = -45;
     frame.menu.scale = frame.menu:CreateSlider(L["Window Scale"], "10", "400", 10, 400, 1, db.winSize, "scale", function(self) UpdateAllWindowProps(); end);
-    frame.menu.nextOffSetY = -45;
+    frame.menu.nextOffSetY = -25;
+    
     -- window strata
     local stratas = {"BACKGROUND", "LOW", "MEDIUM", "HIGH", "DIALOG", "TOOLTIP"};
     local strataList = {};
@@ -291,8 +292,9 @@ local function General_WindowSettings()
     frame.menu.strataList:ClearAllPoints();
     frame.menu.strataList:SetPoint("LEFT", frame.menu.strataText, "LEFT", frame.menu.strataText:GetStringWidth(), 0);
     frame.menu.lastObj = frame.menu.strataText;
-    
-    frame.menu.nextOffSetY = -25;
+    frame.menu.nextOffSetY = -5;
+    frame.menu.clamp = frame.menu:CreateCheckButton(L["Clamp window to screen."], db, "clampToScreen", nil, function(self) UpdateAllWindowProps(); end);
+    frame.menu.nextOffSetY = -10;
     frame.menu:CreateButton(L["Set Window Spawn Location"], ShowDemoWindow);
     frame.menu.nextOffSetY = -10;
     frame.menu.sub = frame.menu:CreateSection();

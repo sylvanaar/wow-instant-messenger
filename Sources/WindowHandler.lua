@@ -75,6 +75,7 @@ db_defaults.pop_rules = {};
 db_defaults.whoLookups = true;
 db_defaults.hoverLinks = false;
 db_defaults.tabAdvance = false;
+db_defaults.clampToScreen = true;
 
 db_defaults.formatting = {
                 bracketing = {
@@ -540,8 +541,45 @@ local function MessageWindow_Frame_OnHide(self)
         end
 end
 
+
+local function updateTracker(win)
+                if(not WindowParent.animUp) then
+                                local pX, pY, pW, pH = WindowParent:GetLeft(), WindowParent:GetTop(), WindowParent:GetWidth(), WindowParent:GetHeight();
+                                local sX, sY, sW, sH = win:GetLeft(), win:GetTop(), win:GetWidth(), win:GetHeight();
+                                if(sY < 0) then -- bottom
+                                                if(win.offScreen ~= 1) then
+                                                                win.offScreen = 1;
+                                                                CallModuleFunction("OnWindowLeaveScreen", win, 1);
+                                                end
+                                elseif((sY - sH) > pH) then -- top
+                                                if(win.offScreen ~= 2) then
+                                                                win.offScreen = 2;
+                                                                CallModuleFunction("OnWindowLeaveScreen", win, 2);
+                                                end
+                                elseif((sX + sW) < 0) then -- left
+                                                if(win.offScreen ~= 3) then
+                                                                win.offScreen = 3;
+                                                                CallModuleFunction("OnWindowLeaveScreen", win, 3);
+                                                end
+                                elseif(sX > pW) then -- left
+                                                if(win.offScreen ~= 4) then
+                                                                win.offScreen = 4;
+                                                                CallModuleFunction("OnWindowLeaveScreen", win, 4);
+                                                end
+                                else
+                                                --on screen
+                                                if(win.offScreen ~= 0) then
+                                                                CallModuleFunction("OnWindowEnterScreen", win);
+                                                end
+                                                win.offScreen = 0;
+                                end
+                end
+end
+
+
 local function MessageWindow_Frame_OnUpdate(self, elapsed)
 	-- window is visible, there aren't any messages waiting...
+        updateTracker(self);
 	self.msgWaiting = false;
 	self.unreadCount = 0;
         -- animation segment
@@ -706,7 +744,7 @@ end
 local function instantiateWindow(obj)
     local fName = obj:GetName();
     -- set frame's initial properties
-    obj:SetClampedToScreen(not WindowParent.animUp);
+    obj:SetClampedToScreen(not WindowParent.animUp and db.clampToScreen);
     obj:SetFrameStrata("DIALOG");
     obj:SetMovable(true);
     obj:SetToplevel(true);
@@ -973,6 +1011,7 @@ local function instantiateWindow(obj)
 	self:SetScale(db.winSize.scale/100);
 	self.widgets.Backdrop:SetAlpha(db.windowAlpha/100);
 	local Path,_,Flags = self.widgets.chat_display:GetFont();
+        self:SetClampedToScreen(not WindowParent.animUp and db.clampToScreen);
 	self.widgets.chat_display:SetFont(Path,db.fontSize+2,Flags);
 	self.widgets.chat_display:SetAlpha(1);
 	self.widgets.chat_display:SetIndentedWordWrap(db.wordwrap_indent);
@@ -1046,7 +1085,7 @@ local function instantiateWindow(obj)
     end
     obj.ResetAnimation = function(self)
 	if(self.animation.mode) then
-		self:SetClampedToScreen(not WindowParent.animUp);
+		self:SetClampedToScreen(not WindowParent.animUp and db.clampToScreen);
 		self:SetScale_Orig(db.winSize.scale/100);
                 self:ClearAllPoints();
 		self:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", self.animation.initLeft, self.animation.initTop - WindowParent:GetBottom());
@@ -1501,7 +1540,7 @@ local function WindowParent_AnimFinished(self)
         end
         for i=1, #WindowSoupBowl.windows do
 		local win = WindowSoupBowl.windows[i].obj;
-                win:SetClampedToScreen(not self.animUp);
+                win:SetClampedToScreen(not self.animUp and db.clampToScreen);
                 if(win:IsVisible()) then
                                 WIM.CallModuleFunction("OnWindowShow", win);
                 end
