@@ -75,7 +75,7 @@ db_defaults.pop_rules = {};
 db_defaults.whoLookups = true;
 db_defaults.hoverLinks = false;
 db_defaults.tabAdvance = false;
-db_defaults.clampToScreen = true;
+db_defaults.clampToScreen = false;
 
 db_defaults.formatting = {
                 bracketing = {

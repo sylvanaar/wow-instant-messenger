@@ -483,6 +483,10 @@ WIM.AddLocale("enUS", {
     ["Enable WorldFrame Click Detection."] = true,
     ["The UI must be reloaded in order to disable this module fully. Reload UI now?"] = true,
     
+    --OffScreenTracker.lua
+    ["WIM Window Off Screen"] = true,
+    ["Click to reposition."] = true,
+    
     --Misc
     ["WIM has detected that you are playing on a private server. Some servers can not process ChatAddonMessages. Would you like to enable them anyway?"] = true,
     
