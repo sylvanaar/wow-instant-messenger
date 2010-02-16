@@ -17,7 +17,7 @@ end
 
 -- ChangeLog Entries.
 
-addBetaEntry("3.3.1", "02/16/2010", [[
+addEntry("3.3.1", "02/16/2010", [[
     *Updated TOC to 3.3
     *Added party event handling for new CHAT_MSG_PARTY_LEADER.
     *Updated WIM to work with the new tutorial system.
