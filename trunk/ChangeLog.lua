@@ -16,6 +16,10 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.3.2", "02/16/2010", [[
+    *OnWindowLeaveScreen is only fired when Clamp to Screen is disabled.
+    *Off screen detection did not account for effective scale.
+]]);
 
 addEntry("3.3.1", "02/16/2010", [[
     *Updated TOC to 3.3
