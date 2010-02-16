@@ -544,24 +544,26 @@ end
 
 local function updateTracker(win)
                 if(not WindowParent.animUp) then
-                                local pX, pY, pW, pH = WindowParent:GetLeft(), WindowParent:GetTop(), WindowParent:GetWidth(), WindowParent:GetHeight();
-                                local sX, sY, sW, sH = win:GetLeft(), win:GetTop(), win:GetWidth(), win:GetHeight();
-                                if(sY < 0) then -- bottom
+                                local pS, sS = WindowParent:GetEffectiveScale(), win:GetEffectiveScale()
+                                local pL, pR, pT, pB = WindowParent:GetLeft()*pS, WindowParent:GetRight()*pS, WindowParent:GetTop()*pS, WindowParent:GetBottom()/pS;
+                                local sL, sR, sT, sB = win:GetLeft()*sS, win:GetRight()*sS, win:GetTop()*sS, win:GetBottom()*sS;
+                                
+                                if(not db.clampToScreen and sT < 0) then -- bottom
                                                 if(win.offScreen ~= 1) then
                                                                 win.offScreen = 1;
                                                                 CallModuleFunction("OnWindowLeaveScreen", win, 1);
                                                 end
-                                elseif((sY - sH) > pH) then -- top
+                                elseif(not db.clampToScreen and sB > pT) then -- top
                                                 if(win.offScreen ~= 2) then
                                                                 win.offScreen = 2;
                                                                 CallModuleFunction("OnWindowLeaveScreen", win, 2);
                                                 end
-                                elseif((sX + sW) < 0) then -- left
+                                elseif(not db.clampToScreen and sR < 0) then -- left
                                                 if(win.offScreen ~= 3) then
                                                                 win.offScreen = 3;
                                                                 CallModuleFunction("OnWindowLeaveScreen", win, 3);
                                                 end
-                                elseif(sX > pW) then -- left
+                                elseif(not db.clampToScreen and sL > pR) then -- right
                                                 if(win.offScreen ~= 4) then
                                                                 win.offScreen = 4;
                                                                 CallModuleFunction("OnWindowLeaveScreen", win, 4);
