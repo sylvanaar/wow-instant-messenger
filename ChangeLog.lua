@@ -16,6 +16,11 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addBetaEntry("3.3.3", "02/??/2010", [[
+    *Animation system now part of WIM namespace preventing local/global confusion.
+    *libChatHandler-1.0 no longer hooks the Default ChatFrame reducing tainted objects.
+]]);
+
 addEntry("3.3.2", "02/16/2010", [[
     *OnWindowLeaveScreen is only fired when Clamp to Screen is disabled.
     *Off screen detection did not account for effective scale.
