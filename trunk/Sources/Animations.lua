@@ -12,9 +12,20 @@
 	updateFunc = function,		--The function called to do the actual change. Takes self, elapsed fraction. Usually frame.SetPoint, frame.SetAlpha, ect.
 	getPosFunc = function,		--The function returning the data being passed into updateFunc. For example. might return .18 if updateFunc is frame.SetAlpha.
 --]]
+
+-- imports
+local WIM = WIM;
+local _G = _G;
+local table = table;
+local type = type;
+local pairs = pairs;
+
+-- set namespace
+setfenv(1, WIM);
+
 local AnimatingFrames = {};
 
-local AnimUpdateFrame = CreateFrame("Frame");
+local AnimUpdateFrame = _G.CreateFrame("Frame");
 
 local function Animation_UpdateFrame(self, animElapsed, animTable)
 	local totalTime = animTable.totalTime
@@ -52,7 +63,8 @@ local function Animation_OnUpdate(self, elapsed)
 	end
 end
 
-function WIM.SetUpAnimation(frame, animTable, postFunc, reverse)
+-- WIM API
+function SetUpAnimation(frame, animTable, postFunc, reverse)
 	if ( type(animTable.updateFunc) == "string" ) then
 		animTable.updateFunc = frame[animTable.updateFunc];
 	end
