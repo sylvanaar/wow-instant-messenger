@@ -195,18 +195,7 @@ local function displayURL(link)
     _G.StaticPopup_Show ("WIM_SHOW_URL", theLink);
 end
 
-
---Hook SetItemRef
-local SetItemRef_orig = _G.SetItemRef;
-local function setItemRef (link, text, button)
-	if (isLinkTypeURL(link)) then
-		displayURL(link);
-		return;
-	end
-	SetItemRef_orig(link, text, button);
-end
-_G.SetItemRef = setItemRef;
-
+WIM.RegisterItemRefHandler("wim_url", displayURL);
 
 --context menu
 local function MENU_ARMORY_CLICKED(self)
