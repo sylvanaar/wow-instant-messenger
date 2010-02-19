@@ -849,43 +849,36 @@ function ShowFilterFrame(filter, index, isChat)
 end
 
 
---Hook SetItemRef
-local SetItemRef_orig = _G.SetItemRef;
-local function setItemRef (link, text, button)
-	if (_G.strsub(link, 1, 10) == "WIMBLOCKED") then
-            local msgId = _G.tonumber(link:match("(%d+)"));
-	    if(msgId and blockedEvents[msgId]) then
-                local event = blockedEvents[msgId][1];
-                local args = {"\009\002"..blockedEvents[msgId][2],
-                    blockedEvents[msgId][3], blockedEvents[msgId][4], blockedEvents[msgId][5], blockedEvents[msgId][6],
-                    blockedEvents[msgId][7], blockedEvents[msgId][8], blockedEvents[msgId][9], blockedEvents[msgId][10],
-                    blockedEvents[msgId][11], blockedEvents[msgId][12]};
-                local win;
-                if(event:find("WHISPER_INFORM")) then
-                    modules.WhisperEngine:CHAT_MSG_WHISPER_INFORM(_G.unpack(args));
-                elseif(event:find("WHISPER")) then
-                    modules.WhisperEngine:CHAT_MSG_WHISPER(_G.unpack(args));
-                elseif(event:find("RAID_LEADER")) then
-                    modules.RaidChat:CHAT_MSG_RAID_LEADER(_G.unpack(args));
-                elseif(event:find("RAID")) then
-                    modules.RaidChat:CHAT_MSG_RAID(_G.unpack(args));
-                elseif(event:find("GUILD")) then
-                    modules.GuildChat:CHAT_MSG_GUILD(_G.unpack(args));
-                elseif(event:find("OFFICER")) then
-                    modules.OfficerChat:CHAT_MSG_OFFICER(_G.unpack(args));
-                elseif(event:find("PARTY")) then
-                    modules.PartyChat:CHAT_MSG_PARTY(_G.unpack(args));
-                elseif(event:find("SAY")) then
-                    modules.SayChat:CHAT_MSG_SAY(_G.unpack(args));
-                elseif(event:find("CHANNEL")) then
-                    modules.ChannelChat:CHAT_MSG_CHANNEL(_G.unpack(args));
-                end
-            end
-	    return;
-	end
-	SetItemRef_orig(link, text, button);
-end
-_G.SetItemRef = setItemRef;
+WIM.RegisterItemRefHandler("WIMBLOCKED", function (link)
+    local msgId = _G.tonumber(link:match("(%d+)"));
+    if(msgId and blockedEvents[msgId]) then
+        local event = blockedEvents[msgId][1];
+        local args = {"\009\002"..blockedEvents[msgId][2],
+            blockedEvents[msgId][3], blockedEvents[msgId][4], blockedEvents[msgId][5], blockedEvents[msgId][6],
+            blockedEvents[msgId][7], blockedEvents[msgId][8], blockedEvents[msgId][9], blockedEvents[msgId][10],
+            blockedEvents[msgId][11], blockedEvents[msgId][12]};
+        local win;
+        if(event:find("WHISPER_INFORM")) then
+            modules.WhisperEngine:CHAT_MSG_WHISPER_INFORM(_G.unpack(args));
+        elseif(event:find("WHISPER")) then
+            modules.WhisperEngine:CHAT_MSG_WHISPER(_G.unpack(args));
+        elseif(event:find("RAID_LEADER")) then
+            modules.RaidChat:CHAT_MSG_RAID_LEADER(_G.unpack(args));
+        elseif(event:find("RAID")) then
+            modules.RaidChat:CHAT_MSG_RAID(_G.unpack(args));
+        elseif(event:find("GUILD")) then
+            modules.GuildChat:CHAT_MSG_GUILD(_G.unpack(args));
+        elseif(event:find("OFFICER")) then
+            modules.OfficerChat:CHAT_MSG_OFFICER(_G.unpack(args));
+        elseif(event:find("PARTY")) then
+            modules.PartyChat:CHAT_MSG_PARTY(_G.unpack(args));
+        elseif(event:find("SAY")) then
+            modules.SayChat:CHAT_MSG_SAY(_G.unpack(args));
+        elseif(event:find("CHANNEL")) then
+            modules.ChannelChat:CHAT_MSG_CHANNEL(_G.unpack(args));
+        end
+    end
+end);
 
 
 local function blockCatcher(msg, smf)
