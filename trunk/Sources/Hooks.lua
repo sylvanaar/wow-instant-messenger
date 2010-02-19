@@ -4,11 +4,6 @@ Module specific hooks are found within it's own files.
 ]]
 
 
-
-
-
-
-
 -------------------------------------------------------------------------------------------
 -- The following hooks will account for anything that is being inserted into default chat frame and
 -- spoofs other callers into thinking that they are actually linking into the chat frame.
@@ -61,6 +56,22 @@ ChatFrameEditBox.HighlightText = function(self, theStart, theEnd)
 --hooksecurefunc("UnitPopup_HideButtons", WIM_UnitPopup_HideButtons);
 --hooksecurefunc("UnitPopup_OnClick", WIM_UnitPopup_OnClick);
 -------------------------------------------------------------------------------------------
+
+--ItemRef Definitions
+local registeredItemRef = {};
+function WIM.RegisterItemRefHandler(cmd, fun)
+    registeredItemRef[cmd] = fun;
+end
+local ItemRefTooltip_SetHyperlink = ItemRefTooltip.SetHyperlink;
+ItemRefTooltip.SetHyperlink = function(self, link)
+    for cmd, fun in pairs(registeredItemRef) do
+        if(string.match(link, "^"..cmd..":")) then
+            fun(link);
+            return;
+        end
+    end
+    ItemRefTooltip_SetHyperlink(self, link);
+end
 
 
 
