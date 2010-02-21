@@ -20,6 +20,7 @@ addBetaEntry("3.3.3", "02/??/2010", [[
     *Animation system now part of WIM namespace preventing local/global confusion.
     *libChatHandler-1.0 no longer hooks the Default ChatFrame reducing tainted objects.
     *Created API to handle custom SetItemRef calls - Eliminated large cause of taint plaguing.
+    *Includes a revised version of libWho-2.0. Eliminates tainting of FriendsFrame.
 ]]);
 
 addEntry("3.3.2", "02/16/2010", [[
