@@ -16,7 +16,7 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addBetaEntry("3.3.3", "02/??/2010", [[
+addEntry("3.3.3", "02/23/2010", [[
     *Animation system now part of WIM namespace preventing local/global confusion.
     *libChatHandler-1.0 no longer hooks the Default ChatFrame reducing tainted objects.
     *Created API to handle custom SetItemRef calls - Eliminated large cause of taint plaguing.
@@ -30,7 +30,7 @@ addEntry("3.3.2", "02/16/2010", [[
 
 addEntry("3.3.1", "02/16/2010", [[
     *Updated TOC to 3.3
-    *Added party event handling for new CHAT_MSG_PARTY_LEADER.
+    +Added party event handling for new CHAT_MSG_PARTY_LEADER.
     *Updated WIM to work with the new tutorial system.
     +Added 'Windows Settings' option 'Clamp window to screen'.
     +Added new WIM Module API Events (OnWindowLeaveScreen, OnWindowEnterScreen).
