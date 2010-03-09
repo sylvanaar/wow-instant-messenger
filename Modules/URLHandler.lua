@@ -44,10 +44,10 @@ armoryLinks = {
         title = "WoW-Heroes",
         url = "http://www.wow-heroes.com/index.php?zone={eu/us}&server={realm}&name={user}"
     },
-	{
-		title = "Wowhead Profiler",
-		url = "http://www.wowhead.com/?profile={eu/us}.{realm}.{user}",
-	}
+    {
+	title = "Wowhead Profiler",
+	url = "http://www.wowhead.com/?profile={eu/us}.{realm}.{user}",
+    }
 };
 
 -- patterns created by Sylvanaar & used in Prat
