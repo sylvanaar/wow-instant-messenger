@@ -45,8 +45,8 @@ armoryLinks = {
         url = "http://www.wow-heroes.com/index.php?zone={eu/us}&server={realm}&name={user}"
     },
     {
-	title = "Wowhead Profiler",
-	url = "http://www.wowhead.com/?profile={eu/us}.{realm}.{user}",
+		title = "Wowhead Profiler",
+		url = "http://www.wowhead.com/?profile={eu/us}.{realm-}.{user}",
     }
 };
 
@@ -215,6 +215,7 @@ local function MENU_ARMORY_CLICKED(self)
     local link = self.value;
     link = link:gsub("{eu/www}", eu_www);
     link = link:gsub("{realm}", realm);
+	link = link:gsub("{realm%-}", realm:gsub(" ","-"));
     link = link:gsub("{user}", user);
     link = link:gsub("{eu/us}", eu_us);
     link = link:gsub("{EU/US}", string.upper(eu_us));
