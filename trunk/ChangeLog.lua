@@ -16,6 +16,10 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addBetaEntry("3.3.4", "03/??/2010", [[
+    +Added Wowhead profile link.
+]]);
+
 addEntry("3.3.3", "02/23/2010", [[
     *Animation system now part of WIM namespace preventing local/global confusion.
     *libChatHandler-1.0 no longer hooks the Default ChatFrame reducing tainted objects.
