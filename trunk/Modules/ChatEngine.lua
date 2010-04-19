@@ -552,12 +552,14 @@ function Raid:OnEnable()
     RegisterWidget("chat_info", createWidget_Chat);
     self:RegisterChatEvent("CHAT_MSG_RAID");
     self:RegisterChatEvent("CHAT_MSG_RAID_LEADER");
+    self:RegisterChatEvent("CHAT_MSG_RAID_WARNING");
     self:RegisterEvent("PARTY_MEMBERS_CHANGED");
 end
 
 function Raid:OnDisable()
     self:UnregisterChatEvent("CHAT_MSG_RAID");
     self:UnregisterChatEvent("CHAT_MSG_RAID_LEADER");
+    self:UnregisterChatEvent("CHAT_MSG_RAID_WARNING");
 end
 
 function Raid:OnWindowDestroyed(self)
@@ -660,6 +662,42 @@ function Raid:CHAT_MSG_RAID_LEADER(...)
     CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_RAID_LEADER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
 
+function Raid:CHAT_MSG_RAID_WARNING_CONTROLLER(eventController, ...)
+    if(eventController.ignoredByWIM) then
+        eventController:BlockFromDelegate(self);
+        return;
+    end
+    if(not db.chat.raid.neverSuppress and getRuleSet().supress) then
+        eventController:BlockFromChatFrame(self);
+    end
+end
+
+function Raid:CHAT_MSG_RAID_WARNING(...)
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_RAID_WARNING", ...);
+    if(filter) then
+        return;
+    end
+    local win = getChatWindow(_G.RAID, "raid");
+    local color = _G.ChatTypeInfo["RAID_WARNING"];
+    self.raidWindow = win;
+    if(not self.chatLoaded) then
+        Raid:PARTY_MEMBERS_CHANGED();
+    end
+    self.chatLoaded = true;
+    arg3 = CleanLanguageArg(arg3);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_RAID_WARNING", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+    if(arg2 ~= _G.UnitName("player")) then
+        win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
+        if(not db.chat.raid.neverPop) then
+            win:Pop("in");
+        end
+    else
+        if(not db.chat.raid.neverPop) then
+            win:Pop("out");
+        end
+    end
+    CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_RAID_WARNING", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+end
 
 
 --------------------------------------

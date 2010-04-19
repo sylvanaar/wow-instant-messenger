@@ -471,8 +471,7 @@ local minimapMenu = AddContextMenu(info.text, info);
     info.text = L["Enable"].." WIM";
     info.func = function() SetEnabled(not db.enabled); end;
     info.notCheckable = true;
-    minimapMenu:AddSubItem(AddContextMenu("ENABLE_DISABLE_WIM", info));
-    
+    minimapMenu:AddSubItem(AddContextMenu("ENABLE_DISABLE_WIM", info));    
 
 --------------------------------------
 --      Global Extensions to WIM    --
