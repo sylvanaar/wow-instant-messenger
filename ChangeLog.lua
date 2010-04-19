@@ -16,8 +16,12 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addBetaEntry("3.3.4", "03/??/2010", [[
+addBetaEntry("3.3.4", "04/??/2010", [[
     +Added Wowhead profile link.
+    *Fixed error some encountered with db and Expose on load.
+    +Added 'Enable/Disable Expose' to Minimap Icon's context menu.
+    *Changed window clamp to screen defaulted to on instead of off.
+    +Added Raid announcements/warnings to raid chat.
 ]]);
 
 addEntry("3.3.3", "02/23/2010", [[

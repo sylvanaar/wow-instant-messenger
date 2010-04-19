@@ -24,9 +24,22 @@ local inCombat = false;
 
 local isWaiting = false;
 
+function Expose:VARIABLES_LOADED()
+    -- add menu option inside of Minimap's menu.
+    local minimapMenu = GetContextMenu("MENU_MINIMAP");
+    local info = _G.UIDropDownMenu_CreateInfo();
+    info.text = (db.expose.combat and L["Disable"] or L["Enable"]).." Expose";
+    info.func = function()
+        db.expose.combat = not db.expose.combat;
+        GetContextMenu("ENABLE_DISABLE_EXPOSE").text = db.expose.combat and L["Disable"].." Expose" or L["Enable"].." Expose";
+    end
+    info.notCheckable = true;
+    minimapMenu:AddSubItem(AddContextMenu("ENABLE_DISABLE_EXPOSE", info));
+end
+
 function Expose:OnStateChange(state, combatFlag)
     --if(1) then return; end -- not ready for release.
-    if(db.expose.combat) then
+    if(db and db.expose and db.expose.combat) then
         if(db.expose.groupOnly) then
             -- check if in group, if not, return.
             if(not _G.IsInInstance()) then
