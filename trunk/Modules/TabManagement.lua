@@ -16,6 +16,7 @@ db_defaults.tabs.whispers = {
 };
 db_defaults.tabs.chat = {
     enabled = false,
+    aswhisper = false,
 };
 
 local Tabs = WIM.CreateModule("Tabs", true);
@@ -129,7 +130,7 @@ function Tabs:OnWindowCreated(win)
             group:Attach(win);
         end
     elseif(db.tabs.chat.enabled and win.type == "chat") then
-        local group = getAvailableChatGroup();
+        local group = db.tabs.chat.aswhisper and getAvailableWhisperGroup() or getAvailableChatGroup();
         if(group) then
             group:Attach(win);
         end

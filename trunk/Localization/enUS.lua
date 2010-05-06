@@ -388,6 +388,7 @@ WIM.AddLocale("enUS", {
     ["Press <Tab> to advance to next tell target."] = true,
     ["Colorize names."] = true,
     ["Clamp window to screen."] = true,
+    ["Group with whisper windows."] = true,
     
     -- TabManagement.lua --
     ["Tab Management"] = true,
