@@ -790,6 +790,7 @@ local function General_Tabs()
     f.sub.whispers:CreateCheckButton(L["Place guild members in their own group."], db.tabs.whispers, "guild", L["Does not apply to windows already opened."]);
     f.sub.nextOffSetY = -80;
     f.sub.chat = f.sub:CreateCheckButton(L["Automatically group chat windows."], db.tabs.chat, "enabled", L["Does not apply to windows already opened."]);
+    f.sub.chat:CreateCheckButton(L["Group with whisper windows."], db.tabs.chat, "aswhisper", L["Does not apply to windows already opened."]);
     return f;
 end
 
