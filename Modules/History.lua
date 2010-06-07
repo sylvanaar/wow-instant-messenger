@@ -331,7 +331,7 @@ function ChatHistory:PostEvent_ChatMessage(event, ...)
         elseif(event == "OFFICER" and db.history.chat.officer) then
             recordAs = _G.GUILD_RANK1_DESC;
             chatType = "officer";
-        elseif(event == "PARTY" and db.history.chat.party) then
+        elseif((event == "PARTY" or event == "PARTY_LEADER") and db.history.chat.party) then
             recordAs = _G.PARTY;
             chatType = "party";
         elseif((event == "RAID" or event == "RAID_LEADER") and db.history.chat.raid) then
