@@ -19,6 +19,7 @@ end
 addEntry("3.3.5", "06/23/2010", [[
     *Updated for WoW version 3.3.5
     +Added initial BattleNet whisper support.
+    +Added history recording for Party Leader (Thanks Stewart).
 ]]);
 
 addEntry("3.3.4", "05/06/2010", [[

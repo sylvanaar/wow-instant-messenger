@@ -222,6 +222,15 @@ end
 
 function ShortcutBar:OnWindowShow(obj)
     if(obj.widgets.shortcuts) then
+        for i=1, #buttons do
+        if(buttons[i].id == "invite" or buttons[i].id == "ignore") then
+            if(obj.isBN) then
+                obj.widgets.shortcuts.buttons[i]:Disable();
+            else
+                obj.widgets.shortcuts.buttons[i]:Enable();
+            end
+        end
+    end
         obj.widgets.shortcuts:UpdateButtons();
     end
 end

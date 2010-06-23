@@ -15,7 +15,7 @@ setfenv(1, WIM);
 -- Core information
 addonTocName = "WIM";
 version = "3.3.5";
-beta = true; -- flags current version as beta.
+beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 useProtocol2 = false; -- test switch for new W2W Protocol. (Dev use only)
 
@@ -79,6 +79,8 @@ local function initialize()
         
         workerFrame:RegisterEvent("GUILD_ROSTER_UPDATE");
         workerFrame:RegisterEvent("FRIENDLIST_UPDATE");
+	workerFrame:RegisterEvent("BN_FRIEND_LIST_SIZE_CHANGED");
+	workerFrame:RegisterEvent("BN_FRIEND_INFO_CHANGED");
         
         --querie guild roster
         if( _G.IsInGuild() ) then
@@ -392,9 +394,21 @@ function WIM:FRIENDLIST_UPDATE()
 			env.cache[env.realm][env.character].friendList[name] = true; --[set place holder for quick lookup
 		end
 	end
+	for i=1, _G.BNGetNumFriends() do
+	    local id, name, surname = _G.BNGetFriendInfo(i);
+	    name = name.." "..surname;
+	    if(name) then
+		env.cache[env.realm][env.character].friendList[name] = true; --[set place holder for quick lookup
+		if(windows.active.whisper[name]) then
+		    windows.active.whisper[name]:SendWho();
+		end
+	    end
+	end
     lists.friends = env.cache[env.realm][env.character].friendList;
     dPrint("Friends list updated...");
 end
+WIM.BN_FRIEND_LIST_SIZE_CHANGED = WIM.FRIENDLIST_UPDATE;
+WIM.BN_FRIEND_INFO_CHANGED = WIM.FRIENDLIST_UPDATE;
 
 function WIM:GUILD_ROSTER_UPDATE()
 	env.cache[env.realm][env.character].guildList = env.cache[env.realm][env.character].guildList or {};

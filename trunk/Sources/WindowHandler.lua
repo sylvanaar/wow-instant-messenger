@@ -1892,7 +1892,12 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
                         arg11 = arg11 or 0;
 			return applyBracket().."|Hplayer:".._G.UnitName("player")..":"..arg11.."|h"..(db.coloredNames and constants.classes.GetMyColoredName() or _G.UnitName("player")).."|h"..applyBracket(2)..": "..arg1;
                 elseif(event == "CHAT_MSG_BN_WHISPER") then
-			return applyBracket().."|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and doColoredNames(event, ...) or arg2).."|h"..applyBracket(2)..": "..arg1;
+                        local win = smf.parentWindow;
+                        local color = "";
+                        if(win.bn.client == "WoW" and constants.classes[win.bn.class] and constants.classes[win.bn.class].color) then
+                                color = constants.classes[win.bn.class].color
+                        end
+			return applyBracket().."|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and color and "|cff"..color..arg2.."|r" or arg2).."|h"..applyBracket(2)..": "..arg1;
 		elseif(event == "CHAT_MSG_BN_WHISPER_INFORM") then
                         arg11 = arg11 or 0;
 			return applyBracket().."|Hplayer:".._G.UnitName("player")..":"..arg11.."|h"..(db.coloredNames and constants.classes.GetMyColoredName() or _G.UnitName("player")).."|h"..applyBracket(2)..": "..arg1;
