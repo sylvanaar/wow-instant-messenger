@@ -265,6 +265,11 @@ RegisterShortcut("location", L["Player Location"], {
                 self.parentWindow:SendWho();
             else
                 WIM.MENU_ARMORY_USER = self.parentWindow.theUser;
+                WIM.MENU_ARMORY_REALM = env.realm;
+                if(self.parentWindow.isBN) then
+                    WIM.MENU_ARMORY_USER = self.parentWindow.bn.toonName;
+                    WIM.MENU_ARMORY_REALM = self.parentWindow.bn.realmName;
+                end
                 PopContextMenu("MENU_ARMORY", self:GetName());
             end
         end,
@@ -274,6 +279,12 @@ RegisterShortcut("location", L["Player Location"], {
             if(not tbl or not tbl.services) then
                 _G.GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
                 _G.GameTooltip:AddLine("|cff"..self.parentWindow.classColor..self.parentWindow.theUser.."|r");
+                if(self.parentWindow.isBN) then
+                    local bn = self.parentWindow.bn;
+                    if bn.toonName then _G.GameTooltip:AddDoubleLine(L["Toon Name"]..":", "|cffffffff"..bn.toonName.."|r"); end
+                    if bn.client then _G.GameTooltip:AddDoubleLine(L["Game"]..":", "|cffffffff"..bn.client.."|r"); end
+                    if bn.realmName then _G.GameTooltip:AddDoubleLine(L["Realm"]..":", "|cffffffff"..bn.realmName.."|r"); end
+                end
                 _G.GameTooltip:AddDoubleLine(L["Location"]..":", "|cffffffff"..location.."|r");
                 _G.GameTooltip:AddLine("|cff69ccf0"..L["Click to update..."].."|r");
                 _G.GameTooltip:AddLine("|cff69ccf0"..L["Right-Click for profile links..."].."|r");

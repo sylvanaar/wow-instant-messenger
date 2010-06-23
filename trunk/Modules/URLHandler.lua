@@ -211,7 +211,7 @@ local function MENU_ARMORY_CLICKED(self)
     else
         user = MENU_ARMORY_USER;
     end
-    realm = realm or env.realm;
+    realm = realm or MENU_ARMORY_REALM;
     local link = self.value;
     link = link:gsub("{eu/www}", eu_www);
     link = link:gsub("{realm}", realm);

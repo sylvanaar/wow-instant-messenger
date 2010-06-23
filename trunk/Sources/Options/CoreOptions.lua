@@ -497,8 +497,11 @@ local function Whispers_DisplaySettings()
     
     frame.menu:CreateColorPicker(L["Color: Messages Sent"], db.displayColors, "wispOut");
     frame.menu:CreateColorPicker(L["Color: Messages Received"], db.displayColors, "wispIn");
-    
     frame.menu.nextOffSetY = -10;
+    frame.menu:CreateColorPicker(L["Color: BNet Messages Sent"], db.displayColors, "BNwispOut");
+    frame.menu:CreateColorPicker(L["Color: BNet Messages Received"], db.displayColors, "BNwispIn");
+    
+    frame.menu.nextOffSetY = -20;
     frame.menu:CreateCheckButton(L["Use colors suggested by skin."], db.displayColors, "useSkin");
     
     frame.menu.nextOffSetY = -20;
@@ -801,7 +804,7 @@ local function General_Sounds(isChat)
     f.sub.nextOffSetY = -20;
     local soundList = {};
 
-    local whisperCount = 4;
+    local whisperCount = 5;
     local chatCount = 11;
 
     for i = 1, (isChat and chatCount or whisperCount) do
@@ -833,9 +836,10 @@ local function General_Sounds(isChat)
         f.sub:CreateCheckButtonMenu(L["Play sound when a message is sent."], db.sounds.chat, "msgout", nil, nil, soundList[10], db.sounds.chat, "msgout_sml");
     else
         f.sub.whispers = f.sub:CreateCheckButtonMenu(L["Play sound when a whisper is received."], db.sounds.whispers, "msgin", nil, nil, soundList[1], db.sounds.whispers, "msgin_sml");
+        f.sub.whispers:CreateCheckButtonMenu(L["Play special sound for battle.net friends."], db.sounds.whispers, "bnet", nil, nil, soundList[5], db.sounds.whispers, "bnet_sml");
         f.sub.whispers:CreateCheckButtonMenu(L["Play special sound for friends."], db.sounds.whispers, "friend", nil, nil, soundList[2], db.sounds.whispers, "friend_sml");
         f.sub.whispers:CreateCheckButtonMenu(L["Play special sound for guild members."], db.sounds.whispers, "guild", nil, nil, soundList[3], db.sounds.whispers, "guild_sml");
-        f.sub.nextOffSetY = -70;
+        f.sub.nextOffSetY = -90;
         f.sub:CreateCheckButtonMenu(L["Play sound when a whisper is sent."], db.sounds.whispers, "msgout", nil, nil, soundList[4], db.sounds.whispers, "msgout_sml");
     end
     return f;

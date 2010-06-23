@@ -137,10 +137,14 @@ local function debugSentData(msg, ttype, target)
     end
 end
 
+local function isBattleNet(user)
+  return _G.BNet_GetPresenceID(user);
+end
+
 
 -- outbound Traffic:
 function SendData(ttype, target, cmd, data)
-    if(db.disableAddonMessages) then
+    if(db.disableAddonMessages or (ttype == "WHISPER" and isBattleNet(target))) then
         return; -- we don't want to send addon messages if on a private server.
     end
     data = data and tostring(data) or ""; --tostring(data);

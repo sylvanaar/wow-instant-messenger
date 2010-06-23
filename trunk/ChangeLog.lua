@@ -16,6 +16,11 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.3.5", "06/23/2010", [[
+    *Updated for WoW version 3.3.5
+    +Added initial BattleNet whisper support.
+]]);
+
 addEntry("3.3.4", "05/06/2010", [[
     +Added Wowhead profile link.
     *Fixed error some encountered with db and Expose on load.

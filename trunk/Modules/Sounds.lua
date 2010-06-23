@@ -18,7 +18,9 @@ db_defaults.sounds = {
         friend = false,
         friend_sml = "IM",
         guild = false,
-        guild_sml = "IM"
+        guild_sml = "IM",
+        bnet = false,
+        bnet_sml = "IM"
     },
     chat = {
         msgin = true,
@@ -53,7 +55,9 @@ local Sounds = CreateModule("Sounds", true);
 function Sounds:PostEvent_Whisper(...)
     if(db and db.sounds.whispers.msgin) then
         local msg, user = ...;
-        if(db.sounds.whispers.friend and lists.friends[user]) then
+        if(db.sounds.whispers.bnet and windows.active.whisper[user].isBN) then
+            playSound(db.sounds.whispers.bnet_sml);
+        elseif(db.sounds.whispers.friend and lists.friends[user]) then
             playSound(db.sounds.whispers.friend_sml);
         elseif(db.sounds.whispers.guild and lists.guild[user]) then
             playSound(db.sounds.whispers.guild_sml);
