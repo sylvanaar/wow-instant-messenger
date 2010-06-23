@@ -9,32 +9,36 @@ Module specific hooks are found within it's own files.
 -- spoofs other callers into thinking that they are actually linking into the chat frame.
 --DEFAULT_CHAT_FRAME.editBox
 
-hooksecurefunc(ChatFrameEditBox, "Insert", function(self,theText)
+local Hooked_ChatFrameEditBoxes = {};
+
+local function hookChatFrameEditBox(editBox)
+    if(editBox and not Hooked_ChatFrameEditBoxes[editBox:GetName()]) then
+        hooksecurefunc(editBox, "Insert", function(self,theText)
 				if(WIM.EditBoxInFocus) then
 					WIM.EditBoxInFocus:Insert(theText);
 				end
 			end )
 
 
-ChatFrameEditBox.wimIsVisible = ChatFrameEditBox.IsVisible;
-ChatFrameEditBox.IsVisible = function(self)
+        editBox.wimIsVisible = editBox.IsVisible;
+        editBox.IsVisible = function(self)
 				if(WIM.EditBoxInFocus) then
 					return true;
 				else
-					return ChatFrameEditBox:wimIsVisible();
+					return self:wimIsVisible();
 				end
 			end
-ChatFrameEditBox.wimIsShown = ChatFrameEditBox.IsShown;
-ChatFrameEditBox.IsShown = function(self)
+        editBox.wimIsShown = editBox.IsShown;
+        editBox.IsShown = function(self)
 				if(WIM.EditBoxInFocus) then
 					return true;
 				else
-					return ChatFrameEditBox:wimIsShown();
+					return self:wimIsShown();
 				end
 			end
 
--- can not hook GetText() because it taints the chat bar. Breaks /tar
-hooksecurefunc(ChatFrameEditBox, "SetText", function(self,theText)
+        -- can not hook GetText() because it taints the chat bar. Breaks /tar
+        hooksecurefunc(editBox, "SetText", function(self,theText)
 				local firstChar = "";
 				--if a slash command is being set, ignore it. Let WoW take control of it.
 				if(string.len(theText) > 0) then firstChar = string.sub(theText, 1, 1); end
@@ -42,19 +46,32 @@ hooksecurefunc(ChatFrameEditBox, "SetText", function(self,theText)
 					WIM.EditBoxInFocus:SetText(theText);
 				end
 			end );
-ChatFrameEditBox.wimHighlightText = ChatFrameEditBox.HighlightText;
-ChatFrameEditBox.HighlightText = function(self, theStart, theEnd)
+        editBox.wimHighlightText = editBox.HighlightText;
+        editBox.HighlightText = function(self, theStart, theEnd)
 				if(WIM.EditBoxInFocus) then
 					WIM.EditBoxInFocus:HighlightText(theStart, theEnd);
 				else
-					ChatFrameEditBox:wimHighlightText(theStart, theEnd);
+					self:wimHighlightText(theStart, theEnd);
 				end
 			end
+        Hooked_ChatFrameEditBoxes[editBox:GetName()] = true;
+    end
+end
+
+hooksecurefunc("ChatEdit_HandleChatType", function(editBox)
+        hookChatFrameEditBox(editBox);
+    end);
 
    
---hooksecurefunc("ToggleMinimap", WIM_ToggleMinimap);
---hooksecurefunc("UnitPopup_HideButtons", WIM_UnitPopup_HideButtons);
---hooksecurefunc("UnitPopup_OnClick", WIM_UnitPopup_OnClick);
+function WIM.getVisibleChatFrameEditBox()
+    for eb in pairs(Hooked_ChatFrameEditBoxes) do
+        if _G[eb]:wimIsVisible() then
+            return _G[eb];
+        end
+    end
+end
+
+
 -------------------------------------------------------------------------------------------
 
 --ItemRef Definitions

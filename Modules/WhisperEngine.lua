@@ -451,7 +451,8 @@ local function replyTellTarget(TellNotTold)
 			win.widgets.msg_box.setText = 1; 
 			win:Pop(true); -- force popup 
 			win.widgets.msg_box:SetFocus();
-			_G.ChatEdit_OnEscapePressed(_G.ChatFrameEditBox); 
+			local eb = getVisibleChatFrameEditBox();
+			_G.ChatEdit_OnEscapePressed(getVisibleChatFrameEditBox() or _G.ChatFrame1EditBox); 
 		end      
         end
     end
@@ -473,7 +474,7 @@ local function CF_extractTellTarget(editBox, msg)
             win.widgets.msg_box.setText = 1;
             win:Pop(true); -- force popup
             win.widgets.msg_box:SetFocus();
-	    _G.ChatEdit_OnEscapePressed(_G.ChatFrameEditBox);
+	    _G.ChatEdit_OnEscapePressed(editBox);
         end
     end
 end
@@ -489,24 +490,23 @@ local function CF_sendTell(name) -- needed in order to UnitPopups to work with w
             win.widgets.msg_box.setText = 1;
             win:Pop(true); -- force popup
             win.widgets.msg_box:SetFocus();
-	    _G.ChatEdit_OnEscapePressed(_G.ChatFrameEditBox);
+	    _G.ChatEdit_OnEscapePressed(getVisibleChatFrameEditBox() or _G.ChatFrame1EditBox);
 	end
     end
 end
 
 local function CF_HandleChatType(editBox, msg, command, send)
-	for index, value in pairs(_G.ChatTypeInfo) do
-		local i = 1;
-		local cmdString = _G["SLASH_"..index..i];
-		while ( cmdString ) do
-			cmdString = strupper(cmdString);
-			if ( cmdString == command ) then
-				-- index is the entered command
-				if(index == "REPLY") then replyTellTarget(true); end
-				return;
-			end
-			i = i + 1;
-			cmdString = _G["SLASH_"..index..i];
+	local chatType, tellTarget = editBox:GetAttribute("chatType"), editBox:GetAttribute("tellTarget");
+	_G.DEFAULT_CHAT_FRAME:AddMessage(editBox:GetName()..":"..chatType.."("..(tellTarget or "")..")");
+	if(db and db.enabled and (chatType == "WHISPER" or chatType == "REPLY")) then
+		local curState = curState;
+		curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+		if(db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
+		    local win = getWhisperWindowByUser(tellTarget);
+		    win.widgets.msg_box.setText = 1;
+		    win:Pop(true); -- force popup
+		    win.widgets.msg_box:SetFocus();
+		    _G.ChatEdit_OnEscapePressed(editBox);
 		end
 	end
 end
@@ -516,7 +516,7 @@ end
 hooksecurefunc("ChatFrame_SendTell", CF_sendTell);
 
 -- the following hook is needed in order to intercept /w, /whisper
-hooksecurefunc("ChatEdit_ExtractTellTarget", CF_extractTellTarget);
+--hooksecurefunc("ChatEdit_ExtractTellTarget", CF_extractTellTarget);
 
 -- the following hook is needed in order to intercept /r
 hooksecurefunc("ChatEdit_HandleChatType", CF_HandleChatType);
