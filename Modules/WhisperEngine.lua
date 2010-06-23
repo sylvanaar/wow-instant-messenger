@@ -104,7 +104,16 @@ db_defaults.displayColors.wispOut = {
 	g=0.07843137254901961, 
 	b=0.9882352941176471
     }
-
+db_defaults.displayColors.BNwispIn = {
+	r=0,
+	g=0.4862745098039216,
+	b=0.6549019607843137,
+    }
+db_defaults.displayColors.BNwispOut = {
+        r=0.1725490196078431,
+	g=0.6352941176470588,
+	b=1,
+    }
 
 local Windows = windows.active.whisper;
 
@@ -146,6 +155,8 @@ function WhisperEngine:OnEnableWIM()
         WhisperEngine:RegisterChatEvent("CHAT_MSG_AFK");
         WhisperEngine:RegisterChatEvent("CHAT_MSG_DND");
         WhisperEngine:RegisterChatEvent("CHAT_MSG_SYSTEM");
+	WhisperEngine:RegisterChatEvent("CHAT_MSG_BN_WHISPER");
+        WhisperEngine:RegisterChatEvent("CHAT_MSG_BN_WHISPER_INFORM");
 end
 
 function WhisperEngine:OnDisableWIM()
@@ -154,11 +165,13 @@ function WhisperEngine:OnDisableWIM()
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_AFK");
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_DND");
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_SYSTEM");
+	WhisperEngine:UnregisterChatEvent("CHAT_MSG_BN_WHISPER");
+        WhisperEngine:UnregisterChatEvent("CHAT_MSG_BN_WHISPER_INFORM");
 end
 
 
 
-local function getWhisperWindowByUser(user)
+local function getWhisperWindowByUser(user, isBN)
     user = FormatUserName(user);
     if(not user or user == "") then
         -- if invalid user, then return nil;
@@ -171,7 +184,9 @@ local function getWhisperWindowByUser(user)
     else
         -- otherwise, create a new one.
         Windows[user] = CreateWhisperWindow(user);
-        if(db.whoLookups or lists.gm[user]) then
+	Windows[user].isBN = isBN;
+	Windows[user].bn = Windows[user].bn or {};
+        if(db.whoLookups or lists.gm[user] or Windows[user].isBN) then
             Windows[user]:SendWho(); -- send who request
         end
         Windows[user].online = true;
@@ -184,6 +199,10 @@ local function windowDestroyed(self)
         local user = self:GetParent().theUser;
         Windows[user].online = nil;
         Windows[user].msgSent = nil;
+	for k in pairs(Windows[user].bn) do
+		Windows[user].bn[k] = nil;
+	end
+	Windows[user].isBN = nil;
         Windows[user] = nil;
     end
 end
@@ -222,8 +241,12 @@ function SendSplitMessage(PRIORITY, HEADER, theMsg, CHANNEL, EXTRA, to)
                                 local index = _G.tonumber(string.match(link, "(%d+)"));
                                 return splitMessageLinks[index] or link;
                         end);
-                        _G.ChatThrottleLib:SendChatMessage(PRIORITY, HEADER, chunk, CHANNEL, EXTRA, to);
-                        chunk = (splitMessage[i] or "").." ";
+			if(Windows[to] and Windows[to].isBN) then
+				_G.BNSendWhisper(Windows[to].bn.id, chunk);
+			else
+				_G.ChatThrottleLib:SendChatMessage(PRIORITY, HEADER, chunk, CHANNEL, EXTRA, to);
+                        end
+			chunk = (splitMessage[i] or "").." ";
                 end
         end
         
@@ -243,7 +266,11 @@ RegisterWidgetTrigger("msg_box", "whisper", "OnEnterPressed", function(self)
         local msgCount = math.ceil(string.len(msg)/255);
         if(msgCount == 1) then
             Windows[obj.theUser].msgSent = true;
-            _G.ChatThrottleLib:SendChatMessage("ALERT", "WIM", msg, "WHISPER", nil, obj.theUser);
+	    if(obj.isBN) then
+		_G.BNSendWhisper(obj.bn.id, msg);
+	    else
+	        _G.ChatThrottleLib:SendChatMessage("ALERT", "WIM", msg, "WHISPER", nil, obj.theUser);
+	    end
         elseif(msgCount > 1) then
             Windows[obj.theUser].msgSent = true;
             SendSplitMessage("ALERT", "WIM", msg, "WHISPER", nil, obj.theUser);
@@ -318,6 +345,68 @@ function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
         if(#recentSent > maxRecent) then
                 table.remove(recentSent, 1);
         end
+end
+
+
+-- CHAT_MSG_BN_WHISPER_INFORM  CONTROLLER (For Supression from Chat Frame)
+function WhisperEngine:CHAT_MSG_BN_WHISPER_INFORM_CONTROLLER(eventItem, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13)
+    if(eventItem.ignoredByWIM) then
+        return;
+    end
+    -- execute appropriate supression rules
+    local curState = curState;
+    curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+    if(WIM.db.pop_rules.whisper[curState].supress) then
+        eventItem:BlockFromChatFrame();
+    end
+end
+
+function WhisperEngine:CHAT_MSG_BN_WHISPER_INFORM(...)
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = honorChatFrameEventFilter("CHAT_MSG_BN_WHISPER_INFORM", ...);
+    if(filter) then
+        return; -- ChatFrameEventFilter says don't process
+    end
+    local color = db.displayColors.BNwispOut; -- color contains .r, .g & .b
+    local win = getWhisperWindowByUser(arg2);
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BN_WHISPER_INFORM", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
+    win:Pop("out");
+    _G.ChatEdit_SetLastToldTarget(arg2);
+    win.online = true;
+    win.msgSent = false;
+    CallModuleFunction("PostEvent_WhisperInform", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
+    addToTableUnique(recentSent, arg1);
+        if(#recentSent > maxRecent) then
+                table.remove(recentSent, 1);
+        end
+end
+
+-- CHAT_MSG_BN_WHISPER  CONTROLLER (For Supression from Chat Frame)
+function WhisperEngine:CHAT_MSG_BN_WHISPER_CONTROLLER(eventItem, ...)
+    if(eventItem.ignoredByWIM) then
+        return;
+    end
+    -- execute appropriate supression rules
+    local curState = curState;
+    curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+    if(WIM.db.pop_rules.whisper[curState].supress) then
+        eventItem:BlockFromChatFrame();
+    end
+end
+
+function WhisperEngine:CHAT_MSG_BN_WHISPER(...)
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = honorChatFrameEventFilter("CHAT_MSG_BN_WHISPER", ...);
+    if(filter) then
+        return; -- ChatFrameEventFilter says don't process
+    end
+    local color = WIM.db.displayColors.BNwispIn; -- color contains .r, .g & .b
+    local win = getWhisperWindowByUser(arg2);
+    win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
+    win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BN_WHISPER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
+    win:Pop("in");
+    _G.ChatEdit_SetLastTellTarget(arg2);
+    win.online = true;
+    updateMinimapAlerts();
+    CallModuleFunction("PostEvent_Whisper", ...);
 end
 
 -- CHAT_MSG_AFK  CONTROLLER (For Supression from Chat Frame)
@@ -458,51 +547,15 @@ local function replyTellTarget(TellNotTold)
     end
 end
 
-local function CF_extractTellTarget(editBox, msg)
-    if(db.enabled) then
-        -- Grab the first "word" in the string
-        local target = gsub(msg, "(%s*)([^%s]+)(.*)", "%2", 1);
-        if ( (strlen(target) <= 0) or (strsub(target, 1, 1) == "|") ) then
-            return;
-        end
-        
-	local curState = curState;
-        curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
-        if(db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
-            target = string.gsub(target, "^%l", string.upper)
-	    local win = getWhisperWindowByUser(target);
-            win.widgets.msg_box.setText = 1;
-            win:Pop(true); -- force popup
-            win.widgets.msg_box:SetFocus();
-	    _G.ChatEdit_OnEscapePressed(editBox);
-        end
-    end
-end
-
-local function CF_sendTell(name) -- needed in order to UnitPopups to work with whispers.
-    if(db and db.enabled) then
-        local curState = curState;
-        curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
-	if(db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
-            -- Remove spaces from the server name for slash command parsing
-            name = gsub(name, " ", "");
-	    local win = getWhisperWindowByUser(name);
-            win.widgets.msg_box.setText = 1;
-            win:Pop(true); -- force popup
-            win.widgets.msg_box:SetFocus();
-	    _G.ChatEdit_OnEscapePressed(getVisibleChatFrameEditBox() or _G.ChatFrame1EditBox);
-	end
-    end
-end
 
 local function CF_HandleChatType(editBox, msg, command, send)
 	local chatType, tellTarget = editBox:GetAttribute("chatType"), editBox:GetAttribute("tellTarget");
-	_G.DEFAULT_CHAT_FRAME:AddMessage(editBox:GetName()..":"..chatType.."("..(tellTarget or "")..")");
-	if(db and db.enabled and (chatType == "WHISPER" or chatType == "REPLY")) then
+	--_G.DEFAULT_CHAT_FRAME:AddMessage(editBox:GetName()..":"..chatType.."("..(tellTarget or "")..")");
+	if(db and db.enabled and (chatType == "WHISPER" or chatType == "BN_WHISPER")) then
 		local curState = curState;
 		curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
 		if(db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
-		    local win = getWhisperWindowByUser(tellTarget);
+		    local win = getWhisperWindowByUser(tellTarget, chatType == "BN_WHISPER");
 		    win.widgets.msg_box.setText = 1;
 		    win:Pop(true); -- force popup
 		    win.widgets.msg_box:SetFocus();
@@ -510,13 +563,6 @@ local function CF_HandleChatType(editBox, msg, command, send)
 		end
 	end
 end
-
-
--- the following hook is needed in order to intercept Send Whisper from UnitPopup Menus
-hooksecurefunc("ChatFrame_SendTell", CF_sendTell);
-
--- the following hook is needed in order to intercept /w, /whisper
---hooksecurefunc("ChatEdit_ExtractTellTarget", CF_extractTellTarget);
 
 -- the following hook is needed in order to intercept /r
 hooksecurefunc("ChatEdit_HandleChatType", CF_HandleChatType);

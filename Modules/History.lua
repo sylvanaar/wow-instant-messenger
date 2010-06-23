@@ -123,7 +123,7 @@ local function recordWhisper(inbound, ...)
     local msg, from = ...;
     local db = db.history.whispers;
     local win = windows.active.whisper[from] or windows.active.chat[from] or windows.active.w2w[from];
-    if(win and (lists.gm[from] or db.all or (db.friends and lists.friends[from]) or (db.guild and lists.guild[from]))) then
+    if(win and (lists.gm[from] or db.all or (db.friends and (lists.friends[from] or win.isBN)) or (db.guild and lists.guild[from]))) then
         win.widgets.history:SetHistory(true);
         local history = getPlayerHistoryTable(from);
         history.info.gm = lists.gm[from];

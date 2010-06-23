@@ -914,6 +914,36 @@ local function instantiateWindow(obj)
                         Race = "",
                         Zone = L["Unknown"]
                 });
+        elseif(self.isBN) then
+                -- get information of BN user from friends data.
+                local id = _G.BNet_GetPresenceID(self.theUser);
+                if(id) then
+                                local hasFocus, toonName, client, realmName, faction, race, class, guild, zoneName, level, gameText, broadcastText, broadcastTime = _G.BNGetToonInfo(id);
+                                self.class = class;
+                                self.level = level;
+                                self.race = race;
+                                self.guild = guild;
+                                self.location = zoneName;
+                                self.bn.class = class;
+                                self.bn.level = level;
+                                self.bn.race = race;
+                                self.bn.guild = guild;
+                                self.bn.location = zoneName;
+                                self.bn.gameText = gameText;
+                                self.bn.toonName = toonName;
+                                self.bn.client = client;
+                                self.bn.realmName = realmName;
+                                self.bn.faction = faction;
+                                self.bn.broadcastText = broadcastText;
+                                self.bn.broadcastTime = broadcastTime;
+                                self.bn.hasFocus = hasFocus;
+                                self.bn.id = id;
+                                --self.widgets.from:SetText(self.theUser.." - "..toonName);
+                                self:UpdateIcon();
+                                self:UpdateCharDetails();
+                else
+                                self:AddMessage(_G.BN_UNABLE_TO_RESOLVE_NAME, db.displayColors.errorMsg.r, db.displayColors.errorMsg.g, db.displayColors.errorMsg.b);
+                end
         else
         	local whoLib = libs.WhoLib;
         	if(whoLib) then
@@ -1859,6 +1889,11 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
 		if(event == "CHAT_MSG_WHISPER") then
 			return applyBracket().."|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and doColoredNames(event, ...) or arg2).."|h"..applyBracket(2)..": "..arg1;
 		elseif(event == "CHAT_MSG_WHISPER_INFORM") then
+                        arg11 = arg11 or 0;
+			return applyBracket().."|Hplayer:".._G.UnitName("player")..":"..arg11.."|h"..(db.coloredNames and constants.classes.GetMyColoredName() or _G.UnitName("player")).."|h"..applyBracket(2)..": "..arg1;
+                elseif(event == "CHAT_MSG_BN_WHISPER") then
+			return applyBracket().."|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and doColoredNames(event, ...) or arg2).."|h"..applyBracket(2)..": "..arg1;
+		elseif(event == "CHAT_MSG_BN_WHISPER_INFORM") then
                         arg11 = arg11 or 0;
 			return applyBracket().."|Hplayer:".._G.UnitName("player")..":"..arg11.."|h"..(db.coloredNames and constants.classes.GetMyColoredName() or _G.UnitName("player")).."|h"..applyBracket(2)..": "..arg1;
                 elseif(event == "CHAT_MSG_AFK") then
