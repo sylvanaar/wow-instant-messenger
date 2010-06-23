@@ -961,7 +961,7 @@ local function instantiateWindow(obj)
                                 --if(not EditBoxInFocus) then
                                                 ShowContainer();
                                                 self.tabStrip:JumpToTab(self);
-                                                if(not _G.ChatFrameEditBox:wimIsVisible() and (rules.autofocus or forceFocus)) then
+                                                if(not getVisibleChatFrameEditBox() and (rules.autofocus or forceFocus)) then
                                                         self.widgets.msg_box:SetFocus();
                                                 end
                                 --end
@@ -969,7 +969,7 @@ local function instantiateWindow(obj)
                                 ShowContainer();
 				self:ResetAnimation();
 				self:Show();
-                                if((not _G.ChatFrameEditBox:wimIsVisible() and not EditBoxInFocus and rules.autofocus) or forceFocus) then
+                                if((not getVisibleChatFrameEditBox() and not EditBoxInFocus and rules.autofocus) or forceFocus) then
                                         self.widgets.msg_box:SetFocus();
                                 end
 				local count = 0;
@@ -997,7 +997,7 @@ local function instantiateWindow(obj)
 				self:Show();
                                 setWindowAsFadedIn(self);
 			end
-                        if(self:IsVisible() and not _G.ChatFrameEditBox:wimIsVisible() and not EditBoxInFocus and rules.autofocus) then
+                        if(self:IsVisible() and not getVisibleChatFrameEditBox and not EditBoxInFocus and rules.autofocus) then
                                 self.widgets.msg_box:SetFocus();
                         end
 		end
@@ -1775,8 +1775,8 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkLeave", fu
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnEnterPressed", function(self)
 		if(strsub(self:GetText(), 1, 1) == "/") then
 			EditBoxInFocus = nil;
-			_G.ChatFrameEditBox:SetText(self:GetText());
-			_G.ChatEdit_SendText(_G.ChatFrameEditBox, 1);
+			_G.ChatFrame1EditBox:SetText(self:GetText());
+			_G.ChatEdit_SendText(_G.ChatFrame1EditBox, 1);
 			self:SetText("");
 			EditBoxInFocus = self;
 		else
@@ -1805,7 +1805,8 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnEscapePressed", fun
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnUpdate", function(self)
 		if(self.setText == 1) then
 			self.setText = 0;
-			self:SetText("");
+			self:SetText(self.textToSet or "");
+                        self.textToSet = "";
 		end
 	end);
 	
