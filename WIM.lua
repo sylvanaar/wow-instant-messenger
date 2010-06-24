@@ -14,7 +14,7 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.3.5";
+version = "3.3.6";
 beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 useProtocol2 = false; -- test switch for new W2W Protocol. (Dev use only)
