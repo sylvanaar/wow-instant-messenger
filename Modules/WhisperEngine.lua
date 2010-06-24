@@ -367,7 +367,7 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER_INFORM(...)
         return; -- ChatFrameEventFilter says don't process
     end
     local color = db.displayColors.BNwispOut; -- color contains .r, .g & .b
-    local win = getWhisperWindowByUser(arg2);
+    local win = getWhisperWindowByUser(arg2, true);
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BN_WHISPER_INFORM", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
     win:Pop("out");
     _G.ChatEdit_SetLastToldTarget(arg2);
@@ -399,7 +399,7 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER(...)
         return; -- ChatFrameEventFilter says don't process
     end
     local color = WIM.db.displayColors.BNwispIn; -- color contains .r, .g & .b
-    local win = getWhisperWindowByUser(arg2);
+    local win = getWhisperWindowByUser(arg2, true);
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BN_WHISPER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
     win:Pop("in");
@@ -548,14 +548,37 @@ local function replyTellTarget(TellNotTold)
 end
 
 
-local function CF_HandleChatType(editBox, msg, command, send)
-	local chatType, tellTarget = editBox:GetAttribute("chatType"), editBox:GetAttribute("tellTarget");
-	--_G.DEFAULT_CHAT_FRAME:AddMessage(editBox:GetName()..":"..chatType.."("..(tellTarget or "")..")");
-	if(db and db.enabled and (chatType == "WHISPER" or chatType == "BN_WHISPER")) then
+local tellTargetExtractionAutoComplete = _G.AUTOCOMPLETE_LIST.ALL;
+function CF_ExtractTellTarget(editBox, msg)
+	-- Grab the string after the slash command
+	local target = string.match(msg, "%s*(.*)");
+	
+	--If we haven't even finished one word, we aren't done.
+	if ( not target or not string.find(target, "%s") or (string.sub(target, 1, 1) == "|") ) then
+		return false;
+	end
+	
+	if ( _G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include, tellTargetExtractionAutoComplete.exclude, 1, nil, true) ) then
+		--Even if there's a space, we still want to let the person keep typing -- they may be trying to type whatever is in AutoComplete.
+		return false;
+	end
+	
+	--Keep pulling off everything after the last space until we either have something on the AutoComplete list or only a single word is left.
+	while ( string.find(target, "%s") ) do
+		--Pull off everything after the last space.
+		target = string.match(target, "(.+)%s+[^%s]*");
+		if ( _G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include, tellTargetExtractionAutoComplete.exclude, 1, nil, true)  ) then
+			break;
+		end
+	end
+
+	msg = string.sub(msg, string.len(target) + 2);
+
+	if(db and db.enabled) then
 		local curState = curState;
 		curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
 		if(db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
-		    local win = getWhisperWindowByUser(tellTarget, chatType == "BN_WHISPER");
+		    local win = getWhisperWindowByUser(target, _G.BNet_GetPresenceID(target));
 		    win.widgets.msg_box.setText = 1;
 		    win:Pop(true); -- force popup
 		    win.widgets.msg_box:SetFocus();
@@ -565,7 +588,7 @@ local function CF_HandleChatType(editBox, msg, command, send)
 end
 
 -- the following hook is needed in order to intercept /r
-hooksecurefunc("ChatEdit_HandleChatType", CF_HandleChatType);
+hooksecurefunc("ChatEdit_ExtractTellTarget", CF_ExtractTellTarget);
 
 --Hook ChatFrame_ReplyTell & ChatFrame_ReplyTell2
 hooksecurefunc("ChatFrame_ReplyTell", function() replyTellTarget(true) end);

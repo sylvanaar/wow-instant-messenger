@@ -1893,9 +1893,10 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
 			return applyBracket().."|Hplayer:".._G.UnitName("player")..":"..arg11.."|h"..(db.coloredNames and constants.classes.GetMyColoredName() or _G.UnitName("player")).."|h"..applyBracket(2)..": "..arg1;
                 elseif(event == "CHAT_MSG_BN_WHISPER") then
                         local win = smf.parentWindow;
-                        local color = "";
+                        local color;
                         if(win.bn.client == "WoW" and constants.classes[win.bn.class] and constants.classes[win.bn.class].color) then
                                 color = constants.classes[win.bn.class].color
+                                color = string.len(color) == 6 and color or nil;
                         end
 			return applyBracket().."|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and color and "|cff"..color..arg2.."|r" or arg2).."|h"..applyBracket(2)..": "..arg1;
 		elseif(event == "CHAT_MSG_BN_WHISPER_INFORM") then
