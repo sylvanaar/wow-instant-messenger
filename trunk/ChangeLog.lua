@@ -16,7 +16,7 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addEntry("3.3.6", "06/23/2010", [[
+addEntry("3.3.6", "06/24/2010", [[
     *Fixed issue when receiving messages from realID users.
     +Invite & Ignore now work for realID messages from users on the same realm.
     *Fixed bug where items were not linking into WIM windows.
