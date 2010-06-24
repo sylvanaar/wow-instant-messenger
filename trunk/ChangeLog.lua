@@ -16,6 +16,14 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.3.6", "06/23/2010", [[
+    *Fixed issue when receiving messages from realID users.
+    +Invite & Ignore now work for realID messages from users on the same realm.
+    *Fixed bug where items were not linking into WIM windows.
+    *Added extra check for realID class colors.
+    *Fixed bug with intercepting whisper slash commands.
+]]);
+
 addEntry("3.3.5", "06/23/2010", [[
     *Updated for WoW version 3.3.5
     +Added initial BattleNet whisper support.

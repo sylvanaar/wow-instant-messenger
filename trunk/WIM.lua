@@ -385,30 +385,43 @@ end
 
 function WIM:FRIENDLIST_UPDATE()
     env.cache[env.realm][env.character].friendList = env.cache[env.realm][env.character].friendList or {};
-    for key, _ in pairs(env.cache[env.realm][env.character].friendList) do
-        env.cache[env.realm][env.character].friendList[key] = nil;
+    for key, d in pairs(env.cache[env.realm][env.character].friendList) do
+	if(d == 1) then
+	    env.cache[env.realm][env.character].friendList[key] = nil;
+	end
     end
 	for i=1, _G.GetNumFriends() do 
 		local name, junk = _G.GetFriendInfo(i);
 		if(name) then
-			env.cache[env.realm][env.character].friendList[name] = true; --[set place holder for quick lookup
+			env.cache[env.realm][env.character].friendList[name] = 1; --[set place holder for quick lookup
 		end
 	end
+    lists.friends = env.cache[env.realm][env.character].friendList;
+    dPrint("Friends list updated...");
+end
+
+function WIM:BN_FRIEND_LIST_SIZE_CHANGED()
+    env.cache[env.realm][env.character].friendList = env.cache[env.realm][env.character].friendList or {};
+    for key, d in pairs(env.cache[env.realm][env.character].friendList) do
+	if(d == 2) then
+            env.cache[env.realm][env.character].friendList[key] = nil;
+	end
+    end
 	for i=1, _G.BNGetNumFriends() do
 	    local id, name, surname = _G.BNGetFriendInfo(i);
 	    name = name.." "..surname;
 	    if(name) then
-		env.cache[env.realm][env.character].friendList[name] = true; --[set place holder for quick lookup
+		env.cache[env.realm][env.character].friendList[name] = 2; --[set place holder for quick lookup
 		if(windows.active.whisper[name]) then
 		    windows.active.whisper[name]:SendWho();
 		end
 	    end
 	end
     lists.friends = env.cache[env.realm][env.character].friendList;
-    dPrint("Friends list updated...");
+    dPrint("RealID list updated...");
 end
-WIM.BN_FRIEND_LIST_SIZE_CHANGED = WIM.FRIENDLIST_UPDATE;
-WIM.BN_FRIEND_INFO_CHANGED = WIM.FRIENDLIST_UPDATE;
+WIM.BN_FRIEND_INFO_CHANGED = WIM.BN_FRIEND_LIST_SIZE_CHANGED;
+
 
 function WIM:GUILD_ROSTER_UPDATE()
 	env.cache[env.realm][env.character].guildList = env.cache[env.realm][env.character].guildList or {};

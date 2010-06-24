@@ -58,7 +58,7 @@ local function hookChatFrameEditBox(editBox)
     end
 end
 
-hooksecurefunc("ChatEdit_HandleChatType", function(editBox)
+hooksecurefunc("ChatEdit_ActivateChat", function(editBox)
         hookChatFrameEditBox(editBox);
     end);
 
@@ -73,6 +73,14 @@ end
 
 
 -------------------------------------------------------------------------------------------
+
+hooksecurefunc("ChatEdit_InsertLink", function(text)
+        if(WIM.EditBoxInFocus) then
+            WIM.EditBoxInFocus:Insert(" "..text);
+            StackSplitFrame:Hide();
+        end
+    end);
+
 
 --ItemRef Definitions
 local registeredItemRef = {};

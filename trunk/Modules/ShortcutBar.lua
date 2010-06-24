@@ -224,7 +224,7 @@ function ShortcutBar:OnWindowShow(obj)
     if(obj.widgets.shortcuts) then
         for i=1, #buttons do
         if(buttons[i].id == "invite" or buttons[i].id == "ignore") then
-            if(obj.isBN) then
+            if(obj.isBN and obj.bn.realmName ~= env.realm) then
                 obj.widgets.shortcuts.buttons[i]:Disable();
             else
                 obj.widgets.shortcuts.buttons[i]:Enable();
@@ -306,7 +306,8 @@ RegisterShortcut("location", L["Player Location"], {
     });
 RegisterShortcut("invite", L["Invite to Party"], {
         OnClick = function(self)
-            _G.InviteUnit(self.parentWindow.theUser);
+            local win = self.parentWindow;
+            _G.InviteUnit(win.isBN and win.toonName or self.parentWindow.theUser);
         end
     });
 RegisterShortcut("friend", L["Add Friend"], {
@@ -320,11 +321,11 @@ RegisterShortcut("friend", L["Add Friend"], {
 RegisterShortcut("ignore", L["Ignore User"], {
         OnClick = function(self)
             _G.StaticPopupDialogs["WIM_IGNORE"] = {
-		text = _G.format(L["Are you sure you want to\nignore %s?"], "|cff69ccf0"..self.parentWindow.theUser.."|r"),
+		text = _G.format(L["Are you sure you want to\nignore %s?"], "|cff69ccf0"..(win.isBN and win.toonName or self.parentWindow.theUser).."|r"),
 		button1 = L["Yes"],
 		button2 = L["No"],
 		OnAccept = function()
-		    _G.AddIgnore(self.parentWindow.theUser);
+		    _G.AddIgnore(win.isBN and win.toonName or self.parentWindow.theUser);
 		end,
 		timeout = 0,
 		whileDead = 1,
