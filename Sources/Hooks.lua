@@ -11,6 +11,7 @@ Module specific hooks are found within it's own files.
 
 local Hooked_ChatFrameEditBoxes = {};
 
+-- may no longer be needed.... not sure of other addons depend on it...
 local function hookChatFrameEditBox(editBox)
     if(editBox and not Hooked_ChatFrameEditBoxes[editBox:GetName()]) then
         hooksecurefunc(editBox, "Insert", function(self,theText)
@@ -73,14 +74,6 @@ end
 
 
 -------------------------------------------------------------------------------------------
-
-hooksecurefunc("ChatEdit_InsertLink", function(text)
-        if(WIM.EditBoxInFocus) then
-            WIM.EditBoxInFocus:Insert(" "..text);
-            StackSplitFrame:Hide();
-        end
-    end);
-
 
 --ItemRef Definitions
 local registeredItemRef = {};
