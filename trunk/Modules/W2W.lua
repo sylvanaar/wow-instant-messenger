@@ -284,9 +284,9 @@ function ShowW2WTip(win, anchor, point)
     _G.GameTooltip:AddDoubleLine("|cff"..win.classColor..win.theUser.."|r", (win.w2w.version and "v"..win.w2w.version or ""));
     if(win.isBN) then
         local bn = win.bn;
-        if bn.toonName then _G.GameTooltip:AddDoubleLine(L["Character"]..":", "|cffffffff"..bn.toonName.."|r"); end
-        if bn.client then _G.GameTooltip:AddDoubleLine(L["Game"]..":", "|cffffffff"..bn.client.."|r"); end
-        if bn.realmName then _G.GameTooltip:AddDoubleLine(L["Realm"]..":", "|cffffffff"..bn.realmName.."|r"); end
+        if bn.toonName and bn.toonName then _G.GameTooltip:AddDoubleLine(L["Character"]..":", "|cffffffff"..bn.toonName.."|r"); end
+        if bn.client and bn.client then _G.GameTooltip:AddDoubleLine(L["Game"]..":", "|cffffffff"..bn.client.."|r"); end
+        if bn.realmName and bn.realmName then _G.GameTooltip:AddDoubleLine(L["Realm"]..":", "|cffffffff"..bn.realmName.."|r"); end
     end
     _G.GameTooltip:AddDoubleLine(L["Location"]..":",  "|cffffffff"..location.."|r");
     _G.GameTooltip:AddDoubleLine(L["Coordinates"]..":", "|cffffffff".._G.math.floor((tbl.x or 0)*100)..",".._G.math.floor((tbl.y or 0)*100).."|r");
