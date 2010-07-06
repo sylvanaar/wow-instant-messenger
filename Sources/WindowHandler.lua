@@ -1842,11 +1842,11 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnUpdate", function(s
 	
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusGained", function(self)
                                 EditBoxInFocus = self;
-                                _G.ACTIVE_CHAT_EDIT_BOX = self; -- preserve linking abilities.
+                                --_G.ACTIVE_CHAT_EDIT_BOX = self; -- preserve linking abilities.
                 end);
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusLost", function(self)
                                 EditBoxInFocus = nil;
-                                _G.ACTIVE_CHAT_EDIT_BOX = nil;
+                                --_G.ACTIVE_CHAT_EDIT_BOX = nil;
                 end);
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseUp", function(self, button)
                                 _G.CloseDropDownMenus();

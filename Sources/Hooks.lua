@@ -75,6 +75,21 @@ end
 
 -------------------------------------------------------------------------------------------
 
+-- linking hooks
+local ChatEdit_GetActiveWindow_orig = ChatEdit_GetActiveWindow;
+function ChatEdit_GetActiveWindow()
+    local tb = debugstack();
+    if(WIM.EditBoxInFocus) then
+        -- if WIM has focus, see where its coming from first...
+        -- if from ChatEdit_InsertLink, return EditBoxInFocus, otherwise, return normal.
+        if(tb:match('ChatEdit_InsertLink')) then
+            return WIM.EditBoxInFocus;
+        end
+    end
+    return ChatEdit_GetActiveWindow_orig();
+end
+
+
 --ItemRef Definitions
 local registeredItemRef = {};
 function WIM.RegisterItemRefHandler(cmd, fun)
