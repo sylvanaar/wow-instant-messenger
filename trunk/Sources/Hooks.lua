@@ -78,7 +78,9 @@ end
 -- linking hooks
 local ChatEdit_GetActiveWindow_orig = ChatEdit_GetActiveWindow;
 function ChatEdit_GetActiveWindow()
-    local tb = debugstack();
+    --[[
+    --local tb = debugstack();
+    --DEFAULT_CHAT_FRAME:AddMessage(tb);
     if(WIM.EditBoxInFocus) then
         -- if WIM has focus, see where its coming from first...
         -- if from ChatEdit_InsertLink, return EditBoxInFocus, otherwise, return normal.
@@ -86,7 +88,8 @@ function ChatEdit_GetActiveWindow()
             return WIM.EditBoxInFocus;
         end
     end
-    return ChatEdit_GetActiveWindow_orig();
+    ]]
+    return WIM.EditBoxInFocus or ChatEdit_GetActiveWindow_orig();
 end
 
 
