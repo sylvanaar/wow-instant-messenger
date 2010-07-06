@@ -1,10 +1,11 @@
 ﻿--[[
-    Language Localization: zhTW
+    Update:2010/07/04
+    Language Localization: zhTW 
     Translated by: Junxian <junxian1121@hotmail.com>
 ]]
 
 WIM.AddLocale("zhTW", {
-    ["WIM (WoW Instant Messenger)"] = true,
+    ["WIM (WoW Instant Messenger)"] = "WIM (魔獸世界即時通)",
     ["_Description"] = "WIM 的設計是為了讓你在魔獸世界中與人交談時有更親切的介面，在這個視窗中您可以自訂所有的設定。若您有任何的問題，歡迎各位到官方網頁提供意見。\n網址：http://www.WIMAddon.com",
 
     ["_DemoText"] = "這個視窗可以設定對話視窗出現的預設位置。您可以將這個視窗拖曳到您想要的位置，當您關閉這個視窗的時候，所有的設定將被自動記錄下來。",
@@ -116,8 +117,8 @@ WIM.AddLocale("zhTW", {
     ["Alphabetical"] = "字母順序",
     ["Recent Activity"] = "最近使用",
     ["Keep windows on top of your UI."] = "保持對話視窗在介面的最上層",
+    ["Enable/Disable addon messages."] = "開啟/關閉插件訊息",
 
-    
     -- Class Names --
     ["Druid"] = "德魯伊",
     ["Hunter"] = "獵人",
@@ -178,23 +179,23 @@ WIM.AddLocale("zhTW", {
     ["Add Filter"] = "增加過濾條件",
     
     -- History.lua --
-    ["WIM History Button"] = "WIM 對話紀錄按鈕",
-    ["Clicking the %s button on the message window will show that user's history in WIM's History Viewer."] = "按下對話視窗的 %s 按鈕將會顯示使用者對話紀錄。",
-    ["Click to view message history."] = true,
-    ["WIM pruned %d |4message:messages; from your history."] = true,
-    ["History Viewer"] = "對話紀錄檢視",
+    ["WIM History Button"] = "WIM 對話記錄按鈕",
+    ["Clicking the %s button on the message window will show that user's history in WIM's History Viewer."] = "按下對話視窗的 %s 按鈕將會顯示使用者對話記錄。",
+    ["Click to view message history."] = "檢視歷史記錄",
+    ["WIM pruned %d |4message:messages; from your history."] = "WIM 刪除 %d |4message:messages; 從你的歷史記錄",
+    ["History Viewer"] = "對話記錄檢視",
     ["Filters"] = "過濾器",
-    ["Are you sure you want to delete all history saved for %s on %s?"] = "您確定要刪除所有 %s 在 %s 的紀錄？",
+    ["Are you sure you want to delete all history saved for %s on %s?"] = "您確定要刪除所有 %s 在 %s 儲存的記錄？",
     ["Search resulted in %d |4message:messages;."] = "搜尋結果於 %d |4message:messages;",
     ["No results found!"] = "沒有發現符合的條件!",
     ["Search"] = "搜尋",
     ["Show All"] = "顯示全部",
-    ["Loading History"] = "載入對話紀錄",
+    ["Loading History"] = "載入對話記錄",
     ["Chat View"] = "檢視對話",
     ["Text View"] = "檢視文字",
-    ["WIM History Viewer can be accessed any time by typing:"] = "WIM 對話紀錄檢視可以隨時透過下列指令開啟:",
-    ["WIM History Viewer"] = "檢視 WIM 對話紀錄",
-    ["Display history viewer."] = "顯示對話紀錄",
+    ["WIM History Viewer can be accessed any time by typing:"] = "WIM 對話記錄檢視可以隨時透過下列指令開啟:",
+    ["WIM History Viewer"] = "檢視 WIM 對話記錄",
+    ["Display history viewer."] = "顯示對話記錄",
     
     -- ldb.lua --
     ["No New Messages"] = "沒有新的訊息",
@@ -205,11 +206,11 @@ WIM.AddLocale("zhTW", {
     
     -- Negotiate.lua --
     ["WIM Update Available!"] = "WIM 已有新的更新!",
-    ["There is a newer version of WIM available for download. You can download it at %s."] = "目前已經有新版的WIM!\n您可以到 %s 下載新版本",
+    ["There is a newer version of WIM available for download. You can download it at %s."] = "目前已經有新版的 WIM!\n您可以到 %s 下載新版本",
     
     -- ShortcutBar.lua --
-    --["Location"] = "玩家位置",
-    ["Player Location"] = "玩家位置",
+    ["Location"] = "玩家位置",
+    --["Player Location"] = "玩家位置",
     ["Unknown"] = "未知",
     ["Click to update..."] = "點擊更新資訊...",
     ["Coordinates"] = "玩家座標",
@@ -217,6 +218,8 @@ WIM.AddLocale("zhTW", {
     ["Add Friend"] = "加入好友",
     ["Ignore User"] = "加入黑名單",
     ["Are you sure you want to\nignore %s?"] = "您確定您要忽略 %s",
+    ["Right-Click for profile links..."] ="右鍵點擊 查看英雄榜",
+    ["Profile Links"] = "查看英雄榜",
     
     -- Tutorials.lua --
     ["Display WIM tips"] = "顯示 WIM 小提示",
@@ -229,9 +232,10 @@ WIM.AddLocale("zhTW", {
     -- WhisperEngine.lua --
     ["Whisper Received!"] = "收到密語!",
     ["You received a whisper which was hidden due to your current activity. You can change how whispers behave in WIM's options by typing"] = "您收到一個密語但因為您現在的活動而被隱藏。您可以變更 WIM 的密語設定。",
-    
+    ["Recently Sent Messages"] = "最近傳送的訊息",
+
     -- Clear.lua --
-    ["You are about to clear all of WIM's history!"] = "你即將刪除所有的 WIM 對話紀錄",
+    ["You are about to clear all of WIM's history!"] = "你即將刪除所有的 WIM 對話記錄",
     ["This action will reload your user interface."] = "這個動作將重新載入你的使用者介面",
     ["Do you want to continue?"] = "你確定要繼續嗎?",
     ["You are about to restore WIM's filters to it's default settings!"] = "你即將把 WIM 的過濾選項恢復成預設值!",
@@ -262,6 +266,8 @@ WIM.AddLocale("zhTW", {
     ["Default"] = "預設",
     ["%s is Away From Keyboard: %s"] = "%s 目前暫離: %s",
     ["%s does not wish to be disturbed: %s"] = "%s 目前不願被打擾: %s",
+    ["Right-Mouse Click!"] = "滑鼠 右鍵點擊!",
+    ["There might be useful tools hidden under the message box. Right-Click to see them!"] = "有可用的工具被隱藏在訊息欄下方，請按滑鼠右鍵開啟",
     
     -- Options.lua --
     ["Display WIM's options."] = "顯示 WIM 設定選單",
@@ -269,7 +275,7 @@ WIM.AddLocale("zhTW", {
     ["Reset all options to default."] = "將所有設定恢復為預設值",
     
     -- CoreOptions --
-    ["Created by:"] = "作者：",
+    ["Created By:"] = "作者：",
     ["Special Thanks:"] = "特別感謝：",
     ["Welcome!"] = "歡迎！",
     ["Enable WIM"] = "啟用 WIM",
@@ -277,8 +283,8 @@ WIM.AddLocale("zhTW", {
     ["<Right-Click> to show unread messages."] = "<右鍵> 顯示未讀密語",
     ["Display Tutorials"] = "顯示教學",
     ["Reset Tutorials"] = "重設教學",
-    ["Credits"] = "版權",
-    ["This is a long message which contains both emoticons and urls 8). WIM's home is www.WIMAddon.com."] = "這一段很長的訊息是給你觀看設定後的顯示效果用的。 其中包含網址連接與心情符號 8)。 我們的網址是 www.WIMAddon.com.",
+    ["Credits"] = "榮譽",
+    ["This is a long message which contains both emoticons and urls 8). WIM's home is www.WIMAddon.com."] = "這一段很長的訊息是給你觀看設定後的顯示效果用的。 其中包含網址連接與心情符號 8)。 我們的網址是 www.WIMAddon.com",
     ["Message Formatting"] = "訊息格式",
     ["Manipulate how WIM displays messages."] = "設定 WIM 如何顯示訊息格式",
     ["Preview"] = "預覽",
@@ -289,6 +295,7 @@ WIM.AddLocale("zhTW", {
     ["Window Behavior"] = "視窗的動作",
     ["You can control how windows behave while you are in different situations."] = "您可以設定訊息視窗在您不同的狀態下的動作。",
     ["Intercept Slash Commands"] = "攔截斜線指令",
+    ["Behaviors per current state"] ="各種情況動作",
     ["Use the same rules for all states."] = "所有的狀態下都採用相同規則",
     ["Behaviors for state:"] = "此行為套用到下列狀態:",
     ["Pop-Up window when message is sent."] = "當送出密語時彈出對話視窗",
@@ -298,7 +305,7 @@ WIM.AddLocale("zhTW", {
     ["Suppress messages from the default chat frame."] = "過濾系統內建對話框中的密語訊息",
     ["Window Settings"] = "視窗設定",
     ["Some settings may be limited by certain skins."] = "部份設定將會因為套用的佈景受到限制",
-      ["Default Width"] = "預設寬度",
+    ["Default Width"] = "預設寬度",
     ["Default Height"] = "預設高度",
     ["Window Scale"] = "視窗縮放",
     ["Window Alpha"] = "視窗透明度",
@@ -317,15 +324,15 @@ WIM.AddLocale("zhTW", {
     ["Color: System Messages"] = "顏色: 系統訊息",
     ["Color: Error Messages"] = "顏色: 錯誤訊息",
     ["Color: URL - Web Addresses"] = "顏色: 網址連結",
-    ["Color: History Messages Sent"] = "顏色: 對話紀錄-送出",
-    ["Color: History Messages Received"] = "顏色: 對話紀錄-收到",
+    ["Color: History Messages Sent"] = "顏色: 對話記錄-送出",
+    ["Color: History Messages Received"] = "顏色: 對話記錄-收到",
     ["Use colors suggested by skin."] = "使用面版建議色彩",
     ["Enable window fading effects."] = "開啟視窗淡化效果",
     ["Enable window animation effects."] = "開啟視窗動態效果",
     ["Display item links when hovering over them."] = "當滑鼠移至物品連結上時，直接顯示物品說明",
     ["Fonts"] = "字型",
     ["Configure the fonts used in WIM's message windows."] = "設定 WIM 訊息視窗中的字型",
-    ["Font Outline"] = "字體外框",
+    ["Font Outline"] = "文字描邊",
     ["Thin"] = "細",
     ["Thick"] = "粗",
     ["Use font suggested by skin."] = "面版建議使用的字型",
@@ -333,6 +340,9 @@ WIM.AddLocale("zhTW", {
     ["Configure general display settings when dealing with whispers."] = "設定當密語出現時的顯示設定",
     ["Color: Messages Sent"] = "顏色: 已傳送密語",
     ["Color: Messages Received"] = "顏色: 已接收密語",
+    ["Color: BNet Messages Sent"] = "顏色: 已傳送 BNet 密語",
+    ["Color: BNet Messages Received"] ="顏色: 已接收 BNet 密語",
+
     ["Use colors suggested by skin."] = "使用佈景主題建議",
     ["Display user class icons and details."] = "顯示對方職業圖示與資訊",
     ["Requires who lookups."] = "需要用到查詢功能",
@@ -347,8 +357,8 @@ WIM.AddLocale("zhTW", {
     ["Action:"] = "動作:",
     ["Occurrences:"] = "發生次數:",
     ["Delete Filter"] = "刪除過濾",
-    ["History"] = "訊息紀錄",
-    ["WIM can store conversations to be viewed at a later time."] = "WIM 可以儲存對話紀錄",
+    ["History"] = "訊息記錄",
+    ["WIM can store conversations to be viewed at a later time."] = "WIM 可以儲存對話記錄",
     ["Enable History"] = "開啟訊息記錄",
     ["Messages"] = " 則訊息",
     ["Preview history inside message windows."] = "在對話視窗中顯示的訊息數量",
@@ -375,12 +385,18 @@ WIM.AddLocale("zhTW", {
     ["Sounds"] = "音效",
     ["Configure various sound events and how they are triggered."] = "設定此插件的音效功能",
     ["Play sound when a whisper is received."] = "當收到密語時撥放音效",
-    ["Play special sound for friends."] = "設定朋友的特殊音效",
-    ["Play special sound for guild members."] = "設定工會成員的特殊音效",
+    ["Play special sound for friends."] = "設定好友音效",
+    ["Play special sound for guild members."] = "設定公會成員音效",
     ["Play sound when a whisper is sent."] = "當送出密語時撥放音效",
     ["Allow others to see my talent spec."] = "讓其他人看見我的天賦資訊",
+    ["Play special sound for battle.net friends."] = "設定 battle.net 好友音效",
     ["Window Strata:"] = "視窗層級:",
     ["Unlock from Minimap"] = "解鎖小地圖按鈕",
+    ["Press <Tab> to advance to next tell target."] = "按下 <Tab> 切換到下一個對話欄",
+    ["Colorize names."] = "名字上色",
+    ["Bracket names."] = "名字加上括號",
+    ["Clamp window to screen."] = "限制視窗不超出畫面",
+    ["Group with whisper windows."] = "群組包含密語視窗",
     
     -- TabManagement.lua --
     ["Tab Management"] = "標籤管理",
@@ -388,6 +404,7 @@ WIM.AddLocale("zhTW", {
     ["Automatically group whispers."] = "自動群組密語對話視窗",
     ["Place friends in their own group."] = "將好友放在同一個群組",
     ["Place guild members in their own group."] = "將公會成員放在同一個群組",
+    ["Automatically group chat windows."] = "自動群組聊天對話視窗",
     ["Does not apply to windows already opened."] = "不要套用到已經開啟的對話視窗",
 
     -- Talent Specs --
@@ -420,8 +437,9 @@ WIM.AddLocale("zhTW", {
 	["Unholy"] = "穢邪",
 
     -- ChangeLog.lua --
-    ["Change Log"] = true,
-    ["View WIM's change log."] = true,
+    ["Change Log"] = "更新日誌",
+    ["View WIM's change log."] = "檢視 WIM 的更新日誌",
+    ["Available For Download!"] = "有新版本可下載！",
     
     -- Filters.lua --
     ["Show Alert"] = "顯示警告",
@@ -435,8 +453,51 @@ WIM.AddLocale("zhTW", {
     ["Hide All Windows"] = "隱藏所有視窗",
     
     --Emoticons.lua
-    ["Also"] = true,
-    ["More"] = true,
-    ["Emoticons"] = true,
+    ["Also"] = "並且",
+    ["More"] = "更多",
+    ["Emoticons"] = "心情符號",
     
+    --Expose.lua
+    ["Your conversations have been hidden in order to clear your screen while in combat. To disable this feature type"] = "你的對話視窗將在進入戰鬥狀態時被隱藏。要停用這個功能請輸入:",
+    ["Expose"] = "Expose",
+    ["Expose is a Mac OS X inspired feature which enables you to quickly clear your screen of windows and then restore them back to their original position."] = "Expose 是 Mac OS X 的一個增強功能，當你處於戰鬥時可快速清除畫面上的對話視窗，在戰鬥結束後再恢復顯示對話視窗",
+    ["Auto hide/restore windows during combat."] = "戰鬥時自動 隱藏/恢復 對話視窗",
+    ["Delay if I am typing a message."] = "如果我正在輸入訊息則延遲關閉",
+    ["Border Size"] = "邊框大小",
+    ["Only while in an instance."] = "只在副本中",
+    ["Show Border"] = "顯示邊框",
+    ["Animation Direction:"] = "動畫方向:",
+
+    --ChatEngine.lua
+    ["WIM will manage this chat type within its own message windows."] = "WIM 可收集不同頻道的對話並在各自獨立的視窗中呈現",
+    ["Show Minimap Alerts"] = "顯示小地圖警示",
+    ["Never pop-up on my screen."] = "絕不在我的螢幕上突然彈出",
+    ["Never suppress messages."] = "絕不抑制訊息",
+    ["Have WIM monitor this channel."] = "WIM 已監視這個頻道",
+    ["Never Pop"] = "絕不彈出",
+    ["Never have this window pop-up on my screen."] = "這個視窗絕不在我的螢幕上突然彈出",
+    ["Never Supress"] = "絕不抑制",
+    ["Never suppress messages from the default chat frame."] = "預設的聊天框中絕不抑制訊息",
+    ["Show unread message alert on minimap."] = "在小地圖上提示有未閱讀的訊息",
+    ["No History"] = "無對話記錄",
+    ["Do not record history for this channel."] = "這個頻道不記錄對話內容",
+    ["World Chat"] = "一般頻道",
+    ["Custom Chat"] = "自定頻道",
+    ["Chat"] = "聊天",
+    ["Play special sound for %s."] = "對 %s 撥放特別的音效",
+    ["Play sound when a message is received."] = "當收到訊息時撥放音效",
+    ["Play sound when a message is sent."] = "當發送訊息時撥放音效",
+    ["Do not play sounds for this channel."] = "這個頻道不要播放音效",
+    ["No Sound"] = "無聲",
+    ["Sensitivity"] = "靈敏度",
+    ["Enable WorldFrame Click Detection."] = "啟用「世界框架」點擊檢測",
+    ["The UI must be reloaded in order to disable this module fully. Reload UI now?"] = "為了使這個 UI 模組完全停用，你必須重新載入所有 UI，你現在要重新載入 UI 嗎？",
+    
+    --OffScreenTracker.lua
+    ["WIM Window Off Screen"] = "關閉 WIM 視窗追蹤",
+    ["Click to reposition."] = "點擊 重新定位",
+    
+    --Misc
+    ["WIM has detected that you are playing on a private server. Some servers can not process ChatAddonMessages. Would you like to enable them anyway?"] = "WIM 發現你正在一個私人的伺服器上玩 WOW，某些私人的伺服器並不完全支援 WIM 的模組，你是否仍要嘗試載入 WIM 呢？",
+
 });

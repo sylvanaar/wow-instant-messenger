@@ -16,8 +16,11 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addEntry("3.3.7", "07/??/2010", [[
+addBetaEntry("3.3.7", "07/??/2010", [[
     *Fixed linking of all blizzard items.
+    *Changed tooltip to read 'Character' instead of 'Toon Name'.
+    *Per request, ldb module changed from launcher to data source.
+    *Update zhTW translations. Thank you Junxian.
 ]]);
 
 addEntry("3.3.6", "06/24/2010", [[

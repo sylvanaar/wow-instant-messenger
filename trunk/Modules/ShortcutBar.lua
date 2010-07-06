@@ -290,7 +290,7 @@ RegisterShortcut("location", L["Player Location"], {
                 _G.GameTooltip:AddLine("|cff"..self.parentWindow.classColor..self.parentWindow.theUser.."|r");
                 if(self.parentWindow.isBN) then
                     local bn = self.parentWindow.bn;
-                    if bn.toonName then _G.GameTooltip:AddDoubleLine(L["Toon Name"]..":", "|cffffffff"..bn.toonName.."|r"); end
+                    if bn.toonName then _G.GameTooltip:AddDoubleLine(L["Character"]..":", "|cffffffff"..bn.toonName.."|r"); end
                     if bn.client then _G.GameTooltip:AddDoubleLine(L["Game"]..":", "|cffffffff"..bn.client.."|r"); end
                     if bn.realmName then _G.GameTooltip:AddDoubleLine(L["Realm"]..":", "|cffffffff"..bn.realmName.."|r"); end
                 end

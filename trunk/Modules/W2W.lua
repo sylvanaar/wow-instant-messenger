@@ -284,7 +284,7 @@ function ShowW2WTip(win, anchor, point)
     _G.GameTooltip:AddDoubleLine("|cff"..win.classColor..win.theUser.."|r", (win.w2w.version and "v"..win.w2w.version or ""));
     if(win.isBN) then
         local bn = win.bn;
-        if bn.toonName then _G.GameTooltip:AddDoubleLine(L["Toon Name"]..":", "|cffffffff"..bn.toonName.."|r"); end
+        if bn.toonName then _G.GameTooltip:AddDoubleLine(L["Character"]..":", "|cffffffff"..bn.toonName.."|r"); end
         if bn.client then _G.GameTooltip:AddDoubleLine(L["Game"]..":", "|cffffffff"..bn.client.."|r"); end
         if bn.realmName then _G.GameTooltip:AddDoubleLine(L["Realm"]..":", "|cffffffff"..bn.realmName.."|r"); end
     end

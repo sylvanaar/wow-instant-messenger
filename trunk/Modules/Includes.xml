@@ -21,5 +21,6 @@
     <Script file="Expose.lua"/>
     <Script file="ClickControl.lua"/>
     <Script file="OffScreenTracker.lua"/>
+    <Script file="alias.lua"/>
     
 </Ui>
