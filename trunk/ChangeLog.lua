@@ -16,12 +16,12 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addBetaEntry("3.3.7", "07/??/2010", [[
+addEntry("3.3.7", "07/13/2010", [[
     *Fixed linking of all blizzard items.
     *Changed tooltip to read 'Character' instead of 'Toon Name'.
     *Per request, ldb module changed from launcher to data source.
     *Update zhTW translations. Thank you Junxian.
-    *tweaked real id tooltip to not show bank info if info not provided.
+    *Tweaked real id tooltip to not show bank info if info not provided.
 ]]);
 
 addEntry("3.3.6", "06/24/2010", [[
