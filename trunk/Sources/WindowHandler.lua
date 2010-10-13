@@ -1182,7 +1182,6 @@ end
 -- load object into it's default state.
 local function loadWindowDefaults(obj)
 	obj:Hide();
-
         obj.age = _G.GetTime();
         obj.hasMoved = false;
 

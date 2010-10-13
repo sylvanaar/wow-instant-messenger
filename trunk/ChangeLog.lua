@@ -16,6 +16,14 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addBetaEntry("3.4.1", "10/*/2010", [[
+    *Updated TOC for WoW 4.0
+    *Fixed BNet handling for new name link usage (||K)
+    *Fixed title bar of BN Whispers to show name correctly.
+    *Fixed W2W tooltip for talent spec. Blizzard changed GetTalentTabInfo
+    *Fixed bug where BNet users weren't being saved to history.
+]]);
+
 addEntry("3.3.7", "07/13/2010", [[
     *Fixed linking of all blizzard items.
     *Changed tooltip to read 'Character' instead of 'Toon Name'.

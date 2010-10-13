@@ -14,8 +14,8 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.3.7";
-beta = false; -- flags current version as beta.
+version = "3.4.1";
+beta = true; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 useProtocol2 = false; -- test switch for new W2W Protocol. (Dev use only)
 
@@ -532,7 +532,7 @@ end
 function GetTalentSpec()
         local talents, tabs = "", _G.GetNumTalentTabs();
         for i=1, tabs do
-                local name, iconTexture, pointsSpent, background = _G.GetTalentTabInfo(i);
+                local name, _, _, _, pointsSpent = _G.GetTalentTabInfo(i);
                 talents = i==tabs and talents..pointsSpent or talents..pointsSpent.."/";
         end
         return talents ~= "" and talents or "0/0/0";
