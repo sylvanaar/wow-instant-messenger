@@ -22,6 +22,7 @@ addBetaEntry("3.4.1", "10/*/2010", [[
     *Fixed title bar of BN Whispers to show name correctly.
     *Fixed W2W tooltip for talent spec. Blizzard changed GetTalentTabInfo
     *Fixed bug where BNet users weren't being saved to history.
+    *Converted sound files to OGG - Blizzard no longer supports MP3 & Wav
 ]]);
 
 addEntry("3.3.7", "07/13/2010", [[
