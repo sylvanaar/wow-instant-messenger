@@ -95,7 +95,7 @@ end
 
 
 function WIM.FormatUserName(user)
-	if(user ~= nil) then
+	if(user ~= nil and not string.find(user, "^|K")) then
 	    user = string.gsub(user, "[A-Z]", string.lower);
 	    user = string.gsub(user, "^[a-z]", string.upper);
 	    user = string.gsub(user, "-[a-z]", string.upper); -- accomodate for cross server...

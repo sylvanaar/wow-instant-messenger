@@ -89,6 +89,12 @@ local function filterEmoticons(theMsg, smf)
     local results;
     theMsg = encodeColors(theMsg);
     repeat
+        theMsg, results = string.gsub(theMsg, "(|K[^|]+|k[^|]+|k)", function(theLink)
+            table.insert(LinkRepository, theLink);
+            return "\001\004"..#LinkRepository;
+        end, 1);
+    until results == 0;
+    repeat
         theMsg, results = string.gsub(theMsg, "(|H[^|]+|h[^|]+|h)", function(theLink)
             table.insert(LinkRepository, theLink);
             return "\001\004"..#LinkRepository;
@@ -106,7 +112,7 @@ local function filterEmoticons(theMsg, smf)
     end
         
     -- put all the links back into the string...
-    for i=1, #LinkRepository do
+    for i=#LinkRepository, 1, -1 do
         theMsg = string.gsub(theMsg, "\001\004"..i.."", LinkRepository[i]);
     end
     

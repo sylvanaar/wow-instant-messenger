@@ -177,6 +177,7 @@ local function getWhisperWindowByUser(user, isBN)
         -- if invalid user, then return nil;
         return nil;
     end
+    local safeName = string.lower(user);
     local obj = Windows[user];
     if(obj and obj.type == "whisper") then
         -- if the whisper window exists, return the object
@@ -552,24 +553,36 @@ local tellTargetExtractionAutoComplete = _G.AUTOCOMPLETE_LIST.ALL;
 function CF_ExtractTellTarget(editBox, msg)
 	-- Grab the string after the slash command
 	local target = string.match(msg, "%s*(.*)");
-	
-	--If we haven't even finished one word, we aren't done.
-	if ( not target or not string.find(target, "%s") or (string.sub(target, 1, 1) == "|") ) then
-		return false;
-	end
-	
-	if ( _G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include, tellTargetExtractionAutoComplete.exclude, 1, nil, true) ) then
-		--Even if there's a space, we still want to let the person keep typing -- they may be trying to type whatever is in AutoComplete.
-		return false;
-	end
-	
-	--Keep pulling off everything after the last space until we either have something on the AutoComplete list or only a single word is left.
-	while ( string.find(target, "%s") ) do
-		--Pull off everything after the last space.
-		target = string.match(target, "(.+)%s+[^%s]*");
-		if ( _G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include, tellTargetExtractionAutoComplete.exclude, 1, nil, true)  ) then
-			break;
+	local bNetID;
+	--_G.DEFAULT_CHAT_FRAME:AddMessage("Raw: "..msg:gsub("|", ":")); -- debugging
+	if(target:find("|K")) then
+		target, bNetID = string.match(msg, "^(|Kg([0-9]+)|k[0-9]+|k)");
+		local _, g, s = _G.BNGetFriendInfoByID(bNetID);
+		local buffer = "0"; -- init 1 for space between names
+		for b in string.gmatch(g..s, "|k(0+)|k") do
+			buffer = buffer..b
 		end
+		target = "|Kf"..bNetID.."|k"..buffer.."|k";
+	else
+		--If we haven't even finished one word, we aren't done.
+		if ( not target or not string.find(target, "%s") or (string.sub(target, 1, 1) == "|") ) then
+			return false;
+		end
+		
+		if ( _G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include, tellTargetExtractionAutoComplete.exclude, 1, nil, true) ) then
+			--Even if there's a space, we still want to let the person keep typing -- they may be trying to type whatever is in AutoComplete.
+			return false;
+		end
+		
+		--Keep pulling off everything after the last space until we either have something on the AutoComplete list or only a single word is left.
+		while ( string.find(target, "%s") ) do
+			--Pull off everything after the last space.
+			target = string.match(target, "(.+)%s+[^%s]*");
+		if ( _G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include, tellTargetExtractionAutoComplete.exclude, 1, nil, true)  ) then
+				break;
+			end
+		end
+	
 	end
 
 	msg = string.sub(msg, string.len(target) + 2);
@@ -578,7 +591,7 @@ function CF_ExtractTellTarget(editBox, msg)
 		local curState = curState;
 		curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
 		if(db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
-		    local win = getWhisperWindowByUser(target, _G.BNet_GetPresenceID(target));
+		    local win = getWhisperWindowByUser(target, bNetID);
 		    win.widgets.msg_box.setText = 1;
 		    win:Pop(true); -- force popup
 		    win.widgets.msg_box:SetFocus();
