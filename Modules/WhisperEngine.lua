@@ -555,7 +555,7 @@ function CF_ExtractTellTarget(editBox, msg)
 	local target = string.match(msg, "%s*(.*)");
 	local bNetID;
 	--_G.DEFAULT_CHAT_FRAME:AddMessage("Raw: "..msg:gsub("|", ":")); -- debugging
-	if(target:find("|K")) then
+	if(target:find("^|K")) then
 		target, bNetID = string.match(msg, "^(|Kg([0-9]+)|k[0-9]+|k)");
 		local _, g, s = _G.BNGetFriendInfoByID(bNetID);
 		local buffer = "0"; -- init 1 for space between names

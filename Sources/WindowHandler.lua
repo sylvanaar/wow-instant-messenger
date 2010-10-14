@@ -864,7 +864,9 @@ local function instantiateWindow(obj)
                 local classTag = obj.class;
                 icon:SetGradient("VERTICAL", 1, 1, 1, 1, 1, 1);
                 icon:SetTexture(GetSelectedSkin().message_window.widgets.class_icon.texture);
-                if(self.class == "") then
+                if(self.bn and self.bn.client == "S2") then
+                                classTag = "sc2";
+                elseif(self.class == "") then
                 	classTag = "blank"
                 else
                 	if(constants.classes[self.class]) then

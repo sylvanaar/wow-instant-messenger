@@ -18,11 +18,13 @@ end
 -- ChangeLog Entries.
 addBetaEntry("3.4.1", "10/*/2010", [[
     *Updated TOC for WoW 4.0
-    *Fixed BNet handling for new name link usage (||K)
+    *Fixed BNet handling for new name link usage (||K) ty Stewart.
     *Fixed title bar of BN Whispers to show name correctly.
     *Fixed W2W tooltip for talent spec. Blizzard changed GetTalentTabInfo
     *Fixed bug where BNet users weren't being saved to history.
     *Converted sound files to OGG - Blizzard no longer supports MP3 & Wav
+    *Fixed Ignore shortcut.
+    +Added new class icon for StarCraft2 players to default skin.
 ]]);
 
 addEntry("3.3.7", "07/13/2010", [[
