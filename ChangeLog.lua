@@ -16,7 +16,7 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addBetaEntry("3.4.1", "10/*/2010", [[
+addEntry("3.4.1", "10/*/2010", [[
     *Updated TOC for WoW 4.0
     *Fixed BNet handling for new name link usage (||K) ty Stewart.
     *Fixed title bar of BN Whispers to show name correctly.
