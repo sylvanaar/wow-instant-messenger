@@ -937,7 +937,15 @@ function BNC:OnWindowDestroyed(self)
     end
 end
 
-function BNC:CHAT_MSG_BN_CONVERSATION(eventController, ...)
+function BNC:CHAT_MSG_BN_CONVERSATION_LIST(...)
+
+end
+
+function BNC:CHAT_MSG_BN_CONVERSATION_NOTICE(...)
+
+end
+
+function BNC:CHAT_MSG_BN_CONVERSATION_CONTROLLER(eventController, ...)
     if(eventController.ignoredByWIM) then
         eventController:BlockFromDelegate(self);
         return;
