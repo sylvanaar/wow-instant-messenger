@@ -176,7 +176,10 @@ local function getChatWindow(ChatName, chatType)
         if(chatType == "guild") then
             Windows[ChatName].CHAT_listCount = _G.GetNumGuildMembers;
             Windows[ChatName].CHAT_listFun = _G.GetGuildRosterInfo;
-        else
+	elseif(chatType == "BN_CONVERSATION") then
+	    Windows[ChatName].CHAT_listCount = function() local l = Windows[ChatName].chatList; return #l; end;
+	    Windows[ChatName].CHAT_listFun = function(i) return Windows[ChatName].chatList[i]; end
+	else
             Windows[ChatName].CHAT_listCount = nil;
             Windows[ChatName].CHAT_listFun = nil;
         end
@@ -916,6 +919,19 @@ function BNC:OnEnable()
     self:RegisterChatEvent("CHAT_MSG_BN_CONVERSATION");
     self:RegisterChatEvent("CHAT_MSG_BN_CONVERSATION_LIST");
     self:RegisterChatEvent("CHAT_MSG_BN_CONVERSATION_NOTICE");
+    self.frame = self.frame or _G.CreateFrame("Frame");
+    self.frame:Show();
+    self.frame:SetScript("OnUpdate", function(self, elapsed)
+		for i=1, 10 do
+			if(_G.BNGetConversationInfo(i)) then
+				local winName = _G.format(_G.CONVERSATION_NAME, _G.MAX_WOW_CHAT_CHANNELS + i);
+				local win = getChatWindow(winName, "BN_CONVERSATION");
+				win.channelNumber = i;
+				win.channelIdentifier = winName;
+			end
+		end
+	self:Hide();
+    end);
 end
 
 function BNC:OnDisable()
@@ -937,13 +953,6 @@ function BNC:OnWindowDestroyed(self)
     end
 end
 
-function BNC:CHAT_MSG_BN_CONVERSATION_LIST(...)
-
-end
-
-function BNC:CHAT_MSG_BN_CONVERSATION_NOTICE(...)
-
-end
 
 function BNC:CHAT_MSG_BN_CONVERSATION_CONTROLLER(eventController, ...)
     if(eventController.ignoredByWIM) then
@@ -956,14 +965,14 @@ function BNC:CHAT_MSG_BN_CONVERSATION_CONTROLLER(eventController, ...)
 end
 
 function BNC:CHAT_MSG_BN_CONVERSATION(...)
-    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = honorChatFrameEventFilter("CHAT_MSG_BN_CONVERSATION", ...);
+    local filter, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = honorChatFrameEventFilter("CHAT_MSG_BN_CONVERSATION", ...);
     if(filter) then
         return;
     end
     -- arg4 Convo Name
     -- arg8 Convo Number
     -- arg13 sender realID Channel Name
-    local win = getChatWindow("1"..arg4, "BN_CONVERSATION");
+    local win = getChatWindow(_G.format(_G.CONVERSATION_NAME, _G.MAX_WOW_CHAT_CHANNELS + arg8), "BN_CONVERSATION");
     local color = _G.ChatTypeInfo["BN_CONVERSATION"];
     win.widgets.char_info:SetText("");
     win.channelNumber = arg8;
@@ -989,10 +998,55 @@ function BNC:CHAT_MSG_BN_CONVERSATION(...)
     end
 end
 
+function BNC:CHAT_MSG_BN_CONVERSATION_LIST_CONTROLLER(eventController, ...)
+	if(self.requestedList) then
+		eventController:BlockFromChatFrame(self);
+		self.requestedList = nil;
+	end
+end
+
+function BNC:CHAT_MSG_BN_CONVERSATION_LIST(...)
+	local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
+	local winName = _G.format(_G.CONVERSATION_NAME, _G.MAX_WOW_CHAT_CHANNELS + arg8);
+	local win = getChatWindow(winName, "BN_CONVERSATION");
+	cleanChatList(win);
+	SplitToTable(arg1, ", ", win.chatList);
+end
+
+BNC.CHAT_MSG_BN_CONVERSATION_CONTROLLER = BNC.CHAT_MSG_BN_CONVERSATION_CONTROLLER;
+function BNC:CHAT_MSG_BN_CONVERSATION_NOTICE(...)
+	local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13 = ...;
+	--arg1 = notice type
+	--arg8 = BN convo id
+	local channelLink = _G.format(_G.CHAT_BN_CONVERSATION_GET_LINK, arg8, _G.MAX_WOW_CHAT_CHANNELS + arg8);
+	local playerLink = _G.format("|HBNplayer:%s:%s:%s:%s:%s|h[%s]|h", arg2, arg13, arg11, _G.Chat_GetChatCategory("BN_CONVERSATION_NOTICE"), arg8, arg2);
+	local message = _G.format(_G["CHAT_CONVERSATION_"..arg1.."_NOTICE"], channelLink, playerLink)
+	local winName = _G.format(_G.CONVERSATION_NAME, _G.MAX_WOW_CHAT_CHANNELS + arg8);
+	local win = getChatWindow(winName, "BN_CONVERSATION");
+	win.channelNumber = arg8;
+	win.channelIdentifier = arg4;
+	win.widgets.chat_info:SetText(tonumber(_G.BNGetNumConversationMembers(win.channelNumber)));
+	local color = _G.ChatTypeInfo["BN_CONVERSATION"];
+	local neverPop = db.chat["bn"] and db.chat["bn"].neverPop;
+	if(arg1 == "YOU_JOINED_CONVERSATION") then
+		win:Pop(not neverPop);
+	end
+	win:AddEventMessage(color.r, color.g, color.b, "CHAT_BN_CONVERSATION", message);
+	--YOU_LEFT_CONVERSATION
+	--YOU_JOINED_CONVERSATION
+	BNC:UpdateList(win);
+end
+
 function BNC:OnWindowShow(win)
-    if(win.type == "chat" and win.chatType == "BN_CONVERSATION") then
-        win.widgets.chat_info:SetText(tonumber(_G.BNGetNumConversationMembers(win.channelNumber)));
-    end
+	if(win.type == "chat" and win.chatType == "BN_CONVERSATION") then
+	    win.widgets.chat_info:SetText(tonumber(_G.BNGetNumConversationMembers(win.channelNumber)));
+	    BNC:UpdateList(win);
+	end
+end
+
+function BNC:UpdateList(win)
+	BNC.requestedList = true;
+	_G.BNListConversation(win.channelNumber);
 end
 
 --[[

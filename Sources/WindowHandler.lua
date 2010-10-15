@@ -1934,6 +1934,8 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
 			end
 		elseif(event == "CHAT_MSG_CHANNEL_NOTICE") then
                         return _G.format(_G["CHAT_"..arg1.."_NOTICE"], arg8, arg4);
+                elseif(event == "CHAT_BN_CONVERSATION") then
+                        return arg1;
                 else
 			return "Unknown event received...";
 		end
