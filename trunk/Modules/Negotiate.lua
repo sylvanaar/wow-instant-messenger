@@ -73,6 +73,9 @@ local function tagToModuleName(tag)
 end
 
 local function shouldNegotiate(tag, user, token)
+    if(not user) then
+        return;
+    end
     local cache = getCache(tag);
     if(cache[user]) then
         cache[user] = token;

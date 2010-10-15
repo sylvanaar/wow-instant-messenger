@@ -91,7 +91,7 @@ local WIM_ClassicSkin = {
                 points = {
                     {"TOPLEFT", "window", "TOPLEFT", 50, -8}
                 },
-                font = "GameFontNormalLarge",
+                font = "FriendsFont_Normal", --GameFontNormalLarge
                 font_color = "ffffff",
                 font_height = 16,
                 font_flags = "",

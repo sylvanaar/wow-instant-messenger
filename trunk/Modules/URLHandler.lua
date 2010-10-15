@@ -170,10 +170,11 @@ local function displayURL(link)
         button2 = _G.TEXT(_G.ACCEPT),
         hasEditBox = 1,
         hasWideEditBox = 1,
+	editBoxWidth = 350,
         showAlert = 1, -- HACK : it"s the only way I found to make de StaticPopup have sufficient width to show WideEditBox :(
         OnShow = function(self)
                 self = self or _G.this; -- tbc hack
-                local editBox = _G.getglobal(self:GetName().."WideEditBox");
+                local editBox = _G.getglobal(self:GetName().."WideEditBox") or _G.getglobal(self:GetName().."EditBox");
                 editBox:SetText(format(theLink));
                 editBox:SetFocus();
                 editBox:HighlightText(0);
