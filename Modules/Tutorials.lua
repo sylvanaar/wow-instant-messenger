@@ -117,6 +117,37 @@ local ARROW_TYPES = {
 	"ArrowCurveRightDown", "ArrowCurveRightUp", "ArrowCurveLeftDown", "ArrowCurveLeftUp",
 }
 
+local ARROW_SIZES = {
+	["ArrowUp"] = {x = 68, y = 89},
+	["ArrowDown"] = {x = 68, y = 89},
+	["ArrowLeft"] = {x = 89, y = 68},
+	["ArrowRight"] = {x = 89, y = 68},
+	["ArrowCurveUpRight"] = {x = 66, y = 81},
+	["ArrowCurveUpLeft"] = {x = 66, y = 81},
+	["ArrowCurveDownRight"] = {x = 66, y = 81},
+	["ArrowCurveDownLeft"] = {x = 66, y = 81},
+	["ArrowCurveRightDown"] = {x = 82, y = 66},
+	["ArrowCurveRightUp"] = {x = 82, y = 66},
+	["ArrowCurveLeftDown"] = {x = 82, y = 66},
+	["ArrowCurveLeftUp"] = {x = 82, y = 66},
+}
+
+local MOUSE_SIZE = { x = 76, y = 101}
+
+local TUTORIAL_QUEST_ARRAY = {
+	["HUMAN"] = {questID = 7, displayNPC = 197},
+	["DWARF"] = {questID = 7},
+	["NIGHTELF"] = {questID = 7},
+	["GNOME"] = {questID = 7},
+	["DRAENEI"] = {questID = 7},
+	["WORGEN"] = {questID = 7},
+	["ORC"] = {questID = 7},
+	["SCOURGE"] = {questID = 7},
+	["TAUREN"] = {questID = 7},
+	["TROLL"] = {questID = 7},
+	["BLOODELF"] = {questID = 7},
+	["GOBLIN"] = {questID = 7},
+};
 
 local DISPLAY_DATA = {
     ["Base"] = {
@@ -154,33 +185,83 @@ function _G.TutorialFrame_Update(currentTutorial)
 	
 	-- setup the frame
 	_G.TutorialFrame_ClearTextures();
-	local anchorData = displayData.anchorData;
-	_G.TutorialFrame:SetPoint( anchorData.align, _G.UIParent, anchorData.align, anchorData.xOff, anchorData.yOff );
-
-	local anchorParentLeft = _G.TutorialFrameLeft1;
-	local anchorParentRight = _G.TutorialFrameRight1;
-	for i = 2, displayData.tileHeight do
-		local leftTexture = _G["TutorialFrameLeft"..i];
-		local rightTexture = _G["TutorialFrameRight"..i];
-		leftTexture:SetPoint("TOPLEFT", anchorParentLeft, "BOTTOMLEFT", 0, 0);
-		rightTexture:SetPoint("TOPRIGHT", anchorParentRight, "BOTTOMRIGHT", 0, 0);
-		leftTexture:Show();
-		rightTexture:Show();
-		anchorParentLeft = leftTexture;
-		anchorParentRight = rightTexture;
+	if (displayData.anchorData) then
+		local anchorData = displayData.anchorData;
+		_G.TutorialFrame:SetPoint( anchorData.align, _G.UIParent, anchorData.align, anchorData.xOff, anchorData.yOff );
 	end
-	_G.TutorialFrameBottom:SetPoint("TOPLEFT", anchorParentLeft, "BOTTOMLEFT", 0, 0);
-	_G.TutorialFrameBottom:SetPoint("TOPRIGHT", anchorParentRight, "TOPRIGHT", 0, 0);
 
-	local height = TUTORIALFRAME_TOP_HEIGHT + (displayData.tileHeight * TUTORIALFRAME_MIDDLE_HEIGHT) + TUTORIALFRAME_BOTTOM_HEIGHT;
-	_G.TutorialFrame:SetSize(TUTORIALFRAME_WIDTH, height);
+	if (displayData.tileHeight == 0) then
+		_G.TutorialFrameTop:Hide();
+		_G.TutorialFrameLeft1:Hide();
+		_G.TutorialFrameRight1:Hide();
+		_G.TutorialFrameBottom:Hide();
+		_G.TutorialFrameBackground:Hide();
+		_G.TutorialFrameCloseButton:Hide();
+		_G.TutorialFrameOkayButton:Hide();
+		_G.TutorialFramePrevButton:Hide();
+		_G.TutorialFrameNextButton:Hide();
+		_G.TutorialFrame:SetSize(1024, 768);
+	else
+		_G.TutorialFrameTop:Show();
+		_G.TutorialFrameLeft1:Show();
+		_G.TutorialFrameRight1:Show();
+		_G.TutorialFrameBottom:Show();
+		_G.TutorialFrameBackground:Show();
+		_G.TutorialFrameCloseButton:Show();
+		_G.TutorialFrameOkayButton:Show();
+		_G.TutorialFramePrevButton:Show();
+		_G.TutorialFrameNextButton:Show();
+		local anchorParentLeft = _G.TutorialFrameLeft1;
+		local anchorParentRight = _G.TutorialFrameRight1;
+		for i = 2, displayData.tileHeight do
+			local leftTexture = _G["TutorialFrameLeft"..i];
+			local rightTexture = _G["TutorialFrameRight"..i];
+			leftTexture:SetPoint("TOPLEFT", anchorParentLeft, "BOTTOMLEFT", 0, 0);
+			rightTexture:SetPoint("TOPRIGHT", anchorParentRight, "BOTTOMRIGHT", 0, 0);
+			leftTexture:Show();
+			rightTexture:Show();
+			anchorParentLeft = leftTexture;
+			anchorParentRight = rightTexture;
+		end
+		_G.TutorialFrameBottom:SetPoint("TOPLEFT", anchorParentLeft, "BOTTOMLEFT", 0, 0);
+		_G.TutorialFrameBottom:SetPoint("TOPRIGHT", anchorParentRight, "TOPRIGHT", 0, 0);
+
+		local height = TUTORIALFRAME_TOP_HEIGHT + (displayData.tileHeight * TUTORIALFRAME_MIDDLE_HEIGHT) + TUTORIALFRAME_BOTTOM_HEIGHT;
+		_G.TutorialFrame:SetSize(TUTORIALFRAME_WIDTH, height);
+	end
+
+	local _, className = _G.UnitClass("player");
+	local _, raceName  = _G.UnitRace("player");
+	className = _G.strupper(className);
+	raceName = _G.strupper(raceName);
+	
+	if (displayData.displayNPC) then
+		_G.TutorialNPCModel:SetCreature(TUTORIAL_QUEST_ARRAY[raceName].displayNPC);
+		_G.TutorialNPCModel:Show();
+	end
 
 	-- setup the text
-	local title = _G["TUTORIAL_TITLE"..currentTutorial];
-	local text = _G["TUTORIAL"..currentTutorial];
-        if(title == L["WIM Update Available!"]) then
-            theButton:Show();
-        end
+	-- check for class specific first, then race specific, then normal
+	local title = _G["TUTORIAL_TITLE"..currentTutorial.."_"..className];
+	if ( not title ) then
+		title = _G["TUTORIAL_TITLE"..currentTutorial.."_"..raceName];
+		if ( not title ) then
+			title = _G["TUTORIAL_TITLE"..currentTutorial];
+		end
+	end
+	local text = _G["TUTORIAL"..currentTutorial.."_"..className];
+	if ( not text ) then
+		text = _G["TUTORIAL"..currentTutorial.."_"..raceName];
+		if ( not text ) then
+			text = _G["TUTORIAL"..currentTutorial];
+		end
+	end
+	
+	if (displayData.raidwarning) then
+		_G.RaidNotice_AddMessage(_G.RaidWarningFrame, text, _G.ChatTypeInfo["RAID_WARNING"]);
+		return;
+	end
+
 	if ( title and text) then
 		_G.TutorialFrameTitle:SetText(title);
 		_G.TutorialFrameText:SetText(text);
@@ -205,7 +286,7 @@ function _G.TutorialFrame_Update(currentTutorial)
 		local imageData = displayData["imageData"..i];
 		if(imageData and imageTexture) then
 			imageTexture:SetTexture(imageData.file);
-			imageTexture:SetPoint( imageData.align, TutorialFrame, imageData.align, imageData.xOff, imageData.yOff );
+			imageTexture:SetPoint( imageData.align, _G.TutorialFrame, imageData.align, imageData.xOff, imageData.yOff );
 			if ( imageData.layer ) then
 				imageTexture:SetDrawLayer(imageData.layer);
 			end
@@ -217,21 +298,63 @@ function _G.TutorialFrame_Update(currentTutorial)
 		end
 	end
 
+	-- setup mouse
+	local mouseData = displayData.mouseData;
+	if(mouseData) then
+		local mouseTexture = _G["TutorialFrameMouse"..mouseData.image];
+		mouseTexture:SetPoint( mouseData.align, TutorialFrame, mouseData.align, mouseData.xOff, mouseData.yOff );
+		
+		local scale = 1.0;
+		if ( mouseData.scale ) then
+			scale = mouseData.scale;
+		end
+		mouseTexture:SetWidth( MOUSE_SIZE.x * scale );
+		mouseTexture:SetHeight( MOUSE_SIZE.y * scale );
+		
+		if ( mouseData.layer ) then
+			mouseTexture:SetDrawLayer(mouseData.layer);
+		end
+		mouseTexture:Show();
+	end
+
 	-- setup keys
 	for i = 1, MAX_TUTORIAL_KEYS do
 		local keyTexture = _G["TutorialFrameKey"..i];
 		local keyString = _G["TutorialFrameKeyString"..i];
-		if ( keyTexture ) then
+		local keyData = displayData["keyData"..i];
+		if(keyTexture and keyString and keyData) then
+			keyTexture:SetPoint( keyData.align, TutorialFrame, keyData.align, keyData.xOff, keyData.yOff );
+			keyString:SetText( GetBindingText(GetBindingKey(keyData.command), "KEY_") );
+			if ( keyData.layer ) then
+				keyTexture:SetDrawLayer(keyData.layer);
+				keyString:SetDrawLayer(keyData.layer);
+			end
+			keyTexture:Show();
+			keyString:Show();
+		elseif ( keyTexture ) then
 			keyTexture:ClearAllPoints();
 			keyTexture:Hide();
 			keyString:Hide();
 		end
 	end
-        
-        -- setup arrows
+
+	-- setup arrows
 	for i = 1, getn(ARROW_TYPES) do
-                local arrowTexture = _G[ "TutorialFrame"..ARROW_TYPES[i] ];
-		if ( arrowTexture ) then
+		local arrowData = displayData[ ARROW_TYPES[i] ];
+		local arrowTexture = _G[ "TutorialFrame"..ARROW_TYPES[i] ];
+		if ( arrowData and arrowTexture ) then
+			arrowTexture:SetPoint( arrowData.align, TutorialFrame, arrowData.align, arrowData.xOff, arrowData.yOff );
+			if ( arrowData.layer ) then
+				arrowTexture:SetDrawLayer(arrowData.layer);
+			end
+			local scale = arrowData.scale;
+			if ( not scale ) then
+				scale = 1.0;
+			end
+			arrowTexture:SetWidth( ARROW_SIZES[ARROW_TYPES[i]].x * scale );
+			arrowTexture:SetHeight( ARROW_SIZES[ARROW_TYPES[i]].y * scale );
+			arrowTexture:Show();
+		elseif ( arrowTexture ) then
 			arrowTexture:ClearAllPoints();
 			arrowTexture:Hide();
 		end
