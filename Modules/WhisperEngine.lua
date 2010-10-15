@@ -245,7 +245,11 @@ function SendSplitMessage(PRIORITY, HEADER, theMsg, CHANNEL, EXTRA, to)
 			if(Windows[to] and Windows[to].isBN) then
 				_G.BNSendWhisper(Windows[to].bn.id, chunk);
 			else
-				_G.ChatThrottleLib:SendChatMessage(PRIORITY, HEADER, chunk, CHANNEL, EXTRA, to);
+				if(CHANNEL == "BN_CONVERSATION") then
+					_G.BNSendConversationMessage(to, chunk);
+				else
+					_G.ChatThrottleLib:SendChatMessage(PRIORITY, HEADER, chunk, CHANNEL, EXTRA, to);
+				end
                         end
 			chunk = (splitMessage[i] or "").." ";
                 end
