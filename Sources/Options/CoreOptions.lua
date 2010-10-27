@@ -53,9 +53,8 @@ local function General_Main()
         });
     end
     frame.welcome.sensitivity = frame.welcome:CreateCheckButtonMenu(L["Enable WorldFrame Click Detection."], WIM.modules.ClickControl, "enabled", nil, function(self, button) EnableModule("ClickControl", self:GetChecked()); end, sensitivity, db.ClickControl, "clickSensitivity");
-    frame.welcome.nextOffSetY = -45;
-    
-    
+    frame.welcome:CreateCheckButton(L["Force sounds when game sound is disabled."], db.sounds, "force_game_sound");
+    frame.welcome.nextOffSetY = -25;
     
     frame.welcome.cb3 = frame.welcome:CreateCheckButton(L["Display Tutorials"], WIM.modules.Tutorials, "enabled", nil, function(self, button) EnableModule("Tutorials", self:GetChecked()); end);
     frame.welcome.reset = frame.welcome:CreateButton(L["Reset Tutorials"], function() db.shownTutorials = {}; end);

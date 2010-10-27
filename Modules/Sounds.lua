@@ -5,6 +5,9 @@ local PlaySoundFile = PlaySoundFile;
 local SML = _G.LibStub:GetLibrary("LibSharedMedia-3.0");
 local SOUND = SML.MediaType.SOUND;
 local string = string;
+local math = math;
+local GetCVar = GetCVar;
+local SetCVar = SetCVar;
 
 --set namespace
 setfenv(1, WIM);
@@ -38,18 +41,59 @@ db_defaults.sounds = {
         say_sml = "Chat Blip",
         world_sml = "Chat Blip",
         custom_sml = "Chat Blip",
-    }
+    },
+    force_game_sound = false
 };
+
+local isGameSound = false; -- initial value. gets updated on module enabled/disabled & CVAR_UPDATE
+local soundDelay = 1; -- how long to keep the sound enabled. (in seconds)
+local soundFrame = _G.CreateFrame("Frame");
+
+
+local function enableGameSound()
+    if(db and db.force_game_sound) then
+        soundFrame.elapsed = 0;
+        soundFrame:Show();
+        SetCVar("Sound_EnableAllSound", "1");
+    end
+end
+
+local function disableGameSound()
+    soundFrame.elapsed = 0;
+    SetCVar("Sound_EnableAllSound", isGameSound and "1" or "0");
+end
+
+-- create frame to listen for settings changes and for timer events.
+soundFrame:RegisterEvent("CVAR_UPDATE");
+soundFrame:SetScript("OnEvent", function(self, event, var, val)
+    if(var == "ENABLE_SOUND") then
+            isGameSound = GetCVar("Sound_EnableAllSound") == "1" and true or false;
+    end
+end);
+soundFrame:SetScript("OnUpdate", function(self, elapsed)
+    self.elapsed = self.elapsed + elapsed;
+    if(self.elapsed > soundDelay) then
+        self:Hide();
+        disableGameSound();
+    end
+end);
+soundFrame:Hide();
+
 
 local function playSound(smlKey)
     local path = SML:Fetch(SOUND, smlKey);
     if path then
+        enableGameSound();
         PlaySoundFile(path);
     end
 end
 
 --Whisper Sounds
 local Sounds = CreateModule("Sounds", true);
+
+function Sounds:VARIABLES_LOADED()
+    isGameSound = GetCVar("Sound_EnableAllSound") == "1" and true or false;
+end
 
 -- Sound events
 function Sounds:PostEvent_Whisper(...)
@@ -76,6 +120,18 @@ end
 
 --Chat Sounds
 local ChatSounds = CreateModule("ChatSounds", true);
+
+function ChatSounds:VARIABLES_LOADED()
+    isGameSound = GetCVar("Sound_EnableAllSound") == "1" and true or false;
+end
+
+function _G.test()
+    if isGameSound then
+        _G.DEFAULT_CHAT_FRAME:AddMessage("Game Sound Enabled!");
+    else
+        _G.DEFAULT_CHAT_FRAME:AddMessage("Game Sound Disabled!");
+    end
+end
 
 -- Sound events
 function ChatSounds:PostEvent_ChatMessage(event, ...)

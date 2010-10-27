@@ -294,7 +294,7 @@ local function getPositionStr()
 	if(not x) then x = 0; end
 	if(not y) then y = 0; end
 	if(subZoneInfo and subZoneInfo ~= zoneInfo and subZoneInfo ~= "") then zoneInfo = "("..zoneInfo..") ".._G.GetSubZoneText(); end
-	return zoneInfo..":"..C..":"..Z..":"..x..":"..y;
+	return (zoneInfo or L["Unknown"])..":"..C..":"..Z..":"..x..":"..y;
 end
 
 local function RegisterLocationRequest(user)
