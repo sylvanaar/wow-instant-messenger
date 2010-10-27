@@ -16,14 +16,16 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addBetaEntry("3.4.2", "10/*/2010", [[
+addEntry("3.4.2", "10/27/2010", [[
     *Fixed URL Handler. Blizz removed WideEditBox. Thanks Astaldo.
     +New W2W protocol. Produces less addon traffic. Not backwards compatible.
     *Updated WIM's tutorial system to match WoW's new tutorial system.
     *Updated default skin to use same font as friends list. Was issue with international names.
+    +Added BNet Conversation support.
+    +Added option to force sounds when game sound is disabled (General/Main).
 ]]);
 
-addEntry("3.4.1", "10/*/2010", [[
+addEntry("3.4.1", "10/14/2010", [[
     *Updated TOC for WoW 4.0
     *Fixed BNet handling for new name link usage (||K) ty Stewart.
     *Fixed title bar of BN Whispers to show name correctly.
