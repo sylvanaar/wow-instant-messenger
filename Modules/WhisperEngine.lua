@@ -560,13 +560,9 @@ function CF_ExtractTellTarget(editBox, msg)
 	local bNetID;
 	--_G.DEFAULT_CHAT_FRAME:AddMessage("Raw: "..msg:gsub("|", ":")); -- debugging
 	if(target:find("^|K")) then
-		target, bNetID = string.match(msg, "^(|Kf([0-9]+)|k[0-9]+|k)");
-		local _, g, s = _G.BNGetFriendInfoByID(bNetID);
-		local buffer = "0"; -- init 1 for space between names
-		for b in string.gmatch(g..s, "|k(0+)|k") do
-			buffer = buffer..b
-		end
-		target = "|Kf"..bNetID.."|k"..buffer.."|k";
+        bNetID = _G.BNet_GetPresenceID(target);
+		
+        target, msg = _G.BNTokenCombineGivenAndSurname(target);
 	else
 		--If we haven't even finished one word, we aren't done.
 		if ( not target or not string.find(target, "%s") or (string.sub(target, 1, 1) == "|") ) then
@@ -586,10 +582,9 @@ function CF_ExtractTellTarget(editBox, msg)
 				break;
 			end
 		end
-	
+    
+    	msg = string.sub(msg, string.len(target) + 2);
 	end
-
-	msg = string.sub(msg, string.len(target) + 2);
 
 	if(db and db.enabled) then
 		local curState = curState;
