@@ -552,7 +552,7 @@ local function replyTellTarget(TellNotTold)
     end
 end
 
-
+-- "/w |Kf287|k0000000000000|k " 
 local tellTargetExtractionAutoComplete = _G.AUTOCOMPLETE_LIST.ALL;
 function CF_ExtractTellTarget(editBox, msg)
 	-- Grab the string after the slash command
@@ -560,7 +560,7 @@ function CF_ExtractTellTarget(editBox, msg)
 	local bNetID;
 	--_G.DEFAULT_CHAT_FRAME:AddMessage("Raw: "..msg:gsub("|", ":")); -- debugging
 	if(target:find("^|K")) then
-		target, bNetID = string.match(msg, "^(|Kg([0-9]+)|k[0-9]+|k)");
+		target, bNetID = string.match(msg, "^(|Kf([0-9]+)|k[0-9]+|k)");
 		local _, g, s = _G.BNGetFriendInfoByID(bNetID);
 		local buffer = "0"; -- init 1 for space between names
 		for b in string.gmatch(g..s, "|k(0+)|k") do
