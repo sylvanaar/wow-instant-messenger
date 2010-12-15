@@ -560,9 +560,8 @@ function CF_ExtractTellTarget(editBox, msg)
 	local bNetID;
 	--_G.DEFAULT_CHAT_FRAME:AddMessage("Raw: "..msg:gsub("|", ":")); -- debugging
 	if(target:find("^|K")) then
-        bNetID = _G.BNet_GetPresenceID(target);
-		
         target, msg = _G.BNTokenCombineGivenAndSurname(target);
+        bNetID = _G.BNet_GetPresenceID(target);
 	else
 		--If we haven't even finished one word, we aren't done.
 		if ( not target or not string.find(target, "%s") or (string.sub(target, 1, 1) == "|") ) then
