@@ -915,5 +915,5 @@ RegisterOptionFrame(L["Chat"], L["Sounds"], function() return General_Sounds(tru
 RegisterOptionFrame(L["Chat"], L["Window Behavior"], ChatPopRules);
 RegisterOptionFrame(L["Chat"]); -- breaker
 
-RegisterOptionFrame("WIM-2-WIM", L["General"], W2W_Main);
-RegisterOptionFrame("WIM-2-WIM", L["Privacy"], W2W_Privacy);
+--RegisterOptionFrame("WIM-2-WIM", L["General"], W2W_Main);
+--RegisterOptionFrame("WIM-2-WIM", L["Privacy"], W2W_Privacy);
