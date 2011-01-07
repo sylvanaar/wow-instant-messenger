@@ -234,7 +234,7 @@ function History:OnWindowCreated(win)
                     win.nextStamp = tmpTable[i].time;
                     win.nextStampColor = db.displayColors.historyOut;
                     win:AddMessage(applyMessageFormatting(win.widgets.chat_display, "CHAT_MSG_WHISPER", tmpTable[i].msg, tmpTable[i].from,
-                                    nil, nil, nil, nil, nil, nil, nil, nil, -i), color.r, color.g, color.b);
+                                    nil, nil, nil, nil, nil, nil, nil, nil, -i, "0x0300000000000000"), color.r, color.g, color.b);
                 end
                 win.widgets.chat_display:AddMessage(" ");
             end
