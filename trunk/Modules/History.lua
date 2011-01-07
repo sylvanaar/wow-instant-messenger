@@ -1244,7 +1244,7 @@ table.insert(ViewTypes, {
             end
                 frame.nextStamp = msg.time;
                 frame:AddMessage(applyStringModifiers(applyMessageFormatting(frame, "CHAT_MSG_"..(msg.event or "WHISPER"), msg.msg, msg.from,
-                        nil, nil, nil, nil, 0, msg.channelName and ChannelCache[msg.channelName], msg.channelName, nil, chatFrameMsgId), frame), color.r, color.g, color.b);
+                        nil, nil, nil, nil, 0, msg.channelName and ChannelCache[msg.channelName], msg.channelName, nil, chatFrameMsgId, "0x0300000000000000"), frame), color.r, color.g, color.b);
                 chatFrameMsgId = chatFrameMsgId > -1000 and chatFrameMsgId - 1 or -1;
                 
         end
@@ -1259,7 +1259,7 @@ table.insert(ViewTypes, {
                 nextColor.r, nextColor.g, nextColor.b = color.r, color.g, color.b;
                 frame.nextStamp = msg.time;
                 frame:AddMessage(applyStringModifiers(applyMessageFormatting(frame, "CHAT_MSG_WHISPER", msg.msg, msg.from,
-                nil, nil, nil, nil, 0, msg.channelName and ChannelCache[msg.channelName], msg.channelName), frame), color.r, color.g, color.b)
+                nil, nil, nil, nil, 0, msg.channelName and ChannelCache[msg.channelName], msg.channelName, "0x0300000000000000"), frame), color.r, color.g, color.b)
             end
         end
     });
