@@ -127,6 +127,11 @@ local function recordWhisper(inbound, ...)
         win.widgets.history:SetHistory(true);
         local history = getPlayerHistoryTable(from);
         history.info.gm = lists.gm[from];
+        
+        if(inbound and from:find("^|K")) then
+            from = _G.BNTokenCombineGivenAndSurname(from);
+        end
+        
         table.insert(history, {
             convo = from,
             type = 1, -- whisper
