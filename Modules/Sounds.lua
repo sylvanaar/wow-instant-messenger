@@ -84,7 +84,7 @@ local function playSound(smlKey)
     local path = SML:Fetch(SOUND, smlKey);
     if path then
         enableGameSound();
-        PlaySoundFile(path);
+        PlaySoundFile(path, "Master");
     end
 end
 
