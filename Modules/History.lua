@@ -122,15 +122,25 @@ end
 local function recordWhisper(inbound, ...)
     local msg, from = ...;
     local db = db.history.whispers;
+    
+    if(inbound and from:find("^|K")) then
+        local pid = _G.BNet_GetPresenceID(from)
+        if pid then
+    		local _, givenName, surname, toonName = _G.BNGetFriendInfoByID(pid);
+    		if ( givenName and surname ) then
+    				from = string.format(_G.BATTLENET_NAME_FORMAT, givenName, surname);
+    		else
+    			local _, toonName = _G.BNGetToonInfo(pid);
+    			from = toonName;
+    		end        
+		end
+    end
+                    
     local win = windows.active.whisper[from] or windows.active.chat[from] or windows.active.w2w[from];
     if(win and (lists.gm[from] or db.all or (db.friends and (lists.friends[from] or win.isBN)) or (db.guild and lists.guild[from]))) then
         win.widgets.history:SetHistory(true);
         local history = getPlayerHistoryTable(from);
         history.info.gm = lists.gm[from];
-        
-        if(inbound and from:find("^|K")) then
-            from = _G.BNTokenCombineGivenAndSurname(from);
-        end
         
         table.insert(history, {
             convo = from,
