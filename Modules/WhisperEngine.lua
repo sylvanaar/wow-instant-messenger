@@ -528,74 +528,86 @@ end
 --------------------------------------
 --          Whisper Related Hooks   --
 --------------------------------------
-
 local function replyTellTarget(TellNotTold)
-    if(db.enabled) then
-        local curState = curState;
-        curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
-        local lastTell; 
-	if(TellNotTold) then 
-		lastTell = _G.ChatEdit_GetLastTellTarget(); 
-	else 
-		lastTell = _G.ChatEdit_GetLastToldTarget(); 
-	end             
-	if(lastTell ~= "" and db.pop_rules.whisper.intercept) then 
-		local win = getWhisperWindowByUser(lastTell); 
-		if(win:IsVisible() or db.pop_rules.whisper[curState].onSend) then 
-			win.widgets.msg_box.setText = 1; 
-			win:Pop(true); -- force popup 
-			win.widgets.msg_box:SetFocus();
-			local eb = getVisibleChatFrameEditBox();
-			_G.ChatEdit_OnEscapePressed(getVisibleChatFrameEditBox() or _G.ChatFrame1EditBox); 
-		end      
-        end
+  if (db.enabled) then
+    local curState = curState;
+    curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+    local lastTell;
+    if (TellNotTold) then
+      lastTell = _G.ChatEdit_GetLastTellTarget();
+    else
+      lastTell = _G.ChatEdit_GetLastToldTarget();
     end
+
+    -- Grab the string after the slash command
+    local bNetID;
+    if (lastTell:find("^|K")) then
+      lastTell = _G.BNTokenCombineGivenAndSurname(lastTell);
+      bNetID = _G.BNet_GetPresenceID(lastTell);
+    end
+
+    if (lastTell ~= "" and db.pop_rules.whisper.intercept) then
+      local win = getWhisperWindowByUser(lastTell, bNetID);
+
+      if (win:IsVisible() or db.pop_rules.whisper[curState].onSend) then
+        win.widgets.msg_box.setText = 1;
+        win:Pop(true); -- force popup
+        win.widgets.msg_box:SetFocus();
+        local eb = getVisibleChatFrameEditBox();
+        _G.ChatEdit_OnEscapePressed(getVisibleChatFrameEditBox() or _G.ChatFrame1EditBox);
+      end
+    end
+  end
 end
 
 -- "/w |Kf287|k0000000000000|k " 
 local tellTargetExtractionAutoComplete = _G.AUTOCOMPLETE_LIST.ALL;
 function CF_ExtractTellTarget(editBox, msg)
-	-- Grab the string after the slash command
-	local target = string.match(msg, "%s*(.*)");
-	local bNetID;
-	--_G.DEFAULT_CHAT_FRAME:AddMessage("Raw: "..msg:gsub("|", ":")); -- debugging
-	if(target:find("^|K")) then
-        target, msg = _G.BNTokenCombineGivenAndSurname(target);
-        bNetID = _G.BNet_GetPresenceID(target);
-	else
-		--If we haven't even finished one word, we aren't done.
-		if ( not target or not string.find(target, "%s") or (string.sub(target, 1, 1) == "|") ) then
-			return false;
-		end
-		
-		if ( _G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include, tellTargetExtractionAutoComplete.exclude, 1, nil, true) ) then
-			--Even if there's a space, we still want to let the person keep typing -- they may be trying to type whatever is in AutoComplete.
-			return false;
-		end
-		
-		--Keep pulling off everything after the last space until we either have something on the AutoComplete list or only a single word is left.
-		while ( string.find(target, "%s") ) do
-			--Pull off everything after the last space.
-			target = string.match(target, "(.+)%s+[^%s]*");
-		if ( _G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include, tellTargetExtractionAutoComplete.exclude, 1, nil, true)  ) then
-				break;
-			end
-		end
-    
-    	msg = string.sub(msg, string.len(target) + 2);
-	end
+  -- Grab the string after the slash command
+  local target = string.match(msg, "%s*(.*)");
+  local bNetID;
+  --_G.DEFAULT_CHAT_FRAME:AddMessage("Raw: "..msg:gsub("|", ":")); -- debugging
+  if (target:find("^|K")) then
+    target, msg = _G.BNTokenCombineGivenAndSurname(target);
+    bNetID = _G.BNet_GetPresenceID(target);
+  else
+    --If we haven't even finished one word, we aren't done.
+    if (not target or not string.find(target, "%s") or (string.sub(target, 1, 1) == "|")) then
+      return false;
+    end
 
-	if(db and db.enabled) then
-		local curState = curState;
-		curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
-		if(db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
-		    local win = getWhisperWindowByUser(target, bNetID);
-		    win.widgets.msg_box.setText = 1;
-		    win:Pop(true); -- force popup
-		    win.widgets.msg_box:SetFocus();
-		    _G.ChatEdit_OnEscapePressed(editBox);
-		end
-	end
+    if (_G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include,
+      tellTargetExtractionAutoComplete.exclude, 1, nil, true)) then
+      --Even if there's a space, we still want to let the person keep typing -- they may be trying to type whatever
+      -- -- is in AutoComplete.
+      return false;
+    end
+
+    --Keep pulling off everything after the last space until we either have something on the AutoComplete list or
+    -- -- only a single word is left.
+    while (string.find(target, "%s")) do
+      --Pull off everything after the last space.
+      target = string.match(target, "(.+)%s+[^%s]*");
+      if (_G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include,
+        tellTargetExtractionAutoComplete.exclude, 1, nil, true)) then
+        break;
+      end
+    end
+
+    msg = string.sub(msg, string.len(target) + 2);
+  end
+
+  if (db and db.enabled) then
+    local curState = curState;
+    curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+    if (db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
+      local win = getWhisperWindowByUser(target, bNetID);
+      win.widgets.msg_box.setText = 1;
+      win:Pop(true); -- force popup
+      win.widgets.msg_box:SetFocus();
+      _G.ChatEdit_OnEscapePressed(editBox);
+    end
+  end
 end
 
 -- the following hook is needed in order to intercept /r
