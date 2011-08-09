@@ -369,7 +369,7 @@ local function CreateSection(parent, title, desc)
             end);
     end
     frame:SetScript("OnShow", function(self)
-            if(self.lastObj) then
+            if(self.lastObj and cbm) then
                 self:SetHeight(self:GetTop()-self.lastObj:GetBottom());
             end
         end);
