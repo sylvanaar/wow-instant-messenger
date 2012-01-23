@@ -110,5 +110,10 @@ ItemRefTooltip.SetHyperlink = function(self, link)
 end
 
 
-
+-- Dri: workaround for WoW build15050 whisper bug when x-realm server name contains a space.
+local origChatFrame_SendTell = _G.ChatFrame_SendTell
+_G.ChatFrame_SendTell = function(name, chatframe, ...)
+	name = gsub(name," ","")
+	origChatFrame_SendTell(name, chatframe, ...)
+end
 
