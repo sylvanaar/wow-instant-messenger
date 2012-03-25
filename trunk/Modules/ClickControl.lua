@@ -99,6 +99,7 @@ function ClickControl:OnDisable()
             OnCancel = function() end,
             timeout = 0,
             whileDead = 1,
+            preferredIndex = 3,
             hideOnEscape = 1
         };        
         _G.StaticPopup_Show ("WIM_CLICKCONTROL_DISABLE", theLink);

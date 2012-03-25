@@ -16,6 +16,7 @@ local function clearFun(sub)
             end,
             timeout = 0,
             whileDead = 1,
+            preferredIndex = 3,
             hideOnEscape = 1
         };
         StaticPopup_Show ("WIM_CLEAR_HISTORY");
