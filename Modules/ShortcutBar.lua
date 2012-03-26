@@ -330,7 +330,7 @@ RegisterShortcut("ignore", L["Ignore User"], {
 		end,
 		timeout = 0,
 		whileDead = 1,
-		preferredIndex = 3,
+		preferredIndex = 3,
 		hideOnEscape = 1
 	    };
 	    _G.StaticPopup_Show("WIM_IGNORE");
