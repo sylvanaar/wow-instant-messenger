@@ -166,7 +166,7 @@ local function displayURL(link)
         button2 = _G.TEXT(_G.ACCEPT),
         hasEditBox = 1,
         hasWideEditBox = 1,
-        preferredIndex = 3,
+        preferredIndex = 3,
 		editBoxWidth = 350,
         showAlert = 1, -- HACK : it"s the only way I found to make de StaticPopup have sufficient width to show WideEditBox :(
         OnShow = function(self)
