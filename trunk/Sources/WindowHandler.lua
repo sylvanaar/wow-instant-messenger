@@ -866,6 +866,8 @@ local function instantiateWindow(obj)
                 icon:SetTexture(GetSelectedSkin().message_window.widgets.class_icon.texture);
                 if(self.bn and self.bn.client == "S2") then
                                 classTag = "sc2";
+                elseif(self.bn and self.bn.client == "D3") then
+                                classTag = "d3";
                 elseif(self.class == "") then
                 	classTag = "blank"
                 else
