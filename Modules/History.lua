@@ -121,27 +121,19 @@ end
 
 local function recordWhisper(inbound, ...)
     local msg, from = ...;
-    local db = db.history.whispers;
-    
-    if(inbound and from:find("^|K")) then
+    local db = db.history.whispers;     
+    local win = windows.active.whisper[from] or windows.active.chat[from] or windows.active.w2w[from];
+    if (win and (lists.gm[from] or db.all or (db.friends and (lists.friends[from] or win.isBN)) or (db.guild and lists.guild[from]))) then
+        win.widgets.history:SetHistory(true);
+        --If realid whisper, we save them under toonname to avoid caching issues
+        --(ie "from" changes every session, we can't use that to save whispers, plus if user dumps cache, they all return unknown)
         local pid = _G.BNet_GetPresenceID(from)
         if pid then
-    		local _, givenName, surname, toonName = _G.BNGetFriendInfoByID(pid);
-    		if ( givenName and surname ) then
-    				from = string.format(_G.BATTLENET_NAME_FORMAT, givenName, surname);
-    		else
-    			local _, toonName = _G.BNGetToonInfo(pid);
-    			from = toonName;
-    		end        
+			local _, givenName, surname, toonName = _G.BNGetFriendInfoByID(pid);
+			from = toonName;
 		end
-    end
-                    
-    local win = windows.active.whisper[from] or windows.active.chat[from] or windows.active.w2w[from];
-    if(win and (lists.gm[from] or db.all or (db.friends and (lists.friends[from] or win.isBN)) or (db.guild and lists.guild[from]))) then
-        win.widgets.history:SetHistory(true);
         local history = getPlayerHistoryTable(from);
         history.info.gm = lists.gm[from];
-        
         table.insert(history, {
             convo = from,
             type = 1, -- whisper
