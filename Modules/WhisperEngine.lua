@@ -26,6 +26,7 @@ local select = select;
 local unpack = unpack;
 local math = math;
 local time = time;
+local isMOP = select(4, _G.GetBuildInfo()) >= 50000
 
 -- set name space
 setfenv(1, WIM);
@@ -315,7 +316,11 @@ function WhisperEngine:CHAT_MSG_WHISPER(...)
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     win:Pop("in");
-    _G.ChatEdit_SetLastTellTarget(arg2);
+    if isMOP then--MoP expects type to be defined here.
+    	_G.ChatEdit_SetLastTellTarget(arg2, "WHISPER");
+    else
+    	_G.ChatEdit_SetLastTellTarget(arg2);
+    end
     win.online = true;
     updateMinimapAlerts();
     CallModuleFunction("PostEvent_Whisper", ...);
@@ -409,7 +414,11 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER(...)
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BN_WHISPER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
     win:Pop("in");
-    _G.ChatEdit_SetLastTellTarget(arg2);
+    if isMOP then--MoP expects type to be defined here.
+    	_G.ChatEdit_SetLastTellTarget(arg2, "BN_WHISPER");
+    else
+    	_G.ChatEdit_SetLastTellTarget(arg2);
+    end
     win.online = true;
     updateMinimapAlerts();
     CallModuleFunction("PostEvent_Whisper", ...);
@@ -431,7 +440,11 @@ function WhisperEngine:CHAT_MSG_AFK(...)
     if(win) then
         win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_AFK", ...);
         win:Pop("out");
-        _G.ChatEdit_SetLastTellTarget(select(2, ...));
+   		if isMOP then--MoP expects type to be defined here.
+   		 	_G.ChatEdit_SetLastTellTarget(select(2, ...), "AFK");
+    	else
+   		 	_G.ChatEdit_SetLastTellTarget(select(2, ...));
+    	end
         win.online = true;
     end
 end
@@ -447,7 +460,11 @@ function WhisperEngine:CHAT_MSG_DND(...)
     if(win) then
         win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_AFK", ...);
         win:Pop("out");
-        _G.ChatEdit_SetLastTellTarget(select(2, ...));
+   		if isMOP then--MoP expects type to be defined here.
+   		 	_G.ChatEdit_SetLastTellTarget(select(2, ...), "AFK");
+    	else
+   		 	_G.ChatEdit_SetLastTellTarget(select(2, ...));
+    	end
         win.online = true;
     end
 end
