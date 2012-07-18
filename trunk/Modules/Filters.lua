@@ -8,6 +8,7 @@ local CreateFrame = CreateFrame;
 local type = type;
 local tonumber = tonumber;
 local unpack = unpack;
+local isMOP = select(4, _G.GetBuildInfo()) >= 50000
 
 --set namespace
 setfenv(1, WIM);
@@ -761,7 +762,7 @@ local function createFilterFrame()
     win.border:SetWidth(win:GetWidth() - 60);
     win.border:SetPoint("BOTTOM", 0, 55);
     win.border:SetTexture(1, 1, 1, .25);
-    win.save = CreateFrame("Button", win:GetName().."Save", win, "UIPanelButtonTemplate2");
+    win.save = CreateFrame("Button", win:GetName().."Save", win, isMOP and "UIPanelButtonTemplate" or "UIPanelButtonTemplate2");
     win.save:SetPoint("TOPRIGHT", win.border, "BOTTOMRIGHT", 0, -5);
     win.save.text = _G[win.save:GetName().."Text"];
     win.save.text:SetText(L["Save"]);
