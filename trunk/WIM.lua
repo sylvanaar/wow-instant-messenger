@@ -14,13 +14,10 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.4.2";
+version = "3.6.0";
 beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 useProtocol2 = true; -- test switch for new W2W Protocol. (Dev use only)
-
--- WOTLK check by CKKnight (we'll keep this around for now...)
-isPTR = select(4, _G.GetBuildInfo()) >= 30100;
 
 -- is Private Server?
 isPrivateServer = not (string.match(_G.GetCVar("realmList"), "worldofwarcraft.com$")
