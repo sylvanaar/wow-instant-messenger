@@ -586,7 +586,7 @@ function CF_ExtractTellTarget(editBox, msg)
   local bNetID;
   --_G.DEFAULT_CHAT_FRAME:AddMessage("Raw: "..msg:gsub("|", ":")); -- debugging
   if (target:find("^|K")) then
-    target, msg = _G.BNTokenCombineGivenAndSurname(target);
+    target, msg = isMOP and _G.BNTokenFindName(target) or _G.BNTokenCombineGivenAndSurname(target);
     bNetID = _G.BNet_GetPresenceID(target);
   else
     --If we haven't even finished one word, we aren't done.
