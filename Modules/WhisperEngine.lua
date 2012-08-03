@@ -560,7 +560,7 @@ local function replyTellTarget(TellNotTold)
     -- Grab the string after the slash command
     local bNetID;
     if (lastTell:find("^|K")) then
-      lastTell = _G.BNTokenCombineGivenAndSurname(lastTell);
+      lastTell = isMOP and _G.BNTokenFindName(lastTell) or _G.BNTokenCombineGivenAndSurname(lastTell);
       bNetID = _G.BNet_GetPresenceID(lastTell);
     end
 

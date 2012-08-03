@@ -8,6 +8,7 @@ local CreateFrame = CreateFrame;
 local date = date;
 local time = time;
 local select = select;
+local isMOP = select(4, _G.GetBuildInfo()) >= 50000
 
 --set namespace
 setfenv(1, WIM);
@@ -129,8 +130,11 @@ local function recordWhisper(inbound, ...)
         --(ie "from" changes every session, we can't use that to save whispers, plus if user dumps cache, they all return unknown)
         local pid = _G.BNet_GetPresenceID(from)
         if pid then
-			local _, givenName, surname, toonName = _G.BNGetFriendInfoByID(pid);
-			from = toonName;
+			if isMOP then
+				from = select(5, _G.BNGetFriendInfoByID(pid))--toonname is 5th arg in MoP because isBattleTagPresence is new 4th, surname is also changed to battleTag
+			else
+				from = select(4, _G.BNGetFriendInfoByID(pid))
+			end
 		end
         local history = getPlayerHistoryTable(from);
         history.info.gm = lists.gm[from];
