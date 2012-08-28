@@ -8,7 +8,6 @@ local type = type;
 local table = table;
 local pairs = pairs;
 local tonumber = tonumber;
-local isMOP = select(4, _G.GetBuildInfo()) >= 50000
 
 --set namespace
 setfenv(1, WIM);
@@ -63,7 +62,7 @@ local function SetFullSize(self)
 end
 
 local function CreateButton(parent, text, fun)
-    local button = CreateFrame("Button", parent:GetName()..statObject("Button"), parent, isMOP and "UIPanelButtonTemplate" or "UIPanelButtonTemplate2");
+    local button = CreateFrame("Button", parent:GetName()..statObject("Button"), parent, "UIPanelButtonTemplate");
     button.text = _G[button:GetName().."Text"];
     button.text:SetText(text);
     button:SetWidth(button.text:GetStringWidth()+40);
