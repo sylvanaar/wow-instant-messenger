@@ -8,7 +8,6 @@ local table = table;
 local pairs = pairs;
 local string = string;
 local next = next;
-local isMOP = select(4, _G.GetBuildInfo()) >= 50000
 
 -- set name space
 setfenv(1, WIM);
@@ -19,9 +18,6 @@ version = "3.6.0";
 beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 useProtocol2 = true; -- test switch for new W2W Protocol. (Dev use only)
-
--- WOTLK check by CKKnight (we'll keep this around for now...)
-isPTR = select(4, _G.GetBuildInfo()) >= 30100;
 
 -- is Private Server?
 isPrivateServer = not (string.match(_G.GetCVar("realmList"), "worldofwarcraft.com$")
@@ -410,12 +406,7 @@ function WIM:BN_FRIEND_LIST_SIZE_CHANGED()
 	end
     end
 	for i=1, _G.BNGetNumFriends() do
-	    local id, name, surname = _G.BNGetFriendInfo(i);--in mop surname is removed and replaced by battletag and name & surname are combined into name
-	    if isMOP then
-	    	name = name
-	    else
-	    	name = name.." "..surname;
-	    end
+	    local id, name = _G.BNGetFriendInfo(i);--in mop surname is removed and replaced by battletag and name & surname are combined into name
 	    if(name) then
 		env.cache[env.realm][env.character].friendList[name] = 2; --[set place holder for quick lookup
 		if(windows.active.whisper[name]) then
