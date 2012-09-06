@@ -313,7 +313,7 @@ function WIM.honorChatFrameEventFilter(event, ...)
                 if filter then 
                     return true, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15; 
                 elseif(narg1) then
-                    arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12 = narg1, narg2, narg3, narg4, narg5, narg6, narg7, narg8, narg9, narg10, narg11, narg12, narg13, narg14, narg15;
+                    arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15 = narg1, narg2, narg3, narg4, narg5, narg6, narg7, narg8, narg9, narg10, narg11, narg12, narg13, narg14, narg15;
                 end
             end 
         end 
