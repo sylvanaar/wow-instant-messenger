@@ -541,6 +541,7 @@ local function replyTellTarget(TellNotTold)
     end
 
     -- Grab the string after the slash command
+    if not lastTell then return end--because if you fat finger R or try to re ply before someone sent a tell, it generates a lua error without this
     local bNetID;
     if (lastTell:find("^|K")) then
       lastTell = _G.BNTokenFindName(lastTell);
