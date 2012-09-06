@@ -475,7 +475,7 @@ function Party:PARTY_MEMBERS_CHANGED()
         table.insert(self.partyWindow.chatList, myName);
         local count = 0;
         for i=1, 4 do
-            if(_G.GetPartyMember(i)) then
+            if UnitExists("party"..i) then
                 count = count + 1;
                 local name = _G.UnitName("party"..i);
                 table.insert(self.partyWindow.chatList, name);
