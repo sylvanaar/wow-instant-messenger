@@ -145,7 +145,7 @@ local function updateMinimapAlerts()
         alertPushed = true;
         local color = db.displayColors.wispIn;
         MinimapPushAlert(L["Whispers"], RGBPercentToHex(color.r, color.g, color.b), count);
-        DisplayTutorial(L["Whisper Received!"], L["You received a whisper which was hidden due to your current activity. You can change how whispers behave in WIM's options by typing"].." |cff69ccf0/wim|r");
+--        DisplayTutorial(L["Whisper Received!"], L["You received a whisper which was hidden due to your current activity. You can change how whispers behave in WIM's options by typing"].." |cff69ccf0/wim|r");
     end
 end
 

@@ -284,7 +284,7 @@ function Guild:GUILD_ROSTER_UPDATE()
         cleanChatList(self.guildWindow);
         local count = 0;
         for i=1, _G.GetNumGuildMembers() do 
-	    local name, rank, rankIndex, level, class, zone, note, officernote, online, status, classFileName = _G.GetGuildRosterInfo(i);
+	    local name, rank, rankIndex, level, class, zone, note, officernote, online, status, classFileName, achievementPoints, achievementRank, isMobile = _G.GetGuildRosterInfo(i);
 	    if(online) then
 		_G.GuildControlSetRank(rankIndex);
                 local guildchat_listen, guildchat_speak, officerchat_listen, officerchat_speak, promote, demote,
@@ -379,7 +379,7 @@ function Officer:GUILD_ROSTER_UPDATE()
         cleanChatList(self.officerWindow);
         local count = 0;
         for i=1, _G.GetNumGuildMembers() do 
-	    local name, rank, rankIndex, level, class, zone, note, officernote, online, status, classFileName = _G.GetGuildRosterInfo(i);
+	    local name, rank, rankIndex, level, class, zone, note, officernote, online, status, classFileName, achievementPoints, achievementRank, isMobile = _G.GetGuildRosterInfo(i);
             if(online) then
                 _G.GuildControlSetRank(rankIndex);
                 local guildchat_listen, guildchat_speak, officerchat_listen, officerchat_speak, promote, demote,

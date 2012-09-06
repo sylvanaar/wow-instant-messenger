@@ -157,7 +157,7 @@ local function onEnable()
                 end
             end
         end
-    DisplayTutorial(L["WIM (WoW Instant Messenger)"], L["WIM is currently running. To access WIM's wide array of options type:"].." |cff69ccf0/wim|r");
+--    DisplayTutorial(L["WIM (WoW Instant Messenger)"], L["WIM is currently running. To access WIM's wide array of options type:"].." |cff69ccf0/wim|r");
     dPrint("WIM is now enabled.");
     
     --Private Server Check
@@ -409,9 +409,9 @@ function WIM:BN_FRIEND_LIST_SIZE_CHANGED()
 	    local id, name = _G.BNGetFriendInfo(i);--in mop surname is removed and replaced by battletag and name & surname are combined into name
 	    if(name) then
 		env.cache[env.realm][env.character].friendList[name] = 2; --[set place holder for quick lookup
-		if(windows.active.whisper[name]) then
-		    windows.active.whisper[name]:SendWho();
-		end
+			if(windows.active.whisper[name]) then
+			    windows.active.whisper[name]:SendWho();
+			end
 	    end
 	end
     lists.friends = env.cache[env.realm][env.character].friendList;

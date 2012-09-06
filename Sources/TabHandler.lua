@@ -478,7 +478,7 @@ local function createTabGroup()
             local oldCustomSize = win.customSize;
             local inFocus = EditBoxInFocus and EditBoxInFocus:GetParent().tabStrip == self and true or false;
             win.customSize = true;
-            DisplayTutorial(L["Manipulating Tabs"], L["You can <Shift-Click> a tab and drag it out into it's own window."]);
+ --           DisplayTutorial(L["Manipulating Tabs"], L["You can <Shift-Click> a tab and drag it out into it's own window."]);
             
             if(oldWin and oldWin ~= win) then
                 local oW, oH, oL, oT, oA = oldWin:GetWidth(), oldWin:GetHeight(), oldWin:GetLeft(), oldWin:SafeGetTop(), oldWin:GetAlpha();

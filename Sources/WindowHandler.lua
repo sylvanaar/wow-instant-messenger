@@ -267,7 +267,7 @@ resizeFrame:SetScript("OnMouseUp", function(self)
 		if(tabStrip) then
 			dPrint("Size sent to tab strip.");
 		end
-                DisplayTutorial(L["Window Resized!"], L["If you want all windows to be this size, you can set the default window size within WIM's options."]);
+--                DisplayTutorial(L["Window Resized!"], L["If you want all windows to be this size, you can set the default window size within WIM's options."]);
 	end);
 resizeFrame:SetScript("OnHide", function(self)
                 if(self.parentWindow and self.isSizing) then
@@ -1010,11 +1010,11 @@ local function instantiateWindow(obj)
 				for i=1, #WindowSoupBowl.windows do
 					count = WindowSoupBowl.windows[i].obj:IsShown() and count + 1 or count;
 				end
-				if(count > 1) then
+--[[				if(count > 1) then
 					DisplayTutorial(L["Creating Tab Groups"], L["You can group two or many windows together by <Shift-Clicking> a window and dragging it on top of another."]);
 				else
 					DisplayTutorial(L["Resizing Windows"], L["You can resize a window by holding <Shift> and dragging the bottom right corner of the window."]);
-				end
+				end--]]
 		end
 	else
 		-- execute pop rules.
@@ -1668,7 +1668,7 @@ RegisterWidgetTrigger("close", "whisper,chat,w2w,demo", "OnClick", function(self
                         self.forceShift = false;
 			destroyWindow(self:GetParent());
 		else
-			DisplayTutorial(L["Message Window Hidden"], L["WIM's message window has been hidden to WIM's Minimap Icon. If you want to end a conversation, you may do so by <Shift-Clicking> the close button."]);
+--			DisplayTutorial(L["Message Window Hidden"], L["WIM's message window has been hidden to WIM's Minimap Icon. If you want to end a conversation, you may do so by <Shift-Clicking> the close button."]);
 			self:GetParent():Hide(true);
 		end
 	end);
@@ -1856,7 +1856,7 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseUp", function(self,
                                 if(button == "RightButton") then
                                                 PopContextMenu("MENU_MSGBOX", self);
                                 else
-                                                DisplayTutorial(L["Right-Mouse Click!"], L["There might be useful tools hidden under the message box. Right-Click to see them!"]);
+ --                                               DisplayTutorial(L["Right-Mouse Click!"], L["There might be useful tools hidden under the message box. Right-Click to see them!"]);
                                 end
                 end);
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseDown", function(self, button)
