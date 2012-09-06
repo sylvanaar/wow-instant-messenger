@@ -20,7 +20,7 @@ addEntry("3.6.1", "10/27/2010", [[
     *Fixed a lua error that could occur if you try to /r a tell when you weren't whispered.
     *Fixed for party chat not working through WIM
     *Disabled out of date tutorial frame until it's updated. all it does is spam lua errors if it's on.
-    *Fixed sub section anchoring on the Whisper History section. (ie, no more overlapping sections)
+    *Fixed 2 out of the 3 anchoring problems. 1 is left but it's less severe at least.
 ]]);
 
 addEntry("3.6.0", "9/03/2012", [[

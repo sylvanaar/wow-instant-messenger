@@ -883,7 +883,7 @@ local function General_Credits()
     frame.menu.createdBy = frame.menu:CreateSection("|cff69ccf0"..L["Created By:"].."|r", credits[1]);
     frame.menu.nextOffSetY = -20;
     
-    frame.menu.createdBy = frame.menu:CreateSection("|cff69ccf0"..L["Special Thanks:"].."|r", credits[2]);
+    frame.menu.createdBy2 = frame.menu.createdBy:CreateSection("|cff69ccf0"..L["Special Thanks:"].."|r", credits[2]);
     
     return frame;
 end
