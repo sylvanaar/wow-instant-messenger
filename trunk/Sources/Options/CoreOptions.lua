@@ -56,11 +56,11 @@ local function General_Main()
     frame.welcome:CreateCheckButton(L["Force sounds when game sound is disabled."], db.sounds, "force_game_sound");
     frame.welcome.nextOffSetY = -25;
     
-    frame.welcome.cb3 = frame.welcome:CreateCheckButton(L["Display Tutorials"], WIM.modules.Tutorials, "enabled", nil, function(self, button) EnableModule("Tutorials", self:GetChecked()); end);
-    frame.welcome.reset = frame.welcome:CreateButton(L["Reset Tutorials"], function() db.shownTutorials = {}; end);
-    frame.welcome.reset:ClearAllPoints();
-    frame.welcome.reset:SetPoint("LEFT", frame.welcome.cb3, "RIGHT", frame.welcome.cb2.text:GetStringWidth()+30, 0);
-    frame.welcome.lastObj = frame.welcome.cb3;
+--    frame.welcome.cb3 = frame.welcome:CreateCheckButton(L["Display Tutorials"], WIM.modules.Tutorials, "enabled", nil, function(self, button) EnableModule("Tutorials", self:GetChecked()); end);
+--    frame.welcome.reset = frame.welcome:CreateButton(L["Reset Tutorials"], function() db.shownTutorials = {}; end);
+--    frame.welcome.reset:ClearAllPoints();
+--    frame.welcome.reset:SetPoint("LEFT", frame.welcome.cb3, "RIGHT", frame.welcome.cb2.text:GetStringWidth()+30, 0);
+--    frame.welcome.lastObj = frame.welcome.cb3;
     return frame;
 end
 
@@ -713,10 +713,9 @@ local function General_History(isChat)
     f.sub.chat:Disable();
     f.sub.lastObj = f.sub.whispers;]]
     
-    f.maint = f:CreateSection(L["Maintenance"], L["Allowing your history logs to grow too large will affect the game's performance, therefore it is reccomended that you use the following options."]);
-    f.maint:ClearAllPoints();
-    f.maint:SetFullSize();
-    f.maint:SetPoint("BOTTOM", 0, 10);
+    f.sub.maint = f.sub:CreateSection(L["Maintenance"], L["Allowing your history logs to grow too large will affect the game's performance, therefore it is reccomended that you use the following options."]);
+    f.sub.maint:SetFullSize();
+    f.sub.maint:SetPoint("BOTTOM", 0, 10);
     local countList = {100, 200, 500, 1000};
     tsList = {};
     for i=1, #countList do
@@ -726,9 +725,9 @@ local function General_History(isChat)
             justifyH = "LEFT",
         });
     end
-    f.maint.nextOffSetY = -10;
-    f.maint:CreateCheckButtonMenu(L["Save a maximum number of messages per person."], historyDB, "maxPer", nil, nil, tsList, db.history, "maxCount");
-    --f.maint.nextOffSetY = -10;
+    f.sub.maint.nextOffSetY = -10;
+    f.sub.maint:CreateCheckButtonMenu(L["Save a maximum number of messages per person."], historyDB, "maxPer", nil, nil, tsList, db.history, "maxCount");
+    --f.sub.maint.nextOffSetY = -10;
     local tsList2 = {};
     for i=1, 5 do
         table.insert(tsList2, {
@@ -737,7 +736,7 @@ local function General_History(isChat)
             justifyH = "LEFT",
         });
     end
-    f.maint:CreateCheckButtonMenu(L["Automatically delete old messages."], historyDB, "ageLimit", nil, nil, tsList2, db.history, "maxAge");
+    f.sub.maint:CreateCheckButtonMenu(L["Automatically delete old messages."], historyDB, "ageLimit", nil, nil, tsList2, db.history, "maxAge");
     return f;
 end
 

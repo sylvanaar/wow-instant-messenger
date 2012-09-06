@@ -226,7 +226,7 @@ function Module:VersionCheck(versionData)
         if(not alreadyAlerted and tonumber(isBeta) == 0) then
             -- there is a newer version
             alreadyAlerted = true;
-            DisplayTutorial(L["WIM Update Available!"], _G.format(L["There is a newer version of WIM available for download. You can download it at %s."], "|cff69ccf0WIMAddon.com|r"))
+--            DisplayTutorial(L["WIM Update Available!"], _G.format(L["There is a newer version of WIM available for download. You can download it at %s."], "|cff69ccf0WIMAddon.com|r"))
         end
         return 1;
     elseif(diff < 0) then

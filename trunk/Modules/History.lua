@@ -92,8 +92,8 @@ local function createWidget()
         self.parentWindow.isHistory = isHistory;
         if(isHistory and modules.History.enabled) then
             self:SetAlpha(1);
-            DisplayTutorial(L["WIM History Button"], _G.format(L["Clicking the %s button on the message window will show that user's history in WIM's History Viewer."],
-                    "|T"..GetSelectedSkin().message_window.widgets.history.NormalTexture..":0:0:0:0|t"));
+  --          DisplayTutorial(L["WIM History Button"], _G.format(L["Clicking the %s button on the message window will show that user's history in WIM's History Viewer."],
+  --                  "|T"..GetSelectedSkin().message_window.widgets.history.NormalTexture..":0:0:0:0|t"));
         else
             self:SetAlpha(0);
         end
@@ -1361,7 +1361,7 @@ function ShowHistoryViewer(user)
         HistoryViewer.nav:Show();
         HistoryViewer.UpdateUserList();
         HistoryViewer:SelectConvo(user);
-        DisplayTutorial(L["WIM History Viewer"], L["WIM History Viewer can be accessed any time by typing:"].." \n|cff69ccf0/wim history|r");
+ --       DisplayTutorial(L["WIM History Viewer"], L["WIM History Viewer can be accessed any time by typing:"].." \n|cff69ccf0/wim history|r");
     end
     HistoryViewer:Show();
 end
