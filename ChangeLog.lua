@@ -16,7 +16,7 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addEntry("3.6.1", "10/27/2010", [[
+addEntry("3.6.1", "9/6/2012", [[
     *Fixed a lua error that could occur if you try to /r a tell when you weren't whispered.
     *Fixed for party chat not working through WIM
     *Disabled out of date tutorial frame until it's updated. all it does is spam lua errors if it's on.

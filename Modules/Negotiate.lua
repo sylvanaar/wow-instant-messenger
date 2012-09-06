@@ -136,8 +136,8 @@ function Module:GUILD_ROSTER_UPDATE()
         --negotiate with new only
         local token = _G.GetTime();
         for i=1, _G.GetNumGuildMembers() do 
-	    local name, _, _, _, _, _, _, _, online, _, _ = _G.GetGuildRosterInfo(i);
-	    if(name and online and shouldNegotiate("guild", name, token)) then
+	    local name, _, _, _, _, _, _, _, online, _, _, _, _, isMobile = _G.GetGuildRosterInfo(i);
+	    if not isMobile and (name and online and shouldNegotiate("guild", name, token)) then
 		Negotiate("WHISPER", name);
 	    end
 	end
@@ -146,8 +146,8 @@ function Module:GUILD_ROSTER_UPDATE()
         --build cache
         local token = _G.GetTime();
         for i=1, _G.GetNumGuildMembers() do 
-	    local name, _, _, _, _, _, _, _, online, _, _ = _G.GetGuildRosterInfo(i);
-	    if(name and online and shouldNegotiate("guild", name, token)) then
+	    local name, _, _, _, _, _, _, _, online, _, _, _, _, isMobile = _G.GetGuildRosterInfo(i);
+	    if (name and online and shouldNegotiate("guild", name, token)) then
 		-- do nothing, we're broadcasting...
 	    end
 	end
