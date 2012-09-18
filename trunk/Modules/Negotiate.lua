@@ -72,8 +72,8 @@ local function tagToModuleName(tag)
     end
 end
 
-local function shouldNegotiate(tag, user, token)
-    if(not user) then
+local function shouldNegotiate(tag, user, token, isMobile)
+    if (not user) or isMobile then
         return;
     end
     local cache = getCache(tag);
@@ -136,21 +136,21 @@ function Module:GUILD_ROSTER_UPDATE()
         --negotiate with new only
         local token = _G.GetTime();
         for i=1, _G.GetNumGuildMembers() do 
-	    local name, _, _, _, _, _, _, _, online, _, _, _, _, isMobile = _G.GetGuildRosterInfo(i);
-	    if not isMobile and (name and online and shouldNegotiate("guild", name, token)) then
-		Negotiate("WHISPER", name);
-	    end
-	end
+			local name, _, _, _, _, _, _, _, online, _, _, _, _, isMobile = _G.GetGuildRosterInfo(i);
+			if name and online and shouldNegotiate("guild", name, token, isMobile) then
+				Negotiate("WHISPER", name);
+			end
+		end
         cleanCachebyToken("guild", token);
     else
         --build cache
         local token = _G.GetTime();
         for i=1, _G.GetNumGuildMembers() do 
-	    local name, _, _, _, _, _, _, _, online, _, _, _, _, isMobile = _G.GetGuildRosterInfo(i);
-	    if (name and online and shouldNegotiate("guild", name, token)) then
-		-- do nothing, we're broadcasting...
-	    end
-	end
+			local name, _, _, _, _, _, _, _, online, _, _, _, _, isMobile = _G.GetGuildRosterInfo(i);
+			if name and online and shouldNegotiate("guild", name, token, isMobile) then
+				-- do nothing, we're broadcasting...
+			end
+		end
         Negotiate("GUILD");
     end
 end
