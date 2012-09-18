@@ -15,7 +15,7 @@
     <Script file="TabManagement.lua"/>
     <Script file="History.lua"/>
     <Script file="ldb.lua"/>
-    <Script file="Negotiate.lua"/>
+<!--    <Script file="Negotiate.lua"/>-->
 <!--    <Script file="W2W.lua"/>-->
 <!--    <Script file="W2Wv2.lua"/>-->
     <Script file="Expose.lua"/>
