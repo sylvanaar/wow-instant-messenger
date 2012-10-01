@@ -788,7 +788,7 @@ local function createFilterFrame()
             end
             win:Hide();
         end);
-    win.cancel = CreateFrame("Button", win:GetName().."Cancel", win, "UIPanelButtonTemplate2");
+    win.cancel = CreateFrame("Button", win:GetName().."Cancel", win, "UIPanelButtonTemplate");
     win.cancel:SetPoint("TOPRIGHT", win.save, "TOPLEFT", -10, 0);
     win.cancel.text = _G[win.cancel:GetName().."Text"];
     win.cancel.text:SetText(L["Cancel"]);
