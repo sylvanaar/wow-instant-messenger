@@ -109,7 +109,7 @@ local WIM_ClassicSkin = {
             close = {
                 state_hide = {
                     NormalTexture = "Interface\\Minimap\\UI-Minimap-MinimizeButtonDown-Up",
-                    PushedTexture = "Interface\\Minimap\\UI-Panel-MinimizeButtonDown-Down",
+                    PushedTexture = "Interface\\Minimap\\UI-Minimap-MinimizeButtonDown-Down",
                     HighlightTexture = "Interface\\Buttons\\UI-Panel-MinimizeButton-Highlight",
                     HighlightAlphaMode = "ADD"
                 },

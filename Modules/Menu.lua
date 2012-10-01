@@ -73,7 +73,8 @@ end
 local function createButton(parent)
     buttonCount = buttonCount + 1;
     local button = CreateFrame("Button", "WIM3MenuButton"..buttonCount, parent, "UIPanelButtonTemplate");
-    button:SetNormalTexture(nil); button:SetPushedTexture(nil); button:SetDisabledTexture(nil); button:SetHighlightTexture(nil);
+    local bgtex = "Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\Menu_bg"
+    button:SetNormalTexture(bgtex); button:SetPushedTexture(bgtex); button:SetDisabledTexture(bgtex); button:SetHighlightTexture(bgtex);
     button:SetHighlightTexture("Interface\\QuestFrame\\UI-QuestLogTitleHighlight", "ADD");
     button:GetHighlightTexture():SetVertexColor(.196, .388, .8);
     button:SetHeight(20);
