@@ -128,6 +128,7 @@ WIM.AddLocale("enUS", {
     ["Warlock"] = true,
     ["Warrior"] = true,
     ["Death Knight"] = true,
+    ["Monk"] = true,
     
     -- Female Class Names --
     ["DruidF"] = "Druid",
@@ -140,6 +141,7 @@ WIM.AddLocale("enUS", {
     ["WarlockF"] = "Warlock",
     ["WarriorF"] = "Warrior",
     ["Death KnightF"] = "Death Knight",
+    ["MonkF"] = true,
     
     ["Game Master"] = true,
     
@@ -407,6 +409,7 @@ WIM.AddLocale("enUS", {
     ["Balance"] = true,
     ["Beast Mastery"] = true,
     ["Blood"] = true,
+    ["Brewmaster"] = true,
     ["Combat"] = true,
     ["Demonology"] = true,
     ["Destruction"] = true,
@@ -417,9 +420,11 @@ WIM.AddLocale("enUS", {
     ["Fire"] = true,
     ["Frost"] = true,
     ["Fury"] = true,
+    ["Guardian"] = true,
     ["Holy"] = true,
     ["Hybrid"] = true,
     ["Marksmanship"] = true,
+    ["Mistweaver"] = true,
     ["Protection"] = true,
     ["Restoration"] = true,
     ["Retribution"] = true,
@@ -427,6 +432,7 @@ WIM.AddLocale("enUS", {
     ["Subtlety"] = true,
     ["Survival"] = true,
     ["Unholy"] = true,
+    ["Windwalker"] = true,
     
     -- ChangeLog.lua --
     ["Change Log"] = true,

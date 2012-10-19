@@ -16,7 +16,7 @@ local classes = constants.classes;
 
 local classList = {
      "Druid", "Hunter", "Mage", "Paladin", "Priest", "Rogue",
-     "Shaman", "Warlock", "Warrior",  "Death Knight"
+     "Shaman", "Warlock", "Warrior",  "Death Knight", "Monk"
 };
 
 constants.classListEng = classList;
@@ -25,7 +25,7 @@ constants.classListEng = classList;
 classes[L["Druid"]]	= {
                               color = "ff7d0a",
                               tag = "DRUID",
-                              talent = {L["Balance"], L["Feral Combat"], L["Restoration"]}
+                              talent = {L["Balance"], L["Feral Combat"], L["Guardian"], L["Restoration"]}
                          };
 classes[L["Hunter"]]	= {
                               color = "abd473",
@@ -71,6 +71,11 @@ classes[L["Death Knight"]] = {
                               color = "c41f3b",
                               tag = "DEATHKNIGHT",
                               talent = {L["Blood"], L["Frost"], L["Unholy"]}
+                         };
+classes[L["Monk"]]		= {
+                              color = "00ff96",
+                              tag = "MONK",
+                              talent = {L["Brewmaster"], L["Windwalker"], L["Mistweaver"]}
                          };
 classes[L["Game Master"]] = {
                               color = "00c0ff",
