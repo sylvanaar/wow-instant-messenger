@@ -1775,9 +1775,9 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w,demo", "OnMouseUp", func
                         end
                 end
 	end);
+_G.FOO = nil;
 
-
-RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkClick", function(self, ...) _G.SetItemRef(...); end);
+RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkClick", function(self, link, text, button) _G.SetItemRef(link, text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""), button, self); end);
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w","OnMessageScrollChanged", function(self) updateScrollBars(self:GetParent()); end);
 
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkEnter", function(self, link)
@@ -1907,7 +1907,7 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
                                 color = constants.classes[win.bn.class].color
                                 color = string.len(color) == 6 and color or nil;
                         end
-			return applyBracket().."|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and color and "|cff"..color..arg2.."|r" or arg2).."|h"..applyBracket(2)..": "..arg1;
+			return applyBracket().."|HBNplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and color and "|cff"..color..arg2.."|r" or arg2).."|h"..applyBracket(2)..": "..arg1;
 		elseif(event == "CHAT_MSG_BN_WHISPER_INFORM") then
                         arg11 = arg11 or 0;
 			return applyBracket().."|Hplayer:".._G.UnitName("player")..":"..arg11.."|h"..(db.coloredNames and constants.classes.GetMyColoredName() or _G.UnitName("player")).."|h"..applyBracket(2)..": "..arg1;

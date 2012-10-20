@@ -666,7 +666,7 @@ local function instantiateMessageWindowObj(obj)
     chat_display:SetScript("OnDragStart", function() MessageWindow_MovementControler_OnDragStart(); end);
     chat_display:SetScript("OnDragStop", function() MessageWindow_MovementControler_OnDragStop(); end);
     chat_display:SetScript("OnMouseWheel", MessageWindow_ScrollingMessageFrame_OnMouseWheel);
-    chat_display:SetScript("OnHyperlinkClick", function() ChatFrame_OnHyperlinkShow(arg1, arg2, arg3); end);
+    chat_display:SetScript("OnHyperlinkClick", function(...) ChatFrame_OnHyperlinkShow(...); end);
     chat_display:SetScript("OnMessageScrollChanged", function() WIM_UpdateScrollBars(this); end);
     chat_display:SetScript("OnMouseDown", MessageWindow_ScrollingMessageFrame_OnMouseDown);
     chat_display:SetScript("OnMouseUp", MessageWindow_ScrollingMessageFrame_OnMouseUp);
