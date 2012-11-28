@@ -454,6 +454,7 @@ end
 
 function Party:OnDisable()
     self:UnregisterChatEvent("CHAT_MSG_PARTY");
+    self:UnregisterChatEvent("CHAT_MSG_PARTY_LEADER");
 end
 
 function Party:OnWindowDestroyed(self)
