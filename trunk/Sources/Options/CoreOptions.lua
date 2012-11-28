@@ -700,7 +700,7 @@ local function General_History(isChat)
         f.sub.col2 = f.sub:CreateCheckButton(_G.SAY, historyDB, "say");
         f.sub.col2:ClearAllPoints();
         f.sub.col2:SetPoint("TOPLEFT", f.sub.col1, 200, 0);
-        f.sub:CreateCheckButton(_G.BATTLEGROUND, historyDB, "battleground");
+        f.sub:CreateCheckButton(_G.INSTANCE_CHAT, historyDB, "battleground");
         f.sub:CreateCheckButton(L["World Chat"], historyDB, "world");
         f.sub:CreateCheckButton(L["Custom Chat"], historyDB, "custom");
     end
@@ -825,8 +825,8 @@ local function General_Sounds(isChat)
         f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.PARTY), db.sounds.chat, "party", nil, nil, soundList[4], db.sounds.chat, "party_sml");
         f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.RAID), db.sounds.chat, "raid", nil, nil, soundList[5], db.sounds.chat, "raid_sml");
         f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.RAID_LEADER), db.sounds.chat, "raidleader", nil, nil, soundList[6], db.sounds.chat, "raidleader_sml");
-        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.BATTLEGROUND), db.sounds.chat, "battleground", nil, nil, soundList[5], db.sounds.chat, "battleground_sml");
-        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.BATTLEGROUND_LEADER), db.sounds.chat, "battlegroundleader", nil, nil, soundList[6], db.sounds.chat, "battleground_sml");
+        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.INSTANCE_CHAT), db.sounds.chat, "battleground", nil, nil, soundList[5], db.sounds.chat, "battleground_sml");
+        f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.INSTANCE_CHAT_LEADER), db.sounds.chat, "battlegroundleader", nil, nil, soundList[6], db.sounds.chat, "battleground_sml");
         f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(_G.SAY), db.sounds.chat, "say", nil, nil, soundList[7], db.sounds.chat, "say_sml");
         f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(L["World Chat"]), db.sounds.chat, "world", nil, nil, soundList[8], db.sounds.chat, "world_sml");
         f.sub.chat:CreateCheckButtonMenu(L["Play special sound for %s."]:format(L["Custom Chat"]), db.sounds.chat, "custom", nil, nil, soundList[9], db.sounds.chat, "custom_sml");

@@ -1916,7 +1916,7 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
                         return _G.format(L["%s does not wish to be disturbed: %s"], applyBracket().."|Hplayer:"..arg2..":"..arg11.."|h"..arg2.."|h"..applyBracket(2), arg1);
                 elseif(event == "CHAT_MSG_GUILD" or event == "CHAT_MSG_OFFICER" or event == "CHAT_MSG_PARTY" or
                                 event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_SAY" or event == "CHAT_MSG_PARTY_LEADER" or
-                                event == "CHAT_MSG_CHANNEL" or event == "CHAT_MSG_BATTLEGROUND" or event == "CHAT_MSG_BATTLEGROUND_LEADER" or event == "CHAT_MSG_BN_CONVERSATION") then
+                                event == "CHAT_MSG_CHANNEL" or event == "CHAT_MSG_INSTANCE_CHAT" or event == "CHAT_MSG_INSTANCE_CHAT_LEADER" or event == "CHAT_MSG_BN_CONVERSATION") then
                         return applyBracket().."|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and doColoredNames(event, ...) or arg2).."|h"..applyBracket(2)..": "..arg1;
                 elseif(event == "CHAT_MSG_RAID_WARNING") then
                         return _G.RAID_WARNING.." "..applyBracket().."|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and doColoredNames(event, ...) or arg2).."|h"..applyBracket(2)..": "..arg1;
