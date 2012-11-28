@@ -156,9 +156,9 @@ function ChatSounds:PostEvent_ChatMessage(event, ...)
                 playSound(db.sounds.chat.raidleader_sml);
             elseif(d.raid and (event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER")) then
                 playSound(db.sounds.chat.raid_sml);
-            elseif(d.raid and event == "CHAT_MSG_BATTLEGROUND_LEADER") then
+            elseif(d.raid and event == "CHAT_MSG_INSTANCE_CHAT_LEADER") then
                 playSound(db.sounds.chat.battlegroundleader_sml);    
-            elseif(d.raid and (event == "CHAT_MSG_BATTLEGROUND" or event == "CHAT_MSG_BATTLEGROUND_LEADER")) then
+            elseif(d.raid and (event == "CHAT_MSG_INSTANCE_CHAT" or event == "CHAT_MSG_INSTANCE_CHAT_LEADER")) then
                 playSound(db.sounds.chat.battleground_sml);    
             elseif(d.say and event == "CHAT_MSG_SAY") then
                 playSound(db.sounds.chat.say_sml);
