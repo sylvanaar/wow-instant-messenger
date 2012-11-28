@@ -33,7 +33,7 @@ local WHO_LIST = {};
 
 Module:RegisterEvent("FRIENDLIST_UPDATE");
 Module:RegisterEvent("GUILD_ROSTER_UPDATE");
-Module:RegisterEvent("PARTY_MEMBERS_CHANGED");
+Module:RegisterEvent("GROUP_ROSTER_UPDATE");
 Module:RegisterEvent("CHAT_MSG_SYSTEM");
 
 
@@ -133,30 +133,30 @@ end
 
 function Module:GUILD_ROSTER_UPDATE()
     if(isCache("guild")) then
-        --negotiate with new only
-        local token = _G.GetTime();
-        for i=1, _G.GetNumGuildMembers() do 
-			local name, _, _, _, _, _, _, _, online, _, _, _, _, isMobile = _G.GetGuildRosterInfo(i);
-			if name and online and shouldNegotiate("guild", name, token, isMobile) then
-				Negotiate("WHISPER", name);
-			end
-		end
-        cleanCachebyToken("guild", token);
+      -- negotiate with new only
+      local token = _G.GetTime();
+      for i=1, _G.GetNumGuildMembers() do 
+			  local name, _, _, _, _, _, _, _, online, _, _, _, _, isMobile = _G.GetGuildRosterInfo(i);
+			  if name and online and shouldNegotiate("guild", name, token, isMobile) then
+				  Negotiate("WHISPER", name);
+			  end
+		  end
+      cleanCachebyToken("guild", token);
     else
-        --build cache
-        local token = _G.GetTime();
-        for i=1, _G.GetNumGuildMembers() do 
-			local name, _, _, _, _, _, _, _, online, _, _, _, _, isMobile = _G.GetGuildRosterInfo(i);
-			if name and online and shouldNegotiate("guild", name, token, isMobile) then
-				-- do nothing, we're broadcasting...
-			end
-		end
-        Negotiate("GUILD");
+      --build cache
+      local token = _G.GetTime();
+      for i=1, _G.GetNumGuildMembers() do 
+			  local name, _, _, _, _, _, _, _, online, _, _, _, _, isMobile = _G.GetGuildRosterInfo(i);
+			  if name and online and shouldNegotiate("guild", name, token, isMobile) then
+				  -- do nothing, we're broadcasting...
+			  end
+		  end
+      Negotiate("GUILD");
     end
 end
 
-function Module:PARTY_MEMBERS_CHANGED()
-    if(_G.GetNumRaidMembers() > 0) then
+function Module:GROUP_ROSTER_UPDATE()
+    if(_G.IsInRaid()) then
         if(isCache("raid")) then
             --negotiate with new only
             local token = _G.GetTime();
@@ -183,7 +183,7 @@ function Module:PARTY_MEMBERS_CHANGED()
             Negotiate("RAID");
             cleanCachebyToken("raid", token);
         end
-    else
+    elseif (_G.IsInGroup())
         if(isCache("party")) then
             --negotiate with new only
             local token = _G.GetTime();

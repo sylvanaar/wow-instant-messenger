@@ -449,7 +449,7 @@ function Party:OnEnable()
     RegisterWidget("chat_info", createWidget_Chat);
     self:RegisterChatEvent("CHAT_MSG_PARTY");
     self:RegisterChatEvent("CHAT_MSG_PARTY_LEADER");
-    self:RegisterEvent("PARTY_MEMBERS_CHANGED");
+    self:RegisterEvent("GROUP_ROSTER_UPDATE");
 end
 
 function Party:OnDisable()
@@ -468,14 +468,14 @@ function Party:OnWindowDestroyed(self)
     end
 end
 
-function Party:PARTY_MEMBERS_CHANGED()
+function Party:GROUP_ROSTER_UPDATE()
     if(Party.partyWindow) then
         cleanChatList(self.partyWindow);
         local myName = _G.UnitName("player");
         table.insert(self.partyWindow.chatList, myName);
         local count = 0;
         for i=1, 4 do
-            if _G.UnitExists and _G.UnitExists("party"..i) or UnitExists and UnitExists("party"..i) then--Strange work around but comments say it fixes the problems
+            if _G.UnitExists("party"..i) then
                 count = count + 1;
                 local name = _G.UnitName("party"..i);
                 table.insert(self.partyWindow.chatList, name);
@@ -504,7 +504,7 @@ function Party:CHAT_MSG_PARTY(...)
     local color = _G.ChatTypeInfo["PARTY"];
     Party.partyWindow = win;
     if(not self.chatLoaded) then
-        Party:PARTY_MEMBERS_CHANGED();
+        Party:GROUP_ROSTER_UPDATE();
     end
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
@@ -541,7 +541,7 @@ function Party:CHAT_MSG_PARTY_LEADER(...)
     local color = _G.ChatTypeInfo["PARTY_LEADER"];
     self.raidWindow = win;
     if(not self.chatLoaded) then
-        Party:PARTY_MEMBERS_CHANGED();
+        Party:GROUP_ROSTER_UPDATE();
     end
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
@@ -575,7 +575,7 @@ function Raid:OnEnable()
     self:RegisterChatEvent("CHAT_MSG_RAID");
     self:RegisterChatEvent("CHAT_MSG_RAID_LEADER");
     self:RegisterChatEvent("CHAT_MSG_RAID_WARNING");
-    self:RegisterEvent("PARTY_MEMBERS_CHANGED");
+    self:RegisterEvent("GROUP_ROSTER_UPDATE");
 end
 
 function Raid:OnDisable()
@@ -595,7 +595,7 @@ function Raid:OnWindowDestroyed(self)
     end
 end
 
-function Raid:PARTY_MEMBERS_CHANGED()
+function Raid:GROUP_ROSTER_UPDATE()
     if(Raid.raidWindow) then
         cleanChatList(self.raidWindow);
         local count = 0;
@@ -629,7 +629,7 @@ function Raid:CHAT_MSG_RAID(...)
     local color = _G.ChatTypeInfo["RAID"];
     self.raidWindow = win;
     if(not self.chatLoaded) then
-        Raid:PARTY_MEMBERS_CHANGED();
+        Raid:GROUP_ROSTER_UPDATE();
     end
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
@@ -666,7 +666,7 @@ function Raid:CHAT_MSG_RAID_LEADER(...)
     local color = _G.ChatTypeInfo["RAID_LEADER"];
     self.raidWindow = win;
     if(not self.chatLoaded) then
-        Raid:PARTY_MEMBERS_CHANGED();
+        Raid:GROUP_ROSTER_UPDATE();
     end
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
@@ -703,7 +703,7 @@ function Raid:CHAT_MSG_RAID_WARNING(...)
     local color = _G.ChatTypeInfo["RAID_WARNING"];
     self.raidWindow = win;
     if(not self.chatLoaded) then
-        Raid:PARTY_MEMBERS_CHANGED();
+        Raid:GROUP_ROSTER_UPDATE();
     end
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);

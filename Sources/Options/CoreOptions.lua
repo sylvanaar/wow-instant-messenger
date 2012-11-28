@@ -649,7 +649,7 @@ local function Whispers_Filters(isChat)
     for i=1, filterListCount do
         frame.list:createButton();
     end
-    frame.nextOffSetY = -5;
+    frame.nextOffSetY = 20;
     frame.add = frame:CreateButton(L["Add Filter"], function(self) ShowFilterFrame(nil, nil, isChat); end);
     frame.edit = frame:CreateButton(L["Edit Filter"], function(self) ShowFilterFrame(filters[frame.list.selected], frame.list.selected, isChat); end);
     frame.edit:ClearAllPoints();
@@ -695,7 +695,7 @@ local function General_History(isChat)
         f.sub.col1 = f.sub:CreateCheckButton(_G.GUILD, historyDB, "guild");
         f.sub:CreateCheckButton(_G.GUILD_RANK1_DESC, historyDB, "officer");
         f.sub:CreateCheckButton(_G.PARTY, historyDB, "party");
-        f.sub:CreateCheckButton(_G.RAID, historyDB, "raid");
+        f.sub.col1row = f.sub:CreateCheckButton(_G.RAID, historyDB, "raid");
         
         f.sub.col2 = f.sub:CreateCheckButton(_G.SAY, historyDB, "say");
         f.sub.col2:ClearAllPoints();
@@ -714,8 +714,15 @@ local function General_History(isChat)
     f.sub.lastObj = f.sub.whispers;]]
     
     f.sub.maint = f.sub:CreateSection(L["Maintenance"], L["Allowing your history logs to grow too large will affect the game's performance, therefore it is reccomended that you use the following options."]);
-    f.sub.maint:SetFullSize();
-    f.sub.maint:SetPoint("BOTTOM", 0, 10);
+    if (isChat) then
+      f.sub.maint:ClearAllPoints();
+      f.sub.maint:SetPoint("LEFT",f.sub.col1);
+      f.sub.maint:SetPoint("RIGHT",f.sub);
+      f.sub.maint:SetPoint("TOP",f.sub.col1row,"BOTTOM", 0, -10);
+    else
+      f.sub.maint:SetFullSize();
+    end
+    f.sub.maint:SetPoint("BOTTOM",0,10);
     local countList = {100, 200, 500, 1000};
     tsList = {};
     for i=1, #countList do
