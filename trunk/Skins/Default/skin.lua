@@ -148,7 +148,7 @@ local WIM_ClassicSkin = {
                 }
             },
             chat_info = {
-                NormalTexture = "", -- by default we don't want a texture, but your skin is welcome to have one.
+                NormalTexture = nil, -- by default we don't want a texture, but your skin is welcome to have one.
                 PushedTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\w2w",
                 HighlightTexture = "Interface\\AddOns\\"..WIM.addonTocName.."\\Skins\\Default\\w2w",
                 HighlightAlphaMode = "ADD",
