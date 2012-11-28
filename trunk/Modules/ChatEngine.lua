@@ -922,15 +922,17 @@ function BNC:OnEnable()
     self.frame = self.frame or _G.CreateFrame("Frame");
     self.frame:Show();
     self.frame:SetScript("OnUpdate", function(self, elapsed)
-		for i=1, 10 do
-			if(_G.BNGetConversationInfo(i)) then
-				local winName = _G.format(_G.CONVERSATION_NAME, _G.MAX_WOW_CHAT_CHANNELS + i);
-				local win = getChatWindow(winName, "BN_CONVERSATION");
-				win.channelNumber = i;
-				win.channelIdentifier = winName;
+        if _G.BNFeaturesEnabledAndConnected ~= nil then
+			for i=1, 10 do
+				if(_G.BNGetConversationInfo(i)) then
+					local winName = _G.format(_G.CONVERSATION_NAME, _G.MAX_WOW_CHAT_CHANNELS + i);
+					local win = getChatWindow(winName, "BN_CONVERSATION");
+					win.channelNumber = i;
+					win.channelIdentifier = winName;
+				end
 			end
-		end
-	self:Hide();
+            self:Hide();
+        end
     end);
 end
 
