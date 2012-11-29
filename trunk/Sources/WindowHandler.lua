@@ -132,7 +132,7 @@ local FormattingCalls = {}; -- functions which are passed events to be formatted
 local StringModifiers = {}; -- registered functions which will be used to format the message part of the string.
 
 
---Window's Parent (Container for all Windows)
+-- Window's Parent (Container for all Windows)
 WindowParent = _G.CreateFrame("Frame", "WIM_UIParent", _G.UIParent);
                 WindowParent:SetFrameStrata("BACKGROUND");
                 WindowParent:SetPoint("BOTTOMLEFT", _G.UIParent, "BOTTOMLEFT", 0, 0);
@@ -140,9 +140,9 @@ WindowParent = _G.CreateFrame("Frame", "WIM_UIParent", _G.UIParent);
                                 WindowParent:SetWidth(_G.UIParent:GetWidth());
                                 WindowParent:SetHeight(_G.UIParent:GetHeight());
                 end);
-                --WindowParent.test = WindowParent:CreateTexture("BACKGROUND");
-                --WindowParent.test:SetTexture(1,1,1,.5)
-                --WindowParent.test:SetAllPoints();
+                -- WindowParent.test = WindowParent:CreateTexture("BACKGROUND");
+                -- WindowParent.test:SetTexture(1,1,1,.5)
+                -- WindowParent.test:SetAllPoints();
                 WindowParent:Hide();
 
 
@@ -241,7 +241,7 @@ resizeFrame.Attach = function(self, win)
 			self.parentWindow = win;
 			ApplySkinToWidget(self);
 			self:Show();
-			--resizeFrame:SetFrameLevel(999);
+			-- resizeFrame:SetFrameLevel(999);
 		else
                         self:Reset();
 			resizeFrame:Hide();
@@ -392,7 +392,7 @@ local function executeHandlers(WidgetName, wType, HandlerName, ...)
 	end
 end
 
---Returns object, SoupBowl_windows_index or nil if window can not be found.
+-- Returns object, SoupBowl_windows_index or nil if window can not be found.
 local function getWindowBy(userName)
     if(type(userName) ~= "string") then
         return nil;
@@ -405,7 +405,7 @@ local function getWindowBy(userName)
 end
 
 
---Clean up the frame's points and make sure the main point TOPLEFT,BOTTOMRIGHT is set
+-- Clean up the frame's points and make sure the main point TOPLEFT,BOTTOMRIGHT is set
 function cleanPoints(win)
                 local x, y;
                 for i = 1, win:GetNumPoints() do
@@ -441,9 +441,9 @@ local function setWindowAsFadedIn(obj)
 	end
 end
 
---------------------------------------
---       Widget Script Handlers     --
---------------------------------------
+-------------------------------------- 
+--       Widget Script Handlers     -- 
+-------------------------------------- 
 
 function updateScrollBars(parentWindow)
         if(parentWindow and parentWindow.widgets and parentWindow.widgets.chat_display) then
@@ -499,7 +499,7 @@ local function MessageWindow_Frame_OnShow(self)
         if(WindowParent.animUp) then
                 return;
         end
-                --_G.DEFAULT_CHAT_FRAME:AddMessage(_G.debugstack(1))
+                -- _G.DEFAULT_CHAT_FRAME:AddMessage(_G.debugstack(1))
         setWindowAsFadedIn(self);
         if(self ~= DemoWindow) then
                 updateScrollBars(self);
@@ -569,7 +569,7 @@ local function updateTracker(win)
                                                                 CallModuleFunction("OnWindowLeaveScreen", win, 4);
                                                 end
                                 else
-                                                --on screen
+                                                -- on screen
                                                 if(win.offScreen ~= 0) then
                                                                 CallModuleFunction("OnWindowEnterScreen", win);
                                                 end
@@ -648,14 +648,14 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
 	end
 end
 
---local function MessageWindow_MsgBox_OnMouseUp()
+-- local function MessageWindow_MsgBox_OnMouseUp()
 --    CloseDropDownMenus();
 --    if(arg1 == "RightButton") then
 --        WIM_MSGBOX_MENU_CUR_USER = this:GetParent().theUser;
 --        UIDropDownMenu_Initialize(WIM_MsgBoxMenu, WIM_MsgBoxMenu_Initialize, "MENU");
 --        ToggleDropDownMenu(1, nil, WIM_MsgBoxMenu, this, 0, 0);
 --    end
---end
+-- end
 
 
 
@@ -714,7 +714,7 @@ local function loadRegisteredWidgets(obj)
 				widgets[widget]:SetDefaults(); -- load defaults for this widget
 			end
 		end
-		--widgets[widget].parentWindow = obj;
+		-- widgets[widget].parentWindow = obj;
 		if(type(widgets[widget]) == "table") then
 			widgets[widget].parentWindow = obj;
 		end
@@ -808,12 +808,12 @@ local function instantiateWindow(obj)
     widgets.scroll_down.widgetName = "scroll_down";
     
     widgets.chat_display = CreateFrame("ScrollingMessageFrame", fName.."ScrollingMessageFrame", obj);
-    --widgets.chat_display:RegisterForDrag("LeftButton");
+    -- widgets.chat_display:RegisterForDrag("LeftButton");
     widgets.chat_display:SetFading(false);
     widgets.chat_display:SetMaxLines(128);
     widgets.chat_display:SetMovable(true);
-    --widgets.chat_display:SetScript("OnDragStart", function(self) MessageWindow_MovementControler_OnDragStart(self); end);
-    --widgets.chat_display:SetScript("OnDragStop", function(self) MessageWindow_MovementControler_OnDragStop(self); end);
+    -- widgets.chat_display:SetScript("OnDragStart", function(self) MessageWindow_MovementControler_OnDragStart(self); end);
+    -- widgets.chat_display:SetScript("OnDragStop", function(self) MessageWindow_MovementControler_OnDragStop(self); end);
     widgets.chat_display:SetJustifyH("LEFT");
     widgets.chat_display:EnableMouse(true);
     widgets.chat_display:EnableMouseWheel(1);
@@ -822,12 +822,12 @@ local function instantiateWindow(obj)
     widgets.msg_box = CreateFrame("EditBox", fName.."MsgBox", obj);
     widgets.msg_box:SetAutoFocus(false);
     widgets.msg_box:SetHistoryLines(32);
-    --widgets.msg_box:SetMaxLetters(255);
+    -- widgets.msg_box:SetMaxLetters(255);
     widgets.msg_box:SetAltArrowKeyMode(true);
     widgets.msg_box:EnableMouse(true);
     widgets.msg_box.widgetName = "msg_box";
     
-    --Addmessage functions
+    -- Addmessage functions
     obj.AddMessage = function(self, msg, ...)
 	msg = applyStringModifiers(msg, self.widgets.chat_display);
 	self.widgets.chat_display:AddMessage(msg, ...);
@@ -864,9 +864,9 @@ local function instantiateWindow(obj)
                 local classTag = obj.class;
                 icon:SetGradient("VERTICAL", 1, 1, 1, 1, 1, 1);
                 icon:SetTexture(GetSelectedSkin().message_window.widgets.class_icon.texture);
-                if(self.bn and self.bn.client == "S2") then
+                if(self.bn and self.bn.client == BNET_CLIENT_SC2) then
                                 classTag = "sc2";
-                elseif(self.bn and self.bn.client == "D3") then
+                elseif(self.bn and self.bn.client == BNET_CLIENT_D3) then
                                 classTag = "d3";
                 elseif(self.class == "") then
                 	classTag = "blank"
@@ -923,10 +923,10 @@ local function instantiateWindow(obj)
                 local id = _G.BNet_GetPresenceID(self.theUser);
                 if(id) then
                                 local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText, broadcastText, broadcastTime = _G.BNGetToonInfo(id);
-                                self.class = class;
-                                self.level = level;
-                                self.race = race;
-                                self.guild = guild;
+                                self.class = class or "";
+                                self.level = level or "";
+                                self.race = race or "";
+                                self.guild = guild or "";
                                 self.location = zoneName;
                                 self.bn.class = class;
                                 self.bn.level = level;
@@ -942,9 +942,11 @@ local function instantiateWindow(obj)
                                 self.bn.broadcastTime = broadcastTime;
                                 self.bn.hasFocus = hasFocus;
                                 self.bn.id = id;
-                                --self.widgets.from:SetText(self.theUser.." - "..toonName);
+                                -- self.widgets.from:SetText(self.theUser.." - "..toonName);
                                 self:UpdateIcon();
-                                self:UpdateCharDetails();
+                                if (client == BNET_CLIENT_WOW) then
+                                  self:UpdateCharDetails();
+                                end
                 else
                                 self:AddMessage(_G.BN_UNABLE_TO_RESOLVE_NAME, db.displayColors.errorMsg.r, db.displayColors.errorMsg.g, db.displayColors.errorMsg.b);
                 end
@@ -955,7 +957,7 @@ local function instantiateWindow(obj)
         			{
         				queue = whoLib.WHOLIB_QUEUE_QUIET, 
         				timeout = 0,
-        				--flags = whoLib.WHOLIB_FLAG_ALWAYS_CALLBACK,
+        				-- flags = whoLib.WHOLIB_FLAG_ALWAYS_CALLBACK,
         				callback = self.WhoCallback
         			});
                          if(result) then
@@ -992,13 +994,13 @@ local function instantiateWindow(obj)
 	if(forceResult == true) then
 		-- go by forceResult and ignore rules
 		if(self.tabStrip) then
-                                --if(not EditBoxInFocus) then
+                                -- if(not EditBoxInFocus) then
                                                 ShowContainer();
                                                 self.tabStrip:JumpToTab(self);
                                                 if(not getVisibleChatFrameEditBox() and (rules.autofocus or forceFocus)) then
                                                         self.widgets.msg_box:SetFocus();
                                                 end
-                                --end
+                                -- end
 		else
                                 ShowContainer();
 				self:ResetAnimation();
@@ -1014,7 +1016,7 @@ local function instantiateWindow(obj)
 					DisplayTutorial(L["Creating Tab Groups"], L["You can group two or many windows together by <Shift-Clicking> a window and dragging it on top of another."]);
 				else
 					DisplayTutorial(L["Resizing Windows"], L["You can resize a window by holding <Shift> and dragging the bottom right corner of the window."]);
-				end--]]
+				end-- ]]
 		end
 	else
 		-- execute pop rules.
@@ -1113,7 +1115,7 @@ local function instantiateWindow(obj)
 			a.initTop = self:SafeGetTop();
 			a.to = MinimapIcon or nil;
 			a.elapsed, a.time = 0, .5;
-                        a.scaleLimit = .001 --_G.math.max(_G.math.ceil((100-_G.UIParent:GetScale()*100)/2)/100 + .04, .01);
+                        a.scaleLimit = .001 -- _G.math.max(_G.math.ceil((100-_G.UIParent:GetScale()*100)/2)/100 + .04, .01);
 			a.mode = "HIDE"; -- this starts the animation
 			dPrint("Animation Started: "..self:GetName());
 		end
@@ -1146,7 +1148,7 @@ local function instantiateWindow(obj)
                 return self:GetBottom() - WindowParent:GetBottom();
     end
     
-    --enforce that all core widgets have parentWindow set.
+    -- enforce that all core widgets have parentWindow set.
 	local w;
 	for _, w in pairs(obj.widgets) do
 		w.parentWindow = obj;
@@ -1156,12 +1158,12 @@ local function instantiateWindow(obj)
     loadRegisteredWidgets(obj);
     loadHandlers(obj);
     
-    --local shortcuts = CreateFrame("Frame", fName.."ShortcutFrame", obj);
-    --shortcuts:SetToplevel(true);
-    --shortcuts:SetFrameStrata("DIALOG");
-    --for i=1,ShortcutCount do
+    -- local shortcuts = CreateFrame("Frame", fName.."ShortcutFrame", obj);
+    -- shortcuts:SetToplevel(true);
+    -- shortcuts:SetFrameStrata("DIALOG");
+    -- for i=1,ShortcutCount do
     --    CreateFrame("Button", fName.."ShortcutFrameButton"..i, shortcuts, "WIM_ShortcutButtonTemplate");
-    --end
+    -- end
 
 end
 
@@ -1243,15 +1245,15 @@ local function loadWindowDefaults(obj)
         placeWindow(obj);
 end
 
---Create (recycle if available) message window. Returns object.
+-- Create (recycle if available) message window. Returns object.
 -- (wtype == "whisper", "chat" or "w2w")
 local function createWindow(userName, wtype)
     if(type(userName) ~= "string") then
         return;
     end
-    --if(type(WIM:GetSelectedSkin()) ~= "table") then
+    -- if(type(WIM:GetSelectedSkin()) ~= "table") then
     --    WIM:LoadSkin(WIM.db.skin.selected, WIM.db.skin.style);
-    --end
+    -- end
     local func = function ()
                         if(WindowSoupBowl.available > 0) then
                             local i;
@@ -1266,7 +1268,7 @@ local function createWindow(userName, wtype)
                     end
     local obj, index = func();
     if(obj) then
-        --object available...
+        -- object available...
         WindowSoupBowl.available = WindowSoupBowl.available - 1;
         WindowSoupBowl.used = WindowSoupBowl.used + 1;
         WindowSoupBowl.windows[index].inUse = true;
@@ -1282,7 +1284,7 @@ local function createWindow(userName, wtype)
     else
         -- must create new object
         WindowSoupBowl.used = WindowSoupBowl.used + 1;
-        WindowSoupBowl.windowToken = WindowSoupBowl.windowToken + 1; --increment token for propper frame name creation.
+        WindowSoupBowl.windowToken = WindowSoupBowl.windowToken + 1; -- increment token for propper frame name creation.
         local fName = "WIM3_msgFrame"..WindowSoupBowl.windowToken;
         local f = CreateFrame("Frame",fName, WindowParent);
         local winTable = {
@@ -1296,7 +1298,7 @@ local function createWindow(userName, wtype)
         f.type = wtype;
         f.isParent = true;
         instantiateWindow(f);
-        --f.icon.theUser = userName;
+        -- f.icon.theUser = userName;
         loadWindowDefaults(f);
         dPrint("Window created '"..f:GetName().."'");
 	CallModuleFunction("OnWindowCreated", f);
@@ -1307,7 +1309,7 @@ local function createWindow(userName, wtype)
 end
 
 
---Returns object, SoupBowl_windows_index or nil if window can not be found.
+-- Returns object, SoupBowl_windows_index or nil if window can not be found.
 local function getWindowByName(userName)
     if(type(userName) ~= "string") then
         return nil;
@@ -1319,7 +1321,7 @@ local function getWindowByName(userName)
     end
 end
 
---Deletes message window and makes it available in the Soup Bowl.
+-- Deletes message window and makes it available in the Soup Bowl.
 local function destroyWindow(userNameOrObj)
     local obj, index;
     if(type(userNameOrObj) == "string") then
@@ -1336,9 +1338,9 @@ local function destroyWindow(userNameOrObj)
         WindowSoupBowl.windows[index].user = "";
         WindowSoupBowl.available = WindowSoupBowl.available + 1;
         WindowSoupBowl.used = WindowSoupBowl.used - 1;
-        --WIM_Astrolabe:RemoveIconFromMinimap(obj.icon);
-        --obj.icon:Hide();
-        --obj.icon.track = false;
+        -- WIM_Astrolabe:RemoveIconFromMinimap(obj.icon);
+        -- obj.icon:Hide();
+        -- obj.icon.track = false;
         obj:Show();
         obj.widgets.chat_display:Clear();
         obj:Hide();
@@ -1359,7 +1361,7 @@ function RegisterWidgetTrigger(WidgetName, wType, HandlerName, Function)
 	if(not Widget_Triggers[WidgetName]) then
 		Widget_Triggers[WidgetName] = {}
 	end
-	--config widget table to handle hander
+	-- config widget table to handle hander
 	if(not Widget_Triggers[WidgetName][HandlerName]) then
 		Widget_Triggers[WidgetName][HandlerName] = {
 			whisper = {},
@@ -1368,7 +1370,7 @@ function RegisterWidgetTrigger(WidgetName, wType, HandlerName, Function)
                         demo = {},
 		};
 	end
-	--register to table
+	-- register to table
 	for i=1,select("#", string.split(",", wType)) do
 		table.insert(Widget_Triggers[WidgetName][HandlerName][select(i, string.split(",", wType))], Function);
 	end
@@ -1422,7 +1424,7 @@ function RegisterWidget(widgetName, createFunction, moduleName)
         updateActiveObjects();
 end
 
---iterator: All loaded widgets
+-- iterator: All loaded widgets
 function Widgets(widgetName)
         local index = 1
         return function()
@@ -1537,9 +1539,9 @@ function RemoveEscapeWindow(frame)
 end
 
 
-------------------------------------
--- WindowParent - Container Calls --
-------------------------------------
+------------------------------------ 
+-- WindowParent - Container Calls -- 
+------------------------------------ 
 
 
 local function WindowParent_AnimPos(self, fraction)
@@ -1650,9 +1652,9 @@ function ToggleContainer(animate)
 end
 
 
-----------------------------------
--- Set default widget triggers	--
-----------------------------------
+---------------------------------- 
+-- Set default widget triggers	-- 
+---------------------------------- 
 
 RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnEnter", function(self)
 		if(db.showToolTips == true) then
@@ -1668,7 +1670,7 @@ RegisterWidgetTrigger("close", "whisper,chat,w2w,demo", "OnClick", function(self
                         self.forceShift = false;
 			destroyWindow(self:GetParent());
 		else
---			DisplayTutorial(L["Message Window Hidden"], L["WIM's message window has been hidden to WIM's Minimap Icon. If you want to end a conversation, you may do so by <Shift-Clicking> the close button."]);
+-- 			DisplayTutorial(L["Message Window Hidden"], L["WIM's message window has been hidden to WIM's Minimap Icon. If you want to end a conversation, you may do so by <Shift-Clicking> the close button."]);
 			self:GetParent():Hide(true);
 		end
 	end);
@@ -1844,11 +1846,11 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnUpdate", function(s
 	
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusGained", function(self)
                                 EditBoxInFocus = self;
-                                --_G.ACTIVE_CHAT_EDIT_BOX = self; -- preserve linking abilities.
+                                -- _G.ACTIVE_CHAT_EDIT_BOX = self; -- preserve linking abilities.
                 end);
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusLost", function(self)
                                 EditBoxInFocus = nil;
-                                --_G.ACTIVE_CHAT_EDIT_BOX = nil;
+                                -- _G.ACTIVE_CHAT_EDIT_BOX = nil;
                 end);
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseUp", function(self, button)
                                 _G.CloseDropDownMenus();
@@ -1902,7 +1904,7 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
                 elseif(event == "CHAT_MSG_BN_WHISPER") then
                         local win = smf.parentWindow;
                         local color;
-                        if(win.bn.client == "WoW" and constants.classes[win.bn.class] and constants.classes[win.bn.class].color) then
+                        if(win.bn.client == BNET_CLIENT_WOW and constants.classes[win.bn.class] and constants.classes[win.bn.class].color) then
                                 color = constants.classes[win.bn.class].color
                                 color = string.len(color) == 6 and color or nil;
                         end
