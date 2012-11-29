@@ -864,9 +864,9 @@ local function instantiateWindow(obj)
                 local classTag = obj.class;
                 icon:SetGradient("VERTICAL", 1, 1, 1, 1, 1, 1);
                 icon:SetTexture(GetSelectedSkin().message_window.widgets.class_icon.texture);
-                if(self.bn and self.bn.client == "S2") then
+                if(self.bn and self.bn.client == _G.BNET_CLIENT_SC2) then
                                 classTag = "sc2";
-                elseif(self.bn and self.bn.client == "D3") then
+                elseif(self.bn and self.bn.client == _G.BNET_CLIENT_D3) then
                                 classTag = "d3";
                 elseif(self.class == "") then
                 	classTag = "blank"
@@ -944,7 +944,7 @@ local function instantiateWindow(obj)
                                 self.bn.id = id;
                                 -- self.widgets.from:SetText(self.theUser.." - "..toonName);
                                 self:UpdateIcon();
-                                if (client == "WoW") then
+                                if (client == _G.BNET_CLIENT_WOW) then
                                   self:UpdateCharDetails();
                                 end
                 else
@@ -1904,7 +1904,7 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
                 elseif(event == "CHAT_MSG_BN_WHISPER") then
                         local win = smf.parentWindow;
                         local color;
-                        if(win.bn.client == "WoW" and constants.classes[win.bn.class] and constants.classes[win.bn.class].color) then
+                        if(win.bn.client == _G.BNET_CLIENT_WOW and constants.classes[win.bn.class] and constants.classes[win.bn.class].color) then
                                 color = constants.classes[win.bn.class].color
                                 color = string.len(color) == 6 and color or nil;
                         end
