@@ -16,6 +16,11 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.6.3", "12/6/2012", [[
+    *Updated for 5.1
+    *Fixed more UI issues
+    *Fixed party chat
+]]);
 addEntry("3.6.1", "9/6/2012", [[
     *Fixed a lua error that could occur if you try to /r a tell when you weren't whispered.
     *Fixed for party chat not working through WIM
