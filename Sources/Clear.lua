@@ -7,6 +7,7 @@ local function clearFun(sub)
     sub = string.trim(string.lower(sub));
     if(sub == "history") then
         StaticPopupDialogs["WIM_CLEAR_HISTORY"] = {
+        	preferredIndex = STATICPOPUP_NUMDIALOGS,
             text = L["You are about to clear all of WIM's history!"].."\n"..L["This action will reload your user interface."].."\n"..L["Do you want to continue?"],
             button1 = _G.YES,
             button2 = _G.NO,
@@ -16,12 +17,12 @@ local function clearFun(sub)
             end,
             timeout = 0,
             whileDead = 1,
-            preferredIndex = 3,
             hideOnEscape = 1
         };
         StaticPopup_Show ("WIM_CLEAR_HISTORY");
     elseif(sub == "filters") then
         StaticPopupDialogs["WIM_CLEAR_FILTERS"] = {
+        	preferredIndex = STATICPOPUP_NUMDIALOGS,
             text = L["You are about to restore WIM's filters to it's default settings!"].."\n"..L["This action will reload your user interface."].."\n"..L["Do you want to continue?"],
             button1 = _G.YES,
             button2 = _G.NO,
@@ -31,7 +32,6 @@ local function clearFun(sub)
             end,
             timeout = 0,
             whileDead = 1,
-            preferredIndex = 3,
             hideOnEscape = 1
         };
         StaticPopup_Show ("WIM_CLEAR_FILTERS");

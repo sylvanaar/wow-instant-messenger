@@ -627,6 +627,7 @@ local function createHistoryViewer()
                 button.delete:SetPoint("RIGHT");
                 button.delete:SetScript("OnClick", function(self)
                         _G.StaticPopupDialogs["WIM_DELETE_HISTORY"] = {
+                        	preferredIndex = STATICPOPUP_NUMDIALOGS,
                             text = _G.format(L["Are you sure you want to delete all history saved for %s on %s?"],
                                 "|cff69ccf0"..self:GetParent().user.."|r",
                                 "|cff69ccf0"..win.USER.."|r"
@@ -660,7 +661,6 @@ local function createHistoryViewer()
                             end,
                             timeout = 0,
                             whileDead = 1,
-                            preferredIndex = 3,
                             hideOnEscape = 1
                         };
                         _G.StaticPopup_Show("WIM_DELETE_HISTORY");

@@ -90,6 +90,7 @@ function ClickControl:OnDisable()
     if(isInitialized) then
     -- alert to reload UI.
         _G.StaticPopupDialogs["WIM_CLICKCONTROL_DISABLE"] = {
+        	preferredIndex = STATICPOPUP_NUMDIALOGS,
             text = L["The UI must be reloaded in order to disable this module fully. Reload UI now?"],
             button1 = _G.TEXT(_G.YES),
             button2 = _G.TEXT(_G.NO),
@@ -99,7 +100,6 @@ function ClickControl:OnDisable()
             OnCancel = function() end,
             timeout = 0,
             whileDead = 1,
-            preferredIndex = 3,
             hideOnEscape = 1
         };        
         _G.StaticPopup_Show ("WIM_CLICKCONTROL_DISABLE", theLink);
