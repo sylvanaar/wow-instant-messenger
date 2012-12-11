@@ -322,6 +322,7 @@ RegisterShortcut("ignore", L["Ignore User"], {
         OnClick = function(self)
         local win = self.parentWindow;
         _G.StaticPopupDialogs["WIM_IGNORE"] = {
+        preferredIndex = STATICPOPUP_NUMDIALOGS,
 		text = _G.format(L["Are you sure you want to\nignore %s?"], "|cff69ccf0"..(win.isBN and win.toonName or win.theUser).."|r"),
 		button1 = L["Yes"],
 		button2 = L["No"],
@@ -330,7 +331,6 @@ RegisterShortcut("ignore", L["Ignore User"], {
 		end,
 		timeout = 0,
 		whileDead = 1,
-		preferredIndex = 3,
 		hideOnEscape = 1
 	    };
 	    _G.StaticPopup_Show("WIM_IGNORE");
