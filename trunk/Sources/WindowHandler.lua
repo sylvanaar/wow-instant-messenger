@@ -868,6 +868,8 @@ local function instantiateWindow(obj)
                                 classTag = "sc2";
                 elseif(self.bn and self.bn.client == _G.BNET_CLIENT_D3) then
                                 classTag = "d3";
+                elseif(self.bn and self.bn.client == "CLNT") then--Battle.net Desktop App
+                                classTag = "bnd";
                 elseif(self.class == "") then
                 	classTag = "blank"
                 else
