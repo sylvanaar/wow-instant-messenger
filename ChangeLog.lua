@@ -16,6 +16,10 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.6.4", "01/18/2013", [[
+    *Added Monk icon to class icons
+    *Added recognition and icon to Battle.net Desktop App users
+]]);
 addEntry("3.6.3", "12/6/2012", [[
     *Updated for 5.1
     *Fixed more UI issues
@@ -26,10 +30,6 @@ addEntry("3.6.1", "9/6/2012", [[
     *Fixed for party chat not working through WIM
     *Disabled out of date tutorial frame until it's updated. all it does is spam lua errors if it's on.
     *Fixed 2 out of the 3 anchoring problems. 1 is left but it's less severe at least.
-]]);
-
-addEntry("3.6.0", "9/03/2012", [[
-    *Updated for wow patch 5.0.4
 ]]);
 
 
