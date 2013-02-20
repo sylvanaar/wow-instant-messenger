@@ -5,6 +5,7 @@ local table = table;
 local unpack = unpack;
 local string = string;
 local pairs = pairs;
+local ipairs = ipairs;
 local select = select;
 
 --set namespace
@@ -29,7 +30,8 @@ end
 specialrepl = specialrepl.."]"
 
 local function convertEmoteToPattern(theEmote)
-    return (theEmote:gsub(specialrepl,"%%%0"));
+    theEmote = string.gsub(theEmote,specialrepl,"%%%0");
+    return theEmote;
 --[[    local i; -- Dri: ticket 379 this loop hits the in combat script execution time limit since 5.1, looped gsub is costly, do it all-in-one instead
     for i=1, #special do
         theEmote = string.gsub(theEmote, "%"..special[i], "%%"..special[i]);
