@@ -1299,7 +1299,8 @@ function ChatAlerts:PostEvent_ChatMessage(event, ...)
         end
         
         if(win and not win:IsVisible() and win.unreadCount and win.unreadCount > 0) then
-            local color = _G.ChatTypeInfo[string.upper(win.chatType)];
+            local chat_type = win.chatType == "battleground" and "INSTANCE_CHAT" or string.upper(win.chatType);
+            local color = _G.ChatTypeInfo[chat_type]; -- Drii: ticket 344 color error if party/instance chat handled by WIM
             MinimapPushAlert(win.theUser, RGBPercentToHex(color.r, color.g, color.b), win.unreadCount);
         end
     end

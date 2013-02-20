@@ -19,14 +19,22 @@ local Emote = WIM.CreateModule("Emoticons", true);
 local LinkRepository = {}; -- used for emotes and link parsing.
 local tmpList = {};
 
+-- Dri: keeping the special table as a helper for authors poking into WIM code to more easily add chars for parsing, 
+-- we could just as well construct a static specialstr for the replacement function manually and save us some string garbage.
 local special = {"%", ":", "-", "^", "$", ")", "(", "]", "]", "~", "@", "#", "&", "*", "_", "+", "=", ",", ".", "?", "/", "\\", "{", "}", "|", "`", ";", "\"", "'"};
+local specialrepl = "["
+for i,token in ipairs(special) do
+	specialrepl = specialrepl.."%"..token
+end
+specialrepl = specialrepl.."]"
 
 local function convertEmoteToPattern(theEmote)
-    local i;
+    return (theEmote:gsub(specialrepl,"%%%0"));
+--[[    local i; -- Dri: ticket 379 this loop hits the in combat script execution time limit since 5.1, looped gsub is costly, do it all-in-one instead
     for i=1, #special do
         theEmote = string.gsub(theEmote, "%"..special[i], "%%"..special[i]);
     end
-    return theEmote;
+    return theEmote;]]
 end
 
 local function getEmoteFilePath(theEmote)
@@ -60,7 +68,7 @@ end
 
 local function filterEmoticons(theMsg, smf)
 
-    --saftey check...
+    --safety check...
     if(not theMsg or theMsg == "") then
         return "";
     end

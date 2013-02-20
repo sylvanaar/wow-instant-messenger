@@ -854,7 +854,8 @@ local function instantiateWindow(obj)
         local icon = self.widgets.class_icon;
         if(self.type == "chat" and self.chatType) then
                 icon:SetTexture(GetSelectedSkin().message_window.widgets.class_icon.chatAlphaMask);
-                local color = _G.ChatTypeInfo[string.upper(self.chatType)];
+                local chat_type = self.chatType == "battleground" and "INSTANCE_CHAT" or string.upper(self.chatType);
+                local color = _G.ChatTypeInfo[chat_type]; -- Drii: ticket 344
                 icon:SetTexCoord(0,1,0,1);
                 icon:SetGradient("VERTICAL", color.r, color.g, color.b, color.r, color.g, color.b);
                 if(GetSelectedSkin().message_window.widgets.from.use_class_color) then
