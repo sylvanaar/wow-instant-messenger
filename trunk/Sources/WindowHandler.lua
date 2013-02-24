@@ -430,12 +430,30 @@ local function getParentMessageWindow(obj)
     end
 end
 
+local function createFadeAnimation(obj, direction)
+	local anim = obj:CreateAnimationGroup()
+	local fade = anim:CreateAnimation("Alpha")
+	fade:SetDuration(0.25)
+	if direction == "in" then
+		fade:SetChange(1)
+		anim:SetScript("OnFinished", function() obj:SetAlpha(1) end)
+	else
+		fade:SetChange(-0.5)
+		anim:SetScript("OnFinished", function() obj:SetAlpha(0.5) end)
+	end
+	return anim
+end
+
 local function setWindowAsFadedIn(obj)
 	if(WIM.db.winFade) then
 		obj.delayFadeElapsed = 0;
 		obj.delayFade = true;
 		obj.fadedIn = true;
-		UIFrameFadeIn(obj, FadeProps.interval, obj:GetAlpha(), FadeProps.max)
+		if not obj.animIn then obj.animIn = createFadeAnimation(obj, "in") end
+		if not obj.animIn:IsPlaying() then
+			obj:SetAlpha(0.5)
+			obj.animIn:Play()
+		end
 	else
 		obj:SetAlpha(FadeProps.max);
 	end
@@ -622,7 +640,11 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                 				self.fadedIn = true;
                 				self.delayFade = false;
                 				self.delayFadeElapsed = 0;
-                				UIFrameFadeIn(self, FadeProps.interval, self:GetAlpha(), FadeProps.max);
+								if not self.animIn then self.animIn = createFadeAnimation(self, "in") end
+								if not self.animIn:IsPlaying() then
+									self:SetAlpha(0.5)
+									self.animIn:Play()
+								end
                 			elseif(window ~= self and window.parentWindow ~= self and not self.isOnHyperLink and
                 					(not (window.tabStrip and window.tabStrip.selected.obj == self)) and
                 					helperFrame.attachedTo ~= self and
@@ -636,7 +658,9 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                 				else
                 					self.fadedIn = false;
                 					self.delayFadeElapsed = 0;
-                					UIFrameFadeOut(self, FadeProps.interval, self:GetAlpha(), FadeProps.min);
+									if not self.animOut then self.animOut = createFadeAnimation(self, "out") end
+									self:SetAlpha(1)
+									self.animOut:Play()
                 				end
                 			end
                 		end
