@@ -1894,16 +1894,19 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnMouseDown", function(sel
 RegisterWidgetTrigger("msg_box", "whisper,w2w", "OnTabPressed", function(self)
                 if(db.tabAdvance and not _G.IsShiftKeyDown()) then
                 		-- Get the current whisper target
-                		local whisperTarget = getParentMessageWindow(self).theUser
+                		local win = getParentMessageWindow(self)
+                		local whisperTarget = win.isBN and win.toonName or win.theUser
+                		local chatType = win.isBN and "BN_WHISPER" or "WHISPER"
                 		-- Lookup the next whisper target
-                		local nextWhisperTarget = _G.ChatEdit_GetNextTellTarget(whisperTarget)
+                		local nextWhisperTarget = _G.ChatEdit_GetNextTellTarget(whisperTarget,chatType)
                 
                 		if nextWhisperTarget ~= "" then
                 			local win = GetWhisperWindowByUser(nextWhisperTarget);
+                			chatType = win.isBN and "BN_WHISPER" or "WHISPER"
                 			win:Hide();
                 			win:Pop(true); -- force popup
                 			win.widgets.msg_box:SetFocus();
-                			_G.ChatEdit_SetLastTellTarget(nextWhisperTarget);
+                			_G.ChatEdit_SetLastTellTarget(nextWhisperTarget,chatType);
                 		end
                 end
 	end);
