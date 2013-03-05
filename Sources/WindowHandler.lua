@@ -439,6 +439,7 @@ local function createFadeAnimation(obj, direction)
 		anim:SetScript("OnFinished", function() obj:SetAlpha(1) end)
 	else
 		fade:SetChange(-0.5)
+		fade:SetStartDelay(1)
 		anim:SetScript("OnFinished", function() obj:SetAlpha(0.5) end)
 	end
 	return anim
@@ -446,14 +447,18 @@ end
 
 local function setWindowAsFadedIn(obj)
 	if(WIM.db.winFade) then
-		obj.delayFadeElapsed = 0;
-		obj.delayFade = true;
-		obj.fadedIn = true;
+		if obj.animOut and obj.animOut:GetProgress() > 0 and obj.animOut:GetProgress() < 0.5 then
+			obj.animOut:Stop()
+			obj.fadedIn = true
+		end
 		if not obj.animIn then obj.animIn = createFadeAnimation(obj, "in") end
-		if not obj.animIn:IsPlaying() then
+		if not obj.animIn:IsPlaying() and not obj.fadedIn then
 			obj:SetAlpha(0.5)
 			obj.animIn:Play()
 		end
+		obj.delayFadeElapsed = 0;
+		obj.delayFade = true;
+		obj.fadedIn = true;
 	else
 		obj:SetAlpha(FadeProps.max);
 	end
@@ -637,14 +642,18 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                 					(EditBoxInFocus and EditBoxInFocus.parentWindow == self)) or
                 					(window.tabStrip and window.tabStrip.selected.obj == self)) and
                 					(not self.fadedIn or self.delayFade)) then
-                				self.fadedIn = true;
-                				self.delayFade = false;
-                				self.delayFadeElapsed = 0;
+								if self.animOut and self.animOut:GetProgress() > 0 and self.animOut:GetProgress() < 0.5 then
+									self.animOut:Stop()
+									self.fadedIn = true
+								end
 								if not self.animIn then self.animIn = createFadeAnimation(self, "in") end
-								if not self.animIn:IsPlaying() then
+								if not self.animIn:IsPlaying() and not self.fadedIn then
 									self:SetAlpha(0.5)
 									self.animIn:Play()
 								end
+                				self.fadedIn = true;
+                				self.delayFade = false;
+                				self.delayFadeElapsed = 0;
                 			elseif(window ~= self and window.parentWindow ~= self and not self.isOnHyperLink and
                 					(not (window.tabStrip and window.tabStrip.selected.obj == self)) and
                 					helperFrame.attachedTo ~= self and
