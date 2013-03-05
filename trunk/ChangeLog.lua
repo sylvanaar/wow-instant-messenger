@@ -16,6 +16,12 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.6.5", "03/05/2013", [[
+	*Replaced frame fade with animations & embed LibChatAnims
+    *Fixed error with chat color if party/instance chat handled by WIM
+    *Fixed lua errors caused by missing chat type args
+    *Changed emoticon string replacements to use one operation to prevent 'script ran too long' errors
+]]);
 addEntry("3.6.4", "01/18/2013", [[
     *Added Monk icon to class icons
     *Added recognition and icon to Battle.net Desktop App users
