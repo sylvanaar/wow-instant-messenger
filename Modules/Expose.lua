@@ -1,6 +1,7 @@
 --imports
 local WIM = WIM;
 local _G = _G;
+local select = select;
 local table = table;
 local unpack = unpack;
 local string = string;
@@ -98,8 +99,17 @@ function Expose:OnContainerShow()
     end
 end
 
+local function hasVisibleChildren()
+	local ui = _G.WIM_UIParent
+	for i=1,ui:GetNumChildren() do
+		local child = select(i, ui:GetChildren())
+		if child.isWimWindow and child:IsVisible() then return true end
+	end
+end
+
+
 function Expose:OnContainerHide()
-    if(db.expose.border) then
+    if(db.expose.border and hasVisibleChildren()) then
         exposeFrame:Show();
         exposeFrame.top:SetPoint("TOPLEFT", exposeFrame, "TOPLEFT", 0, 0);
         exposeFrame.top:SetPoint("BOTTOMRIGHT", exposeFrame, "TOPRIGHT", 0, -(db.expose.borderSize));
