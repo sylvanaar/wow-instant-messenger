@@ -1038,9 +1038,13 @@ local function createHistoryViewer()
         local realm, character = string.match(win.USER, "^([^/]+)/?(.*)$");
         if(realm and character and history[realm] and history[realm][character]) then
             local tbl = history[realm][character][win.CONVO];
-            for i=1, #tbl do
-                table.insert(win.CONVOLIST, tbl[i]);
-            end
+            if tbl then
+           	   for i=1, #tbl do
+            	    table.insert(win.CONVOLIST, tbl[i]);
+           	   end
+           	else
+           		ShowHistoryViewer()
+           	end
         elseif(realm and history[realm]) then
             for character, tbl in pairs(history[realm]) do
                 if(tbl[win.CONVO]) then
