@@ -16,6 +16,13 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.6.7", "04/06/2013", [[
+	*History button on realid whispers will now open history window instead of causing nil error
+	*Don't display the expose border unless we actually hide some windows
+]]);
+addEntry("3.6.6", "03/06/2013", [[
+	*Fix fading issue with new animation
+]]);
 addEntry("3.6.5", "03/05/2013", [[
 	*Replaced frame fade with animations & embed LibChatAnims
     *Fixed error with chat color if party/instance chat handled by WIM
