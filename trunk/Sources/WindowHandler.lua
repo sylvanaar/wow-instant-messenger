@@ -899,11 +899,13 @@ local function instantiateWindow(obj)
                 icon:SetGradient("VERTICAL", 1, 1, 1, 1, 1, 1);
                 icon:SetTexture(GetSelectedSkin().message_window.widgets.class_icon.texture);
                 if(self.bn and self.bn.client == _G.BNET_CLIENT_SC2) then
-                                classTag = "sc2";
+                                classTag = "sc2";--"Interface\\FriendsFrame\\Battlenet-Sc2icon"
                 elseif(self.bn and self.bn.client == _G.BNET_CLIENT_D3) then
-                                classTag = "d3";
+                                classTag = "d3";--"Interface\\FriendsFrame\\Battlenet-D3icon"
+                elseif(self.bn and self.bn.client == "WTCG") then--switch to global BNET_CLIENT_WTCG when 5.3 ships
+                                classTag = "bnd";--"Interface\\FriendsFrame\\Battlenet-WTCGicon" (Out of room in class textures file. maybe it's time to skin only class icons and use blizzard provided textures for game clients)
                 elseif(self.bn and self.bn.client == "CLNT") then--Battle.net Desktop App
-                                classTag = "bnd";
+                                classTag = "bnd";--"Interface\\FriendsFrame\\Battlenet-Battleneticon"
                 elseif(self.class == "") then
                 	classTag = "blank"
                 else
