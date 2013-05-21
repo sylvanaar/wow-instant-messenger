@@ -16,6 +16,9 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.6.8", "04/06/2013", [[
+	*Added recognition for Hearthstone (icon work still needed)
+]]);
 addEntry("3.6.7", "04/06/2013", [[
 	*History button on realid whispers will now open history window instead of causing nil error
 	*Don't display the expose border unless we actually hide some windows
@@ -32,17 +35,6 @@ addEntry("3.6.5", "03/05/2013", [[
 addEntry("3.6.4", "01/18/2013", [[
     *Added Monk icon to class icons
     *Added recognition and icon to Battle.net Desktop App users
-]]);
-addEntry("3.6.3", "12/6/2012", [[
-    *Updated for 5.1
-    *Fixed more UI issues
-    *Fixed party chat
-]]);
-addEntry("3.6.1", "9/6/2012", [[
-    *Fixed a lua error that could occur if you try to /r a tell when you weren't whispered.
-    *Fixed for party chat not working through WIM
-    *Disabled out of date tutorial frame until it's updated. all it does is spam lua errors if it's on.
-    *Fixed 2 out of the 3 anchoring problems. 1 is left but it's less severe at least.
 ]]);
 
 
