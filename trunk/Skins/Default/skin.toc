@@ -1,4 +1,4 @@
-## Interface: 20300
+## Interface: 50400
 ## Title: WIM Classic Skin
 ## Notes: WIM Skin
 ## Author: Pazza (Bronzebeard)
