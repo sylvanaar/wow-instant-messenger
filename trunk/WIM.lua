@@ -14,7 +14,7 @@ setfenv(1, WIM);
 
 -- Core information
 addonTocName = "WIM";
-version = "3.6.8";
+version = "3.6.9";
 beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 useProtocol2 = true; -- test switch for new W2W Protocol. (Dev use only)
@@ -367,7 +367,7 @@ function WIM:VARIABLES_LOADED()
     history = _G.WIM3_History;
     
     -- load some environment data.
-    env.realm = _G.GetCVar("realmName");
+    env.realm = _G.GetRealmName();
     env.character = _G.UnitName("player");
     
     -- inherrit any new default options which wheren't shown in previous releases.
