@@ -43,6 +43,7 @@ local DefaultFilters = {
                     "^GA[^A-Z]+\n"..
                     "^<METAMAP\n"..
                     "^<CT",
+                    "^OQ[,S]",
         action = 2,
         stats = 0,
         protected = true,
