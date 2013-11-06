@@ -478,7 +478,7 @@ function Party:GROUP_ROSTER_UPDATE()
         for i=1, 4 do
             if _G.UnitExists("party"..i) then
                 count = count + 1;
-                local name = _G.UnitName("party"..i);
+                local name = _G.GetUnitName("party"..i, true);
                 table.insert(self.partyWindow.chatList, name);
             end
         end

@@ -457,7 +457,7 @@ end
 
 function IsInParty(user)
     for i=1, 4 do
-        if(_G.UnitName("party"..i) == user) then
+        if(_G.GetUnitName("party"..i, true) == user) then
             return true;
         end
     end
@@ -466,7 +466,7 @@ end
 
 function IsInRaid(user)
     for i=1, 40 do
-        if(_G.UnitName("raid"..i) == user) then
+        if(_G.GetUnitName("raid"..i, true) == user) then
             return true;
         end
     end
