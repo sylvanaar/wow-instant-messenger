@@ -162,7 +162,7 @@ function Module:GROUP_ROSTER_UPDATE()
             local token = _G.GetTime();
             for i=1, 40 do
                 local unit = "raid"..i;
-                local name, realm = _G.UnitName(unit);
+                local name, realm = _G.GetUnitName(unit, true);
                 name = name and realm and string.len(realm) > 2 and name.."-"..realm or name;
                 if(name and _G.UnitIsConnected(unit) and shouldNegotiate("raid", name, token)) then
                     Negotiate("WHISPER", name);
@@ -174,7 +174,7 @@ function Module:GROUP_ROSTER_UPDATE()
             local token = _G.GetTime();
             for i=1, 40 do
                 local unit = "raid"..i;
-                local name, realm = _G.UnitName(unit);
+                local name, realm = _G.GetUnitName(unit, true);
                 name = name and realm and string.len(realm) > 2 and name.."-"..realm or name;
                 if(name and _G.UnitIsConnected(unit) and shouldNegotiate("raid", name, token)) then
                     -- do nothing, we're broadcasting...
@@ -189,7 +189,7 @@ function Module:GROUP_ROSTER_UPDATE()
             local token = _G.GetTime();
             for i=1, 5 do
                 local unit = "party"..i;
-                local name, realm = _G.UnitName(unit);
+                local name, realm = _G.GetUnitname(unit, true);
                 name = name and realm and string.len(realm) > 2 and name.."-"..realm or name;
                 if(name and _G.UnitIsConnected(unit) and shouldNegotiate("party", name, token)) then
                     Negotiate("WHISPER", name);
@@ -201,7 +201,7 @@ function Module:GROUP_ROSTER_UPDATE()
             local token = _G.GetTime();
             for i=1, 5 do
                 local unit = "party"..i;
-                local name, realm = _G.UnitName(unit);
+                local name, realm = _G.GetUnitName(unit, true);
                 name = name and realm and string.len(realm) > 2 and name.."-"..realm or name;
                 if(name and _G.UnitIsConnected(unit) and shouldNegotiate("party", name, token)) then
                     -- do nothing, we're broadcasting...
