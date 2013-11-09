@@ -16,25 +16,11 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addEntry("3.6.8", "04/06/2013", [[
-	*Added recognition for Hearthstone (icon work still needed)
+addEntry("3.6.12", "11/08/2013", [[
+	*Fixes for UnitName changes and connected realms.
 ]]);
-addEntry("3.6.7", "04/06/2013", [[
-	*History button on realid whispers will now open history window instead of causing nil error
-	*Don't display the expose border unless we actually hide some windows
-]]);
-addEntry("3.6.6", "03/06/2013", [[
-	*Fix fading issue with new animation
-]]);
-addEntry("3.6.5", "03/05/2013", [[
-	*Replaced frame fade with animations & embed LibChatAnims
-    *Fixed error with chat color if party/instance chat handled by WIM
-    *Fixed lua errors caused by missing chat type args
-    *Changed emoticon string replacements to use one operation to prevent 'script ran too long' errors
-]]);
-addEntry("3.6.4", "01/18/2013", [[
-    *Added Monk icon to class icons
-    *Added recognition and icon to Battle.net Desktop App users
+addEntry("3.6.11", "10/29/2013", [[
+	*Fixes nil error with patch 5.4.1.
 ]]);
 
 
