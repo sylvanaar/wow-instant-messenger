@@ -8,6 +8,7 @@ local string = string;
 local select = select;
 local math = math;
 local tonumber = tonumber;
+local playerRealm = GetRealmName()
 
 -- set name space
 setfenv(1, WIM);
@@ -291,6 +292,8 @@ function Guild:GUILD_ROSTER_UPDATE()
                         invite_member, remove_member, set_motd, edit_public_note, view_officer_note, edit_officer_note,
                         modify_guild_info, _, withdraw_repair, withdraw_gold, create_guild_event = _G.GuildControlGetRankFlags();
         	if(guildchat_listen) then
+					local shortName, realm = string.split("-", name)
+					if playerRealm == realm then name = shortName end
                     count = count + 1;
                     table.insert(self.guildWindow.chatList, name);
                 end
@@ -386,6 +389,8 @@ function Officer:GUILD_ROSTER_UPDATE()
                         invite_member, remove_member, set_motd, edit_public_note, view_officer_note, edit_officer_note,
                         modify_guild_info, _, withdraw_repair, withdraw_gold, create_guild_event = _G.GuildControlGetRankFlags();
         	if(officerchat_listen) then
+					local shortName, realm = string.split("-", name)
+					if playerRealm == realm then name = shortName end
                     count = count + 1;
                     table.insert(self.officerWindow.chatList, name);
                 end
