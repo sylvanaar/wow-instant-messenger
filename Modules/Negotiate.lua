@@ -19,6 +19,7 @@ local string = string;
 local table = table;
 local time = time;
 local tonumber = tonumber;
+local playerRealm = GetRealmName()
 
 -- set namespace
 setfenv(1, WIM);
@@ -137,6 +138,8 @@ function Module:GUILD_ROSTER_UPDATE()
       local token = _G.GetTime();
       for i=1, _G.GetNumGuildMembers() do 
 			  local name, _, _, _, _, _, _, _, online, _, _, _, _, isMobile = _G.GetGuildRosterInfo(i);
+			  local shortName, realm = string.split("-", name)
+			  if playerRealm == realm then name = shortName end
 			  if name and online and shouldNegotiate("guild", name, token, isMobile) then
 				  Negotiate("WHISPER", name);
 			  end
@@ -147,6 +150,8 @@ function Module:GUILD_ROSTER_UPDATE()
       local token = _G.GetTime();
       for i=1, _G.GetNumGuildMembers() do 
 			  local name, _, _, _, _, _, _, _, online, _, _, _, _, isMobile = _G.GetGuildRosterInfo(i);
+			  local shortName, realm = string.split("-", name)
+			  if playerRealm == realm then name = shortName end
 			  if name and online and shouldNegotiate("guild", name, token, isMobile) then
 				  -- do nothing, we're broadcasting...
 			  end
