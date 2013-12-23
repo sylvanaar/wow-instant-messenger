@@ -293,7 +293,7 @@ function Guild:GUILD_ROSTER_UPDATE()
                         modify_guild_info, _, withdraw_repair, withdraw_gold, create_guild_event = _G.GuildControlGetRankFlags();
         	if(guildchat_listen) then
 					local shortName, realm = string.split("-", name)
-					if gsub(playerRealm, "[%s%-]", "") == realm then name = shortName end
+					if string.gsub(playerRealm, "[%s%-]", "") == realm then name = shortName end
                     count = count + 1;
                     table.insert(self.guildWindow.chatList, name);
                 end
@@ -390,7 +390,7 @@ function Officer:GUILD_ROSTER_UPDATE()
                         modify_guild_info, _, withdraw_repair, withdraw_gold, create_guild_event = _G.GuildControlGetRankFlags();
         	if(officerchat_listen) then
 					local shortName, realm = string.split("-", name)
-					if gsub(playerRealm, "[%s%-]", "") == realm then name = shortName end
+					if string.gsub(playerRealm, "[%s%-]", "") == realm then name = shortName end
                     count = count + 1;
                     table.insert(self.officerWindow.chatList, name);
                 end
