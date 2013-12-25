@@ -125,11 +125,11 @@ local function recordWhisper(inbound, ...)
     local win = windows.active.whisper[from] or windows.active.chat[from] or windows.active.w2w[from];
     if (win and (lists.gm[from] or db.all or (db.friends and (lists.friends[from] or win.isBN)) or (db.guild and lists.guild[from]))) then
         win.widgets.history:SetHistory(true);
-        --If realid whisper, we save them under toonname to avoid caching issues
-        --(ie "from" changes every session, we can't use that to save whispers, plus if user dumps cache, they all return unknown)
+        --If realid/btag whisper, we save them under btag to avoid caching issues
+        --(ie NAME is encoded and changes every session, we can't use that to save whispers, plus if user dumps cache, they all return unknown)
         local pid = _G.BNet_GetPresenceID(from)
         if pid then
-			from = select(5, _G.BNGetFriendInfoByID(pid))
+			from = select(3, _G.BNGetFriendInfoByID(pid))
 		end
         local history = getPlayerHistoryTable(from);
         history.info.gm = lists.gm[from];
