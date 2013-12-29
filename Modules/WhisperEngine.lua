@@ -578,12 +578,12 @@ function CF_ExtractTellTarget(editBox, msg)
       return false;
     end
 
-    if (_G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include,
+ --[[   if (_G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include,
       tellTargetExtractionAutoComplete.exclude, 1, nil, true)) then
       --Even if there's a space, we still want to let the person keep typing -- they may be trying to type whatever
       -- -- is in AutoComplete.
       return false;
-    end
+    end--]]
 
     --Keep pulling off everything after the last space until we either have something on the AutoComplete list or
     -- -- only a single word is left.
