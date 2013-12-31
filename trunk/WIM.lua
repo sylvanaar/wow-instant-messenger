@@ -429,8 +429,7 @@ function WIM:GUILD_ROSTER_UPDATE()
 		for i=1, _G.GetNumGuildMembers(true) do 
 			local name = _G.GetGuildRosterInfo(i);
 			if(name) then
-				local shortName, realm = string.split("-", name)
-				if string.gsub(env.realm, "[%s%-]", "") == realm then name = shortName end
+				name = _G.Ambiguate(name, "none")
 				env.cache[env.realm][env.character].guildList[name] = true; --[set place holder for quick lookup
 			end
 		end
