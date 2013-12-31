@@ -292,8 +292,7 @@ function Guild:GUILD_ROSTER_UPDATE()
                         invite_member, remove_member, set_motd, edit_public_note, view_officer_note, edit_officer_note,
                         modify_guild_info, _, withdraw_repair, withdraw_gold, create_guild_event = _G.GuildControlGetRankFlags();
         	if(guildchat_listen) then
-					local shortName, realm = string.split("-", name)
-					if string.gsub(playerRealm, "[%s%-]", "") == realm then name = shortName end
+					name = _G.Ambiguate(name, "none")
                     count = count + 1;
                     table.insert(self.guildWindow.chatList, name);
                 end
@@ -389,8 +388,7 @@ function Officer:GUILD_ROSTER_UPDATE()
                         invite_member, remove_member, set_motd, edit_public_note, view_officer_note, edit_officer_note,
                         modify_guild_info, _, withdraw_repair, withdraw_gold, create_guild_event = _G.GuildControlGetRankFlags();
         	if(officerchat_listen) then
-					local shortName, realm = string.split("-", name)
-					if string.gsub(playerRealm, "[%s%-]", "") == realm then name = shortName end
+					name = _G.Ambiguate(name, "none")
                     count = count + 1;
                     table.insert(self.officerWindow.chatList, name);
                 end
