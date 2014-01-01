@@ -16,6 +16,12 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.6.13", "12/31/2013", [[
+	*Improvements for patch 5.4.2 (ie it should again recognize who is in guild)
+	*/w interrcept now works again. It may not work as well with autocomplete as it used to though.
+	*RealID/BattleTag conversations will now be saved under associated battletag instead of whatever tooname person is on.
+	*Updated wholib that now better supports connected realms.
+]]);
 addEntry("3.6.12", "11/08/2013", [[
 	*Fixes for UnitName changes and connected realms.
 ]]);
