@@ -129,7 +129,8 @@ local function recordWhisper(inbound, ...)
         --(ie NAME is encoded and changes every session, we can't use that to save whispers, plus if user dumps cache, they all return unknown)
         local pid = _G.BNet_GetPresenceID(from)
         if pid then
-			from = select(3, _G.BNGetFriendInfoByID(pid))
+        	local _, _, btag, _, toonName = _G.BNGetFriendInfoByID(pid)
+			from = btag or toonName--Btag is nill, default to toonname
 		end
         local history = getPlayerHistoryTable(from);
         history.info.gm = lists.gm[from];
@@ -608,6 +609,7 @@ local function createHistoryViewer()
                             extra = " |TInterface\\AddOns\\WIM\\Skins\\Default\\minimap.tga:20:20:0:0|t";
                             color = "fff569";
                         end
+                        if not user then user = _G.UNKNOWN end
                         self.user = user;
                         self.text:SetText("     |cff"..color..user.."|r"..extra..(gmTag == "*" and " |TInterface\\ChatFrame\\UI-ChatIcon-Blizz.blp:0:2:0:0|t" or ""));
                         if(user == win.SELECT) then
