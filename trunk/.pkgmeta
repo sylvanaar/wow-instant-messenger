@@ -11,7 +11,6 @@ externals:
 		tag: latest
 	Libs/LibWho-2.0:
 		url: svn://svn.wowace.com/wow/wholib/mainline/trunk/LibWho-2.0
-		tag: latest
 
 
 	Libs/LibChatAnims: svn://svn.wowace.com/wow/libchatanims/mainline/trunk/LibChatAnims
