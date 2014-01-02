@@ -609,7 +609,10 @@ local function createHistoryViewer()
                             extra = " |TInterface\\AddOns\\WIM\\Skins\\Default\\minimap.tga:20:20:0:0|t";
                             color = "fff569";
                         end
-                        if not user then user = _G.UNKNOWN end
+                        if not user then
+                        	_G.print("Your WIM history is damaged beyond repair and must be erased before it can be used again do to having conversation with a realid friend that has no battletag. This bug has been fixed in WIM but your history cannot be repaired")
+                       		return
+                        end
                         self.user = user;
                         self.text:SetText("     |cff"..color..user.."|r"..extra..(gmTag == "*" and " |TInterface\\ChatFrame\\UI-ChatIcon-Blizz.blp:0:2:0:0|t" or ""));
                         if(user == win.SELECT) then
