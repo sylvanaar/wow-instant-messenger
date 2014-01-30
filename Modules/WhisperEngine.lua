@@ -373,9 +373,10 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER_INFORM(...)
         return; -- ChatFrameEventFilter says don't process
     end
 	if arg2:find("*") then--From battle.net desktop app and it's truncating battletag and breaking our ability to read user data.
+		local removeStar, _ = string.split("*", arg2)
 		for i=1, BNGetNumFriends() do
 			local presenceID, name, battleTag = BNGetFriendInfo(i)
-			if battleTag and battleTag:find(arg2) then
+			if battleTag and battleTag:find(removeStar) then
 				arg2 = battleTag
 				break
 			end
@@ -414,9 +415,10 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER(...)
         return; -- ChatFrameEventFilter says don't process
     end
 	if arg2:find("*") then--From battle.net desktop app and it's truncating battletag and breaking our ability to read user data.
+		local removeStar, _ = string.split("*", arg2)
 		for i=1, BNGetNumFriends() do
 			local presenceID, name, battleTag = BNGetFriendInfo(i)
-			if battleTag and battleTag:find(arg2) then
+			if battleTag and battleTag:find(removeStar) then
 				arg2 = battleTag
 				break
 			end
