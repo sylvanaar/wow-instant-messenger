@@ -155,7 +155,7 @@ function WhisperEngine:OnEnableWIM()
         WhisperEngine:RegisterChatEvent("CHAT_MSG_AFK");
         WhisperEngine:RegisterChatEvent("CHAT_MSG_DND");
         WhisperEngine:RegisterChatEvent("CHAT_MSG_SYSTEM");
-	WhisperEngine:RegisterChatEvent("CHAT_MSG_BN_WHISPER");
+        WhisperEngine:RegisterChatEvent("CHAT_MSG_BN_WHISPER");
         WhisperEngine:RegisterChatEvent("CHAT_MSG_BN_WHISPER_INFORM");
 end
 
@@ -165,7 +165,7 @@ function WhisperEngine:OnDisableWIM()
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_AFK");
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_DND");
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_SYSTEM");
-	WhisperEngine:UnregisterChatEvent("CHAT_MSG_BN_WHISPER");
+        WhisperEngine:UnregisterChatEvent("CHAT_MSG_BN_WHISPER");
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_BN_WHISPER_INFORM");
 end
 
@@ -372,6 +372,16 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER_INFORM(...)
     if(filter) then
         return; -- ChatFrameEventFilter says don't process
     end
+	if arg2:find("*") then--From battle.net desktop app and it's truncating battletag and breaking our ability to read user data.
+		for i=1, BNGetNumFriends() do
+			local presenceID, name, battleTag = BNGetFriendInfo(i)
+				if battleTag and battleTag:find(arg2) then
+					arg2 = battleTag
+					break
+				end
+			end
+		end
+	end
     local color = db.displayColors.BNwispOut; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2, true);
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BN_WHISPER_INFORM", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
@@ -404,6 +414,16 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER(...)
     if(filter) then
         return; -- ChatFrameEventFilter says don't process
     end
+	if arg2:find("*") then--From battle.net desktop app and it's truncating battletag and breaking our ability to read user data.
+		for i=1, BNGetNumFriends() do
+			local presenceID, name, battleTag = BNGetFriendInfo(i)
+				if battleTag and battleTag:find(arg2) then
+					arg2 = battleTag
+					break
+				end
+			end
+		end
+	end
     local color = WIM.db.displayColors.BNwispIn; -- color contains .r, .g & .b
     local win = getWhisperWindowByUser(arg2, true);
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
