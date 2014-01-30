@@ -375,10 +375,9 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER_INFORM(...)
 	if arg2:find("*") then--From battle.net desktop app and it's truncating battletag and breaking our ability to read user data.
 		for i=1, BNGetNumFriends() do
 			local presenceID, name, battleTag = BNGetFriendInfo(i)
-				if battleTag and battleTag:find(arg2) then
-					arg2 = battleTag
-					break
-				end
+			if battleTag and battleTag:find(arg2) then
+				arg2 = battleTag
+				break
 			end
 		end
 	end
@@ -391,9 +390,9 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER_INFORM(...)
     win.msgSent = false;
     CallModuleFunction("PostEvent_WhisperInform", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
     addToTableUnique(recentSent, arg1);
-        if(#recentSent > maxRecent) then
-                table.remove(recentSent, 1);
-        end
+	if(#recentSent > maxRecent) then
+		table.remove(recentSent, 1);
+	end
 end
 
 -- CHAT_MSG_BN_WHISPER  CONTROLLER (For Supression from Chat Frame)
@@ -417,10 +416,9 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER(...)
 	if arg2:find("*") then--From battle.net desktop app and it's truncating battletag and breaking our ability to read user data.
 		for i=1, BNGetNumFriends() do
 			local presenceID, name, battleTag = BNGetFriendInfo(i)
-				if battleTag and battleTag:find(arg2) then
-					arg2 = battleTag
-					break
-				end
+			if battleTag and battleTag:find(arg2) then
+				arg2 = battleTag
+				break
 			end
 		end
 	end
