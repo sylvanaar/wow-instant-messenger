@@ -132,6 +132,9 @@ local function recordWhisper(inbound, ...)
         	local _, _, btag, _, toonName = _G.BNGetFriendInfoByID(pid)
 			from = btag or toonName--Btag is nill, default to toonname
 		end
+		if from:find("%-") then
+			from = _G.Ambiguate(from, "none")--Strip same realm name from history since 5.4.7 now force adds it
+		end
         local history = getPlayerHistoryTable(from);
         history.info.gm = lists.gm[from];
         table.insert(history, {
