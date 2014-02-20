@@ -593,10 +593,7 @@ function CF_ExtractTellTarget(editBox, msg)
     while (string.find(target, "%s")) do
       --Pull off everything after the last space.
       target = string.match(target, "(.+)%s+[^%s]*");
---[[      if not target:find("%-") then--5.4.7 always sends realmname back in all replies now, even when on our own realm
-      	-- so if we send a whisper to someone on our own realm, force add realmname to avoid 2 whisper tabs happening :\
-      	target = target.."-"..playerRealm
-      end--]]
+	target = _G.Ambiguate(target, "none")
       if (_G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include,
         tellTargetExtractionAutoComplete.exclude, 1, nil, true)) then
         break;
