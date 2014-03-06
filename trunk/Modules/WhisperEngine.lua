@@ -320,7 +320,7 @@ function WhisperEngine:CHAT_MSG_WHISPER(...)
     _G.ChatEdit_SetLastTellTarget(arg2, "WHISPER");
     win.online = true;
     updateMinimapAlerts();
-    CallModuleFunction("PostEvent_Whisper", ...);
+    CallModuleFunction("PostEvent_Whisper", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
 
 -- CHAT_MSG_WHISPER_INFORM  CONTROLLER (For Supression from Chat Frame)
@@ -593,7 +593,7 @@ function CF_ExtractTellTarget(editBox, msg)
     while (string.find(target, "%s")) do
       --Pull off everything after the last space.
       target = string.match(target, "(.+)%s+[^%s]*");
-	target = _G.Ambiguate(target, "none")
+      target = _G.Ambiguate(target, "none")
       if (_G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include,
         tellTargetExtractionAutoComplete.exclude, 1, nil, true)) then
         break;

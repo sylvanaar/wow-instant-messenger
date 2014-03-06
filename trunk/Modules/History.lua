@@ -121,7 +121,7 @@ end
 
 local function recordWhisper(inbound, ...)
     local msg, from = ...;
-    local db = db.history.whispers;     
+    local db = db.history.whispers; 
     local win = windows.active.whisper[from] or windows.active.chat[from] or windows.active.w2w[from];
     if (win and (lists.gm[from] or db.all or (db.friends and (lists.friends[from] or win.isBN)) or (db.guild and lists.guild[from]))) then
         win.widgets.history:SetHistory(true);
@@ -131,9 +131,6 @@ local function recordWhisper(inbound, ...)
         if pid then
         	local _, _, btag, _, toonName = _G.BNGetFriendInfoByID(pid)
 			from = btag or toonName--Btag is nill, default to toonname
-		end
-		if from:find("%-") then
-			from = _G.Ambiguate(from, "none")--Strip same realm name from history since 5.4.7 now force adds it
 		end
         local history = getPlayerHistoryTable(from);
         history.info.gm = lists.gm[from];
