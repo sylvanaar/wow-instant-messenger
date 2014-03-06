@@ -16,13 +16,17 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addEntry("3.6.16", "02/20/2013", [[
+addEntry("3.6.17", "03/05/2014", [[
+	*Fix issue that caused incoming whispers not to record for non battle.net.
+	*Strip realm name from more chat channels if WIM is used for them instead of blizzard chat tabs.
+]]);
+addEntry("3.6.16", "02/20/2014", [[
 	*More fixes to prevent double whisper windows from -realm inconsistencies in blizzards code changes.
 ]]);
-addEntry("3.6.15", "02/20/2013", [[
+addEntry("3.6.15", "02/20/2014", [[
 	*Much better compatability with patch 5.4.7 whisper changes.
 ]]);
-addEntry("3.6.13", "12/31/2013", [[
+addEntry("3.6.13", "12/31/2014", [[
 	*Improvements for patch 5.4.2 (ie it should again recognize who is in guild)
 	*/w interrcept now works again. It may not work as well with autocomplete as it used to though.
 	*RealID/BattleTag conversations will now be saved under associated battletag instead of whatever tooname person is on.
