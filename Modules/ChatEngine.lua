@@ -317,6 +317,7 @@ function Guild:CHAT_MSG_GUILD(...)
     if(filter) then
         return;
     end
+    arg2 = _G.Ambiguate(arg2, "none")
     local win = getChatWindow(_G.GUILD, "guild");
     local color = _G.ChatTypeInfo["GUILD"];
     self.guildWindow = win;
@@ -413,6 +414,7 @@ function Officer:CHAT_MSG_OFFICER(...)
     if(filter) then
         return;
     end
+    arg2 = _G.Ambiguate(arg2, "none")
     local win = getChatWindow(_G.GUILD_RANK1_DESC, "officer");
     local color = _G.ChatTypeInfo["OFFICER"];
     Officer.officerWindow = win;
@@ -504,6 +506,7 @@ function Party:CHAT_MSG_PARTY(...)
     if(filter) then
         return;
     end
+    arg2 = _G.Ambiguate(arg2, "none")
     local win = getChatWindow(_G.PARTY, "party");
     local color = _G.ChatTypeInfo["PARTY"];
     Party.partyWindow = win;
@@ -541,6 +544,7 @@ function Party:CHAT_MSG_PARTY_LEADER(...)
     if(filter) then
         return;
     end
+    arg2 = _G.Ambiguate(arg2, "none")
     local win = getChatWindow(_G.PARTY, "party");
     local color = _G.ChatTypeInfo["PARTY_LEADER"];
     self.raidWindow = win;
@@ -629,6 +633,7 @@ function Raid:CHAT_MSG_RAID(...)
     if(filter) then
         return;
     end
+    arg2 = _G.Ambiguate(arg2, "none")
     local win = getChatWindow(_G.RAID, "raid");
     local color = _G.ChatTypeInfo["RAID"];
     self.raidWindow = win;
@@ -666,6 +671,7 @@ function Raid:CHAT_MSG_RAID_LEADER(...)
     if(filter) then
         return;
     end
+    arg2 = _G.Ambiguate(arg2, "none")
     local win = getChatWindow(_G.RAID, "raid");
     local color = _G.ChatTypeInfo["RAID_LEADER"];
     self.raidWindow = win;
@@ -703,6 +709,7 @@ function Raid:CHAT_MSG_RAID_WARNING(...)
     if(filter) then
         return;
     end
+    arg2 = _G.Ambiguate(arg2, "none")
     local win = getChatWindow(_G.RAID, "raid");
     local color = _G.ChatTypeInfo["RAID_WARNING"];
     self.raidWindow = win;
@@ -789,6 +796,7 @@ function Battleground:CHAT_MSG_INSTANCE_CHAT(...)
     if(filter) then
         return;
     end
+    arg2 = _G.Ambiguate(arg2, "none")
     local win = getChatWindow(_G.INSTANCE_CHAT, "battleground");
     win.widgets.chat_info:SetText(getBattlegroundCount());
     local color = _G.ChatTypeInfo["INSTANCE_CHAT"];
@@ -824,6 +832,7 @@ function Battleground:CHAT_MSG_INSTANCE_CHAT_LEADER(...)
     if(filter) then
         return;
     end
+    arg2 = _G.Ambiguate(arg2, "none")
     local win = getChatWindow(_G.INSTANCE_CHAT, "battleground");
     win.widgets.chat_info:SetText(getBattlegroundCount());
     local color = _G.ChatTypeInfo["INSTANCE_CHAT_LEADER"];
@@ -889,6 +898,7 @@ function Say:CHAT_MSG_SAY(...)
     if(filter) then
         return;
     end
+    arg2 = _G.Ambiguate(arg2, "none")
     local win = getChatWindow(_G.SAY, "say");
     local color = _G.ChatTypeInfo["SAY"];
     self.chatLoaded = true;
@@ -1216,6 +1226,7 @@ function Channel:CHAT_MSG_CHANNEL(...)
     elseif(not db.chat[isWorld and "world" or "custom"].channelSettings[channelName] or not db.chat[isWorld and "world" or "custom"].channelSettings[channelName].monitor) then
         return;
     end
+    arg2 = _G.Ambiguate(arg2, "none")
     local win = getChatWindow(channelName, "channel");
     local color = _G.ChatTypeInfo["CHANNEL"..arg8];
     if(arg7 == 1 or arg7 == 2 or arg7 == 22 or arg7 == 23 or arg7 == 26) then
