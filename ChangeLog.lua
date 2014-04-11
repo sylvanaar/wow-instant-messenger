@@ -16,6 +16,9 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.6.18", "04/11/2014", [[
+	*Fixed icon for battle.net desktop app users.
+]]);
 addEntry("3.6.17", "03/05/2014", [[
 	*Fix issue that caused incoming whispers not to record for non battle.net.
 	*Strip realm name from more chat channels if WIM is used for them instead of blizzard chat tabs.
