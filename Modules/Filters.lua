@@ -108,6 +108,7 @@ local function logBlockedEvent(eventItem)
     end
     if(arg11 and blockedEvents[arg11] == nil) then
         blockedEvents[arg11] = {event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11};
+        arg2 = _G.Ambiguate(arg2, "none")
         local msg = "|cffff7d0a"..L["WIM has blocked a message from %s."].." |r|cffff0000[|HWIMBLOCKED:"..arg11.."|h"..L["View Blocked Message"].."|h]|r"
         _G.DEFAULT_CHAT_FRAME:AddMessage(msg:gsub("%%s", "|r[|Hplayer:"..arg2.."|h"..arg2.."|h]|cffff7d0a"));
         _G.PlaySound("TellMessage");
@@ -180,6 +181,7 @@ end
 
 local function processFilter(eventItem, filter)
     local message, name = eventItem:GetArgs();
+    name = _G.Ambiguate(name, "none")
     if(filter.type == 1) then
         --message = string.trim(message);
         local patterns = filter.pattern.."\n";
@@ -358,6 +360,7 @@ local function chatController(self, eventItem, msg, from)
     if(not db or not db.enabled) then
         return;
     end
+    from = _G.Ambiguate(from, "none")
     local isSent = from == _G.UnitName("player");
     for i=1, #chatFilters do
         if(((isSent and chatFilters[i].sent) or (not isSent and chatFilters[i].received)) and chatFilters[i].enabled) then
