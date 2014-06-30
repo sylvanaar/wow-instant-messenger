@@ -1376,7 +1376,6 @@ local function destroyWindow(userNameOrObj)
         WindowSoupBowl.windows[index].user = "";
         WindowSoupBowl.available = WindowSoupBowl.available + 1;
         WindowSoupBowl.used = WindowSoupBowl.used - 1;
-        -- WIM_Astrolabe:RemoveIconFromMinimap(obj.icon);
         -- obj.icon:Hide();
         -- obj.icon.track = false;
         obj:Show();
