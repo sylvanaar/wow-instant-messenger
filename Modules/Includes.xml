@@ -14,7 +14,6 @@
     <Script file="TabManagement.lua"/>
     <Script file="History.lua"/>
     <Script file="ldb.lua"/>
-<!--        <Script file="Negotiate.lua"/>>-->
     <Script file="Expose.lua"/>
     <Script file="ClickControl.lua"/>
     <Script file="OffScreenTracker.lua"/>
