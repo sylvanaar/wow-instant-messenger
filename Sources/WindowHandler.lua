@@ -1376,8 +1376,7 @@ local function destroyWindow(userNameOrObj)
         WindowSoupBowl.windows[index].user = "";
         WindowSoupBowl.available = WindowSoupBowl.available + 1;
         WindowSoupBowl.used = WindowSoupBowl.used - 1;
-        -- obj.icon:Hide();
-        -- obj.icon.track = false;
+
         obj:Show();
         obj.widgets.chat_display:Clear();
         obj:Hide();
