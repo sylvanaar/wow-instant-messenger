@@ -7,7 +7,6 @@
     <Script file="URLHandler.lua"/>
     <Script file="Sounds.lua"/>
     <Script file="Emoticons.lua"/>
-<!--    <Script file="Tutorials.lua"/>/>-->
     <Script file="Menu.lua"/>
     <Script file="TimeStamps.lua"/>
     <Script file="ShortcutBar.lua"/>
@@ -15,9 +14,7 @@
     <Script file="TabManagement.lua"/>
     <Script file="History.lua"/>
     <Script file="ldb.lua"/>
-<!--    <Script file="Negotiate.lua"/>-->
-<!--    <Script file="W2W.lua"/>-->
-<!--    <Script file="W2Wv2.lua"/>-->
+    <Script file="Negotiate.lua"/>
     <Script file="Expose.lua"/>
     <Script file="ClickControl.lua"/>
     <Script file="OffScreenTracker.lua"/>

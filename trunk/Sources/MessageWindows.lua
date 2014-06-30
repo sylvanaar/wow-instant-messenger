@@ -1,3 +1,5 @@
+        WindowSoupBowl.available = WindowSoupBowl.available + 1;
+        WindowSoupBowl.used = WindowSoupBowl.used - 1;
 local WIM = WIM;
 
 -- load message window related default settings.
@@ -464,123 +466,6 @@ local function getMessageWindow(userName)
     end
 end
 
---[[
-local function shouldTrackUser(theUser)
-    if(WIM_W2W[theUser]) then
-        if(WIM_W2W[theUser].zoneInfo) then
-            local astrolabe = WIM.libs.Astrolabe;
-            local tmp = WIM_W2W[theUser].zoneInfo;
-            local C, Z, x, y = astrolabe:GetCurrentPlayerPosition();
-            if((tonumber(tmp.x) == 0 and tonumber(tmp.y == 0)) or (tonumber(x) == 0 or tonumber(y) == 0)) then
-                -- do not show on minimap if either the player or myself are in a non-valid instance.
-                return false
-            else
-                -- only show if we are on the same continent.
-                if(tonumber(C) == tonumber(tmp.C)) then
-                    return true;
-                else
-                    return false;
-                end
-            end
-        else
-            return false;
-        end
-    else
-        return false;
-    end
-end--]]
-
-local function createMipmapDodad()
---    local astrolabe = WIM.libs.Astrolabe;
-
-    local icon = CreateFrame("Button", nil, UIParent);
-    icon:SetWidth(16);
-    icon:SetHeight(16);
-    icon.bg = icon:CreateTexture();
-    icon.bg:SetTexture("Interface\\AddOns\\WIM\\Images\\miniEnabled");
-    icon.bg:SetDrawLayer("BACKGROUND");
-    icon.bg:SetAllPoints();
-    icon.bg:Hide();
-    icon:SetPoint("CENTER", Minimap, "CENTER", 0, 0);
-    
-    icon.track = false;
-    
-    icon.recalc_timeout = 0;
-    icon.phase = 0;
-    
-    icon.arrow = CreateFrame("Model", nil, icon)
-    icon.arrow:SetHeight(140.8)
-    icon.arrow:SetWidth(140.8)
-    icon.arrow:SetPoint("CENTER", Minimap, "CENTER", 0, 0)
-    icon.arrow:SetModel("Interface\\Minimap\\Rotating-MinimapArrow.mdx")
-    icon.arrow:Hide();
-    
-    function icon:OnUpdate(elapsed)
-      if (icon.track and shouldTrackUser(self.theUser)) then
-        --[[
-        self:Show()
-        
-        if self.recalc_timeout <= 0 then
-          self.recalc_timeout = 50
-          
-          astrolabe:PlaceIconOnMinimap(self, tonumber(WIM_W2W[this.theUser].zoneInfo.C), tonumber(WIM_W2W[this.theUser].zoneInfo.Z), tonumber(WIM_W2W[this.theUser].zoneInfo.x), tonumber(WIM_W2W[this.theUser].zoneInfo.y))
-        else
-          self.recalc_timeout = self.recalc_timeout - 1
-        end
-        
-        local edge = astrolabe:IsIconOnEdge(self)
-        
-        if edge then
-          self.arrow:Show()
-          self.bg:Hide()
-        else
-          self.arrow:Hide()
-          self.bg:Show()
-        end
-        
-        if edge then
-          local angle = astrolabe:GetDirectionToIcon(self)
-          if GetCVar("rotateMinimap") == "1" then
-            angle = angle + MiniMapCompassRing:GetFacing()
-          end
-          
-          self.arrow:SetFacing(angle)
-          self.arrow:SetPosition(ofs * (137 / 140) - radius * math.sin(angle),
-                                 ofs               + radius * math.cos(angle), 0);
-          
-          if self.phase > 6.283185307179586476925 then
-            self.phase = self.phase-6.283185307179586476925+elapsed*3.5
-          else
-            self.phase = self.phase+elapsed*3.5
-          end
-          self.arrow:SetModelScale(0.600000023841879+0.1*math.sin(self.phase))
-        end--]]
-      else
-        self:Hide()
-      end
-    end
-    
-    function icon:OnEnter()
-        WIM_ShortcutFrame_Location_OnEnter(icon.theUser);
-    end
-    
-    function icon:OnLeave()
-      GameTooltip:Hide()
-    end
-    
-    function icon:OnClick()
-        WIM_PostMessage(this.theUser, "", 5);
-    end
-    
-    icon:SetScript("OnUpdate", icon.OnUpdate)
-    icon:SetScript("OnEnter", icon.OnEnter)
-    icon:SetScript("OnLeave", icon.OnLeave)
-    icon:SetScript("OnClick", icon.OnClick)
-    
-    icon:RegisterForClicks("LeftButtonUp")
-    
-    return icon;
-end
 
 -- create all of MessageWindow's object children
 local function instantiateMessageWindowObj(obj)
@@ -603,8 +488,7 @@ local function instantiateMessageWindowObj(obj)
     obj:SetScript("OnHide", MessageWindow_Frame_OnHide);
     obj:SetScript("OnUpdate", MessageWindow_Frame_OnUpdate);
     
-    obj.icon = createMipmapDodad(fName);
-    
+
     obj.w2w_menu = CreateFrame("Frame", fName.."W2WMenu", obj, "UIDropDownMenuTemplate");
     obj.w2w_menu:SetClampedToScreen(true);
     
@@ -930,7 +814,7 @@ function WIM:DestroyMessageWindow(userName)
         WindowSoupBowl.windows[index].user = "";
         WindowSoupBowl.available = WindowSoupBowl.available + 1;
         WindowSoupBowl.used = WindowSoupBowl.used - 1;
---        WIM_Astrolabe:RemoveIconFromMinimap(obj.icon);
+
         obj.icon:Hide();
         obj.icon.track = false;
         obj.theUser = nil;
