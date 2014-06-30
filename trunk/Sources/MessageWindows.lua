@@ -464,6 +464,7 @@ local function getMessageWindow(userName)
     end
 end
 
+--[[
 local function shouldTrackUser(theUser)
     if(WIM_W2W[theUser]) then
         if(WIM_W2W[theUser].zoneInfo) then
@@ -487,10 +488,10 @@ local function shouldTrackUser(theUser)
     else
         return false;
     end
-end
+end--]]
 
 local function createMipmapDodad()
-    local astrolabe = WIM.libs.Astrolabe;
+--    local astrolabe = WIM.libs.Astrolabe;
 
     local icon = CreateFrame("Button", nil, UIParent);
     icon:SetWidth(16);
@@ -516,7 +517,7 @@ local function createMipmapDodad()
     
     function icon:OnUpdate(elapsed)
       if (icon.track and shouldTrackUser(self.theUser)) then
-        
+        --[[
         self:Show()
         
         if self.recalc_timeout <= 0 then
@@ -553,7 +554,7 @@ local function createMipmapDodad()
             self.phase = self.phase+elapsed*3.5
           end
           self.arrow:SetModelScale(0.600000023841879+0.1*math.sin(self.phase))
-        end
+        end--]]
       else
         self:Hide()
       end
@@ -929,7 +930,7 @@ function WIM:DestroyMessageWindow(userName)
         WindowSoupBowl.windows[index].user = "";
         WindowSoupBowl.available = WindowSoupBowl.available + 1;
         WindowSoupBowl.used = WindowSoupBowl.used - 1;
-        WIM_Astrolabe:RemoveIconFromMinimap(obj.icon);
+--        WIM_Astrolabe:RemoveIconFromMinimap(obj.icon);
         obj.icon:Hide();
         obj.icon.track = false;
         obj.theUser = nil;

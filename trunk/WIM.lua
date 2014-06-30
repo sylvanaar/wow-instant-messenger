@@ -86,7 +86,6 @@ local function initialize()
         
     -- import libraries.
     libs.WhoLib = _G.LibStub:GetLibrary("LibWho-2.0");
-   -- libs.Astrolabe = _G.DongleStub("Astrolabe-0.4");
     libs.SML = _G.LibStub:GetLibrary("LibSharedMedia-3.0");
     libs.ChatHandler = _G.LibStub:GetLibrary("LibChatHandler-1.0");
     
