@@ -568,52 +568,52 @@ end
 -- "/w |Kf287|k0000000000000|k " 
 local tellTargetExtractionAutoComplete = _G.AUTOCOMPLETE_LIST.ALL;
 function CF_ExtractTellTarget(editBox, msg)
-  -- Grab the string after the slash command
-  local target = string.match(msg, "%s*(.*)");
-  local bNetID;
-  --_G.DEFAULT_CHAT_FRAME:AddMessage("Raw: "..msg:gsub("|", ":")); -- debugging
-  if (target:find("^|K")) then
-    target, msg = _G.BNTokenFindName(target);
-    bNetID = _G.BNet_GetPresenceID(target);
-  else
-    --If we haven't even finished one word, we aren't done.
-    if (not target or not string.find(target, "%s") or (string.sub(target, 1, 1) == "|")) then
-      return false;
-    end
+	-- Grab the string after the slash command
+	local target = string.match(msg, "%s*(.*)");
+	local bNetID;
+	--_G.DEFAULT_CHAT_FRAME:AddMessage("Raw: "..msg:gsub("|", ":")); -- debugging
+	if (target:find("^|K")) then
+		target, msg = _G.BNTokenFindName(target);
+		bNetID = _G.BNet_GetPresenceID(target);
+	else
+		--If we haven't even finished one word, we aren't done.
+		if (not target or not string.find(target, "%s") or (string.sub(target, 1, 1) == "|")) then
+			return false;
+		end
 
- --[[   if (_G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include,
-      tellTargetExtractionAutoComplete.exclude, 1, nil, true)) then
-      --Even if there's a space, we still want to let the person keep typing -- they may be trying to type whatever
-      -- -- is in AutoComplete.
-      return false;
-    end--]]
+		--[[if (_G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include,
+			tellTargetExtractionAutoComplete.exclude, 1, nil, true)) then
+			--Even if there's a space, we still want to let the person keep typing -- they may be trying to type whatever
+			-- -- is in AutoComplete.
+			return false;
+		end--]]
 
-    --Keep pulling off everything after the last space until we either have something on the AutoComplete list or
-    -- -- only a single word is left.
-    while (string.find(target, "%s")) do
-      --Pull off everything after the last space.
-      target = string.match(target, "(.+)%s+[^%s]*");
-      target = _G.Ambiguate(target, "none")
-      if (_G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include,
-        tellTargetExtractionAutoComplete.exclude, 1, nil, true)) then
-        break;
-      end
-    end
+		--Keep pulling off everything after the last space until we either have something on the AutoComplete list or
+		-- -- only a single word is left.
+		while (string.find(target, "%s")) do
+		--Pull off everything after the last space.
+			target = string.match(target, "(.+)%s+[^%s]*");
+			target = _G.Ambiguate(target, "none")
+			if (_G.GetAutoCompleteResults(target, tellTargetExtractionAutoComplete.include,
+				tellTargetExtractionAutoComplete.exclude, 1, nil, true)) then
+				break;
+			end
+		end
+		msg = string.sub(msg, string.len(target) + 2);
+	end
 
-    msg = string.sub(msg, string.len(target) + 2);
-  end
-
-  if (db and db.enabled) then
-    local curState = curState;
-    curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
-    if (db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
-      local win = getWhisperWindowByUser(target, bNetID);
-      win.widgets.msg_box.setText = 1;
-      win:Pop(true); -- force popup
-      win.widgets.msg_box:SetFocus();
-      _G.ChatEdit_OnEscapePressed(editBox);
-    end
-  end
+	if (db and db.enabled) then
+		local curState = curState;
+		curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+		if (db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
+			target = _G.Ambiguate(target, "none")--For good measure, ambiguate again cause it seems some mods interfere with this process
+			local win = getWhisperWindowByUser(target, bNetID);
+			win.widgets.msg_box.setText = 1;
+			win:Pop(true); -- force popup
+			win.widgets.msg_box:SetFocus();
+			_G.ChatEdit_OnEscapePressed(editBox);
+		end
+	end
 end
 
 -- the following hook is needed in order to intercept /r
