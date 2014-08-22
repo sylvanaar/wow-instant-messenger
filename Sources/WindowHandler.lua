@@ -958,7 +958,7 @@ local function instantiateWindow(obj)
                 });
         elseif(self.isBN) then
                 -- get information of BN user from friends data.
-                local id = _G.BNet_GetPresenceID(self.theUser);
+                local id = _G.BNet_GetPresenceID(self.theUser or "");
                 if(id) then
                                 local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText, broadcastText, broadcastTime = _G.BNGetToonInfo(id);
                                 self.class = class or "";
