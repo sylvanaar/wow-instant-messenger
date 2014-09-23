@@ -90,6 +90,32 @@ local WIM_ClassicSkin = {
                 d3 = {.5, .75, .5, 1, .75, .75, .75, 1},
                 bnd = {.25, .75, .25, 1, .5, .75, .5, 1}
             },
+            client_icon = {
+                texture = "Interface\\AddOns\\"..WIM.addonTocName.."\\skins\\default\\client_icons",
+                chatAlphaMask = "Interface\\AddOns\\"..WIM.addonTocName.."\\skins\\default\\chatAlphaMask",
+                width = 64,
+                height = 64,
+                points = {
+                    {"TOPLEFT", "window", "TOPLEFT", -10, 12}
+                },
+                is_round = true,
+                hots = {.5, .5, .5, .75, .75, .5, .75, .75},
+                --druid = {0, 0, 0, .25, .25, 0, .25, .25},
+                --hunter = {.25, 0, .25, .25, .5, 0, .5, .25},
+                --mage = {.5, 0, .5, .25, .75, 0, .75, .25},
+                --paladin = {.75, 0, .75, .25, 1, 0, 1, .25},
+                --priest = {0, .25, 0, .5, .25, .25, .25, .5},
+                --rogue = {.25, .25, .25, .5, .5, .25, .5, .5},
+                --shaman = {.5, .25, .5, .5, .75, .25, .75, .5},
+                --warlock = {.75, .25, .75, .5, 1, .25, 1, .5},
+                --warrior = {0, .5, 0, .75, .25, .5, .25, .75},
+                --deathknight = {.75, .5, .75, .75, 1, .5, 1, .75},
+                hs = {0, .75, 0, 1, .25, .75, .25, 1},
+                --gm = {.25, .5, .25, .75, .5, .5, .5, .75},
+                sc2 = {.75, .75, .75, 1, 1, .75, 1, 1},
+                d3 = {.5, .75, .5, 1, .75, .75, .75, 1},
+                bnd = {.25, .75, .25, 1, .5, .75, .5, 1}
+            },
             from = {
                 points = {
                     {"TOPLEFT", "window", "TOPLEFT", 50, -8}

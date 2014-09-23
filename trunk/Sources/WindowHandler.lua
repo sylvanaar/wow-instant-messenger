@@ -905,7 +905,7 @@ local function instantiateWindow(obj)
                 --(Out of room in class textures file. maybe it's time to skin only class icons and use blizzard provided textures for game clients)
                 elseif(self.bn and self.bn.client == _G.BNET_CLIENT_WTCG) then
                                 classTag = "bnd";--"Interface\\FriendsFrame\\Battlenet-WTCGicon"
-                elseif(self.bn and self.bn.client == _G.BNET_CLIENT_HEROES) then
+                elseif(self.bn and self.bn.client == "Hero") then--_G.BNET_CLIENT_HEROES
                                 classTag = "bnd";--"Interface\\FriendsFrame\\Battlenet-HotSicon"
                 elseif(self.bn and self.bn.client == "App") then--Battle.net Desktop App
                                 classTag = "bnd";--"Interface\\FriendsFrame\\Battlenet-Battleneticon"
