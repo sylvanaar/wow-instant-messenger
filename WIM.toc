@@ -1,4 +1,4 @@
-## Interface: 50400 
+## Interface: 60000 
 ## Title: WIM
 ## Author: Pazza (Bronzebeard), (Updated by Sylvanaar)
 ## Version: @project-version@
