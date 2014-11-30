@@ -16,6 +16,10 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.6.20", "11/30/2014", [[
+	*WIM should no longer taint join battleground.
+	*The window behavior options should be visible once again. Not as pretty as they used to be though.
+]]);
 addEntry("3.6.19", "07/11/2014", [[
 	*Cleaned up and removed unneeded code and library.
 	*Removed private realm check since it doesn't work in 6.0 and causes problems with beta.
