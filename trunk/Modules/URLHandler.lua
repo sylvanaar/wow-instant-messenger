@@ -201,7 +201,7 @@ WIM.RegisterItemRefHandler("wim_url", displayURL);
 
 --context menu
 local isUS = false
-if GetCurrentRegion() == 1 then
+if _G.GetCurrentRegion() == 1 then
 	isUS = true
 end
 local function MENU_ARMORY_CLICKED(self)
