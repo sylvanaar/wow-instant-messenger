@@ -19,6 +19,7 @@ end
 addEntry("3.6.20", "11/30/2014", [[
 	*WIM should no longer taint join battleground.
 	*The window behavior options should be visible once again. Not as pretty as they used to be though.
+	*Armory links should go to correct region now for US players.
 ]]);
 addEntry("3.6.19", "07/11/2014", [[
 	*Cleaned up and removed unneeded code and library.
