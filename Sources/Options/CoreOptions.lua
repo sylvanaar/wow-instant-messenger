@@ -179,7 +179,7 @@ local function createPopRuleFrame(winType)
             frame:Hide();
             frame:Show();
         end);
-    frame.main.nextOffSetY = -80;
+    frame.main.nextOffSetY = -60;
     frame.main.selectedState = "other";
 
     frame.main.options = frame.main:CreateSection();
@@ -190,7 +190,6 @@ local function createPopRuleFrame(winType)
     frame.main.options:CreateCheckButton(L["Auto focus a window when it is shown."], frame.main.options.getDBTree, "autofocus");
     frame.main.options:CreateCheckButton(L["Keep focus on window after sending a message."], frame.main.options.getDBTree, "keepfocus");
     frame.main.options:CreateCheckButton(L["Suppress messages from the default chat frame."], frame.main.options.getDBTree, "supress");
-    
     frame.main.tabs = CreateFrame("Frame", nil, frame.main);
     frame.main.tabs:SetPoint("BOTTOMLEFT", frame.main.options, "TOPLEFT", 0, 1);
     frame.main.tabs:SetPoint("BOTTOMRIGHT", frame.main.options, "TOPRIGHT", 1 , 1);
