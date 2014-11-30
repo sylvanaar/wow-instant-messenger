@@ -16,7 +16,7 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addEntry("3.6.20", "11/30/2014", [[
+addEntry("3.6.21", "11/30/2014", [[
 	*WIM should no longer taint join battleground.
 	*The window behavior options should be visible once again. Not as pretty as they used to be though.
 	*Armory links should go to correct region now for US players.
