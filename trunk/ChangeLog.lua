@@ -16,6 +16,9 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.6.22", "12/28/2014", [[
+	*Fixed 3 more missiong options in 'Display Settings'
+]]);
 addEntry("3.6.21", "11/30/2014", [[
 	*WIM should no longer taint join battleground.
 	*The window behavior options should be visible once again. Not as pretty as they used to be though.

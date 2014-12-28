@@ -357,11 +357,9 @@ local function General_VisualSettings()
     frame.menu.nextOffSetY = -30;
     frame.menu.alpha = frame.menu:CreateSlider(L["Window Alpha"], "1", "100", 1, 100, 1, db, "windowAlpha", function(self) UpdateAllWindowProps(); end);
     frame.menu.nextOffSetY = -35;
-    frame.menu.sub = frame.menu:CreateSection();
-    options.AddFramedBackdrop(frame.menu.sub);
-    frame.menu.sub:CreateCheckButton(L["Enable window fading effects."], db, "winFade");
-    frame.menu.sub:CreateCheckButton(L["Enable window animation effects."], db, "winAnimation");
-    frame.menu.sub:CreateCheckButton(L["Display item links when hovering over them."], db, "hoverLinks");
+	frame.menu:CreateCheckButton(L["Enable window fading effects."], db, "winFade");
+	frame.menu:CreateCheckButton(L["Enable window animation effects."], db, "winAnimation");
+	frame.menu:CreateCheckButton(L["Display item links when hovering over them."], db, "hoverLinks");
     
     return frame;
 end
