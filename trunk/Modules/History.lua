@@ -130,7 +130,7 @@ local function recordWhisper(inbound, ...)
         local pid = _G.BNet_GetPresenceID(from)
         if pid then
         	local _, _, btag, _, toonName = _G.BNGetFriendInfoByID(pid)
-			from = btag or toonName--Btag is nill, default to toonname
+			from = btag or toonName or _G.UNKNOWN--Btag is nill, default to toonname
 		end
         local history = getPlayerHistoryTable(from);
         history.info.gm = lists.gm[from];
