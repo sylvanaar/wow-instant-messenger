@@ -121,6 +121,12 @@ end
 
 local function recordWhisper(inbound, ...)
     local msg, from = ...;
+    if from then
+   	 _G.print(from)
+   	else
+	   	_G.print("from is nil, aborting")
+	   	return
+	end
     local db = db.history.whispers; 
     local win = windows.active.whisper[from] or windows.active.chat[from] or windows.active.w2w[from];
     if (win and (lists.gm[from] or db.all or (db.friends and (lists.friends[from] or win.isBN)) or (db.guild and lists.guild[from]))) then
@@ -130,7 +136,7 @@ local function recordWhisper(inbound, ...)
         local pid = _G.BNet_GetPresenceID(from)
         if pid then
         	local _, _, btag, _, toonName = _G.BNGetFriendInfoByID(pid)
-			from = btag or toonName or _G.UNKNOWN--Btag is nill, default to toonname
+			from = btag or toonName or from
 		end
         local history = getPlayerHistoryTable(from);
         history.info.gm = lists.gm[from];
