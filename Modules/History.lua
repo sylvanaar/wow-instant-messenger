@@ -121,10 +121,7 @@ end
 
 local function recordWhisper(inbound, ...)
     local msg, from = ...;
-    if from then
-   	 _G.print(from)
-   	else
-	   	_G.print("from is nil, aborting")
+    if not from then
 	   	return
 	end
     local db = db.history.whispers; 
