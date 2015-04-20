@@ -16,6 +16,10 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.6.26", "04/20/2015", [[
+	*Fixed lua error in IsInraid filter function.
+	*Updated profile links.
+]]);
 addEntry("3.6.25", "03/25/2015", [[
 	*Grabbed new WhoLib for 2 bugfixes related to that lib.
 ]]);
