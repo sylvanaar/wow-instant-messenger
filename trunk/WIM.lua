@@ -462,7 +462,7 @@ function IsInParty(user)
 end
 
 function IsInRaid(user)
-    for i=1, GetNumGroupMembers() do
+    for i=1, _G.GetNumGroupMembers() do
         if(_G.GetUnitName("raid"..i, true) == user) then
             return true;
         end
