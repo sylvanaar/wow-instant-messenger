@@ -16,6 +16,10 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.6.27", "06/23/2015", [[
+	*Tabs should no longer incorrectly cascade.
+	*Updated Interface version to 6.2.
+]]);
 addEntry("3.6.26", "04/20/2015", [[
 	*Fixed lua error in IsInraid filter function.
 	*Updated profile links.
