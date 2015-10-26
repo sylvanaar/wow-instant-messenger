@@ -16,6 +16,9 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7", "10/26/2015", [[
+	*Will now support application flash/bounce for whispers that are supressed from chat frame.
+]]);
 addEntry("3.6.28", "10/23/2015", [[
 	*Updated URL handler patterns to parse URLs better.
 ]]);
@@ -35,9 +38,6 @@ addEntry("3.6.24", "02/01/2015", [[
 ]]);
 addEntry("3.6.23", "01/02/2015", [[
 	*Fixed another 3 missing options in 'Window Settings'
-]]);
-addEntry("3.6.22", "12/28/2014", [[
-	*Fixed 3 more missing options in 'Display Settings'
 ]]);
 
 
