@@ -398,7 +398,7 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER_CONTROLLER(eventItem, ...)
     local curState = curState;
     curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
     if(WIM.db.pop_rules.whisper[curState].supress) then
-    	FlashClientIcon()
+    	_G.FlashClientIcon()
         eventItem:BlockFromChatFrame();
     end
 end
