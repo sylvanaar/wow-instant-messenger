@@ -36,9 +36,6 @@ addEntry("3.6.26", "04/20/2015", [[
 addEntry("3.6.25", "03/25/2015", [[
 	*Grabbed new WhoLib for 2 bugfixes related to that lib.
 ]]);
-addEntry("3.6.24", "02/01/2015", [[
-	*Grabbed new WhoLib for 2 bugfixes related to that lib.
-]]);
 
 
 local function entryExists(version)
