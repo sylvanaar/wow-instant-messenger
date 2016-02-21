@@ -214,6 +214,16 @@ RegisterWidgetTrigger("msg_box", "chat", "OnEnterPressed", function(self)
         elseif(obj.chatType == "channel") then
             TARGET = "CHANNEL";
             NUMBER = obj.channelNumber;
+        else
+            return;
+        end
+        local msgCount = math.ceil(string.len(msg)/255);
+        if(msgCount == 1) then
+	        _G.ChatThrottleLib:SendChatMessage("ALERT", "WIM", msg, TARGET, nil, NUMBER);
+        elseif(msgCount > 1) then
+            SendSplitMessage("ALERT", "WIM", msg, TARGET, nil, NUMBER);
+        end
+        self:SetText("");
     end);
 
 
