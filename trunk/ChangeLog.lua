@@ -16,6 +16,10 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7.2", "TBD", [[
+	*WIM is now compatible with RealID/battle.net whispers on WoW 7.0 and 6.2.4
+	*Removed RealID multi person chat related features since they no longer exist in 6.2.4+.
+]]);
 addEntry("3.7.1", "01/17/2016", [[
 	*Resolved lua errors in WoW 7.x.
 ]]);
@@ -32,9 +36,6 @@ addEntry("3.6.27", "06/23/2015", [[
 addEntry("3.6.26", "04/20/2015", [[
 	*Fixed lua error in IsInraid filter function.
 	*Updated profile links.
-]]);
-addEntry("3.6.25", "03/25/2015", [[
-	*Grabbed new WhoLib for 2 bugfixes related to that lib.
 ]]);
 
 
