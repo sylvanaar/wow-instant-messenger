@@ -32,7 +32,7 @@ local time = time;
 setfenv(1, WIM);
 
 --Quick and dirty fix for renames in legion to deal with renamed globals
-local BNet_GetPresenceID = _G.BNet_GetBNetIDGameAccount or _G.BNet_GetPresenceID
+local BNet_GetPresenceID = _G.BNet_GetBNetIDAccount or _G.BNet_GetPresenceID
 local BNGetToonInfo = _G.BNGetGameAccountInfo or _G.BNGetToonInfo
 
 
