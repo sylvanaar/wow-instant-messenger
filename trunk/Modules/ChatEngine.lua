@@ -177,9 +177,6 @@ local function getChatWindow(ChatName, chatType)
         if(chatType == "guild") then
             Windows[ChatName].CHAT_listCount = _G.GetNumGuildMembers;
             Windows[ChatName].CHAT_listFun = _G.GetGuildRosterInfo;
-	elseif(chatType == "BN_CONVERSATION") then
-	    Windows[ChatName].CHAT_listCount = function() local l = Windows[ChatName].chatList; return #l; end;
-	    Windows[ChatName].CHAT_listFun = function(i) return Windows[ChatName].chatList[i]; end
 	else
             Windows[ChatName].CHAT_listCount = nil;
             Windows[ChatName].CHAT_listFun = nil;
@@ -217,24 +214,6 @@ RegisterWidgetTrigger("msg_box", "chat", "OnEnterPressed", function(self)
         elseif(obj.chatType == "channel") then
             TARGET = "CHANNEL";
             NUMBER = obj.channelNumber;
-	elseif(obj.chatType == "BN_CONVERSATION") then
-	    TARGET = "BN_CONVERSATION";
-            NUMBER = tonumber(obj.channelNumber);
-	    --BNSendConversationMessage
-        else
-            return;
-        end
-        local msgCount = math.ceil(string.len(msg)/255);
-        if(msgCount == 1) then
-	    if(TARGET == "BN_CONVERSATION") then
-		    _G.BNSendConversationMessage(NUMBER, msg);
-	    else
-	            _G.ChatThrottleLib:SendChatMessage("ALERT", "WIM", msg, TARGET, nil, NUMBER);
-	    end
-        elseif(msgCount > 1) then
-            SendSplitMessage("ALERT", "WIM", msg, TARGET, nil, NUMBER);
-        end
-        self:SetText("");
     end);
 
 
@@ -1480,7 +1459,6 @@ local function loadChatOptions()
     RegisterOptionFrame(L["Chat"], _G.RAID, createRaidChat);
     RegisterOptionFrame(L["Chat"], _G.INSTANCE_CHAT, createBattlegroundChat);
     RegisterOptionFrame(L["Chat"], _G.SAY, createSayChat);
-    RegisterOptionFrame(L["Chat"], _G.BN_CONVERSATION, createBNChat);
     RegisterOptionFrame(L["Chat"], L["World Chat"], createWorldChat);
     RegisterOptionFrame(L["Chat"], L["Custom Chat"], createCustomChat);
     
