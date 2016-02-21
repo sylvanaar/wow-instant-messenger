@@ -972,7 +972,9 @@ local function instantiateWindow(obj)
                 -- get information of BN user from friends data.
                 local id = self.theUser and BNet_GetPresenceID(self.theUser) or nil;
                 if(id) then
-                                local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText, broadcastText, broadcastTime = BNGetToonInfo(id);
+                				--Legion doesn't give game info off presence ID, but doesn't give other info off gameID, so need to run both functions separate now
+                				local gameId = _G.BNet_GetBNetIDGameAccount(self.theUser) or id
+                                local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText, broadcastText, broadcastTime = BNGetToonInfo(gameId);
                                 self.class = class or "";
                                 self.level = level or "";
                                 self.race = race or "";
