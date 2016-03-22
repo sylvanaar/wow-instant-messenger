@@ -16,7 +16,7 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addEntry("3.7.2", "TBD", [[
+addEntry("3.7.2", "03/22/2016", [[
 	*WIM is now compatible with RealID/battle.net whispers on WoW 7.0 and 6.2.4
 	*Removed RealID multi person chat related features since they no longer exist in 6.2.4+.
 ]]);
