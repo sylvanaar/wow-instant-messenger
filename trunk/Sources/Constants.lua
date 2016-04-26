@@ -80,7 +80,7 @@ classes[L["Monk"]]		= {
 classes[L["Demon Hunter"]]	= {
                               color = "a330c9",
                               tag = "DEMONHUNTER",
-                              talent = {L["Havok"], L["Vengeance"]
+                              talent = {L["Havok"], L["Vengeance"]}
                          };
 classes[L["Game Master"]] = {
                               color = "00c0ff",
