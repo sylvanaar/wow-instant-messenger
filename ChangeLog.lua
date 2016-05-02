@@ -16,6 +16,9 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7.4", "05/02/2016", [[
+	*Added chat icon support for Heroes of Storm, Overwatch, and Demon Hunters
+]]);
 addEntry("3.7.3", "03/24/2016", [[
 	*Resolved lua error when ToonID is nil
 ]]);
@@ -31,10 +34,6 @@ addEntry("3.7", "10/26/2015", [[
 ]]);
 addEntry("3.6.28", "10/23/2015", [[
 	*Updated URL handler patterns to parse URLs better.
-]]);
-addEntry("3.6.27", "06/23/2015", [[
-	*Tabs should no longer incorrectly cascade.
-	*Updated Interface version to 6.2.
 ]]);
 
 

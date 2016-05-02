@@ -906,29 +906,45 @@ local function instantiateWindow(obj)
         else
                 local classTag = obj.class;
                 icon:SetGradient("VERTICAL", 1, 1, 1, 1, 1, 1);
-                icon:SetTexture(GetSelectedSkin().message_window.widgets.class_icon.texture);
                 if(self.bn and self.bn.client == _G.BNET_CLIENT_SC2) then
                                 classTag = "sc2";--"Interface\\FriendsFrame\\Battlenet-Sc2icon"
+                                icon:SetTexture(GetSelectedSkin().message_window.widgets.client_icon.texture);
+                                icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.client_icon[classTag]));
                 elseif(self.bn and self.bn.client == _G.BNET_CLIENT_D3) then
                                 classTag = "d3";--"Interface\\FriendsFrame\\Battlenet-D3icon"
+                                icon:SetTexture(GetSelectedSkin().message_window.widgets.client_icon.texture);
+                                icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.client_icon[classTag]));
                 --(Out of room in class textures file. maybe it's time to skin only class icons and use blizzard provided textures for game clients)
                 elseif(self.bn and self.bn.client == _G.BNET_CLIENT_WTCG) then
-                                classTag = "bnd";--"Interface\\FriendsFrame\\Battlenet-WTCGicon"
-                elseif(self.bn and self.bn.client == "Hero") then--_G.BNET_CLIENT_HEROES
-                                classTag = "bnd";--"Interface\\FriendsFrame\\Battlenet-HotSicon"
-                elseif(self.bn and self.bn.client == "App") then--Battle.net Desktop App
+                                classTag = "hs";--"Interface\\FriendsFrame\\Battlenet-WTCGicon"
+                                icon:SetTexture(GetSelectedSkin().message_window.widgets.client_icon.texture);
+                                icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.client_icon[classTag]));
+                elseif(self.bn and self.bn.client == _G.BNET_CLIENT_HEROES) then
+                                classTag = "hots";--"Interface\\FriendsFrame\\Battlenet-HotSicon"
+                                icon:SetTexture(GetSelectedSkin().message_window.widgets.client_icon.texture);
+                                icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.client_icon[classTag]));
+                elseif(self.bn and self.bn.client == _G.BNET_CLIENT_OVERWATCH) then
+                                classTag = "ow";--"Interface\\FriendsFrame\\Battlenet-Overwatchicon"
+                                icon:SetTexture(GetSelectedSkin().message_window.widgets.client_icon.texture);
+                                icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.client_icon[classTag]));
+                elseif(self.bn and (self.bn.client == _G.BNET_CLIENT_APP or self.bn.client == _G.BNET_CLIENT_CLNT)) then--Battle.net Desktop App
                                 classTag = "bnd";--"Interface\\FriendsFrame\\Battlenet-Battleneticon"
+                                icon:SetTexture(GetSelectedSkin().message_window.widgets.client_icon.texture);
+                                icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.client_icon[classTag]));
                 elseif(self.class == "") then
                 	classTag = "blank"
+                	icon:SetTexture(GetSelectedSkin().message_window.widgets.class_icon.texture);
+                	icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.class_icon[classTag]));
                 else
                 	if(constants.classes[self.class]) then
                 		classTag = string.lower(constants.classes[self.class].tag);
-                                classTag = string.gsub(classTag, "f$", "");
+                        classTag = string.gsub(classTag, "f$", "");
                 	else
                 		classTag = "blank";
                 	end
+                	icon:SetTexture(GetSelectedSkin().message_window.widgets.class_icon.texture);
+                	icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.class_icon[classTag]));
                 end
-                icon:SetTexCoord(unpack(GetSelectedSkin().message_window.widgets.class_icon[classTag]));
                 if(constants.classes[self.class]) then
                         self.classColor = constants.classes[self.class].color;
                         if(GetSelectedSkin().message_window.widgets.from.use_class_color) then
