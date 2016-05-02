@@ -17,7 +17,7 @@ end
 
 -- ChangeLog Entries.
 addEntry("3.7.4", "05/02/2016", [[
-	*Added chat icon support for Heroes of Storm, Overwatch, and Demon Hunters
+	*Added chat icon support for Heroes of Storm, Hearthstone, Overwatch, and Demon Hunters
 ]]);
 addEntry("3.7.3", "03/24/2016", [[
 	*Resolved lua error when ToonID is nil
