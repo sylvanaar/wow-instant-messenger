@@ -16,6 +16,9 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7.5", "05/04/2016", [[
+	*I didn't like the Overwatch icon quality, so I made it better.
+]]);
 addEntry("3.7.4", "05/02/2016", [[
 	*Added chat icon support for Heroes of Storm, Hearthstone, Overwatch, and Demon Hunters
 ]]);
@@ -31,9 +34,6 @@ addEntry("3.7.1", "01/17/2016", [[
 ]]);
 addEntry("3.7", "10/26/2015", [[
 	*Will now support application flash/bounce for whispers that are supressed from chat frame.
-]]);
-addEntry("3.6.28", "10/23/2015", [[
-	*Updated URL handler patterns to parse URLs better.
 ]]);
 
 
