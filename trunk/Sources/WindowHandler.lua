@@ -994,12 +994,12 @@ local function instantiateWindow(obj)
                                 self.level = level or "";
                                 self.race = race or "";
                                 self.guild = guild or "";
-                                self.location = zoneName;
+                                self.location = client == _G.BNET_CLIENT_WOW and zoneName or gameText;
                                 self.bn.class = class;
                                 self.bn.level = level;
                                 self.bn.race = race;
                                 self.bn.guild = guild;
-                                self.bn.location = zoneName;
+                                self.bn.location = client == _G.BNET_CLIENT_WOW and zoneName or gameText;
                                 self.bn.gameText = gameText;
                                 self.bn.toonName = toonName;
                                 self.bn.client = client;
