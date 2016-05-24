@@ -16,6 +16,9 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7.6", "05/24/16", [[
+	*Whisper window will now report location correctly for non WoW clients.
+]]);
 addEntry("3.7.5", "05/04/2016", [[
 	*I didn't like the Overwatch icon quality, so I made it better.
 ]]);
