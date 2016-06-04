@@ -613,7 +613,7 @@ local function createHistoryViewer()
                         local user, gmTag = string.match(original, "([^*]+)(*?)$");
                         color = gmTag == "*" and constants.classes[L["Game Master"]].color or "ffffff";
                         if(string.match(original, "^*")) then
-                            extra = " |TInterface\\AddOns\\WIM\\Skins\\Default\\minimap.tga:20:20:0:0|t";
+                            extra = " |TInterface\\AddOns\\WIM\\Skins\\Default\\minimap.blp:20:20:0:0|t";
                             color = "fff569";
                         end
                         if not user then
