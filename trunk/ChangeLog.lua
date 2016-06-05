@@ -16,7 +16,10 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
-addEntry("3.7.6", "05/24/16", [[
+addEntry("3.7.7", "06/04/2016", [[
+	*Whisper window will now report location correctly for non WoW clients.
+]]);
+addEntry("3.7.6", "05/24/2016", [[
 	*Whisper window will now report location correctly for non WoW clients.
 ]]);
 addEntry("3.7.5", "05/04/2016", [[
@@ -34,9 +37,6 @@ addEntry("3.7.2", "03/22/2016", [[
 ]]);
 addEntry("3.7.1", "01/17/2016", [[
 	*Resolved lua errors in WoW 7.x.
-]]);
-addEntry("3.7", "10/26/2015", [[
-	*Will now support application flash/bounce for whispers that are supressed from chat frame.
 ]]);
 
 
