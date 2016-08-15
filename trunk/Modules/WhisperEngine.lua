@@ -190,8 +190,8 @@ local function getWhisperWindowByUser(user, isBN)
     else
         -- otherwise, create a new one.
         Windows[user] = CreateWhisperWindow(user);
-	Windows[user].isBN = isBN;
-	Windows[user].bn = Windows[user].bn or {};
+		Windows[user].isBN = isBN;
+		Windows[user].bn = Windows[user].bn or {};
         if(db.whoLookups or lists.gm[user] or Windows[user].isBN) then
             Windows[user]:SendWho(); -- send who request
         end
@@ -318,6 +318,7 @@ function WhisperEngine:CHAT_MSG_WHISPER(...)
     win:Pop("in");
     _G.ChatEdit_SetLastTellTarget(arg2, "WHISPER");
     win.online = true;
+    win.widgets.chat_display:ScrollToBottom();
     updateMinimapAlerts();
     CallModuleFunction("PostEvent_Whisper", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
