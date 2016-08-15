@@ -1347,6 +1347,8 @@ local function createWindow(userName, wtype)
 	CallModuleFunction("OnWindowCreated", obj);
         table.insert(windowsByAge, obj);
         table.sort(windowsByAge, function(a, b) return a.age > b.age; end);
+        obj.widgets.chat_display:ScrollToBottom();
+		updateScrollBars(obj);
         return obj;
     else
         -- must create new object
@@ -1371,6 +1373,8 @@ local function createWindow(userName, wtype)
 	CallModuleFunction("OnWindowCreated", f);
         table.insert(windowsByAge, f);
         table.sort(windowsByAge, function(a, b) return a.age > b.age; end);
+        f.widgets.chat_display:ScrollToBottom();
+		updateScrollBars(f);
         return f;
     end
 end
