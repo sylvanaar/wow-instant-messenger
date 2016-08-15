@@ -16,6 +16,9 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7.10", "08/15/2016", [[
+	*Fixed missing text on new whisper.
+]]);
 addEntry("3.7.9", "07/29/2016", [[
 	*Fixed a few green texture issues.
 ]]);
@@ -33,9 +36,6 @@ addEntry("3.7.5", "05/04/2016", [[
 ]]);
 addEntry("3.7.4", "05/02/2016", [[
 	*Added chat icon support for Heroes of Storm, Hearthstone, Overwatch, and Demon Hunters
-]]);
-addEntry("3.7.3", "03/24/2016", [[
-	*Resolved lua error when ToonID is nil
 ]]);
 
 
