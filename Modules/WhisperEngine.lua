@@ -318,9 +318,10 @@ function WhisperEngine:CHAT_MSG_WHISPER(...)
     win:Pop("in");
     _G.ChatEdit_SetLastTellTarget(arg2, "WHISPER");
     win.online = true;
-    win.widgets.chat_display:ScrollToBottom();
     updateMinimapAlerts();
     CallModuleFunction("PostEvent_Whisper", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+    win.widgets.chat_display:ScrollToTop();
+    win.widgets.chat_display:ScrollToBottom();
 end
 
 -- CHAT_MSG_WHISPER_INFORM  CONTROLLER (For Supression from Chat Frame)
@@ -349,13 +350,14 @@ function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
     win:Pop("out");
     _G.ChatEdit_SetLastToldTarget(arg2, "WHISPER");
     win.online = true;
-    --win.widgets.chat_display:ScrollToBottom();
     win.msgSent = false;
     CallModuleFunction("PostEvent_WhisperInform", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     addToTableUnique(recentSent, arg1);
         if(#recentSent > maxRecent) then
                 table.remove(recentSent, 1);
         end
+    win.widgets.chat_display:ScrollToTop();
+    win.widgets.chat_display:ScrollToBottom();
 end
 
 
@@ -384,13 +386,14 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER_INFORM(...)
     win:Pop("out");
     _G.ChatEdit_SetLastToldTarget(arg2, "BN_WHISPER");
     win.online = true;
-    --win.widgets.chat_display:ScrollToBottom();
     win.msgSent = false;
     CallModuleFunction("PostEvent_WhisperInform", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
     addToTableUnique(recentSent, arg1);
 	if(#recentSent > maxRecent) then
 		table.remove(recentSent, 1);
 	end
+	win.widgets.chat_display:ScrollToTop();
+	win.widgets.chat_display:ScrollToBottom();
 end
 
 -- CHAT_MSG_BN_WHISPER  CONTROLLER (For Supression from Chat Frame)
@@ -419,9 +422,10 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER(...)
     win:Pop("in");
     _G.ChatEdit_SetLastTellTarget(arg2, "BN_WHISPER");
     win.online = true;
-    win.widgets.chat_display:ScrollToBottom();
     updateMinimapAlerts();
     CallModuleFunction("PostEvent_Whisper", ...);
+    win.widgets.chat_display:ScrollToTop();
+    win.widgets.chat_display:ScrollToBottom();
 end
 
 -- CHAT_MSG_AFK  CONTROLLER (For Supression from Chat Frame)
