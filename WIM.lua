@@ -375,7 +375,7 @@ function WIM:VARIABLES_LOADED()
     
     SetEnabled(db.enabled);
     initialize();
-     _G.print("WIM Notice: Since 7.0 there is a new bug where first whisper is not visible until you get a 2nd whisper, or you scroll up and then back down. That's work around. Scroll up, then scroll down.")
+     --_G.print("WIM Notice: Since 7.0 there is a new bug where first whisper is not visible until you get a 2nd whisper, or you scroll up and then back down. That's work around. Scroll up, then scroll down.")
 end
 
 function WIM:FRIENDLIST_UPDATE()
