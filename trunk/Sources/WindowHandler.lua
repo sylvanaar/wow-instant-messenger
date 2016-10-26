@@ -1117,7 +1117,7 @@ local function instantiateWindow(obj)
 	self.widgets.Backdrop:SetAlpha(db.windowAlpha/100);
 	local Path,_,Flags = self.widgets.chat_display:GetFont();
         self:SetClampedToScreen(not WindowParent.animUp and db.clampToScreen);
-	self.widgets.chat_display:SetFont(Path,db.fontSize+2,Flags);
+	self.widgets.chat_display:SetFont(Path or [[Fonts\FRIZQT__.TTF]],db.fontSize+2,Flags);
 	self.widgets.chat_display:SetAlpha(1);
 	self.widgets.chat_display:SetIndentedWordWrap(db.wordwrap_indent);
 	self.widgets.msg_box:SetAlpha(1);
@@ -1844,7 +1844,7 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w,demo", "OnMouseUp", func
 	end);
 
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkClick", function(self, link, text, button) _G.SetItemRef(link, text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""), button, self); end);
-RegisterWidgetTrigger("chat_display", "whisper,chat,w2w","OnMessageScrollChanged", function(self) updateScrollBars(self:GetParent()); end);
+--RegisterWidgetTrigger("chat_display", "whisper,chat,w2w","OnMessageScrollChanged", function(self) updateScrollBars(self:GetParent()); end);
 
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkEnter", function(self, link)
 			local obj = self.parentWindow;
