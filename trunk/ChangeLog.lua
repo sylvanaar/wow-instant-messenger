@@ -16,9 +16,10 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
---addEntry("3.7.10", "08/15/2016", [[
---	*Fixed missing text on new whisper. Caveat: All whispers will now force scroll to bottom.
---]]);
+addEntry("3.7.10", "11/12/2016", [[
+	*Fixed Links on 7.1
+	*Fixed lua errors on 7.1 (Caveate now there are font issues do to less than ideal fix)
+]]);
 addEntry("3.7.9", "07/29/2016", [[
 	*Fixed a few green texture issues.
 ]]);
