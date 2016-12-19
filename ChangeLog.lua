@@ -16,6 +16,9 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7.11", "12/19/2016", [[
+	*Changed font used in 7.1 work around to avoid CYR font issues.
+]]);
 addEntry("3.7.10", "11/12/2016", [[
 	*Fixed Links on 7.1
 	*Fixed lua errors on 7.1 (Caveate now there are font issues do to less than ideal fix)
