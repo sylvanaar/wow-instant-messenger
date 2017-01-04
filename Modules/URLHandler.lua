@@ -39,6 +39,10 @@ armoryLinks = {
     {
 		title = "Wowhead Profiler",
 		url = "http://www.wowhead.com/profile={eu/us}.{realm-}.{user}",
+    },
+    {
+      title = "WoWProgress",
+      url = "http://www.wowprogress.com/character/{eu/us}/{realm'}/{user}",
     }
 };
 
@@ -225,6 +229,7 @@ local function MENU_ARMORY_CLICKED(self)
     link = link:gsub("{user}", user);
     link = link:gsub("{eu/us}", eu_us);
     link = link:gsub("{EU/US}", string.upper(eu_us));
+    link = link:gsub("{realm'}", realm:gsub("'","-"));
     displayURL("wim_url:"..link);
 end
 
