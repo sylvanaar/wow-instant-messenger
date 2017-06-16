@@ -17,8 +17,7 @@ externals:
 	Libs/ChatThrottleLib:
 		url: https://repos.wowace.com/wow/chatthrottlelib/trunk
 	Libs/LibChatHandler-1.0:
-		url: svn://svn.curseforge.net/wow/libchathandler/mrtwoo_fcf_fix/trunk
-		tag: r23
+		url: https://repos.curseforge.com/wow/libchathandler/trunk
 
 tools-used:
     - idlua
