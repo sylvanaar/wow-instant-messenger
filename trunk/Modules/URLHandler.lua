@@ -30,7 +30,7 @@ armoryLinks = {
     },
     {
         title = "WoW Armory",
-        url = "http://{eu/us}.battle.net/wow/character/{realm}/{user}/advanced"
+        url = "http://{eu/us}.battle.net/wow/character/{realm-}/{user}/advanced"
     },
     {
         title = "WoW-Heroes",
