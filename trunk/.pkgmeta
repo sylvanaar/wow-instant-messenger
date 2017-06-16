@@ -4,18 +4,18 @@ enable-nolib-creation: no
 
 externals:
 	Libs/LibStub:
-		url: svn://svn.wowace.com/wow/libstub/mainline/trunk
-		tag: latest
+		url: https://repos.wowace.com/wow/libstub/trunk
 	Libs/CallbackHandler-1.0:
-		url: svn://svn.wowace.com/wow/callbackhandler/mainline/trunk/CallbackHandler-1.0
-		tag: latest
+		url: https://repos.wowace.com/wow/callbackhandler/trunk
 	Libs/LibWho-2.0:
-		url: svn://svn.wowace.com/wow/wholib/mainline/trunk/LibWho-2.0
-		tag: latest
+		url: https://repos.wowace.com/wow/wholib/trunk
 
-	Libs/LibChatAnims: svn://svn.wowace.com/wow/libchatanims/mainline/trunk/LibChatAnims
-	Libs/LibSharedMedia-3.0: svn://svn.wowace.com/wow/libsharedmedia-3-0/mainline/trunk/LibSharedMedia-3.0
-	Libs/ChatThrottleLib: svn://svn.wowace.com/wow/chatthrottlelib/mainline/trunk
+	Libs/LibChatAnims:
+		url: https://repos.wowace.com/wow/libchatanims/trunk
+	Libs/LibSharedMedia-3.0:
+		url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk
+	Libs/ChatThrottleLib:
+		url: https://repos.wowace.com/wow/chatthrottlelib/trunk
 	Libs/LibChatHandler-1.0:
 		url: svn://svn.curseforge.net/wow/libchathandler/mrtwoo_fcf_fix/trunk
 		tag: r23
