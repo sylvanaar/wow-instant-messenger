@@ -112,8 +112,8 @@ local function createChangeLogWindow()
     win:RegisterForDrag("LeftButton");
 
     -- set script events
-    win:SetScript("OnShow", function(self) _G.PlaySound("igMainMenuOpen"); self:update();  end);
-    win:SetScript("OnHide", function(self) _G.PlaySound("igMainMenuClose");  end);
+    win:SetScript("OnShow", function(self) _G.PlaySound(850); self:update();  end);
+    win:SetScript("OnHide", function(self) _G.PlaySound(851);  end);
     win:SetScript("OnDragStart", function(self) self:StartMoving(); end);
     win:SetScript("OnDragStop", function(self) self:StopMovingOrSizing(); end);
     
