@@ -16,6 +16,11 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7.12", "12/19/2016", [[
+	*7.3 Compat Fixes
+	*SC1 client icon support
+	*Updated some profile URLS
+]]);
 addEntry("3.7.11", "12/19/2016", [[
 	*Changed font used in 7.1 work around to avoid CYR font issues.
 ]]);
@@ -37,9 +42,6 @@ addEntry("3.7.6", "05/24/2016", [[
 ]]);
 addEntry("3.7.5", "05/04/2016", [[
 	*I didn't like the Overwatch icon quality, so I made it better.
-]]);
-addEntry("3.7.4", "05/02/2016", [[
-	*Added chat icon support for Heroes of Storm, Hearthstone, Overwatch, and Demon Hunters
 ]]);
 
 
