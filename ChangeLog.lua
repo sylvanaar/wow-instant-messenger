@@ -16,8 +16,11 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7.14", "09/03/2017", [[
+	*Fixed Officr chat Taint
+]]);
 addEntry("3.7.13", "09/03/2017", [[
-	*Maybe less Taint
+	*Fixed Guild chat Taint
 ]]);
 addEntry("3.7.12", "08/29/2017", [[
 	*7.3 Compat Fixes
@@ -26,10 +29,6 @@ addEntry("3.7.12", "08/29/2017", [[
 ]]);
 addEntry("3.7.11", "12/19/2016", [[
 	*Changed font used in 7.1 work around to avoid CYR font issues.
-]]);
-addEntry("3.7.10", "11/12/2016", [[
-	*Fixed Links on 7.1
-	*Fixed lua errors on 7.1 (Caveate now there are font issues do to less than ideal fix)
 ]]);
 
 
