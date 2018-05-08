@@ -16,6 +16,9 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7.16", "05/02/2018", [[
+	*Fixed GetAutoCompleteResults for 8.x
+]]);
 addEntry("3.7.15", "04/20/2018", [[
 	*Grabbed latest ChatThrottleLib for 8.x compat
 ]]);
