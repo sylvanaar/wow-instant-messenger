@@ -18,6 +18,8 @@ end
 -- ChangeLog Entries.
 addEntry("3.7.17", "07/21/2018", [[
 	*Bumped TOC
+	*Fixed armory link
+	*Re-enabled support for SAY chat, with a new exception to disable during boss encounters
 ]]);
 addEntry("3.7.16", "05/02/2018", [[
 	*Fixed GetAutoCompleteResults for 8.x
