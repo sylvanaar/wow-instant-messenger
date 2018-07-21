@@ -892,7 +892,11 @@ function Say:CHAT_MSG_SAY(...)
     local color = _G.ChatTypeInfo["SAY"];
     self.chatLoaded = true;
     arg3 = CleanLanguageArg(arg3);
-    --win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_SAY", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+    --Don't handle say messages during encounters, when boss mods are handling them
+    local fightingBoss = _G.IsEncounterInProgress() or DBM and DBM:InCombat() or false
+    if not fightingBoss then
+    	win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_SAY", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+    end
     if(arg2 ~= _G.UnitName("player")) then
         win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
         if(not db.chat.say.neverPop) then
@@ -903,7 +907,9 @@ function Say:CHAT_MSG_SAY(...)
             win:Pop("out");
         end
     end
-    --CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_SAY", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+    if not fightingBoss then
+   		CallModuleFunction("PostEvent_ChatMessage", "CHAT_MSG_SAY", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+   	end
 end
 
 
