@@ -279,7 +279,7 @@ function Guild:GUILD_ROSTER_UPDATE()
 		--_G.GuildControlSetRank(rankIndex);
                 local guildchat_listen, guildchat_speak, officerchat_listen, officerchat_speak, promote, demote,
                         invite_member, remove_member, set_motd, edit_public_note, view_officer_note, edit_officer_note,
-                        modify_guild_info, _, withdraw_repair, withdraw_gold, create_guild_event = _G.GuildControlGetRankFlags();
+                        modify_guild_info, _, withdraw_repair, withdraw_gold, create_guild_event = _G.C_GuildInfo.GuildControlGetRankFlags();
         	if(guildchat_listen) then
 					name = _G.Ambiguate(name, "none")
                     count = count + 1;
@@ -377,7 +377,7 @@ function Officer:GUILD_ROSTER_UPDATE()
                 --_G.GuildControlSetRank(rankIndex);
                 local guildchat_listen, guildchat_speak, officerchat_listen, officerchat_speak, promote, demote,
                         invite_member, remove_member, set_motd, edit_public_note, view_officer_note, edit_officer_note,
-                        modify_guild_info, _, withdraw_repair, withdraw_gold, create_guild_event = _G.GuildControlGetRankFlags();
+                        modify_guild_info, _, withdraw_repair, withdraw_gold, create_guild_event = _G.C_GuildInfo.GuildControlGetRankFlags();
         	if(officerchat_listen) then
 					name = _G.Ambiguate(name, "none")
                     count = count + 1;
