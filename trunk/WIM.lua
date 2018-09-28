@@ -381,14 +381,23 @@ end
 function WIM:FRIENDLIST_UPDATE()
     env.cache[env.realm][env.character].friendList = env.cache[env.realm][env.character].friendList or {};
     for key, d in pairs(env.cache[env.realm][env.character].friendList) do
-	if(d == 1) then
-	    env.cache[env.realm][env.character].friendList[key] = nil;
-	end
+		if(d == 1) then
+	    	env.cache[env.realm][env.character].friendList[key] = nil;
+		end
     end
-	for i=1, _G.GetNumFriends() do 
-		local name, junk = _G.GetFriendInfo(i);
-		if(name) then
-			env.cache[env.realm][env.character].friendList[name] = 1; --[set place holder for quick lookup
+    if _G.C_FriendList then
+		for i=1, _G.C_FriendList.GetNumFriends() do 
+			local name = _G.C_FriendList.GetFriendInfoByIndex(i).name;
+			if(name) then
+				env.cache[env.realm][env.character].friendList[name] = 1; --[set place holder for quick lookup
+			end
+		end
+    else
+		for i=1, _G.GetNumFriends() do 
+			local name = _G.GetFriendInfo(i);
+			if(name) then
+				env.cache[env.realm][env.character].friendList[name] = 1; --[set place holder for quick lookup
+			end
 		end
 	end
     lists.friends = env.cache[env.realm][env.character].friendList;
