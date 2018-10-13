@@ -554,6 +554,7 @@ local function replyTellTarget(TellNotTold)
     end
 
     if (lastTell ~= "" and db.pop_rules.whisper.intercept) then
+      lastTell = _G.Ambiguate(lastTell, "none")
       local win = getWhisperWindowByUser(lastTell, bNetID);
 
       if (win:IsVisible() or db.pop_rules.whisper[curState].onSend) then
