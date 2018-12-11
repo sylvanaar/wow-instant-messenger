@@ -16,6 +16,9 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7.19", "12/10/2018", [[
+	*Bumped TOC
+]]);
 addEntry("3.7.18", "07/27/2018", [[
 	*URL handler should now show dialog for copying URL as intended.
 ]]);
@@ -30,9 +33,6 @@ addEntry("3.7.16", "05/02/2018", [[
 ]]);
 addEntry("3.7.15", "04/20/2018", [[
 	*Grabbed latest ChatThrottleLib for 8.x compat
-]]);
-addEntry("3.7.14", "09/03/2017", [[
-	*Fixed Officer chat Taint
 ]]);
 
 
