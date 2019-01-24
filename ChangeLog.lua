@@ -16,6 +16,11 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7.20", "01/24/2019", [[
+	*TOC update for 8.1
+	*fix LibWho error
+	*fix changed BNet name handler
+]]);
 addEntry("3.7.19", "12/10/2018", [[
 	*Bumped TOC
 ]]);

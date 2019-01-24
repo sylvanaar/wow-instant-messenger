@@ -549,7 +549,7 @@ local function replyTellTarget(TellNotTold)
     if not lastTell then return end--because if you fat finger R or try to re ply before someone sent a tell, it generates a lua error without this
     local bNetID;
     if (lastTell:find("^|K")) then
-      lastTell = _G.BNTokenFindName(lastTell);
+      lastTell = _G.BNTokenFindName(lastTell) or lastTell;
       bNetID = BNet_GetPresenceID(lastTell);
     end
 
@@ -576,7 +576,7 @@ function CF_ExtractTellTarget(editBox, msg)
 	local bNetID;
 	--_G.DEFAULT_CHAT_FRAME:AddMessage("Raw: "..msg:gsub("|", ":")); -- debugging
 	if (target:find("^|K")) then
-		target, msg = _G.BNTokenFindName(target);
+		target, msg = _G.BNTokenFindName(target) or target, msg;
 		bNetID = BNet_GetPresenceID(target);
 	else
 		--If we haven't even finished one word, we aren't done.
