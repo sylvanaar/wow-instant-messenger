@@ -570,13 +570,16 @@ end
 
 -- "/w |Kf287|k0000000000000|k " 
 local tellTargetExtractionAutoComplete = _G.AUTOCOMPLETE_LIST.ALL;
-function CF_ExtractTellTarget(editBox, msg)
+function CF_ExtractTellTarget(editBox, msg, chatType)
 	-- Grab the string after the slash command
 	local target = string.match(msg, "%s*(.*)");
 	local bNetID;
 	--_G.DEFAULT_CHAT_FRAME:AddMessage("Raw: "..msg:gsub("|", ":")); -- debugging
 	if (target:find("^|K")) then
-		target, msg = _G.BNTokenFindName(target) or target, msg;
+		local old_target, old_msg = target, msg
+		target, msg = _G.BNTokenFindName(target)
+		target = target or old_target
+		msg = msg or old_msg
 		bNetID = BNet_GetPresenceID(target);
 	else
 		--If we haven't even finished one word, we aren't done.
@@ -619,8 +622,51 @@ function CF_ExtractTellTarget(editBox, msg)
 	end
 end
 
+function CF_SentBNetTell(target)
+	if (db and db.enabled) then
+		local curState = curState;
+		curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+		if (db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
+			local bNetID = BNet_GetPresenceID(target);
+			target = _G.Ambiguate(target, "none")--For good measure, ambiguate again cause it seems some mods interfere with this process
+			local win = getWhisperWindowByUser(target, bNetID);
+			win.widgets.msg_box.setText = 1;
+			win:Pop(true); -- force popup
+			win.widgets.msg_box:SetFocus();
+			local editBox = _G.ChatEdit_ChooseBoxForSend()
+			_G.ChatEdit_OnEscapePressed(editBox);
+		end
+	end
+end
+
+function CE_UpdateHeader(editBox)
+	
+	local chatType = editBox:GetAttribute("chatType");
+    local target = editBox:GetAttribute("tellTarget");
+	
+	if chatType ~= "BN_WHISPER" or not target then return end
+	
+	if (db and db.enabled) then
+		local curState = curState;
+		curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+		if (db.pop_rules.whisper.intercept and db.pop_rules.whisper[curState].onSend) then
+			local bNetID = BNet_GetPresenceID(target);
+			target = _G.Ambiguate(target, "none")--For good measure, ambiguate again cause it seems some mods interfere with this process
+			local win = getWhisperWindowByUser(target, bNetID);
+			win.widgets.msg_box.setText = 1;
+			win:Pop(true); -- force popup
+			win.widgets.msg_box:SetFocus();
+			local editBox = _G.ChatEdit_ChooseBoxForSend()
+			_G.ChatEdit_OnEscapePressed(editBox);
+		end
+	end
+end
+
 -- the following hook is needed in order to intercept /r
 hooksecurefunc("ChatEdit_ExtractTellTarget", CF_ExtractTellTarget);
+hooksecurefunc("ChatEdit_UpdateHeader", CE_UpdateHeader);
+
+hooksecurefunc("ChatFrame_SendBNetTell", CF_SentBNetTell);
 
 --Hook ChatFrame_ReplyTell & ChatFrame_ReplyTell2
 hooksecurefunc("ChatFrame_ReplyTell", function() replyTellTarget(true) end);
