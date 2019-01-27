@@ -16,6 +16,14 @@ local function addBetaEntry(version, rdate, description, transmitted)
 end
 
 -- ChangeLog Entries.
+addEntry("3.7.22", "01/24/2019", [[
+	* trying to fix emote misbehavior in BNet names introduced with patch 8.1
+	* fix class names and icon display for non-english clients
+]]);
+addEntry("3.7.21", "01/24/2019", [[
+	* update BNetWhisper handler for 8.1
+	* update ExtractTellTarget handler
+]]);
 addEntry("3.7.20", "01/24/2019", [[
 	*TOC update for 8.1
 	*fix LibWho error
