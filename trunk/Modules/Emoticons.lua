@@ -81,7 +81,7 @@ local function filterEmoticons(theMsg, smf)
     end
 	
 	--remove player hyperlink from message to circumvent misbehavior as of 8.1
-	local s,e = string.find(theMsg, "]:")
+	local s,e = string.find(theMsg, "]: ")
 	local playerLink = string.sub(theMsg, 1, e)
 	theMsg = string.sub(theMsg, e+1)
 	
