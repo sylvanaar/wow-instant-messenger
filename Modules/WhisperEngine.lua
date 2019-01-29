@@ -644,7 +644,9 @@ function CE_UpdateHeader(editBox)
 	local chatType = editBox:GetAttribute("chatType");
     local target = editBox:GetAttribute("tellTarget");
 	
-	if chatType ~= "BN_WHISPER" or not target then return end
+	if not (chatType == "BN_WHISPER") or not target then return end
+	
+	if not editBox:IsVisible() then return end
 	
 	if (db and db.enabled) then
 		local curState = curState;
