@@ -134,8 +134,8 @@ local function initialize()
 end
 
 function WIM:resetWhisperStickies()
-	ChatTypeInfo["WHISPER"].sticky = 0
-	ChatTypeInfo["BN_WHISPER"].sticky = 0
+	_G["ChatTypeInfo"]["WHISPER"].sticky = 0
+	_G["ChatTypeInfo"]["BN_WHISPER"].sticky = 0
 end
 
 -- called when WIM is enabled.
