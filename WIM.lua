@@ -133,6 +133,11 @@ local function initialize()
     dPrint("WIM initialized...");
 end
 
+function WIM:resetWhisperStickies()
+	ChatTypeInfo["WHISPER"].sticky = 0
+	ChatTypeInfo["BN_WHISPER"].sticky = 0
+end
+
 -- called when WIM is enabled.
 -- WIM will not be enabled until WIM is initialized event is fired.
 local function onEnable()
@@ -144,6 +149,7 @@ local function onEnable()
     end
     
         if(isInitialized) then
+			WIM:resetWhisperStickies()
             for mName, module in pairs(modules) do
                 if(type(module.OnEnableWIM) == "function") then
                     module:OnEnableWIM();
