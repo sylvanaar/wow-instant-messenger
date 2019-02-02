@@ -81,9 +81,18 @@ local function filterEmoticons(theMsg, smf)
     end
 	
 	--remove player hyperlink from message to circumvent misbehavior as of 8.1
-	local s,e = string.find(theMsg, "]: ")
-	local playerLink = string.sub(theMsg, 1, e)
-	theMsg = string.sub(theMsg, e+1)
+	local s,e = string.find(theMsg, ": ")
+	local playerLink
+	
+	if e then
+		playerLink = string.sub(theMsg, 1, e)
+		theMsg = string.sub(theMsg, e+1)
+	end
+	
+	--safety check again...
+    if(not theMsg or theMsg == "") then
+        return playerLink or "";
+    end
 	
     --accomodate WoW's built in symbols and inherrit WoW's options whether to display them or not.
     if ( 1 ) then
@@ -136,7 +145,7 @@ local function filterEmoticons(theMsg, smf)
         LinkRepository[key] = nil;
     end
     
-    return decodeColors(playerLink..theMsg);
+    return decodeColors((playerLink or "")..theMsg);
 end
 
 
