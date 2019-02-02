@@ -1382,7 +1382,6 @@ function ShowHistoryViewer(user)
     end
     HistoryViewer:Show();
 	if not exists and not user then --force update on first show without user
-		_G.print("HistoryViewer first show")
 		HistoryViewer:Hide();
 		HistoryViewer:Show();
 	end
