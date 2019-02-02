@@ -161,6 +161,7 @@ function WhisperEngine:OnEnableWIM()
         WhisperEngine:RegisterChatEvent("CHAT_MSG_SYSTEM");
         WhisperEngine:RegisterChatEvent("CHAT_MSG_BN_WHISPER");
         WhisperEngine:RegisterChatEvent("CHAT_MSG_BN_WHISPER_INFORM");
+		WhisperEngine:RegisterChatEvent("CHAT_MSG_BN_INLINE_TOAST_ALERT");
 end
 
 function WhisperEngine:OnDisableWIM()
@@ -171,6 +172,7 @@ function WhisperEngine:OnDisableWIM()
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_SYSTEM");
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_BN_WHISPER");
         WhisperEngine:UnregisterChatEvent("CHAT_MSG_BN_WHISPER_INFORM");
+		WhisperEngine:UnregisterChatEvent("CHAT_MSG_BN_INLINE_TOAST_ALERT");
 end
 
 
@@ -530,6 +532,23 @@ function WhisperEngine:CHAT_MSG_SYSTEM_CONTROLLER(eventItem, msg)
     
 end
 
+
+function WhisperEngine:CHAT_MSG_BN_INLINE_TOAST_ALERT(process, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, unused, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, supressRaidIcons)
+	
+	local online = process == "FRIEND_ONLINE"
+	local offline = process == "FRIEND_OFFLINE"
+	
+	local curState = db.pop_rules.whisper.alwaysOther and "other" or curState;
+	
+	local _, accName = _G.BNGetFriendInfoByID(bnSenderID)
+	local win = Windows[accName]
+	if win then
+		local msg = accName.." "..(online and _G.BN_TOAST_ONLINE or offline and _G.BN_TOAST_OFFLINE or "")
+		win:AddMessage(msg, db.displayColors.sysMsg.r, db.displayColors.sysMsg.g, db.displayColors.sysMsg.b);
+        win.online = online;
+        return;
+	end
+end
 
 --------------------------------------
 --          Whisper Related Hooks   --
