@@ -137,7 +137,7 @@ function WIM:checkPratSettings()
 	if not Prat then return end
 	local db=Prat.db
 	if not db then return end
-	local csdb = db.children.Prat_ChannelSticky
+	local csdb = db.children.Prat_ChannelSticky.profile
 	csdb.whisper = 0
 	csdb.bn_whisper = 0
 end
