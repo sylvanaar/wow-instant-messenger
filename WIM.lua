@@ -134,15 +134,17 @@ local function initialize()
 end
 
 function WIM:checkPratSettings()
+	local Prat = _G.Prat
 	if not Prat then return end
 	local db=Prat.db
 	if not db then return end
 	local csdb = db.children.Prat_ChannelSticky.profile
-	csdb.whisper = 0
-	csdb.bn_whisper = 0
+	csdb.whisper = false
+	csdb.bn_whisper = false
 end
 
-function WIM:resetWhisperStickies()
+function WIM:checkWhisperStickies()
+	WIM:checkPratSettings()
 	_G["ChatTypeInfo"]["WHISPER"].sticky = 0
 	_G["ChatTypeInfo"]["BN_WHISPER"].sticky = 0
 end
@@ -158,8 +160,7 @@ local function onEnable()
     end
     
         if(isInitialized) then
-			WIM:checkPratSettings()
-			WIM:resetWhisperStickies()
+			WIM:checkWhisperStickies()
             for mName, module in pairs(modules) do
                 if(type(module.OnEnableWIM) == "function") then
                     module:OnEnableWIM();
