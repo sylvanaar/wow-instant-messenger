@@ -178,9 +178,11 @@ end
 
 
 local function getWhisperWindowByUser(user, isBN)
-	if isBN and not string.find(user, "^|K") then
-		local _
-		_, user = _G.BNGetFriendInfoByID(isBN) -- fix window handler when using the chat hyperlink
+	if isBN then
+		if not string.find(user, "^|K") then
+			local _
+			_, user = _G.BNGetFriendInfoByID(isBN) -- fix window handler when using the chat hyperlink
+		end
 	else
 		user = string.gsub(user," ","") -- Drii: WoW build15050 whisper bug for x-realm server with space
 		user = FormatUserName(user);
