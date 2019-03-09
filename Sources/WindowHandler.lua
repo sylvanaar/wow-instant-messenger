@@ -1015,7 +1015,8 @@ local function instantiateWindow(obj)
                                 self.bn.gameText = gameText;
                                 self.bn.toonName = toonName;
                                 self.bn.client = client;
-                                self.bn.realmName = realmName;
+								local _,realm = GetNameAndServer("-"..realmName)
+                                self.bn.realmName = realm;
                                 self.bn.faction = faction;
                                 self.bn.broadcastText = broadcastText;
                                 self.bn.broadcastTime = broadcastTime;
@@ -1292,7 +1293,7 @@ local function loadWindowDefaults(obj)
     
 	obj.widgets.Backdrop:SetAlpha(1);
     
-	obj.widgets.from:SetText(obj.theUser);
+	obj.widgets.from:SetText(GetReadableName(obj.theUser));
 	obj.widgets.from:SetTextColor(RGBHexToPercent(GetSelectedSkin().message_window.widgets.from.font_color));
     
 	obj.widgets.char_info:SetText("");
