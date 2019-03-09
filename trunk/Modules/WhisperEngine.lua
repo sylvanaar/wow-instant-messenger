@@ -185,7 +185,7 @@ local function getWhisperWindowByUser(user, isBN)
 		end
 	else
 		user = string.gsub(user," ","") -- Drii: WoW build15050 whisper bug for x-realm server with space
-		user = FormatUserName(user);
+	--	user = FormatUserName(user);
 	end
     if(not user or user == "") then
         -- if invalid user, then return nil;
