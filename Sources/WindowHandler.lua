@@ -1015,8 +1015,7 @@ local function instantiateWindow(obj)
                                 self.bn.gameText = gameText;
                                 self.bn.toonName = toonName;
                                 self.bn.client = client;
-								local _,realm = GetNameAndServer("-"..realmName)
-                                self.bn.realmName = realm;
+                                self.bn.realmName = realmName;
                                 self.bn.faction = faction;
                                 self.bn.broadcastText = broadcastText;
                                 self.bn.broadcastTime = broadcastTime;
@@ -1856,7 +1855,14 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w,demo", "OnMouseUp", func
                 end
 	end);
 
-RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkClick", function(self, link, text, button) _G.SetItemRef(link, text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""), button, self); end);
+local myself = _G.UnitName("player")
+RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkClick", function(self, link, text, button)
+	local t,n,i = string.split(":", link)
+	if n == myself then
+		return
+	end
+	_G.SetItemRef(link, text:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""), button, self);
+end);
 --RegisterWidgetTrigger("chat_display", "whisper,chat,w2w","OnMessageScrollChanged", function(self) updateScrollBars(self:GetParent()); end);
 
 local lastTTlink
