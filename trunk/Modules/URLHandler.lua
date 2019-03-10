@@ -227,6 +227,8 @@ local function MENU_ARMORY_CLICKED(self)
 		user, realm = GetNameAndServer(MENU_ARMORY_USER)
     else
         user = MENU_ARMORY_USER;
+		local _
+		_, realm = GetNameAndServer("-"..MENU_ARMORY_REALM)
     end
     realm = realm or MENU_ARMORY_REALM;
     local link = self.value;
