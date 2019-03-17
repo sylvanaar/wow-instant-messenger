@@ -517,6 +517,7 @@ function WhisperEngine:CHAT_MSG_SYSTEM_CONTROLLER(eventItem, msg)
     user = FormatUserName(string.match(msg, ERR_FRIEND_ONLINE_SS));
     win = Windows[user];
     if(win) then
+		local msg = user.." ".._G.BN_TOAST_ONLINE
         win:AddMessage(msg, db.displayColors.sysMsg.r, db.displayColors.sysMsg.g, db.displayColors.sysMsg.b);
         win.online = true;
         if(win and win:IsShown() and db.pop_rules.whisper[curState].supress) then
@@ -529,6 +530,7 @@ function WhisperEngine:CHAT_MSG_SYSTEM_CONTROLLER(eventItem, msg)
     user = FormatUserName(string.match(msg, ERR_FRIEND_OFFLINE_S));
     win = Windows[user];
     if(win) then
+		local msg = user.." ".._G.BN_TOAST_OFFLINE
         win:AddMessage(msg, db.displayColors.sysMsg.r, db.displayColors.sysMsg.g, db.displayColors.sysMsg.b);
         win.online = false;
         if(win and win:IsShown() and db.pop_rules.whisper[curState].supress) then
