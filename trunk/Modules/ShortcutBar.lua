@@ -249,7 +249,7 @@ function ShortcutBar:OnWindowShow(obj)
 	if(obj.widgets.shortcuts) then
 		for i=1, #buttons do
 		if(buttons[i].id == "invite" or buttons[i].id == "ignore") then
-			if(obj.isBN and not canInviteBN(obj.isBN)) then	--if(obj.isBN and obj.bn.realmName ~= env.realm) then
+			if(obj.isBN and _G.type(obj.isBN) == "number" and not canInviteBN(obj.isBN)) then	--if(obj.isBN and obj.bn.realmName ~= env.realm) then
 				obj.widgets.shortcuts.buttons[i]:Disable();
 			else
 				obj.widgets.shortcuts.buttons[i]:Enable();
