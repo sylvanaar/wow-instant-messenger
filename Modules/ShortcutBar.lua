@@ -6,6 +6,7 @@ local pairs = pairs;
 local CreateFrame = CreateFrame;
 local string = string;
 local select = select;
+local tonumber = tonumber
 
 --set namespace
 setfenv(1, WIM);
@@ -227,6 +228,7 @@ local BNinviteTypes = {
 	["BN_REQUEST_INVITE"] = true,
 }
 local function canInviteBN(id)
+	if not tonumber(id) then return end
 	local show = true
 	local bnetIDAccount, accountName, battleTag, isBattleTag, characterName, bnetIDGameAccount = _G.BNGetFriendInfoByID(id);
 	if not bnetIDGameAccount then
@@ -236,6 +238,8 @@ local function canInviteBN(id)
 		local inviteType = _G.GetDisplayedInviteType(guid);
 		if not BNinviteTypes["BN_"..inviteType] then
 			show = false;
+		elseif not _G.CanGroupWithAccount(id) then
+			show = false
 		elseif ( not _G.BNFeaturesEnabledAndConnected() ) then
 			show = false;
 		elseif ( _G.UnitInParty(characterName) or _G.UnitInRaid(characterName) ) then
@@ -246,16 +250,22 @@ local function canInviteBN(id)
 end
 
 function ShortcutBar:OnWindowShow(obj)
-	if(obj.widgets.shortcuts) then
+	if (obj.widgets.shortcuts) then
 		for i=1, #buttons do
-		if(buttons[i].id == "invite" or buttons[i].id == "ignore") then
-			if(obj.isBN and _G.type(obj.isBN) == "number" and not canInviteBN(obj.isBN)) then	--if(obj.isBN and obj.bn.realmName ~= env.realm) then
-				obj.widgets.shortcuts.buttons[i]:Disable();
-			else
-				obj.widgets.shortcuts.buttons[i]:Enable();
+			if (buttons[i].id == "invite") then
+				if (obj.isBN and not canInviteBN(obj.bn.id)) then	--if(obj.isBN and obj.bn.realmName ~= env.realm) then
+					obj.widgets.shortcuts.buttons[i]:Disable();
+				else
+					obj.widgets.shortcuts.buttons[i]:Enable();
+				end
+			elseif buttons[i].id == "ignore" then
+				if obj.isBN then
+					obj.widgets.shortcuts.buttons[i]:Disable();
+				else
+					obj.widgets.shortcuts.buttons[i]:Enable();
+				end
 			end
 		end
-	end
 		obj.widgets.shortcuts:UpdateButtons();
 	end
 end
