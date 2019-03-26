@@ -344,7 +344,7 @@ RegisterShortcut("invite", L["Invite to Party"], {
 			local win = self.parentWindow;
 			local isBN = win.isBN
 			if isBN then
-				_G.FriendsFrame_BattlenetInvite(nil, win.isBN)
+				_G.FriendsFrame_BattlenetInvite(nil, win.bn.id)
 			else
 				_G.InviteUnit(self.parentWindow.theUser)
 			end
