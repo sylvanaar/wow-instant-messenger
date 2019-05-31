@@ -971,12 +971,12 @@ local function instantiateWindow(obj)
     end
     
     obj.WhoCallback = function(result)
-	if(result and result.Online and result.Name == obj.theUser) then
-		obj.class = result.Class;
-		obj.level = result.Level;
-		obj.race = result.Race;
-		obj.guild = result.Guild;
-		obj.location = result.Zone;
+	if(result and result.Online and result.fullName == obj.theUser) then
+		obj.class = result.classStr;
+		obj.level = result.level;
+		obj.race = result.raceStr;
+		obj.guild = result.fullGuildName;
+		obj.location = result.area;
 		obj:UpdateIcon();
 		obj:UpdateCharDetails();
 	end
@@ -988,13 +988,13 @@ local function instantiateWindow(obj)
         end
         if(self.isGM) then
                 self.WhoCallback({
-                        Name = self.theUser,
+                        fullName = self.theUser,
                         Online = true,
-                        Guild = "Blizzard",
-                        Class = L["Game Master"],
-                        Level = "",
-                        Race = "",
-                        Zone = L["Unknown"]
+                        fullGuildName = "Blizzard",
+                        classStr = L["Game Master"],
+                        level = "",
+                        raceStr = "",
+                        area = L["Unknown"]
                 });
         elseif(self.isBN) then
                 -- get information of BN user from friends data.
