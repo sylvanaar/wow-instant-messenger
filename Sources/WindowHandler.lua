@@ -971,12 +971,12 @@ local function instantiateWindow(obj)
     end
     
     obj.WhoCallback = function(result)
-	if(result and result.Online and result.fullName == obj.theUser) then
-		obj.class = result.classStr;
-		obj.level = result.level;
-		obj.race = result.raceStr;
-		obj.guild = result.fullGuildName;
-		obj.location = result.area;
+	if(result and result.Online and result.Name == obj.theUser) then
+		obj.class = result.Class;
+		obj.level = result.Level;
+		obj.race = result.Race;
+		obj.guild = result.Guild;
+		obj.location = result.Zone;
 		obj:UpdateIcon();
 		obj:UpdateCharDetails();
 	end
@@ -988,20 +988,20 @@ local function instantiateWindow(obj)
         end
         if(self.isGM) then
                 self.WhoCallback({
-                        fullName = self.theUser,
+                        Name = self.theUser,
                         Online = true,
-                        fullGuildName = "Blizzard",
-                        classStr = L["Game Master"],
-                        level = "",
-                        raceStr = "",
-                        area = L["Unknown"]
+                        Guild = "Blizzard",
+                        Class = L["Game Master"],
+                        Level = "",
+                        Race = "",
+                        Zone = L["Unknown"]
                 });
         elseif(self.isBN) then
                 -- get information of BN user from friends data.
                 local id = self.theUser and BNet_GetBNetIDAccount(self.theUser) or nil;
                 if(id) then
-                				local _, _, _, _, _, toonID = _G.BNGetFriendInfoByID(id)
-                                local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText, broadcastText, broadcastTime = BNGetGameAccountInfo(toonID or 0);
+                				local _, _, _, _, _, bnetIDGameAccount = _G.BNGetFriendInfoByID(id)
+                                local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText, broadcastText, broadcastTime = BNGetGameAccountInfo(bnetIDGameAccount or 0);
                                 self.class = class or "";
                                 self.level = level or "";
                                 self.race = race or "";
