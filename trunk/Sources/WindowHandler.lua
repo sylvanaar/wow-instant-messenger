@@ -1869,11 +1869,10 @@ local lastTTlink
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkEnter", function(self, link)
 			local obj = self.parentWindow;
 			obj.isOnHyperLink = true;
-                        if(db.hoverLinks) and not _G.InCombatLockdown() then -- 8.2+, ShowUIPanel cannot be called in combat
+                        if(db.hoverLinks) then
                                 local t = string.match(link, "^(.-):")
                                 if(t == "item" or t == "enchant" or t == "spell" or t == "quest") then
                                 	lastTTlink = t
-                                	_G.ShowUIPanel(_G.GameTooltip);
                                 	_G.GameTooltip:SetOwner(_G.UIParent, "ANCHOR_CURSOR");
                                 	_G.GameTooltip:SetHyperlink(link);
                                 	_G.GameTooltip:Show();
@@ -1885,17 +1884,12 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkLeave", fu
 			local obj = self.parentWindow;
 			obj.isOnHyperLink = false;
                         if(db.hoverLinks) then
-                        	if not _G.InCombatLockdown() then -- 8.2+, HideUIPanel cannot be called in combat
                                 local t = lastTTlink	--string.match(link, "^(.-):")
                                 if(t == "item" or t == "enchant" or t == "spell" or t == "quest") then
-                                        _G.HideUIPanel(_G.GameTooltip);
+                                    _G.GameTooltip:ClearLines()
+									_G.GameTooltip:Hide()
                                 	lastTTlink = nil
                                 end
-                          --  else
-                            	--if lastTTlink then--A link was showing when we entered combat, and blizzard isn't gonna let us hide it now
-                            		--Some stuff to schedule wait until WIM.curState is not combat, then call hide?
-                            	--end
-                            end
                         end
 		end)
 
