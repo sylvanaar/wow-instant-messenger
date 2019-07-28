@@ -386,7 +386,7 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER_INFORM(...)
         return; -- ChatFrameEventFilter says don't process
     end
     local color = db.displayColors.BNwispOut; -- color contains .r, .g & .b
-    local win = getWhisperWindowByUser(arg2, true, bNetID);
+    local win = getWhisperWindowByUser(arg2, true, arg13);
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BN_WHISPER_INFORM", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
     win:Pop("out");
     _G.ChatEdit_SetLastToldTarget(arg2, "BN_WHISPER");
@@ -419,7 +419,7 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER(...)
         return; -- ChatFrameEventFilter says don't process
     end
     local color = WIM.db.displayColors.BNwispIn; -- color contains .r, .g & .b
-    local win = getWhisperWindowByUser(arg2, true, bNetID);
+    local win = getWhisperWindowByUser(arg2, true, arg13);
     win.unreadCount = win.unreadCount and (win.unreadCount + 1) or 1;
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BN_WHISPER", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
     win:Pop("in");
