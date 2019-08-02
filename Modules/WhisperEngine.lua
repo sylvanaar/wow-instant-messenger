@@ -179,7 +179,7 @@ end
 
 local function getWhisperWindowByUser(user, isBN, bnID)
 	if isBN then
-		if not string.find(user, "^|K") then
+		if bnID and not string.find(user, "^|K") then
 			local _
 			_, user = _G.BNGetFriendInfoByID(bnID) -- fix window handler when using the chat hyperlink
 		end
