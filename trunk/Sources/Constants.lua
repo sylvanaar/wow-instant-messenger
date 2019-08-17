@@ -1,6 +1,6 @@
 local WIM = WIM;
 
-local isClassic = WOW_PROJECT_ID == 2
+local isClassic = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 
 -- imports
 local _G = _G;
