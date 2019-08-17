@@ -96,6 +96,7 @@ db_defaults.pop_rules.whisper = {
         },
         alwaysOther = false,
         intercept = true,
+		obeyAutoFocusRules = false,
 }
 
 db_defaults.displayColors.wispIn = {
