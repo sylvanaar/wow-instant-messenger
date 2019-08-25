@@ -8,7 +8,7 @@ externals:
 	Libs/CallbackHandler-1.0:
 		url: https://repos.wowace.com/wow/callbackhandler/trunk
 	Libs/LibWho-2.0:
-		url: https://repos.wowace.com/wow/wholib/trunk
+		url: https://github.com/sylvanaar/who-lib.git
 
 	Libs/LibChatAnims:
 		url: https://repos.wowace.com/wow/libchatanims/trunk
