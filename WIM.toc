@@ -1,7 +1,7 @@
 ## Interface: 80100 
 ## Title: WIM
 ## Author: Pazza (Bronzebeard), (Updated by Sylvanaar)
-## Version: @project-revision@
+## Version: @project-version@
 ## Notes: Give whispers an instant messenger feel.
 ## eMail: johnlangone@gmail.com
 ## X-Email: johnlangone@gmail.com
