@@ -6,12 +6,12 @@ externals:
 	Libs/LibStub:
 		url: https://repos.wowace.com/wow/libstub/trunk
 	Libs/CallbackHandler-1.0:
-		url: https://repos.wowace.com/wow/callbackhandler/trunk
+		url: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
 	Libs/LibWho-2.0:
 		url: https://github.com/sylvanaar/who-lib.git
 
 	Libs/LibChatAnims:
-		url: https://repos.wowace.com/wow/libchatanims/trunk
+		url: https://repos.wowace.com/wow/libchatanims/trunk/LibChatAnims
 	Libs/LibSharedMedia-3.0:
 		url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk
 	Libs/ChatThrottleLib:
