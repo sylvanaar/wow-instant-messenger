@@ -13,7 +13,7 @@ externals:
 	Libs/LibChatAnims:
 		url: https://repos.wowace.com/wow/libchatanims/trunk/LibChatAnims
 	Libs/LibSharedMedia-3.0:
-		url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk
+		url: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
 	Libs/ChatThrottleLib:
 		url: https://repos.wowace.com/wow/chatthrottlelib/trunk
 	Libs/LibChatHandler-1.0:
