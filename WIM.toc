@@ -5,6 +5,9 @@
 # ## Interface: 11302
 #@end-non-retail@
 
+## X-Curse-Project-ID: 7474
+## X-WoWI-ID: 5342
+
 ## Title: WIM
 ## Author: Pazza (Bronzebeard), (Updated by Sylvanaar)
 ## Version: @project-version@
