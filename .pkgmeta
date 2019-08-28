@@ -1,13 +1,13 @@
 package-as: WIM
 
 externals:
- WIM/Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
- WIM/Libs/CallbackHandler-1.0: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
- WIM/Libs/LibWho-2.0: https://github.com/sylvanaar/who-lib.git
- WIM/Libs/LibChatAnims: https://repos.wowace.com/wow/libchatanims/trunk/LibChatAnims
- WIM/Libs/LibSharedMedia-3.0: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
- WIM/Libs/ChatThrottleLib: https://repos.wowace.com/wow/chatthrottlelib/trunk
- WIM/Libs/LibChatHandler-1.0: https://repos.curseforge.com/wow/libchathandler/trunk
+ Libs/LibStub: https://repos.wowace.com/wow/libstub/trunk
+ Libs/CallbackHandler-1.0: https://repos.wowace.com/wow/callbackhandler/trunk/CallbackHandler-1.0
+ Libs/LibWho-2.0: https://github.com/sylvanaar/who-lib.git
+ Libs/LibChatAnims: https://repos.wowace.com/wow/libchatanims/trunk/LibChatAnims
+ Libs/LibSharedMedia-3.0: https://repos.wowace.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
+ Libs/ChatThrottleLib: https://repos.wowace.com/wow/chatthrottlelib/trunk
+ Libs/LibChatHandler-1.0: https://repos.curseforge.com/wow/libchathandler/trunk
 
 enable-nolib-creation: no
 
