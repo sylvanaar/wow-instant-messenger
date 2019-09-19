@@ -445,12 +445,10 @@ local function createFadeAnimation(obj, direction)
 	local fade = anim:CreateAnimation("Alpha")
 	fade:SetDuration(0.25)
 	if direction == "in" then
---		fade:SetChange(1)
-		fade:SetFromAlpha(0)
+		fade:SetFromAlpha(0.5)
 		fade:SetToAlpha(1)
 		anim:SetScript("OnFinished", function() obj:SetAlpha(1) end)
 	else
-		--fade:SetChange(-0.5)
 		fade:SetFromAlpha(1)
 		fade:SetToAlpha(0.5)
 		fade:SetStartDelay(1)
@@ -650,7 +648,7 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                 	self.fadeElapsed = (self.fadeElapsed or 0) + elapsed;
                 	while(self.fadeElapsed > .1) do
                 		local window = GetMouseFocus();
-                		if(window) then
+                                if(window) then
                 			if(((window == self or window.parentWindow == self  or self.isOnHyperLink or
                 					self == helperFrame.attachedTo or
                 					(EditBoxInFocus and EditBoxInFocus.parentWindow == self)) or
@@ -658,12 +656,12 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                 					(not self.fadedIn or self.delayFade)) then
 								if self.animOut and self.animOut:GetProgress() > 0 and self.animOut:GetProgress() < 0.5 then
 									self.animOut:Stop()
-									self.fadedIn = true
+                                                                        self.fadedIn = true
 								end
 								if not self.animIn then self.animIn = createFadeAnimation(self, "in") end
 								if not self.animIn:IsPlaying() and not self.fadedIn then
 									self:SetAlpha(0.5)
-									self.animIn:Play()
+                                                                        self.animIn:Play()
 								end
                 				self.fadedIn = true;
                 				self.delayFade = false;
@@ -672,7 +670,7 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                 					(not (window.tabStrip and window.tabStrip.selected.obj == self)) and
                 					helperFrame.attachedTo ~= self and
                 					(not EditBoxInFocus or EditBoxInFocus.parentWindow ~= self) and self.fadedIn) then
-                				if(self.delayFade) then
+                                                if(self.delayFade) then
                 					self.delayFadeElapsed = (self.delayFadeElapsed or 0) + elapsed;
                 					while(self.delayFadeElapsed > FadeProps.delay) do
                 						self.delayFade = false;
@@ -681,9 +679,9 @@ local function MessageWindow_Frame_OnUpdate(self, elapsed)
                 				else
                 					self.fadedIn = false;
                 					self.delayFadeElapsed = 0;
-									if not self.animOut then self.animOut = createFadeAnimation(self, "out") end
-									self:SetAlpha(1)
-									self.animOut:Play()
+                                                        if not self.animOut then self.animOut = createFadeAnimation(self, "out") end
+                                                        self:SetAlpha(1)
+                                                        self.animOut:Play()
                 				end
                 			end
                 		end
