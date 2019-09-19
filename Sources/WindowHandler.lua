@@ -1043,6 +1043,50 @@ local function instantiateWindow(obj)
                                 self.WhoCallback(result);
                          end
         	else
+        		--Check if sending unit is in your party, then check guild
+        		if _G.IsInRaid() then
+        			for i = 1, _G.GetNumGroupMembers() do
+        				local unitId = "raid"..i
+        				local name = _G.GetUnitName(unitId, true)
+        				if self.theUser == name then
+        					self.class = _G.UnitClass(unitId) or "";
+        					self.level = _G.UnitLevel(unitId) or "";
+        					self.race = _G.UnitRace(unitId)race or "";
+                            self:UpdateIcon();
+                            self:UpdateCharDetails();
+        					break
+        				end
+        			end
+        		elseif _G.IsInGroup( then
+        			for i = 1, _G.GetNumSubgroupMembers() do
+        				local unitId = "party"..i
+        				local name = _G.GetUnitName(unitId, true)
+        				if self.theUser == name then
+        					self.class = _G.UnitClass(unitId) or "";
+        					self.level = _G.UnitLevel(unitId) or "";
+        					self.race = _G.UnitRace(unitId)race or "";
+                            self:UpdateIcon();
+                            self:UpdateCharDetails();
+        					break
+        				end
+        			end
+        		elseif _G.IsInGuild() then
+					local totalMembers, _, numOnlineAndMobileMembers = _G.GetNumGuildMembers()
+					--Attempt CPU saving, if "show offline" is unchecked, we can reliably scan only online members instead of whole roster
+					local scanTotal = _G.GetGuildRosterShowOffline() and totalMembers or numOnlineAndMobileMembers
+					for i=1, scanTotal do
+						local name, rank, rankIndex, level, class, zone, note, offnote, connected, status, engClass, achPoints, achRank, isMobile = _G.GetGuildRosterInfo(i)
+						if not name then break end--no name, means during our scan someone left guild and we hit an index that no longer returns player name
+						name = _G.Ambiguate(name, "none")
+						if self.theUser == name then
+        					self.class = class or "";
+        					self.level = level or "";
+        					self.location = zone or "";
+                            self:UpdateIcon();
+                            self:UpdateCharDetails();
+        					break
+						end
+        			end
         		dPrint("WhoLib-1.0 not loaded... Skipping who lookup!");
         	end
         end
