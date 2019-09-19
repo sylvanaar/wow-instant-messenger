@@ -1051,20 +1051,20 @@ local function instantiateWindow(obj)
         				if self.theUser == name then
         					self.class = _G.UnitClass(unitId) or "";
         					self.level = _G.UnitLevel(unitId) or "";
-        					self.race = _G.UnitRace(unitId)race or "";
+        					self.race = _G.UnitRace(unitId) or "";
                             self:UpdateIcon();
                             self:UpdateCharDetails();
         					break
         				end
         			end
-        		elseif _G.IsInGroup( then
+        		elseif _G.IsInGroup() then
         			for i = 1, _G.GetNumSubgroupMembers() do
         				local unitId = "party"..i
         				local name = _G.GetUnitName(unitId, true)
         				if self.theUser == name then
         					self.class = _G.UnitClass(unitId) or "";
         					self.level = _G.UnitLevel(unitId) or "";
-        					self.race = _G.UnitRace(unitId)race or "";
+        					self.race = _G.UnitRace(unitId) or "";
                             self:UpdateIcon();
                             self:UpdateCharDetails();
         					break
