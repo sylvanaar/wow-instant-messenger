@@ -28,6 +28,7 @@ local unpack = unpack;
 local strsub = strsub;
 local time = time;
 local Ambiguate = Ambiguate;
+local GetGuildInfo = GetGuildInfo;
 
 -- set namespace
 setfenv(1, WIM);
@@ -1077,12 +1078,16 @@ local function instantiateWindow(obj)
                                         local playerGuildIndex = lists.guild[lookupName];
                                         if (playerGuildIndex) then
                                                 local name, rank, rankIndex, level, class, zone = _G.GetGuildRosterInfo(playerGuildIndex)
-						if name and lookupName:lower() == Ambiguate(name, "none"):lower() then --no name, means during our scan someone left guild and we hit an index that no longer returns player name, or the index is outdated and names do not match
-                                                        self.class = class or "";
-                                                        self.level = level or "";
-                                                        self.location = zone or "";
-                                                        self:UpdateIcon();
-                                                        self:UpdateCharDetails();
+                                                if name and lookupName:lower() == Ambiguate(name, "none"):lower() then --no name, means during our scan someone left guild and we hit an index that no longer returns player name, or the index is outdated and names do not match
+                                                        self.WhoCallback({
+                                                                Name = self.theUser,
+                                                                Online = true,
+                                                                Guild = select(1, GetGuildInfo("player")) or "",
+                                                                Class = class or "",
+                                                                Level = level or "",
+                                                                Race = self.race or "",
+                                                                Zone = zone  or ""
+                                                        });
                                                 end
                                         end
         		end
