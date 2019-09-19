@@ -202,7 +202,7 @@ local function processFilter(eventItem, filter)
                 filter.stats = filter.stats + 1;
                 return filter.action;
         end
-    elseif(filter.type == 3) then
+    elseif(filter.type == 3) and libs.WhoLib then--Without SendWho, this filter type not possible in classic
         -- do not do look up if user has window opened already. Defeats the purpose.
         if(not windows.active.whisper[name] and not userCache[name] and _G.UnitName("player") ~= name) then
             dPrint("Running WhoLookUp on: "..name);

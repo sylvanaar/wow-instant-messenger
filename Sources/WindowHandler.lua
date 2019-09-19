@@ -1031,7 +1031,7 @@ local function instantiateWindow(obj)
                 end
         else
         	local whoLib = libs.WhoLib;
-        	if(whoLib) then
+        	if(whoLib) then--With block load in classic, this nil check will safe exit who checks in classic client
         		local result = whoLib:UserInfo(self.theUser, 
         			{
         				queue = whoLib.WHOLIB_QUEUE_QUIET, 

@@ -82,7 +82,10 @@ local function initialize()
         end
         
     -- import libraries.
-    libs.WhoLib = _G.LibStub:GetLibrary("LibWho-2.0");
+    if _G.WOW_PROJECT_ID ~= _G.WOW_PROJECT_CLASSIC then
+    	--SendWho is protected in Classic, so we just block loading LibWho here
+		libs.WhoLib = _G.LibStub:GetLibrary("LibWho-2.0");
+	end
     libs.SML = _G.LibStub:GetLibrary("LibSharedMedia-3.0");
     libs.ChatHandler = _G.LibStub:GetLibrary("LibChatHandler-1.0");
     
