@@ -219,7 +219,7 @@ local WIM_ClassicSkin = {
             },
             chat_display = {
                 points = {
-                    {"TOPLEFT", "window", "TOPLEFT", 24, -46},
+                    {"TOPLEFT", "window", "TOPLEFT", 24, -50},
                     {"BOTTOMRIGHT", "window", "BOTTOMRIGHT", -38, 39}
                 },
                 font = "ChatFontNormal"
