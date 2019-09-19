@@ -26,7 +26,10 @@ local select = select;
 local unpack = unpack;
 local math = math;
 local time = time;
-local playerRealm = GetRealmName()
+local playerRealm = GetRealmName();
+local C_CreatureInfo = C_CreatureInfo;
+local C_PlayerInfo = C_PlayerInfo;
+local PlayerLocation = PlayerLocation;
 
 -- set name space
 setfenv(1, WIM);
@@ -329,6 +332,22 @@ function WhisperEngine:CHAT_MSG_WHISPER(...)
     _G.ChatEdit_SetLastTellTarget(arg2, "WHISPER");
     win.online = true;
     updateMinimapAlerts();
+
+    -- get missing data available from C_PlayerInfo
+    if (arg12 and (not win.race or win.class)) then
+        local playerLocation = PlayerLocation:CreateFromGUID(arg12);
+
+        local raceId = C_PlayerInfo.GetRace(playerLocation);
+        local race = C_CreatureInfo.GetRaceInfo(raceId).raceName;
+        local class = C_PlayerInfo.GetClass(playerLocation);
+
+        win.race = race
+        win.class = class
+
+        win:UpdateIcon();
+        win:UpdateCharDetails();
+    end
+
     CallModuleFunction("PostEvent_Whisper", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 end
 
