@@ -39,13 +39,13 @@ local BNGetGameAccountInfo = _G.BNGetToonInfo or _G.BNGetGameAccountInfo
 -- load message window related default settings.
 db_defaults.displayColors = {
 		sysMsg = {
-				r=1, 
-				g=0.6627450980392157, 
+				r=1,
+				g=0.6627450980392157,
 				b=0
 			},
 		errorMsg = {
-				r=1, 
-				g=0, 
+				r=1,
+				g=0,
 				b=0
 			},
                 useSkin = true,
@@ -129,11 +129,11 @@ local cascadeDirection = {
 
 windowsByAge = {};
 
-nextColor = {}; 
+nextColor = {};
 
 local FormattingCallsList = {}; -- used to get a list of available Formattings.
 local FormattingCalls = {}; -- functions which are passed events to be formatted. Only one may be used at once.
-	
+
 local StringModifiers = {}; -- registered functions which will be used to format the message part of the string.
 
 
@@ -473,9 +473,9 @@ local function setWindowAsFadedIn(obj)
 	end
 end
 
--------------------------------------- 
---       Widget Script Handlers     -- 
--------------------------------------- 
+--------------------------------------
+--       Widget Script Handlers     --
+--------------------------------------
 
 function updateScrollBars(parentWindow)
         if(parentWindow and parentWindow.widgets and parentWindow.widgets.chat_display) then
@@ -579,7 +579,7 @@ local function updateTracker(win)
                                 local pS, sS = WindowParent:GetEffectiveScale(), win:GetEffectiveScale()
                                 local pL, pR, pT, pB = WindowParent:GetLeft()*pS, WindowParent:GetRight()*pS, WindowParent:GetTop()*pS, WindowParent:GetBottom()/pS;
                                 local sL, sR, sT, sB = win:GetLeft()*sS, win:GetRight()*sS, win:GetTop()*sS, win:GetBottom()*sS;
-                                
+
                                 if(not db.clampToScreen and sT < 0) then -- bottom
                                                 if(win.offScreen ~= 1) then
                                                                 win.offScreen = 1;
@@ -806,13 +806,13 @@ local function instantiateWindow(obj)
     obj.isWimWindow = true;
     obj.helperFrame = helperFrame;
     obj.animation = {};
-    
+
     obj.SetScale_Orig = obj.SetScale;
     obj.SetScale = scaleWindow;
-    
+
     obj.widgets = {};
     local widgets = obj.widgets;
-    
+
     -- add window backdrop frame
     widgets.Backdrop = CreateFrame("Frame", fName.."Backdrop", obj);
     widgets.Backdrop:SetToplevel(false);
@@ -833,22 +833,22 @@ local function instantiateWindow(obj)
     widgets.from.widgetName = "from";
     widgets.char_info = widgets.Backdrop:CreateFontString(fName.."BackdropCharacterDetails", "OVERLAY", "GameFontNormal");
     widgets.char_info.widgetName = "char_info";
-    
+
     -- create core window objects
     widgets.close = CreateFrame("Button", fName.."ExitButton", obj);
     widgets.close:RegisterForClicks("LeftButtonUp", "RightButtonUp");
     widgets.close.curTextureIndex = 1;
     widgets.close.parentWindow = obj;
     widgets.close.widgetName = "close";
-    
+
     widgets.scroll_up = CreateFrame("Button", fName.."ScrollUp", obj);
     widgets.scroll_up:RegisterForClicks("LeftButtonUp", "RightButtonUp");
     widgets.scroll_up.widgetName = "scroll_up";
-    
+
     widgets.scroll_down = CreateFrame("Button", fName.."ScrollDown", obj);
     widgets.scroll_down:RegisterForClicks("LeftButtonUp", "RightButtonUp");
     widgets.scroll_down.widgetName = "scroll_down";
-    
+
     widgets.chat_display = CreateFrame("ScrollingMessageFrame", fName.."ScrollingMessageFrame", obj);
     -- widgets.chat_display:RegisterForDrag("LeftButton");
     widgets.chat_display:SetHyperlinksEnabled(true)
@@ -861,7 +861,7 @@ local function instantiateWindow(obj)
     widgets.chat_display:EnableMouse(true);
     widgets.chat_display:EnableMouseWheel(1);
     widgets.chat_display.widgetName = "chat_display";
-    
+
     widgets.msg_box = CreateFrame("EditBox", fName.."MsgBox", obj);
     widgets.msg_box:SetAutoFocus(false);
     widgets.msg_box:SetHistoryLines(32);
@@ -869,7 +869,7 @@ local function instantiateWindow(obj)
     widgets.msg_box:SetAltArrowKeyMode(true);
     widgets.msg_box:EnableMouse(true);
     widgets.msg_box.widgetName = "msg_box";
-    
+
     -- Addmessage functions
     obj.AddMessage = function(self, msg, ...)
 	msg = applyStringModifiers(msg, self.widgets.chat_display);
@@ -877,11 +877,11 @@ local function instantiateWindow(obj)
         updateScrollBars(self);
 	CallModuleFunction("OnWindowMessageAdded", self, msg, ...);
     end
-    
+
     obj.AddMessageRaw = function(self, msg, ...)
         self.widgets.chat_display:AddMessage(msg, ...);
     end
-    
+
     obj.AddEventMessage = function(self, r, g, b, event, ...)
         nextColor.r, nextColor.g, nextColor.b = r, g, b;
 	local str = applyMessageFormatting(self.widgets.chat_display, event, ...);
@@ -892,7 +892,7 @@ local function instantiateWindow(obj)
                 self.tabStrip:UpdateTabs();
         end
     end
-    
+
     obj.UpdateIcon = function(self)
         local icon = self.widgets.class_icon;
         if(self.type == "chat" and self.chatType) then
@@ -965,11 +965,11 @@ local function instantiateWindow(obj)
                 end
           end
     end
-    
+
     obj.UpdateCharDetails = function(self)
         self.widgets.char_info:SetText(GetSelectedSkin().message_window.widgets.char_info.format(self, self.guild, self.level, self.race, self.class));
     end
-    
+
     obj.WhoCallback = function(result)
 	if(result and result.Online and result.Name == obj.theUser) then
 		obj.class = result.Class;
@@ -981,7 +981,7 @@ local function instantiateWindow(obj)
 		obj:UpdateCharDetails();
 	end
     end
-    
+
     obj.SendWho = function(self)
         if(self.type ~= "whisper") then
                 return;
@@ -1032,9 +1032,9 @@ local function instantiateWindow(obj)
         else
         	local whoLib = libs.WhoLib;
         	if(whoLib) then--With block load in classic, this nil check will safe exit who checks in classic client
-        		local result = whoLib:UserInfo(self.theUser, 
+        		local result = whoLib:UserInfo(self.theUser,
         			{
-        				queue = whoLib.WHOLIB_QUEUE_QUIET, 
+        				queue = whoLib.WHOLIB_QUEUE_QUIET,
         				timeout = 0,
         				-- flags = whoLib.WHOLIB_FLAG_ALWAYS_CALLBACK,
         				callback = self.WhoCallback
@@ -1072,7 +1072,6 @@ local function instantiateWindow(obj)
         			end
         		end
         		if _G.IsInGuild() then
-        			_G.print(self.theUser)
 					local totalMembers, _, numOnlineAndMobileMembers = _G.GetNumGuildMembers()
 					--Attempt CPU saving, if "show offline" is unchecked, we can reliably scan only online members instead of whole roster
 					local scanTotal = _G.GetGuildRosterShowOffline() and totalMembers or numOnlineAndMobileMembers
@@ -1094,7 +1093,7 @@ local function instantiateWindow(obj)
         	end
         end
     end
-    
+
     obj.GetRuleSet = function(self)
         if(db.pop_rules[self.type]) then
                 local curState = db.pop_rules[self.type].alwaysOther and "other" or curState
@@ -1103,7 +1102,7 @@ local function instantiateWindow(obj)
                 return db.pop_rules.whisper.other;
         end
     end
-    
+
     -- PopUp rules
     obj.Pop = function(self, msgDirection, forceResult, forceFocus) -- true to force show, false it ignore rules and force quiet.
 	-- account for variable arguments.
@@ -1113,9 +1112,9 @@ local function instantiateWindow(obj)
 	elseif(msgDirection == nil) then
 		msgDirection = "in";
 	end
-        
+
 	local rules = self:GetRuleSet(); -- defaults incase unknown
-    
+
 	-- pass isNew to pop ruleset.
 	if(forceResult == true) then
 		-- go by forceResult and ignore rules
@@ -1146,7 +1145,7 @@ local function instantiateWindow(obj)
 		end
 	else
 		-- execute pop rules.
-		if((rules.onSend and msgDirection == "out") or (rules.onReceive and msgDirection == "in")) then 
+		if((rules.onSend and msgDirection == "out") or (rules.onReceive and msgDirection == "in")) then
 			if(self.tabStrip) then
 				self:ResetAnimation();
                                 local infocus = EditBoxInFocus and EditBoxInFocus:GetParent().tabStrip;
@@ -1164,12 +1163,12 @@ local function instantiateWindow(obj)
                         end
 		end
 	end
-	
+
 	-- at this state the message is no longer classified as a new window, reset flag.
 	obj.isNew = false;
         CallModuleFunction("OnWindowPopped", self);
     end
-    
+
     obj.UpdateProps = function(self)
         self:SetFrameStrata(db.winSize.strata);
 	self:SetScale(db.winSize.scale/100);
@@ -1181,20 +1180,20 @@ local function instantiateWindow(obj)
 	self.widgets.chat_display:SetIndentedWordWrap(db.wordwrap_indent);
 	self.widgets.msg_box:SetAlpha(1);
 	self.widgets.msg_box:SetAltArrowKeyMode(db.ignoreArrowKeys);
-	
+
 	self.widgets.from:SetAlpha(1);
 	self.widgets.char_info:SetAlpha(1);
 	self.widgets.close:SetAlpha(db.windowAlpha);
 	self.widgets.scroll_up:SetAlpha(db.windowAlpha);
 	self.widgets.scroll_down:SetAlpha(db.windowAlpha);
-	
+
         if(not self.customSize) then
                 self:SetWidth(db.winSize.width);
                 self:SetHeight(db.winSize.height);
         end
-        
+
         local minWidth, minHeight = GetSelectedSkin().message_window.min_width, GetSelectedSkin().message_window.min_height;
-        
+
 	-- process registered widgets
 	local widgetName, widgetObj;
 	for widgetName, widgetObj in pairs(obj.widgets) do
@@ -1217,7 +1216,7 @@ local function instantiateWindow(obj)
         self:SetHeight(_G.math.max(minHeight, self:GetHeight()));
         self.initialized = true;
     end
-    
+
     obj.Hide_Normal = obj.Hide;
     obj.Hide = function(self, animate)
 	if(not self:IsShown() or self.animation.mode) then
@@ -1228,7 +1227,7 @@ local function instantiateWindow(obj)
 		self:Hide_Normal();
 		self:ResetAnimation();
 	else
-                
+
 		if(not db.winAnimation) then
 			self:Hide_Normal();
 			self:ResetAnimation();
@@ -1273,17 +1272,17 @@ local function instantiateWindow(obj)
     obj.SafeGetBottom = function(self)
                 return self:GetBottom() - WindowParent:GetBottom();
     end
-    
+
     -- enforce that all core widgets have parentWindow set.
 	local w;
 	for _, w in pairs(obj.widgets) do
 		w.parentWindow = obj;
 	end
-    
+
     -- load Registered Widgets
     loadRegisteredWidgets(obj);
     loadHandlers(obj);
-    
+
     -- local shortcuts = CreateFrame("Frame", fName.."ShortcutFrame", obj);
     -- shortcuts:SetToplevel(true);
     -- shortcuts:SetFrameStrata("DIALOG");
@@ -1328,37 +1327,37 @@ local function loadWindowDefaults(obj)
 	obj.location = "";
         obj.demoSave = nil;
         obj.classColor = "ffffff";
-    
+
         obj.isGM = lists.gm[obj.theUser];
-    
+
         obj:UpdateIcon();
 	obj.isNew = true;
 
 	obj:SetScale(1);
 	obj:SetAlpha(1);
-    
+
 	obj.widgets.Backdrop:SetAlpha(1);
-    
+
 	obj.widgets.from:SetText(GetReadableName(obj.theUser));
 	obj.widgets.from:SetTextColor(RGBHexToPercent(GetSelectedSkin().message_window.widgets.from.font_color));
-    
+
 	obj.widgets.char_info:SetText("");
-    
+
 	obj.widgets.msg_box.setText = 0;
 	obj.widgets.msg_box:SetText("");
         obj.widgets.msg_box:Show();
-    
+
 	obj.widgets.chat_display:Clear();
 	obj.widgets.chat_display:AddMessage("  ");
 	obj.widgets.chat_display:AddMessage("  ");
 	updateScrollBars(obj);
-        
+
         obj.widgets.close.forceShift = false;
-    
+
 	-- load Registered Widgets (if not created already) & set defaults
 	loadRegisteredWidgets(obj);
 	loadHandlers(obj);
-    
+
 	-- process registered widgets
 	local widgetName, widgetObj;
 	for widgetName, widgetObj in pairs(obj.widgets) do
@@ -1455,7 +1454,7 @@ local function destroyWindow(userNameOrObj)
     else
 	obj, index = getWindowByName(userNameOrObj.theUser);
     end
-    
+
     if(obj) then
 	if(obj.tabStrip) then
 		obj.tabStrip:Detach(obj);
@@ -1645,7 +1644,7 @@ function UpdateAllWindowProps()
 end
 
 function AddEscapeWindow(frame)
-	for i=1, #_G.UISpecialFrames do 
+	for i=1, #_G.UISpecialFrames do
 		if(_G.UISpecialFrames[i] == frame:GetName()) then
 			return;
 		end
@@ -1654,7 +1653,7 @@ function AddEscapeWindow(frame)
 end
 
 function RemoveEscapeWindow(frame)
-	for i=1, #_G.UISpecialFrames do 
+	for i=1, #_G.UISpecialFrames do
 		if(_G.UISpecialFrames[i] == frame:GetName()) then
 			table.remove(_G.UISpecialFrames, i);
 			return;
@@ -1663,9 +1662,9 @@ function RemoveEscapeWindow(frame)
 end
 
 
------------------------------------- 
--- WindowParent - Container Calls -- 
------------------------------------- 
+------------------------------------
+-- WindowParent - Container Calls --
+------------------------------------
 
 
 local function WindowParent_AnimPos(self, fraction)
@@ -1776,9 +1775,9 @@ function ToggleContainer(animate)
 end
 
 
----------------------------------- 
--- Set default widget triggers	-- 
----------------------------------- 
+----------------------------------
+-- Set default widget triggers	--
+----------------------------------
 
 RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnEnter", function(self)
 		if(db.showToolTips == true) then
@@ -1786,9 +1785,9 @@ RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnEnter", function(self)
 			_G.GameTooltip:SetText(L["<Shift-Click> to close window."]);
 		end
 	end);
-	
+
 RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnLeave", function(self) _G.GameTooltip:Hide(); end);
-	
+
 RegisterWidgetTrigger("close", "whisper,chat,w2w,demo", "OnClick", function(self)
 		if(IsShiftKeyDown() or self.forceShift or self.parentWindow.type == "demo") then
                         self.forceShift = false;
@@ -1798,7 +1797,7 @@ RegisterWidgetTrigger("close", "whisper,chat,w2w,demo", "OnClick", function(self
 			self:GetParent():Hide(true);
 		end
 	end);
-	
+
 RegisterWidgetTrigger("close", "whisper,chat,w2w", "OnUpdate", function(self)
                 local SelectedSkin = WIM:GetSelectedSkin();
 		if(GetMouseFocus() == self) then
@@ -1926,7 +1925,7 @@ RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkEnter", fu
                                 end
                         end
 		end)
-		
+
 RegisterWidgetTrigger("chat_display", "whisper,chat,w2w", "OnHyperlinkLeave", function(self, link)
 			local obj = self.parentWindow;
 			obj.isOnHyperLink = false;
@@ -1961,15 +1960,15 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnEnterPressed", func
                         self:Hide();
 			self:Show();
                 end
-                
+
 	end);
-	
+
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnEscapePressed", function(self)
 		self:SetText("");
 		self:Hide();
 		self:Show();
 	end);
-	
+
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnUpdate", function(self)
 		if(self.setText == 1) then
 			self.setText = 0;
@@ -1977,7 +1976,7 @@ RegisterWidgetTrigger("msg_box", "whisper,chat,w2w,demo", "OnUpdate", function(s
                         self.textToSet = "";
 		end
 	end);
-	
+
 RegisterWidgetTrigger("msg_box", "whisper,chat,w2w", "OnEditFocusGained", function(self)
                                 EditBoxInFocus = self;
                                 -- _G.ACTIVE_CHAT_EDIT_BOX = self; -- preserve linking abilities.
@@ -2006,7 +2005,7 @@ RegisterWidgetTrigger("msg_box", "whisper,w2w", "OnTabPressed", function(self)
                 		local chatType = win.isBN and "BN_WHISPER" or "WHISPER"
                 		-- Lookup the next whisper target
                 		local nextWhisperTarget = _G.ChatEdit_GetNextTellTarget(whisperTarget,chatType)
-                
+
                 		if nextWhisperTarget ~= "" then
                 			local win = GetWhisperWindowByUser(nextWhisperTarget);
                 			chatType = win.isBN and "BN_WHISPER" or "WHISPER"
