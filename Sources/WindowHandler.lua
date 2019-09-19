@@ -1057,7 +1057,7 @@ local function instantiateWindow(obj)
         					break
         				end
         			end
-        		elseif _G.IsInGroup( then
+        		elseif _G.IsInGroup() then
         			for i = 1, _G.GetNumSubgroupMembers() do
         				local unitId = "party"..i
         				local name = _G.GetUnitName(unitId, true)
