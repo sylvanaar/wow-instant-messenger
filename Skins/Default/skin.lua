@@ -256,7 +256,7 @@ local WIM_ClassicSkin = {
                     icons = {
                         location = "Interface\\Icons\\Ability_TownWatch",
                         invite = "Interface\\Icons\\Spell_Holy_BlessingOfStrength",
-                        friend = "Interface\\Icons\\INV_Misc_GroupNeedMore",--Needs texture that works in classic, this was introduced in 6.0
+                        friend = "interface\\icons\\spell_chargepositive",
                         ignore = "Interface\\Icons\\Ability_Physical_Taunt",
                     }
                 }
