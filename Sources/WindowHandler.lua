@@ -1051,7 +1051,7 @@ local function instantiateWindow(obj)
         				if self.theUser == name then
         					self.class = _G.UnitClass(unitId) or "";
         					self.level = _G.UnitLevel(unitId) or "";
-        					self.race = _G.UnitRace(unitId)race or "";
+        					self.race = _G.UnitRace(unitId) or "";
                             self:UpdateIcon();
                             self:UpdateCharDetails();
         					break
@@ -1064,7 +1064,7 @@ local function instantiateWindow(obj)
         				if self.theUser == name then
         					self.class = _G.UnitClass(unitId) or "";
         					self.level = _G.UnitLevel(unitId) or "";
-        					self.race = _G.UnitRace(unitId)race or "";
+        					self.race = _G.UnitRace(unitId) or "";
                             self:UpdateIcon();
                             self:UpdateCharDetails();
         					break
