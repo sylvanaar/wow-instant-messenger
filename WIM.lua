@@ -8,6 +8,7 @@ local table = table;
 local pairs = pairs;
 local string = string;
 local next = next;
+local Ambiguate = Ambiguate;
 
 -- set name space
 setfenv(1, WIM);
@@ -438,8 +439,8 @@ function WIM:GUILD_ROSTER_UPDATE()
 		for i=1, _G.GetNumGuildMembers(true) do 
 			local name = _G.GetGuildRosterInfo(i);
 			if(name) then
-				name = _G.Ambiguate(name, "none")
-				env.cache[env.realm][env.character].guildList[name] = true; --[set place holder for quick lookup
+				name = Ambiguate(name, "none")
+				env.cache[env.realm][env.character].guildList[name] = i; --[set place holder for quick lookup
 			end
 		end
 	end
