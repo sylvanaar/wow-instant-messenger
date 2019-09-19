@@ -27,6 +27,7 @@ local type = type;
 local unpack = unpack;
 local strsub = strsub;
 local time = time;
+local Ambiguate = Ambiguate;
 
 -- set namespace
 setfenv(1, WIM);
@@ -1072,24 +1073,20 @@ local function instantiateWindow(obj)
         			end
         		end
         		if _G.IsInGuild() then
-					local totalMembers, _, numOnlineAndMobileMembers = _G.GetNumGuildMembers()
-					--Attempt CPU saving, if "show offline" is unchecked, we can reliably scan only online members instead of whole roster
-					local scanTotal = _G.GetGuildRosterShowOffline() and totalMembers or numOnlineAndMobileMembers
-					for i=1, scanTotal do
-						local name, rank, rankIndex, level, class, zone = _G.GetGuildRosterInfo(i)
-						if not name then break end--no name, means during our scan someone left guild and we hit an index that no longer returns player name
-						name = _G.Ambiguate(name, "none")
-						if self.theUser == name then
-        					self.class = class or "";
-        					self.level = level or "";
-        					self.location = zone or "";
-                            self:UpdateIcon();
-                            self:UpdateCharDetails();
-        					break
-						end
-        			end
+                                        local lookupName = Ambiguate(self.theUser, "none");
+                                        local playerGuildIndex = lists.guild[lookupName];
+                                        if (playerGuildIndex) then
+                                                local name, rank, rankIndex, level, class, zone = _G.GetGuildRosterInfo(playerGuildIndex)
+						if name and lookupName:lower() == Ambiguate(name, "none"):lower() then --no name, means during our scan someone left guild and we hit an index that no longer returns player name, or the index is outdated and names do not match
+                                                        self.class = class or "";
+                                                        self.level = level or "";
+                                                        self.location = zone or "";
+                                                        self:UpdateIcon();
+                                                        self:UpdateCharDetails();
+                                                end
+                                        end
         		end
-        		dPrint("WhoLib-1.0 not loaded... Skipping who lookup!");
+                        dPrint("WhoLib-1.0 not loaded... Skipping who lookup!");
         	end
         end
     end
