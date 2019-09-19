@@ -29,6 +29,9 @@ local strsub = strsub;
 local time = time;
 local Ambiguate = Ambiguate;
 local GetGuildInfo = GetGuildInfo;
+local UnitClass = UnitClass;
+local UnitLevel = UnitLevel;
+local UnitRace = UnitRace;
 
 -- set namespace
 setfenv(1, WIM);
@@ -1050,12 +1053,16 @@ local function instantiateWindow(obj)
         			for i = 1, _G.GetNumGroupMembers() do
         				local unitId = "raid"..i
         				local name = _G.GetUnitName(unitId, true)
-        				if self.theUser == name then
-        					self.class = _G.UnitClass(unitId) or "";
-        					self.level = _G.UnitLevel(unitId) or "";
-        					self.race = _G.UnitRace(unitId) or "";
-                            self:UpdateIcon();
-                            self:UpdateCharDetails();
+                                        if self.theUser == name then
+                                                self.WhoCallback({
+                                                        Name = name,
+                                                        Online = true,
+                                                        Guild = self.guild or "",
+                                                        Class = UnitClass(unitId) or "",
+                                                        Level = UnitLevel(unitId) or "",
+                                                        Race = UnitRace(unitId) or "",
+                                                        Zone = self.zone  or ""
+                                                });
         					break
         				end
         			end
@@ -1063,12 +1070,16 @@ local function instantiateWindow(obj)
         			for i = 1, _G.GetNumSubgroupMembers() do
         				local unitId = "party"..i
         				local name = _G.GetUnitName(unitId, true)
-        				if self.theUser == name then
-        					self.class = _G.UnitClass(unitId) or "";
-        					self.level = _G.UnitLevel(unitId) or "";
-        					self.race = _G.UnitRace(unitId) or "";
-                            self:UpdateIcon();
-                            self:UpdateCharDetails();
+                                        if self.theUser == name then
+                                                self.WhoCallback({
+                                                        Name = name,
+                                                        Online = true,
+                                                        Guild = self.guild or "",
+                                                        Class = UnitClass(unitId) or "",
+                                                        Level = UnitLevel(unitId) or "",
+                                                        Race = UnitRace(unitId) or "",
+                                                        Zone = self.zone  or ""
+                                                });
         					break
         				end
         			end
