@@ -1070,12 +1070,14 @@ local function instantiateWindow(obj)
         					break
         				end
         			end
-        		elseif _G.IsInGuild() then
+        		end
+        		if _G.IsInGuild() then
+        			_G.print(self.theUser)
 					local totalMembers, _, numOnlineAndMobileMembers = _G.GetNumGuildMembers()
 					--Attempt CPU saving, if "show offline" is unchecked, we can reliably scan only online members instead of whole roster
 					local scanTotal = _G.GetGuildRosterShowOffline() and totalMembers or numOnlineAndMobileMembers
 					for i=1, scanTotal do
-						local name, rank, rankIndex, level, class, zone, note, offnote, connected, status, engClass, achPoints, achRank, isMobile = _G.GetGuildRosterInfo(i)
+						local name, rank, rankIndex, level, class, zone = _G.GetGuildRosterInfo(i)
 						if not name then break end--no name, means during our scan someone left guild and we hit an index that no longer returns player name
 						name = _G.Ambiguate(name, "none")
 						if self.theUser == name then
@@ -1087,6 +1089,7 @@ local function instantiateWindow(obj)
         					break
 						end
         			end
+        		end
         		dPrint("WhoLib-1.0 not loaded... Skipping who lookup!");
         	end
         end
