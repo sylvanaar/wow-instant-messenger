@@ -15,7 +15,7 @@ setfenv(1, WIM);
 --[[
     type:   1 - Pattern
             2 - User Type
-            3 - Level
+            3 - Level -- no longer possible since removal of who.
 
     action: 1 - Allow
             2 - Ignore
@@ -63,16 +63,17 @@ local DefaultFilters = {
         received = true,
         stats = 0
     },
-    {
-        name = L["Example Spam Blocker"],
-        enabled = false;
-        type = 3,
-        action = 3,
-        level = 2,
-        received = true,
-        notify = true,
-        stats = 0
-    },
+    -- Who lookups are no longer possible. this filter is no longer possible.
+    -- {
+    --     name = L["Example Spam Blocker"],
+    --     enabled = false;
+    --     type = 3,
+    --     action = 3,
+    --     level = 2,
+    --     received = true,
+    --     notify = true,
+    --     stats = 0
+    -- },
     {
         name = L["WhisperSelect Part 2"],
         enabled = false;
@@ -331,6 +332,13 @@ local ChatFilters = CreateModule("ChatFilters");
 _G.LibStub:GetLibrary("LibChatHandler-1.0"):Embed(ChatFilters);
 
 function ChatFilters:OnEnable()
+    -- filter out filters using Who lookups.
+    for i = #filters, 1, -1 do
+        if (filters[i].type == 3) then
+            table.remove(filters, i);
+        end
+    end
+
     if(db.enabled) then
         ChatFilters:RegisterChatEvent("CHAT_MSG_GUILD", 1);
         ChatFilters:RegisterChatEvent("CHAT_MSG_OFFICER", 1);
@@ -496,13 +504,13 @@ local function createFilterFrame()
             info.value = 2;
             info.func = win.by.click;
             _G.UIDropDownMenu_AddButton(info, _G.UIDROPDOWNMENU_MENU_LEVEL);
-            if(not win.isChat) then
-                local info = _G.UIDropDownMenu_CreateInfo();
-                info.text = L["Level"];
-                info.value = 3;
-                info.func = win.by.click;
-                _G.UIDropDownMenu_AddButton(info, _G.UIDROPDOWNMENU_MENU_LEVEL);
-            end
+            -- if(not win.isChat) then
+            --     local info = _G.UIDropDownMenu_CreateInfo();
+            --     info.text = L["Level"];
+            --     info.value = 3;
+            --     info.func = win.by.click;
+            --     _G.UIDropDownMenu_AddButton(info, _G.UIDROPDOWNMENU_MENU_LEVEL);
+            -- end
         end
     win.by:SetScript("OnShow", function(self)
             win.filter.type = win.filter.type or 1;
