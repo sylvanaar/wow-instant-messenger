@@ -13,7 +13,6 @@ setfenv(1, WIM);
 
 local buttons = {};
 
-
 -- create WIM Module
 local ShortcutBar = CreateModule("ShortcutBar", true);
 
@@ -59,8 +58,8 @@ local function createButton(parent)
 				buttons[self.index].scripts.SetDefaults(self);
 			end
 		end
-		
-		
+
+
 	button:Enable();
 	buttonCount = buttonCount + 1;
 	return button;
@@ -70,10 +69,10 @@ end
 
 local function createShortCutBar()
 	local frame = CreateFrame("Frame");
-	
+
 	--widget info
 	frame.type = "whisper"; -- will only show on whisper windows.
-	
+
 	-- test texture so you can see the frame to be placed.
 	--frame.test = frame:CreateTexture(nil, "BACKGROUND");
 	--frame.test:SetColorTexture(1,1,1,.5);
@@ -230,11 +229,11 @@ local BNinviteTypes = {
 local function canInviteBN(id)
 	if not tonumber(id) then return end
 	local show = true
-	local bnetIDAccount, accountName, battleTag, isBattleTag, characterName, bnetIDGameAccount = _G.BNGetFriendInfoByID(id);
+	local bnetIDAccount, accountName, battleTag, isBattleTag, characterName, bnetIDGameAccount = GetBNGetFriendInfoByID(id);
 	if not bnetIDGameAccount then
 		show = false;
 	else
-		local guid = select(20, _G.BNGetGameAccountInfo(bnetIDGameAccount));
+		local guid = select(20, GetBNGetGameAccountInfo(bnetIDGameAccount));
 		local inviteType = _G.GetDisplayedInviteType(guid);
 		if not BNinviteTypes["BN_"..inviteType] then
 			show = false;

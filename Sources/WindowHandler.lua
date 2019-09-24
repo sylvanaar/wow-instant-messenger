@@ -36,10 +36,6 @@ local UnitRace = UnitRace;
 -- set namespace
 setfenv(1, WIM);
 
---Quick and dirty fix for renames in legion to deal with renamed globals
-local BNet_GetBNetIDAccount = _G.BNet_GetPresenceID or _G.BNet_GetBNetIDAccount
-local BNGetGameAccountInfo = _G.BNGetToonInfo or _G.BNGetGameAccountInfo
-
 
 -- load message window related default settings.
 db_defaults.displayColors = {
@@ -1001,10 +997,10 @@ local function instantiateWindow(obj)
                 });
         elseif(self.isBN) then
                 -- get information of BN user from friends data.
-                local id = self.theUser and BNet_GetBNetIDAccount(self.theUser) or nil;
+                local id = self.theUser and _G.BNet_GetBNetIDAccount(self.theUser) or nil;
                 if(id) then
-                				local _, _, _, _, _, bnetIDGameAccount = _G.BNGetFriendInfoByID(id)
-                                local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText, broadcastText, broadcastTime = BNGetGameAccountInfo(bnetIDGameAccount or 0);
+                				local _, _, _, _, _, bnetIDGameAccount = GetBNGetFriendInfoByID(id)
+                                local hasFocus, toonName, client, realmName, realmID, faction, race, class, guild, zoneName, level, gameText, broadcastText, broadcastTime = GetBNGetGameAccountInfo(bnetIDGameAccount or 0);
                                 self.class = class or "";
                                 self.level = level or "";
                                 self.race = race or "";
