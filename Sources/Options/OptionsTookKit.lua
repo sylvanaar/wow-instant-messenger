@@ -351,13 +351,13 @@ local function CreateSection(parent, title, desc)
     frame:Show();
     frame:SetFullSize();
     if(title) then
-        frame.title = frame:CreateText(nil, 18);
+        frame.title = frame:CreateText(nil, 16);
         frame.title:SetText(title);
         frame.title:SetTextColor(unpack(TitleColor));
         frame.title:SetFullSize();
         frame.title:SetJustifyH("LEFT");
         frame.title:SetPoint("TOPLEFT");
-        frame.nextOffSetY = -4;
+        frame.nextOffSetY = -6;
     end
     if(desc) then
         frame.description = frame:CreateText();

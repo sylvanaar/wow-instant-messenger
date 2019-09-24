@@ -153,7 +153,7 @@ local function createCategory(index)
     cat.text:ClearAllPoints();
     cat.text:SetPoint("CENTER");
     local font, _, _ = _G.ChatFontNormal:GetFont();
-    cat.text:SetFont(font, 16, "");
+    cat.text:SetFont(font, 14, "");
     cat.text:SetText("|cffffffff"..cat.info.title.."|r");
     cat:SetHeight(28);
     cat:SetWidth(options.frame.nav:GetWidth()-2);
