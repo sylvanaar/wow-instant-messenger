@@ -1033,19 +1033,6 @@ local function instantiateWindow(obj)
                                 self:AddMessage(_G.BN_UNABLE_TO_RESOLVE_NAME, db.displayColors.errorMsg.r, db.displayColors.errorMsg.g, db.displayColors.errorMsg.b);
                 end
         else
-        	local whoLib = libs.WhoLib;
-        	if(whoLib) then--With block load in classic, this nil check will safe exit who checks in classic client
-        		local result = whoLib:UserInfo(self.theUser,
-        			{
-        				queue = whoLib.WHOLIB_QUEUE_QUIET,
-        				timeout = 0,
-        				-- flags = whoLib.WHOLIB_FLAG_ALWAYS_CALLBACK,
-        				callback = self.WhoCallback
-        			});
-                         if(result) then
-                                self.WhoCallback(result);
-                         end
-        	else
         		--Check if sending unit is in your party, then check guild
         		if _G.IsInRaid() then
         			for i = 1, _G.GetNumGroupMembers() do
@@ -1100,8 +1087,6 @@ local function instantiateWindow(obj)
                                                 end
                                         end
         		end
-                        dPrint("WhoLib-1.0 not loaded... Skipping who lookup!");
-        	end
         end
     end
 
