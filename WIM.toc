@@ -1,5 +1,5 @@
 #@retail@
-## Interface: 80200
+## Interface: 80205
 #@end-retail@
 #@non-retail@
 # ## Interface: 11302
@@ -17,14 +17,8 @@
 ## X-Website: http://www.wimaddon.com/
 ## X-Category: Chat
 ## DefaultState: Enabled
-#@retail@
-## OptionalDeps: LibStub, CallbackHandler-1.0, ChatThrottleLib, LibSharedMedia-3.0, LibWho-2.0, LibChatHandler-1.0, LibChatAnims
-## X-Embeds: LibStub, CallbackHandler-1.0, ChatThrottleLib, LibSharedMedia-3.0, LibWho-2.0, LibChatHandler-1.0, LibChatAnims
-#@end-retail@
-#@non-retail@
 ## OptionalDeps: LibStub, CallbackHandler-1.0, ChatThrottleLib, LibSharedMedia-3.0, LibChatHandler-1.0, LibChatAnims
 ## X-Embeds: LibStub, CallbackHandler-1.0, ChatThrottleLib, LibSharedMedia-3.0, LibChatHandler-1.0, LibChatAnims
-#@end-non-retail@
 ## SavedVariables: WIM3_Data, WIM3_Cache, WIM3_Filters, WIM3_History, WIM3_ChatFilters, WIM3_Alias
 
 Libs\Includes.xml

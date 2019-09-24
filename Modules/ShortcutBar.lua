@@ -351,7 +351,7 @@ RegisterShortcut("invite", L["Invite to Party"], {
 	});
 RegisterShortcut("friend", L["Add Friend"], {
 		OnClick = function(self)
-			_G.AddFriend(self.parentWindow.theUser);
+			_G.C_FriendList.AddFriend(self.parentWindow.theUser);
 		end,
 		SetDefaults = function(self)
 			ShortcutBar:FRIENDLIST_UPDATE();
@@ -366,7 +366,7 @@ RegisterShortcut("ignore", L["Ignore User"], {
 		button1 = L["Yes"],
 		button2 = L["No"],
 		OnAccept = function()
-			_G.AddIgnore(win.isBN and win.toonName or win.theUser);
+			_G.C_FriendList.AddIgnore(win.isBN and win.toonName or win.theUser);
 		end,
 		timeout = 0,
 		whileDead = 1,
