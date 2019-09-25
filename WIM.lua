@@ -138,14 +138,14 @@ end
 --Retail kind of has these for now, but won't forever, and classic is not expected to make same API restructuring, so this ugly mess is probably required forever
 function GetBNGetFriendInfo(friendIndex)
 	local accountInfo = _G.C_BattleNet and _G.C_BattleNet.GetFriendAccountInfo(friendIndex);
-		if accountInfo then
-			local wowProjectID = accountInfo.gameAccountInfo.wowProjectID or 0;
-			local clientProgram = accountInfo.gameAccountInfo.clientProgram ~= "" and accountInfo.gameAccountInfo.clientProgram or nil;
+	if accountInfo then
+		local wowProjectID = accountInfo.gameAccountInfo.wowProjectID or 0;
+		local clientProgram = accountInfo.gameAccountInfo.clientProgram ~= "" and accountInfo.gameAccountInfo.clientProgram or nil;
 
-			return	accountInfo.bnetAccountID, accountInfo.accountName, accountInfo.battleTag, accountInfo.isBattleTagFriend,
-					accountInfo.gameAccountInfo.characterName, accountInfo.gameAccountInfo.gameAccountID, clientProgram,
-					accountInfo.gameAccountInfo.isOnline, accountInfo.lastOnlineTime, accountInfo.isAFK, accountInfo.isDND, accountInfo.customMessage, accountInfo.note, accountInfo.isFriend,
-					accountInfo.customMessageTime, wowProjectID, accountInfo.rafLinkType == _G.Enum.RafLinkType.Recruit, accountInfo.gameAccountInfo.canSummon, accountInfo.isFavorite, accountInfo.gameAccountInfo.isWowMobile;
+		return	accountInfo.bnetAccountID, accountInfo.accountName, accountInfo.battleTag, accountInfo.isBattleTagFriend,
+				accountInfo.gameAccountInfo.characterName, accountInfo.gameAccountInfo.gameAccountID, clientProgram,
+				accountInfo.gameAccountInfo.isOnline, accountInfo.lastOnlineTime, accountInfo.isAFK, accountInfo.isDND, accountInfo.customMessage, accountInfo.note, accountInfo.isFriend,
+				accountInfo.customMessageTime, wowProjectID, accountInfo.rafLinkType == _G.Enum.RafLinkType.Recruit, accountInfo.gameAccountInfo.canSummon, accountInfo.isFavorite, accountInfo.gameAccountInfo.isWowMobile;
 	else
 		return _G.BNGetFriendInfo(friendIndex)
 	end
@@ -153,14 +153,14 @@ end
 
 function GetBNGetFriendInfoByID(id)
 	local accountInfo = _G.C_BattleNet and _G.C_BattleNet.GetAccountInfoByID(id);
-		if accountInfo then
-			local wowProjectID = accountInfo.gameAccountInfo.wowProjectID or 0;
-			local clientProgram = accountInfo.gameAccountInfo.clientProgram ~= "" and accountInfo.gameAccountInfo.clientProgram or nil;
+	if accountInfo then
+		local wowProjectID = accountInfo.gameAccountInfo.wowProjectID or 0;
+		local clientProgram = accountInfo.gameAccountInfo.clientProgram ~= "" and accountInfo.gameAccountInfo.clientProgram or nil;
 
-			return	accountInfo.bnetAccountID, accountInfo.accountName, accountInfo.battleTag, accountInfo.isBattleTagFriend,
-					accountInfo.gameAccountInfo.characterName, accountInfo.gameAccountInfo.gameAccountID, clientProgram,
-					accountInfo.gameAccountInfo.isOnline, accountInfo.lastOnlineTime, accountInfo.isAFK, accountInfo.isDND, accountInfo.customMessage, accountInfo.note, accountInfo.isFriend,
-					accountInfo.customMessageTime, wowProjectID, accountInfo.rafLinkType == _G.Enum.RafLinkType.Recruit, accountInfo.gameAccountInfo.canSummon, accountInfo.isFavorite, accountInfo.gameAccountInfo.isWowMobile;
+		return	accountInfo.bnetAccountID, accountInfo.accountName, accountInfo.battleTag, accountInfo.isBattleTagFriend,
+				accountInfo.gameAccountInfo.characterName, accountInfo.gameAccountInfo.gameAccountID, clientProgram,
+				accountInfo.gameAccountInfo.isOnline, accountInfo.lastOnlineTime, accountInfo.isAFK, accountInfo.isDND, accountInfo.customMessage, accountInfo.note, accountInfo.isFriend,
+				accountInfo.customMessageTime, wowProjectID, accountInfo.rafLinkType == _G.Enum.RafLinkType.Recruit, accountInfo.gameAccountInfo.canSummon, accountInfo.isFavorite, accountInfo.gameAccountInfo.isWowMobile;
 	else
 		return _G.BNGetFriendInfoByID(id)
 	end
@@ -182,7 +182,7 @@ function GetBNGetGameAccountInfo(toonId)
 		local gameAccountID = gameAccountInfo.gameAccountID or 0;
 		local playerGuid = gameAccountInfo.playerGuid or 0;
 		return	gameAccountInfo.hasFocus, characterName, gameAccountInfo.clientProgram,
-			realmName, realmID, factionName, raceName, className, "", areaName, characterLevel,
+				realmName, realmID, factionName, raceName, className, "", areaName, characterLevel,
 				richPresence, nil, nil,
 				gameAccountInfo.isOnline, gameAccountID, nil, gameAccountInfo.isGameAFK, gameAccountInfo.isGameBusy,
 				playerGuid, wowProjectID, gameAccountInfo.isWowMobile
