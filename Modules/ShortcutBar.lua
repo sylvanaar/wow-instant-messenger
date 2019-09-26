@@ -342,7 +342,11 @@ RegisterShortcut("invite", L["Invite to Party"], {
 		OnClick = function(self)
 			local win = self.parentWindow;
 			if win.isBN then
-				_G.FriendsFrame_InviteOrRequestToJoin and _G.FriendsFrame_InviteOrRequestToJoin(nil, win.bn.id) or _G.FriendsFrame_BattlenetInvite(nil, win.bn.id)
+				if _G.FriendsFrame_InviteOrRequestToJoin then
+					_G.FriendsFrame_InviteOrRequestToJoin(nil, win.bn.id)
+				else
+					_G.FriendsFrame_BattlenetInvite(nil, win.bn.id)
+				end
 			else
 				_G.InviteUnit(win.theUser)
 			end
