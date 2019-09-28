@@ -369,10 +369,12 @@ function WhisperEngine:CHAT_MSG_WHISPER_INFORM(...)
     arg2 = _G.Ambiguate(arg2, "none")
     local win = getWhisperWindowByUser(arg2);
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_WHISPER_INFORM", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
+    win.unreadCount = 0; -- having replied  to conversation implies the messages have been read.
     win:Pop("out");
     _G.ChatEdit_SetLastToldTarget(arg2, "WHISPER");
     win.online = true;
     win.msgSent = false;
+    updateMinimapAlerts();
     CallModuleFunction("PostEvent_WhisperInform", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
     addToTableUnique(recentSent, arg1);
         if(#recentSent > maxRecent) then
@@ -404,10 +406,12 @@ function WhisperEngine:CHAT_MSG_BN_WHISPER_INFORM(...)
     local win = getWhisperWindowByUser(arg2, true, arg13);
 	if not win then return end	--due to a client bug, we can not receive the other player's name, so do nothing
     win:AddEventMessage(color.r, color.g, color.b, "CHAT_MSG_BN_WHISPER_INFORM", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
+    win.unreadCount = 0; -- having replied  to conversation implies the messages have been read.
     win:Pop("out");
     _G.ChatEdit_SetLastToldTarget(arg2, "BN_WHISPER");
     win.online = true;
     win.msgSent = false;
+    updateMinimapAlerts();
     CallModuleFunction("PostEvent_WhisperInform", arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13);
     addToTableUnique(recentSent, arg1);
 	if(#recentSent > maxRecent) then
