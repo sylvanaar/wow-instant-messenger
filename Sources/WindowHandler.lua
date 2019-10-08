@@ -2059,7 +2059,12 @@ RegisterMessageFormatting(L["Default"], function(smf, event, ...)
                                 event == "CHAT_MSG_RAID" or event == "CHAT_MSG_RAID_LEADER" or event == "CHAT_MSG_SAY" or event == "CHAT_MSG_PARTY_LEADER" or
                                 event == "CHAT_MSG_CHANNEL" or event == "CHAT_MSG_INSTANCE_CHAT" or event == "CHAT_MSG_INSTANCE_CHAT_LEADER") then
                         return applyBracket().."|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and doColoredNames(event, ...) or arg2).."|h"..applyBracket(2)..": "..arg1;
-                elseif(event == "CHAT_MSG_RAID_WARNING") then
+				elseif(event == "CHAT_MSG_EMOTE") then
+					return "|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and doColoredNames(event, ...) or arg2).."|h".." "..arg1;
+				elseif(event == "CHAT_MSG_TEXT_EMOTE") then
+					local user = "|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and doColoredNames(event, ...) or arg2).."|h"
+					return arg1;
+				elseif(event == "CHAT_MSG_RAID_WARNING") then
                         return _G.RAID_WARNING.." "..applyBracket().."|Hplayer:"..arg2..":"..arg11.."|h"..(db.coloredNames and doColoredNames(event, ...) or arg2).."|h"..applyBracket(2)..": "..arg1;
                 elseif(event == "CHAT_MSG_CHANNEL_JOIN") then
                         return string.format(_G.CHAT_CHANNEL_JOIN_GET, arg2);
