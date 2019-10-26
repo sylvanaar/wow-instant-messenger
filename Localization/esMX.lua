@@ -1,9 +1,9 @@
 --[[
-    Language Localization: esES
+    Language Localization: esMX
     Translated by: Woopy - Loatheb (NA)
 ]]
 
-WIM.AddLocale("esES", {
+WIM.AddLocale("esMX", {
     ["WIM (WoW Instant Messenger)"] = "WIM (WoW Instant Messenger)",
     ["_Description"] = "WIM es un addon que aporta una sensación familiar a la comunicación a través del chat en The World of Warcraft. En esta pantalla podrá personalizar WIM para adaptarlo a sus necesidades.",
 

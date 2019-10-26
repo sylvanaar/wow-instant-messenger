@@ -12,6 +12,8 @@
 ## Author: Pazza (Bronzebeard), (Updated by Sylvanaar/MysticalOS/Humfras)
 ## Version: @project-version@
 ## Notes: Give whispers an instant messenger feel.
+## Notes-esES: Dale a los susurros una sensación de mensajería instantánea.
+## Notes-esMX: Dale a los susurros una sensación de mensajería instantánea.
 ## eMail: johnlangone@gmail.com
 ## X-Email: johnlangone@gmail.com
 ## X-Website: http://www.wimaddon.com/
