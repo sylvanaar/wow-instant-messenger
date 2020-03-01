@@ -3,7 +3,7 @@
     Translated by: Woopy - Loatheb (NA)
 ]]
 
-local translations = {
+WIM.AddLocale("esES", {
     ["WIM (WoW Instant Messenger)"] = "WIM (WoW Instant Messenger)",
     ["_Description"] = "WIM es un addon que aporta una sensación familiar a la comunicación a través del chat en The World of Warcraft. En esta pantalla podrá personalizar WIM para adaptarlo a sus necesidades.",
 
@@ -515,11 +515,6 @@ local translations = {
     ["Click to reposition."] = "Haga clic para reposicionar.",
 
     --Misc
-    ["WIM has detected that you are playing on a private server. Some servers can not process ChatAddonMessages. Would you like to enable them anyway?"] = "WIM ha detectado que estás jugando en un servidor privado. Algunos servidores no pueden procesar ChatAddonMessages. ¿Quieres habilitarlos de todos modos?"
-,
+    ["WIM has detected that you are playing on a private server. Some servers can not process ChatAddonMessages. Would you like to enable them anyway?"] = "WIM ha detectado que estás jugando en un servidor privado. Algunos servidores no pueden procesar ChatAddonMessages. ¿Quieres habilitarlos de todos modos?",
 
-};
-
-
-WIM.AddLocale("esES", translations);
-WIM.AddLocale("esMX", translations);
+});
