@@ -16,7 +16,6 @@
 ## Notes-esMX: Dale a los susurros una sensación de mensajería instantánea.
 ## eMail: johnlangone@gmail.com
 ## X-Email: johnlangone@gmail.com
-## X-Website: http://www.wimaddon.com/
 ## X-Category: Chat
 ## DefaultState: Enabled
 ## OptionalDeps: LibStub, CallbackHandler-1.0, ChatThrottleLib, LibSharedMedia-3.0, LibChatHandler-1.0, LibChatAnims
