@@ -107,11 +107,11 @@ local function getFreePoints(x, y)
     local width = _G.UIParent:GetWidth()*scale;
     local height = _G.UIParent:GetHeight()*scale;
     local point;
-    
+
     -- set limits to cursor position. We want to stay on the screen.
     x = math.min(width, math.max(x, 0));
     y = math.min(height, math.max(y, 0));
-    
+
     --determine TOP or BOTTOM
     if(y > height/2) then
         point = "TOP";
@@ -119,7 +119,7 @@ local function getFreePoints(x, y)
     else
         point = "BOTTOM";
     end
-    
+
     --determine LEFT or RIGHT
     if(x < width/2) then
         point = point.."LEFT";
@@ -127,7 +127,7 @@ local function getFreePoints(x, y)
         point = point.."RIGHT";
         x = x - width;
     end
-    
+
     return point, x, y;
 end
 
@@ -253,10 +253,10 @@ local function createMinimapIcon()
         self.icon:SetTexCoord(0.05, 0.95, 0.05, 0.95);
     end
     icon.OnEnter = function(self)
-        
+
     end
     icon.OnLeave = function(self)
-        
+
     end
     icon.OnDragStart = function(self)
         self.dragging = true;
@@ -296,7 +296,7 @@ local function createMinimapIcon()
             local scale = _G.UIParent:GetEffectiveScale();
             self:SetPoint("CENTER", _G.UIParent, free.point, free.x/scale, free.y/scale)
         else
-            self:SetFrameStrata("BACKGROUND");
+            self:SetFrameStrata(_G.Minimap:GetFrameStrata());
             self:SetParent(_G.Minimap);
             self:SetFrameLevel(8);
             local angle = math.rad(db.minimap.position or random(0, 360));
@@ -352,7 +352,7 @@ local function createMinimapIcon()
         end
     end
     icon:Load();
-    
+
     local helperFrame = _G.CreateFrame("Frame");
     helperFrame:SetScript("OnUpdate", function(self)
             if(not icon.dragging and not icon.registeredForDrag and IsShiftKeyDown() and GetMouseFocus() == icon) then
@@ -360,8 +360,8 @@ local function createMinimapIcon()
                 icon:RegisterForDrag('LeftButton');
             end
         end);
-    
-    
+
+
     dPrint("MinimapIcon Created...");
     return icon;
 end
@@ -471,7 +471,7 @@ local minimapMenu = AddContextMenu(info.text, info);
     info.text = L["Enable"].." WIM";
     info.func = function() SetEnabled(not db.enabled); end;
     info.notCheckable = true;
-    minimapMenu:AddSubItem(AddContextMenu("ENABLE_DISABLE_WIM", info));    
+    minimapMenu:AddSubItem(AddContextMenu("ENABLE_DISABLE_WIM", info));
 
 --------------------------------------
 --      Global Extensions to WIM    --
