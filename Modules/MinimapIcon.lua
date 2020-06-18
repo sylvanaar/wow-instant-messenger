@@ -324,8 +324,8 @@ local function createMinimapIcon()
             local minimapShape = _G.GetMinimapShape and _G.GetMinimapShape() or 'ROUND';
             -- borrowed from LibDBIcon-1.0
             local quadTable = minimapShapes[minimapShape]
-            local w = (_G.Minimap:GetWidth() / 2) + self:GetWidth() / 4
-            local h = (_G.Minimap:GetHeight() / 2) + self:GetWidth() / 4
+            local w = (_G.Minimap:GetWidth() / 2) + 5
+            local h = (_G.Minimap:GetHeight() / 2) + 5
             if quadTable[q] then
                 x, y = x*w, y*h
             else
