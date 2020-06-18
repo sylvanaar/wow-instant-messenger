@@ -35,6 +35,24 @@ local colorDisabled = "!c41f3b";
 local IconColor = colorEnabled;
 local icon;
 
+-- borrowed from LibDBIcon-1.0
+local minimapShapes = {
+    ["ROUND"] = {true, true, true, true},
+    ["SQUARE"] = {false, false, false, false},
+    ["CORNER-TOPLEFT"] = {false, false, false, true},
+    ["CORNER-TOPRIGHT"] = {false, false, true, false},
+    ["CORNER-BOTTOMLEFT"] = {false, true, false, false},
+    ["CORNER-BOTTOMRIGHT"] = {true, false, false, false},
+    ["SIDE-LEFT"] = {false, true, false, true},
+    ["SIDE-RIGHT"] = {true, false, true, false},
+    ["SIDE-TOP"] = {false, false, true, true},
+    ["SIDE-BOTTOM"] = {true, true, false, false},
+    ["TRICORNER-TOPLEFT"] = {false, true, true, true},
+    ["TRICORNER-TOPRIGHT"] = {true, false, true, true},
+    ["TRICORNER-BOTTOMLEFT"] = {true, true, false, true},
+    ["TRICORNER-BOTTOMRIGHT"] = {true, true, true, false},
+}
+
 local function getNotificationTable(tag)
     local i;
     local emptyNote;
@@ -300,52 +318,26 @@ local function createMinimapIcon()
             self:SetParent(_G.Minimap);
             self:SetFrameLevel(8);
             local angle = math.rad(db.minimap.position or random(0, 360));
-            local cos = math.cos(angle);
-            local sin = math.sin(angle);
+            local x, y, q = math.cos(angle), math.sin(angle), 1
+            if x < 0 then q = q + 1 end
+		    if y > 0 then q = q + 2 end
             local minimapShape = _G.GetMinimapShape and _G.GetMinimapShape() or 'ROUND';
-
-            local round = false;
-            if minimapShape == 'ROUND' then
-		round = true;
-            elseif minimapShape == 'SQUARE' then
-            	round = false;
-            elseif minimapShape == 'CORNER-TOPRIGHT' then
-		round = not(cos < 0 or sin < 0);
-            elseif minimapShape == 'CORNER-TOPLEFT' then
-		round = not(cos > 0 or sin < 0);
-            elseif minimapShape == 'CORNER-BOTTOMRIGHT' then
-		round = not(cos < 0 or sin > 0);
-            elseif minimapShape == 'CORNER-BOTTOMLEFT' then
-		round = not(cos > 0 or sin > 0);
-            elseif minimapShape == 'SIDE-LEFT' then
-		round = cos <= 0;
-            elseif minimapShape == 'SIDE-RIGHT' then
-		round = cos >= 0;
-            elseif minimapShape == 'SIDE-TOP' then
-		round = sin <= 0;
-            elseif minimapShape == 'SIDE-BOTTOM' then
-		round = sin >= 0;
-            elseif minimapShape == 'TRICORNER-TOPRIGHT' then
-		round = not(cos < 0 and sin > 0);
-            elseif minimapShape == 'TRICORNER-TOPLEFT' then
-		round = not(cos > 0 and sin > 0);
-            elseif minimapShape == 'TRICORNER-BOTTOMRIGHT' then
-		round = not(cos < 0 and sin < 0);
-            elseif minimapShape == 'TRICORNER-BOTTOMLEFT' then
-		round = not(cos > 0 and sin < 0);
-            end
-
-            local x, y;
-            if round then
-            	x = cos*80;
-            	y = sin*80;
+            -- borrowed from LibDBIcon-1.0
+            local quadTable = minimapShapes[minimapShape]
+            local w = (_G.Minimap:GetWidth() / 2) + self:GetWidth() / 4
+            local h = (_G.Minimap:GetHeight() / 2) + self:GetWidth() / 4
+            if quadTable[q] then
+                x, y = x*w, y*h
             else
-            	x = math.max(-82, math.min(110*cos, 84));
-            	y = math.max(-86, math.min(110*sin, 82));
+                local diagRadiusW = sqrt(2*(w)^2)-10
+                local diagRadiusH = sqrt(2*(h)^2)-10
+                x = max(-w, min(x*diagRadiusW, w))
+                y = max(-h, min(y*diagRadiusH, h))
             end
+            -- end borrow
 
             self:ClearAllPoints();
-            self:SetPoint('CENTER', x, y);
+            self:SetPoint('CENTER', _G.Minimap, "CENTER", x, y);
             local free = db.minimap.free_position;
             local scale = self:GetEffectiveScale();
             free.point, free.x, free.y = getFreePoints((self:GetLeft() + self:GetWidth()/2)*scale, (self:GetTop() - self:GetHeight()/2)*scale);
