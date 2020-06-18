@@ -329,10 +329,10 @@ local function createMinimapIcon()
             if quadTable[q] then
                 x, y = x*w, y*h
             else
-                local diagRadiusW = sqrt(2*(w)^2)-10
-                local diagRadiusH = sqrt(2*(h)^2)-10
-                x = max(-w, min(x*diagRadiusW, w))
-                y = max(-h, min(y*diagRadiusH, h))
+                local diagRadiusW = math.sqrt(2*(w)^2)-10
+                local diagRadiusH = math.sqrt(2*(h)^2)-10
+                x = math.max(-w, math.min(x*diagRadiusW, w))
+                y = math.max(-h, math.min(y*diagRadiusH, h))
             end
             -- end borrow
 
