@@ -220,6 +220,9 @@ WIM.AddLocale("ptBR", {
     ["Are you sure you want to\nignore %s?"] = "Você tem certeza que você quer\nignora %s?",
     ["Right-Click for profile links..."] = "Clique-Dereita nos links do perfil...",
     ["Profile Links"] = "Links de perfil",
+	["Game"] = "Jogo",
+	["Realm"] = "Reino",
+	["Character"] = "Personagem",
     
     -- Tutorials.lua --
     ["Display WIM tips"] = "Exibir dicas do WIM",
