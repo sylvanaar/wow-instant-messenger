@@ -14,6 +14,8 @@
 ## Notes: Give whispers an instant messenger feel.
 ## Notes-esES: Dale a los susurros una sensación de mensajería instantánea.
 ## Notes-esMX: Dale a los susurros una sensación de mensajería instantánea.
+## Notes-ptBR: Dê aos sussurros uma sensação de mensageiro instantâneo.
+## Notes-frFR: Donnez aux chuchotements une sensation de messagerie instantanée.
 ## eMail: johnlangone@gmail.com
 ## X-Email: johnlangone@gmail.com
 ## X-Category: Chat
