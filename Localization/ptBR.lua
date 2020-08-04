@@ -144,7 +144,7 @@ WIM.AddLocale("ptBR", {
     ["MonkF"] = LOCALIZED_CLASS_NAMES_FEMALE.MONK,
     ["Demon HunterF"] = LOCALIZED_CLASS_NAMES_FEMALE.DEMONHUNTER,
     
-    ["Game Master"] = true,
+    ["Game Master"] = "Mestre do jogo",
     
     -- WIM.lua --
     ["Toggle WIM 'On' and 'Off'."] = "Alternar WIM 'Ligado' e 'Desligado'.",
@@ -425,7 +425,7 @@ WIM.AddLocale("ptBR", {
     ["Fire"] = "Fogo",
     ["Frost"] = "Gélido",
     ["Fury"] = "Fúria",
-    ["Guardian"] = true,
+    ["Guardian"] = "Guardião",
     ["Holy"] = "Sagrado",
     ["Hybrid"] = "Híbrido",
     ["Marksmanship"] = "Precisão",
