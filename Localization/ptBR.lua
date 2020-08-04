@@ -401,7 +401,7 @@ WIM.AddLocale("ptBR", {
     ["Tab Management"] = "Gerenciador de Guia",
     ["Automatically manage your open windows and place them into appropriate tab groups."] = "Gerenciar automaticamente as janelas abertas e colocá-las em grupos de guia apropriado.",
     ["Automatically group whispers."] = "Formar automaticamente um grupo de Sussurros.",
-	["Automatically group chat windows."] = "Formar automaticamente um grupo de as ventanas de bate-papo.",
+	["Automatically group chat windows."] = "Formar automaticamente um grupo de janelas de bate-papo.",
     ["Place friends in their own group."] = "Coloque amigos no seu próprio grupo.",
     ["Place guild members in their own group."] = "Coloque membros da guild no seu próprio grupo.",
     ["Does not apply to windows already opened."] = "Isso não se aplica à janelas já abertas.",
