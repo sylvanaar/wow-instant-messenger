@@ -280,7 +280,7 @@ WIM.AddLocale("ptBR", {
     ["Reset all options to default."] = "Resetar todas as opções para padrão.",
     
     -- CoreOptions --
-    ["Created by:"] = "Criado por:",
+    ["Created By:"] = "Criado por:",
     ["Special Thanks:"] = "Agradecimentos Especiais:",
     ["Welcome!"] = "Bem-Vindo!",
     ["Enable WIM"] = "Habilitar WIM",
@@ -297,6 +297,7 @@ WIM.AddLocale("ptBR", {
     ["Display Emoticons"] = "Exibir Emoticons",
     ["Display URLs as Links"] = "Exibir URLs como Links",
     ["Indent long messages."] = "Encomendar mensagens longas",
+	["Bracket names."] = "Nomes de colchetes.",
     ["Window Behavior"] = "Comportamento da Janela",
     ["You can control how windows behave while you are in different situations."] = "Você pode controlar como as jenelas se comportam enquanto você está em diferentes situações.",
     ["Intercept Slash Commands"] = "Interceptar Comandos de Barra",
@@ -344,7 +345,7 @@ WIM.AddLocale("ptBR", {
     ["Chat Font Size"] = "Tamanho da fonte do Bate-Papo",
     ["Configure general display settings when dealing with whispers."] = "Configurar as exibições gerais quando se lida com sussurros.",
     ["Color: Messages Sent"] = "Cor: Mensagens Enviadas",
-    ["Color: Messages Received"] = "Cor: Mensagens Recebidas",
+    ["Color: Messages Received"] = "Cor: Mensagens Recebidas",	
     ["Use colors suggested by skin."] = "Usar cores sugerido pela pele.",
     ["Display user class icons and details."] = "Exibir ícones e detalhes sobre a classe do usuário.",
     ["Requires who lookups."] = "Exige quem pesquise.",
@@ -394,6 +395,7 @@ WIM.AddLocale("ptBR", {
     ["Window Strata:"] = "Strata da Janela",
     ["Unlock from Minimap"] = "Desbloquear do Minimapa",
     ["Press <Tab> to advance to next tell target."] = "Pressione <Tab> para avançar para o próximo alvo.",
+	["Force sounds when game sound is disabled."] = "Forçar sons quando o som do jogo estiver desativado.",
     ["Colorize names."] = "Colorir nomes.",
     ["Clamp window to screen."] = "Prenda a janela na tela.",
     ["Group with whisper windows."] = "Agrupe com janelas sussurradas.",
