@@ -20,7 +20,7 @@ WIM.AddLocale("ptBR", {
     ["Unknown"] = "Desconhecido",
     ["Click to update..."] = "Clique para atualizar...",
     ["Usage"] = "Uso",
-    
+
     ["state_resting"] = "Descansando",
     ["state_combat"] = "Combate",
     ["state_pvp"] = "JxJ",
@@ -28,13 +28,13 @@ WIM.AddLocale("ptBR", {
     ["state_party"] = "Grupo da Masmorra",
     ["state_raid"] = "Instância da Raide",
     ["state_other"] = "Normal (Outro)",
-    
+
     ["<Shift-Click> to close window."] = "<Shift-Clique> para fechar a janela.",
-    
+
     ["A new version of WIM is available!\nYou can download the latest version from curse"] = "Uma nova versão do WIM está disponível!\nVocê poderá fazer o download da nova versão indo em curse",
-    
+
     ["Options"] = "Opções",
-    
+
     ["Icon Position"] = "Posição do Icone",
     ["Font Size"] = "Tamanho da Fonte",
     ["Window Scale (Percent)"] = "Escala da Janela (Porcentagem)",
@@ -48,7 +48,7 @@ WIM.AddLocale("ptBR", {
     ["Invalid Alias!"] = "Inválido Alias!",
     ["Invalid Keyword/Phrase!"] = "Inválido palavra-chave/frase!",
     ["Keyword/Phrase is already used!"] = "palavra-chave/frase já foi usado!",
-    
+
     ["Day"] = "Dia",
     ["Week"] = "Semana",
     ["Month"] = "Mês",
@@ -60,10 +60,10 @@ WIM.AddLocale("ptBR", {
     ["Ignore"] = "Ignorar",
     ["Block"] = "Bloqueio",
     ["Enable WIM"] = "Habilitar WIM",
-    
+
     ["Auto Close Friends after:"] = "Fechar Amigos Automaticamente após:",
     ["Auto Close Non-Friends after:"] = "Fechar Não-Amigos Automaticamente após:",
-    
+
     ["Display"] = "Exibir",
     ["Incoming Messages"] = "Mensagens Recebidas",
     ["Outgoing Messages"] = "Mensagens de Saída",
@@ -80,14 +80,14 @@ WIM.AddLocale("ptBR", {
     ["Requires /who querying."] = "Exige Consultar /quem.",
     ["Enable window fading effects."] = "Habilitar efeitos de desbotamento na janela",
     ["Enable window animations."] = "Habilitar animação de janela.",
-    
+
     ["Display minimap icon."] = "Exibir ícone no minimapa",
-    
+
     ["General"] = "Geral",
     ["History"] = "História",
     ["Filters"] = "Filtros",
     ["Plugins"] = "Adicionais",
-    
+
     ["Auto focus when window is shown."] = "Focar na janela automaticamente quando ela aparecer.",
     ["Preserve focus after sending messages."] = "Preservar foco depois o envio da mensagem.",
     ["Display tooltips."] = "Exibir dicas.",
@@ -105,7 +105,7 @@ WIM.AddLocale("ptBR", {
     ["Display emoticons."] = "Exibir emoticons.",
     ["Display URLs as item links."] = "Exibir URLs como links de itens.",
     ["Display floating item links."] = "Exibir Flutuantes linkes de item.",
-    
+
     ["Cascade windows."] = "Janelas em cascata.",
     ["Direction:"] = "Direção:",
     ["Tabs"] = "Guias",
@@ -113,9 +113,9 @@ WIM.AddLocale("ptBR", {
     ["Alphabetical"] = "Alfabético",
     ["Recent Activity"] = "Recente Atividade",
     ["Keep windows on top of your UI."] = "Manter as janelas no topo do seu UI.",
-    
+
     ["Enable/Disable addon messages."] = "Habilitar/Desativar mensagens de addon.",
-    
+
     -- Class Names --
     ["Druid"] = LOCALIZED_CLASS_NAMES_MALE.DRUID,
     ["Hunter"] = LOCALIZED_CLASS_NAMES_MALE.HUNTER,
@@ -129,7 +129,7 @@ WIM.AddLocale("ptBR", {
     ["Death Knight"] = LOCALIZED_CLASS_NAMES_MALE.DEATHKNIGHT,
     ["Monk"] = LOCALIZED_CLASS_NAMES_MALE.MONK,
     ["Demon Hunter"] = LOCALIZED_CLASS_NAMES_MALE.DEMONHUNTER,
-    
+
     -- Female Class Names --
     ["DruidF"] = LOCALIZED_CLASS_NAMES_FEMALE.DRUID,
     ["HunterF"] = LOCALIZED_CLASS_NAMES_FEMALE.HUNTER,
@@ -143,14 +143,14 @@ WIM.AddLocale("ptBR", {
     ["Death KnightF"] = LOCALIZED_CLASS_NAMES_FEMALE.DEATHKNIGHT,
     ["MonkF"] = LOCALIZED_CLASS_NAMES_FEMALE.MONK,
     ["Demon HunterF"] = LOCALIZED_CLASS_NAMES_FEMALE.DEMONHUNTER,
-    
+
     ["Game Master"] = "Mestre do jogo",
-    
+
     -- WIM.lua --
     ["Toggle WIM 'On' and 'Off'."] = "Alternar WIM 'Ligado' e 'Desligado'.",
     ["Toggle Debugging Mode 'On' and 'Off'."] = "Alternar Modo de Depuração 'Ligado' e 'Desligado'.",
     ["WIM is currently running. To access WIM's wide array of options type:"] = "WIM está sendo executado. Para acessar a grande variedade de opções do WIM escreva:",
-    
+
     -- Filters.lua --
     ["Whispers Sent by Addons"] = "Sussuros Enviados pelos Addons",
     ["WhisperSelect Part 1"] = "SussurroSelecionado Parte 1",
@@ -178,7 +178,7 @@ WIM.AddLocale("ptBR", {
     ["Cancel"] = "Cancelar",
     ["Edit Filter"] = "Editar Filtro",
     ["Add Filter"] = "Adicionar Filtro",
-    
+
     -- History.lua --
     ["WIM History Button"] = "Botão de História do WIM",
     ["Clicking the %s button on the message window will show that user's history in WIM's History Viewer."] = "Clicando no %s botão da mensagem, a janela irá mostar o histórico do usuário no Visualizador de História do WIM.",
@@ -197,18 +197,18 @@ WIM.AddLocale("ptBR", {
     ["WIM History Viewer can be accessed any time by typing:"] = "Visualizador de História do WIM pode ser acessado todo o tempo escrevendo:",
     ["WIM History Viewer"] = "Visualizador de História do WIM",
     ["Display history viewer."] = "Exibir visualizador de história.",
-    
+
     -- ldb.lua --
     ["No New Messages"] = "Não há novas mensagens",
-    
+
     -- Menu.lua --
     ["Whispers"] = "Sussurros",
     ["Chat"] = "Bate-Papo",
-    
+
     -- Negotiate.lua --
     ["WIM Update Available!"] = "Atualização Disponível do WIM!",
     ["There is a newer version of WIM available for download. You can download it at %s."] = "Há uma versão mais recente do WIM disponível para download. Você pode baixá-lo em %s.",
-    
+
     -- ShortcutBar.lua --
     ["Player Location"] = "Localização do Jogador",
     ["Unknown"] = "Desconhecido",
@@ -224,20 +224,20 @@ WIM.AddLocale("ptBR", {
 	["Game"] = "Jogo",
 	["Realm"] = "Reino",
 	["Character"] = "Personagem",
-    
+
     -- Tutorials.lua --
     ["Display WIM tips"] = "Exibir dicas do WIM",
-    
+
     -- W2W.lua --
     ["%s is typing..."] = "%s está digitando...",
     ["W2W Profile"] = "W2W Perfil",
     ["Talent Spec"] = "Talento Específico",
-    
+
     -- WhisperEngine.lua --
     ["Whisper Received!"] = "Sussurro Recebido!",
     ["You received a whisper which was hidden due to your current activity. You can change how whispers behave in WIM's options by typing"] = "Você recebeu um sussurro que estava escondido devido a sua atividade atual. Você pode mudar o comportamento dos sussuros nas opções do WIM escrevendo",
     ["Recently Sent Messages"] = "Mensagens enviadas recentemente",
-    
+
     -- Clear.lua --
     ["You are about to clear all of WIM's history!"] = "Você está prestes a limpar toda o histórico do WIM!",
     ["This action will reload your user interface."] = "Esta ação irá recarregar a interface do usuário.",
@@ -245,17 +245,17 @@ WIM.AddLocale("ptBR", {
     ["You are about to restore WIM's filters to it's default settings!"] = "Você está prestes a restaurar as configurações padrões do WIM!",
     ["Usage"] = "Uso",
     ["Clear various WIM data."] = "Limpar vários dados do WIM.",
-    
+
     -- SlashHandler.lua --
     ["WIM Slash Commands"] = "Comandos de Barra do WIM",
     ["To see a list of available WIM slash commands type:"] = "Para ver uma lista de comandos de barra do WIM disponível escreva:",
     ["Display available slash commands."] = "Exibir disponíveis comandos de barra.",
     ["Reload User Interface."] = "Recarregar Interface do Usuário.",
-    
+
     -- TabHandler.lua --
     ["Manipulating Tabs"] = "Manipulando Guias",
     ["You can <Shift-Click> a tab and drag it out into it's own window."] = "Você pode <Shift-Clique> um guia e arrastar para fora de sua própria janela.",
-    
+
     -- WindowHandler.lua --
     ["Window Resized!"] = "Janela Redimensionada!",
     ["If you want all windows to be this size, you can set the default window size within WIM's options."] = "Se você quer todas as janelas que seja desse tamanho, você pode definir o tamanho padrão dentro das opções do WIM.",
@@ -272,13 +272,13 @@ WIM.AddLocale("ptBR", {
     ["%s does not wish to be disturbed: %s"] = "%s não deseja ser pertubado: %s",
     ["Right-Mouse Click!"] = "Clique-Direita!",
     ["There might be useful tools hidden under the message box. Right-Click to see them!"] = "Pode haver ferramentas úteis ocultas sob a caixa de mensagem. Clique-direito para vê-las!",
-    
-    
+
+
     -- Options.lua --
     ["Display WIM's options."] = "Exibir opções do WIM.",
     ["Resetting WIM will clear all of your settings!"] = "Resetando WIM irá limpar todas as suas configurações!",
     ["Reset all options to default."] = "Resetar todas as opções para padrão.",
-    
+
     -- CoreOptions --
     ["Created By:"] = "Criado por:",
     ["Special Thanks:"] = "Agradecimentos Especiais:",
@@ -402,7 +402,7 @@ WIM.AddLocale("ptBR", {
     ["Colorize names."] = "Colorir nomes.",
     ["Clamp window to screen."] = "Prenda a janela na tela.",
     ["Group with whisper windows."] = "Agrupe com janelas sussurradas.",
-    
+
     -- TabManagement.lua --
     ["Tab Management"] = "Gerenciador de Guia",
     ["Automatically manage your open windows and place them into appropriate tab groups."] = "Gerenciar automaticamente as janelas abertas e colocá-las em grupos de guia apropriado.",
@@ -411,8 +411,8 @@ WIM.AddLocale("ptBR", {
     ["Place friends in their own group."] = "Coloque amigos no seu próprio grupo.",
     ["Place guild members in their own group."] = "Coloque membros da guild no seu próprio grupo.",
     ["Does not apply to windows already opened."] = "Isso não se aplica à janelas já abertas.",
-    
-    
+
+
     -- Talent Specs --
     ["Affliction"] = "Suplício",
     ["Arcane"] = "Arcano",
@@ -447,28 +447,28 @@ WIM.AddLocale("ptBR", {
     ["Windwalker"] = "Andarilho do Vento",
     ["Havok"] = "Devastação",
     ["Vengeance"] = "Vingança",
-    
+
     -- ChangeLog.lua --
     ["Change Log"] = "Registro de alterações",
     ["View WIM's change log."] = "Ver registro de alterações do WIM.",
     ["Available For Download!"] = "Disponível para baixar!",
-    
+
     -- Filters.lua --
     ["Show Alert"] = "Exibir alerta",
     ["WIM has blocked a message from %s."] = "O WIM bloqueou uma mensagem de %s.",
     ["View Blocked Message"] = "Ver mensagem bloqueada",
     ["Blocked Message"] = "Mensagem bloqueada",
-    
+
     -- MinimapIcon.lua
     ["Show Unread Messages"] = "Exibir mensagens não lidas",
     ["Show All Windows"] = "Exibir todas as janelas",
     ["Hide All Windows"] = "Ocultar todas as janelas",
-    
+
     --Emoticons.lua
     ["Also"] = "Além disso",
     ["More"] = "Mais",
     ["Emoticons"] = "Emoticons",
-    
+
     --Expose.lua
     ["Your conversations have been hidden in order to clear your screen while in combat. To disable this feature type"] = "Suas conversas foram ocultas para limpar sua tela durante o combate. Para desativar esse recurso, digite",
     ["Expose"] = "Expose",
@@ -479,7 +479,7 @@ WIM.AddLocale("ptBR", {
     ["Only while in an instance."] = "Somente enquanto estiver em uma instância.",
     ["Show Border"] = "Exibir borda",
     ["Animation Direction:"] = "Direção da animação:",
-    
+
     --ChatEngine.lua
     ["WIM will manage this chat type within its own message windows."] = "O WIM gerenciará esse tipo de bate-papo dentro de suas próprias janelas de mensagens.",
     ["Show Minimap Alerts"] = "Exibir alertas do Minimapa",
@@ -505,12 +505,12 @@ WIM.AddLocale("ptBR", {
     ["Sensitivity"] = "Sensibilidade",
     ["Enable WorldFrame Click Detection."] = "Habilitar detecção de clique no WorldFrame.",
     ["The UI must be reloaded in order to disable this module fully. Reload UI now?"] = "A interface do usuário deve ser recarregada para desativar completamente este módulo. Recarregar a interface do usuário agora?",
-    
+
     --OffScreenTracker.lua
     ["WIM Window Off Screen"] = "Janela WIM fora da tela",
     ["Click to reposition."] = "Clique para reposicionar.",
-    
+
     --Misc
     ["WIM has detected that you are playing on a private server. Some servers can not process ChatAddonMessages. Would you like to enable them anyway?"] = "O WIM detectou que você está jogando em um servidor privado. Alguns servidores não podem processar o ChatAddonMessages. Deseja ativá-los de qualquer maneira?",
-    
+
 });
