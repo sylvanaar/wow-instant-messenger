@@ -1563,15 +1563,19 @@ end
 
 
 local function createUserList()
-    local win = _G.CreateFrame("Frame", "WIM3_ChatUserList", WIM.WindowParent);
+	-- Changes for Patch 9.0.1 - Shadowlands
+    local win = _G.CreateFrame("Frame", "WIM3_ChatUserList", WIM.WindowParent, "BackdropTemplate");
     win:EnableMouse(true);
     win:Hide();
     win:SetPoint("CENTER");
-    -- set backdrop
-    win:SetBackdrop({bgFile = "Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\Menu_bg",
+    -- set backdrop - Changes for Patch 9.0.1 - Shadowlands
+    win.backdropInfo = {bgFile = "Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\Menu_bg",
         edgeFile = "Interface\\AddOns\\"..addonTocName.."\\Modules\\Textures\\Menu",
         tile = true, tileSize = 32, edgeSize = 32,
-        insets = { left = 32, right = 32, top = 32, bottom = 32 }});
+        insets = { left = 32, right = 32, top = 32, bottom = 32 }};
+
+	win:ApplyBackdrop();
+
     win:SetWidth(200);
     win.title = _G.CreateFrame("Frame", win:GetName().."Title", win);
     win.title:SetHeight(17);

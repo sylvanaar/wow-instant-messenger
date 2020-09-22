@@ -382,7 +382,8 @@ end
 
 
 local function createHistoryViewer()
-    local win = CreateFrame("Frame", "WIM3_HistoryFrame", _G.UIParent);
+	-- Changes for Patch 9.0.1 - Shadowlands
+    local win = CreateFrame("Frame", "WIM3_HistoryFrame", _G.UIParent, "BackdropTemplate");
     win:Hide();
     win.filter = {};
     -- set size and position
@@ -390,11 +391,13 @@ local function createHistoryViewer()
     win:SetHeight(505);
     win:SetPoint("CENTER");
 
-    -- set backdrop
-    win:SetBackdrop({bgFile = "Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\Frame_Background",
+    -- set backdrop - changes for Patch 9.0.1 - Shadowlands
+    win.backdropInfo = {bgFile = "Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\Frame_Background",
         edgeFile = "Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\Frame",
         tile = true, tileSize = 64, edgeSize = 64,
-        insets = { left = 64, right = 64, top = 64, bottom = 64 }});
+        insets = { left = 64, right = 64, top = 64, bottom = 64 }};
+
+	win:ApplyBackdrop();
 
     -- set basic frame properties
     win:SetClampedToScreen(true);
