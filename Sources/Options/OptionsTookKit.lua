@@ -125,15 +125,25 @@ end
 
 
 local function CreateSlider(parent, title, minText, maxText, min, max, step, dbTree, varName, valChanged)
-	-- Changes to Patch 9.0.1 - Shadowlands
-    local s = CreateFrame("Slider", parent:GetName()..statObject("Slider"), parent, "BackdropTemplate");
-    -- set backdrop -changes to Patch 9.0.1 - Shadowlands
+	-- Changes to Patch 9.0.1 - Shadowlands, retail and classic
+	local s = nil;
+    if (addonTocVersion < 90000) then
+		s = CreateFrame("Slider", parent:GetName()..statObject("Slider"), parent);
+	else
+		s = CreateFrame("Slider", parent:GetName()..statObject("Slider"), parent, "BackdropTemplate");
+	end
+
+    -- set backdrop -changes to Patch 9.0.1 - Shadowlands, retail and classic
     s.backdropInfo = {bgFile = "Interface\\Buttons\\UI-SliderBar-Background",
         edgeFile = "Interface\\Buttons\\UI-SliderBar-Border",
         tile = true, tileSize = 8, edgeSize = 8,
         insets = { left = 3, right = 3, top = 6, bottom = 6 }};
 
-	s:ApplyBackdrop();
+	if (addonTocVersion < 90000) then
+		s:SetBackdrop(s.backdropInfo);
+	else
+		s:ApplyBackdrop();
+	end
 
     s:SetHeight(17);
     s:SetPoint("LEFT");
@@ -576,22 +586,32 @@ function options.createDropDownFrame()
         -- don't create more than once.
         return dropDownFrame;
     end
-	-- Changes to Patch 9.0.1 - Shadowlands
-    local f = CreateFrame("Button", "WIM_DropDownFrame", _G.UIParent, "BackdropTemplate");
-    f:Hide();
+	-- Changes to Patch 9.0.1 - Shadowlands, retail and classic
+	local f = nil;
+	if (addonTocVersion < 90000) then
+		f = CreateFrame("Button", "WIM_DropDownFrame", _G.UIParent);
+	else
+		f = CreateFrame("Button", "WIM_DropDownFrame", _G.UIParent, "BackdropTemplate");
+    end
+
+	f:Hide();
     f:SetFrameStrata("TOOLTIP");
     f:SetPoint("CENTER");
     f:SetWidth(100);
     f:SetHeight(300);
     f:EnableMouseWheel(1);
-	-- Changes to Patch 9.0.1 - Shadowlands
+	-- Changes to Patch 9.0.1 - Shadowlands, retail and classic
     f.backdropInfo = {
         bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true, tileSize = 16, edgeSize = 16,
         insets = { left = 5, right = 5, top = 5, bottom = 5 }
     };
 
-	f:ApplyBackdrop();
+	if (addonTocVersion < 90000) then
+		f:SetBackdrop(f.backdropInfo);
+	else
+		f:ApplyBackdrop();
+	end
 
     f:SetBackdropBorderColor(_G.TOOLTIP_DEFAULT_COLOR.r, _G.TOOLTIP_DEFAULT_COLOR.g, _G.TOOLTIP_DEFAULT_COLOR.b);
     f:SetBackdropColor(_G.TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, _G.TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, _G.TOOLTIP_DEFAULT_BACKGROUND_COLOR.b);

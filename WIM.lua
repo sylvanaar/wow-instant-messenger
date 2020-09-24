@@ -19,6 +19,7 @@ version = "@project-version@";
 beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 useProtocol2 = true; -- test switch for new W2W Protocol. (Dev use only)
+addonTocVersion = select(4, _G.GetBuildInfo()); -- <= 19999 means classic, < 90000 means retail, >= 90001 means Patch 9.0.1 Shadowlands
 
 -- is Private Server?
 --[[isPrivateServer = not (string.match(_G.GetCVar("realmList"), "worldofwarcraft.com$")

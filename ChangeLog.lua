@@ -80,9 +80,16 @@ local function logSort(a, b)
 end
 
 local changeLogWindow;
+
 local function createChangeLogWindow()
-    -- create frame object - changes for Patch 9.0.1 - Shadowlands
-    local win = CreateFrame("Frame", "WIM3_ChangeLog", _G.UIParent, "BackdropTemplate");
+    -- create frame object - changes for Patch 9.0.1 - Shadowlands, retail and classic
+	local win = nil;
+	if (WIM.addonTocVersion < 90000) then
+		win = CreateFrame("Frame", "WIM3_ChangeLog", _G.UIParent);
+	else
+		win = CreateFrame("Frame", "WIM3_ChangeLog", _G.UIParent, "BackdropTemplate");
+	end
+
     win:Hide(); -- hide initially, scripts aren't loaded yet.
     table.insert(UISpecialFrames, "WIM3_ChangeLog");
 
@@ -91,13 +98,17 @@ local function createChangeLogWindow()
     win:SetHeight(500);
     win:SetPoint("CENTER");
 
-    -- set backdrop - changes for Patch 9.0.1 - Shadowlands
+    -- set backdrop - changes for Patch 9.0.1 - Shadowlands, retail and classic
     win.backdropInfo = {bgFile = "Interface\\AddOns\\"..WIM.addonTocName.."\\Sources\\Options\\Textures\\Frame_Background",
         edgeFile = "Interface\\AddOns\\"..WIM.addonTocName.."\\Sources\\Options\\Textures\\Frame",
         tile = true, tileSize = 64, edgeSize = 64,
         insets = { left = 64, right = 64, top = 64, bottom = 64 }};
 
-	win:ApplyBackdrop();
+	if (WIM.addonTocVersion < 90000) then
+		win:SetBackdrop(win.backdropInfo);
+	else
+		win:ApplyBackdrop();
+	end
 
     -- set basic frame properties
     win:SetClampedToScreen(true);

@@ -36,8 +36,12 @@ local function getCategoryIndexByName(cat)
 end
 
 local function createOptionsFrame()
-    -- create frame object - changes to Patch 9.0.1 - Shadowlands
-    options.frame = CreateFrame("Frame", "WIM3_Options", _G.UIParent, "BackdropTemplate");
+    -- create frame object - changes to Patch 9.0.1 - Shadowlands, retail and classic
+	if (addonTocVersion < 90000) then
+		options.frame = CreateFrame("Frame", "WIM3_Options", _G.UIParent);
+	else
+		options.frame = CreateFrame("Frame", "WIM3_Options", _G.UIParent, "BackdropTemplate");
+	end
     local win = options.frame;
     win:Hide(); -- hide initially, scripts aren't loaded yet.
 
@@ -46,13 +50,17 @@ local function createOptionsFrame()
     win:SetHeight(500);
     win:SetPoint("CENTER");
 
-    -- set backdrop - changes to Patch 9.0.1 - Shadowlands
+    -- set backdrop - changes to Patch 9.0.1 - Shadowlands, retail and classic
     win.backdropInfo = {bgFile = "Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\Frame_Background",
         edgeFile = "Interface\\AddOns\\"..addonTocName.."\\Sources\\Options\\Textures\\Frame",
         tile = true, tileSize = 64, edgeSize = 64,
         insets = { left = 64, right = 64, top = 64, bottom = 64 }};
 
-	win:ApplyBackdrop();
+	if (addonTocVersion < 90000) then
+		win:SetBackdrop(win.backdropInfo);
+	else
+		win:ApplyBackdrop();
+	end
 
     -- set basic frame properties
     win:SetClampedToScreen(true);
