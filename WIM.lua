@@ -19,6 +19,7 @@ version = "@project-version@";
 beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 useProtocol2 = true; -- test switch for new W2W Protocol. (Dev use only)
+isShadowlands = (select(4, _G.GetBuildInfo()) >= 90000);
 
 -- is Private Server?
 --[[isPrivateServer = not (string.match(_G.GetCVar("realmList"), "worldofwarcraft.com$")
