@@ -265,7 +265,13 @@ end
 
 function Guild:OnWindowShow(self)
     if(self.type == "chat" and self.chatType == "guild") then
-        _G.GuildRoster();
+		-- H.Sch. - ReglohPri - this is deprecated -> GuildRoster() - changed to C_GuildInfo.GuildRoster()
+		if (select(4, _G.GetBuildInfo()) <= 19999) then
+			--for classic
+			_G.GuildRoster();
+		else
+			_G.C_GuildInfo.GuildRoster();
+		end
     end
 end
 
