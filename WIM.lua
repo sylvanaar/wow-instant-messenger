@@ -80,7 +80,8 @@ local function initialize()
 
         --querie guild roster
         if( _G.IsInGuild() ) then
-            _G.GuildRoster();
+			-- H.Sch. - ReglohPri - this is deprecated -> GuildRoster() - changed to C_GuildInfo.GuildRoster()
+            _G.C_GuildInfo.GuildRoster();
         end
 
     -- import libraries.
