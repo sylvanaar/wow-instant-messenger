@@ -19,6 +19,7 @@ version = "@project-version@";
 beta = false; -- flags current version as beta.
 debug = false; -- turn debugging on and off.
 useProtocol2 = true; -- test switch for new W2W Protocol. (Dev use only)
+isShadowlands = (select(4, _G.GetBuildInfo()) >= 90000);
 
 -- is Private Server?
 --[[isPrivateServer = not (string.match(_G.GetCVar("realmList"), "worldofwarcraft.com$")
@@ -79,7 +80,13 @@ local function initialize()
 
         --querie guild roster
         if( _G.IsInGuild() ) then
-            _G.GuildRoster();
+			-- H.Sch. - ReglohPri - this is deprecated -> GuildRoster() - changed to C_GuildInfo.GuildRoster()
+			if (select(4, _G.GetBuildInfo()) <= 19999) then
+				--for classic
+				_G.GuildRoster();
+			else
+				_G.C_GuildInfo.GuildRoster();
+			end
         end
 
     -- import libraries.
