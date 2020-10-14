@@ -174,8 +174,8 @@ function GetBNGetFriendInfoByID(id)
 end
 
 function GetBNGetGameAccountInfo(toonId)
-	local gameAccountInfo = _G.C_BattleNet and _G.C_BattleNet.GetGameAccountInfoByID(toonId)
-	if gameAccountInfo then
+	if isShadowlands then
+		local gameAccountInfo = _G.C_BattleNet.GetGameAccountInfoByID(toonId) or {}
 		local wowProjectID = gameAccountInfo.wowProjectID or 0;
 		local characterName = gameAccountInfo.characterName or "";
 		local realmName = gameAccountInfo.realmName or "";
