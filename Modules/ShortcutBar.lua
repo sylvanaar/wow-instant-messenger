@@ -354,7 +354,9 @@ RegisterShortcut("invite", L["Invite to Party"], {
 					_G.FriendsFrame_BattlenetInvite(nil, win.bn.id)
 				end
 			else
-				_G.InviteUnit(win.theUser)
+				if _G.C_PartyInfo then
+					_G.C_PartyInfo.InviteUnit(win.theUser)
+				end
 			end
 		end
 	});
