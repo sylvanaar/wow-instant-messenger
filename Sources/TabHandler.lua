@@ -485,7 +485,7 @@ local function createTabGroup()
                 local cW, cH, cL, cT, cA = win:GetWidth(), win:GetHeight(), win:GetLeft(), win:SafeGetTop(), win:GetAlpha();
                 if(oW ~= cW) then win:SetWidth(oW); end
                 if(oH ~= cH) then win:SetHeight(oH); end
-                if(oL ~= cL or oT ~= oT) then win:SetPoint("TOPLEFT", WindowParent, "BOTTOMLEFT", oL, oT); end
+                if(oL ~= cL or oT ~= oT) then win:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", oL, oT); end
                 if(oA ~= cA) then win:SetAlpha(oA); end
                 lastWin = oldWin:GetName();
             end
