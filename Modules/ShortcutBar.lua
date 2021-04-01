@@ -354,7 +354,7 @@ RegisterShortcut("invite", L["Invite to Party"], {
 					_G.FriendsFrame_BattlenetInvite(nil, win.bn.id)
 				end
 			else
-				if isShadowlands and not isTBC then
+				if isShadowlands then
 					_G.C_PartyInfo.InviteUnit(win.theUser)
 				else
 					_G.InviteUnit(win.theUser)
