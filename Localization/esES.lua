@@ -32,12 +32,12 @@ local translations = {
 
     ["<Shift-Click> to close window."] = "<Shift-Clic> para cerrar la ventana",
 
-    ["A new version of WIM is available!\nYou can download the latest version from curse"] = "¡Una nueva versión de WIN está disponible!\nPuede descargar la última versión en curse",
+    ["A new version of WIM is available!\nYou can download the latest version from curse"] = "¡Una nueva versión de WIM está disponible!\nPuede descargar la última versión en curse",
 
     ["Options"] = "Opciones",
 
     ["Icon Position"] = "Posición del Icono",
-    ["Font Size"] = "Tamaño del Fuente",
+    ["Font Size"] = "Tamaño de la Fuente",
     ["Window Scale (Percent)"] = "Escala de Ventana (Porcentaje)",
     ["Transparency (Percent)"] = "Transparencia (Porcentaje)",
     ["Window Width"] = "Anchura de Ventana",
@@ -56,8 +56,8 @@ local translations = {
     ["Drag to set default spawn/position for message windows."] = "Arrastre para establecer la posición predeterminada para las ventanas de mensajes.",
     ["Up"] = "Arriba",
     ["Down"] = "Abajo",
-    ["Left"] = "Izquierdo",
-    ["Right"] = "Derecho",
+    ["Left"] = "Izquierda",
+    ["Right"] = "Derecha",
     ["Ignore"] = "Ignorar",
     ["Block"] = "Bloquear",
     ["Enable WIM"] = "Habilitar WIM",
@@ -218,7 +218,7 @@ local translations = {
     ["Invite to Party"] = "Invitar al Grupo",
     ["Add Friend"] = "Añadir Amigo",
     ["Ignore User"] = "Ignorar Usuario",
-    ["Are you sure you want to\nignore %s?"] = "¿Estás seguro de que quieres\nignorar %s?",
+    ["Are you sure you want to\nignore %s?"] = "¿Estás seguro de que quieres\nignorar a %s?",
     ["Right-Click for profile links..."] = "Haga clic derecho para enlaces de perfil...",
     ["Profile Links"] = "Enlaces de Perfil",
     ["Location"] = "Localización",
@@ -320,8 +320,8 @@ local translations = {
     ["Set Window Spawn Location"] = "Establecer ubicación de generación de ventana",
     ["Up"] = "Arriba",
     ["Down"] = "Abajo",
-    ["Left"] = "Izquierdo",
-    ["Right"] = "Derecho",
+    ["Left"] = "Izquierda",
+    ["Right"] = "Derecha",
     ["Cascade overlapping windows."] = "Ventanas superpuestas en cascada.",
     ["Ignore arrow keys in message box."] = "Ignorar las teclas de flecha en el cuadro de mensaje.",
     ["Allow <ESC> to hide windows."] = "Permitir que <ESC> oculte ventanas.",
@@ -471,7 +471,7 @@ local translations = {
     --Emoticons.lua
     ["Also"] = "También",
     ["More"] = "Más",
-    ["Emoticons"] = "Emoticones",
+    ["Emoticons"] = "Emoticonos",
 
     --Expose.lua
     ["Your conversations have been hidden in order to clear your screen while in combat. To disable this feature type"] = "Tus conversaciones se han ocultado para limpiar tu pantalla mientras estás en combate. Para deshabilitar esto escribir",
